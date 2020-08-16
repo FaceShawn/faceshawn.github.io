@@ -16,10 +16,7 @@ date: 2019-03-15 16:41:00
 updated: 2019-03-15 16:41:00
 ---
 
-## 摘要
-
->Git 是一款主流分布式版本管理系统，Github 是提供 Git 服务的一个主流网站，Github Desktop 是其客户端。
->
+> 摘要：Git 是一款主流分布式版本管理系统，Github 是提供 Git 服务的一个主流网站，Github Desktop 是其客户端。
 
 <!-- more -->
 
