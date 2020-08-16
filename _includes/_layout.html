@@ -14,6 +14,8 @@
   {% include _partials/head.html %}
   <title>{{ title }}</title>
   {% include _third-party/analytics/index.html %}
+  <!-- 页面点击小红心 -->
+  <script type="text/javascript" src="assets/js/src/love.js"></script>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="{{ page.lang | default: page.language | default: site.language }}">
@@ -82,5 +84,6 @@
   {% include _third-party/mathjax.html %}
   {% include _third-party/scroll-cookie.html %}
   {% include _third-party/exturl.html %}
+
 </body>
 </html>

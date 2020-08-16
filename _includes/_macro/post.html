@@ -202,9 +202,15 @@
 
           {% if site.busuanzi_count.enable and site.busuanzi_count.page_pv and is_index == false or is_index == nil%}
             <span class="post-meta-divider">|</span>
-            <span class="page-pv">{{ site.busuanzi_count.page_pv_header }}
-            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>{{ site.busuanzi_count.page_pv_footer }}
+            <span class="post-meta-item-icon">
+              <i class="fa fa-eye"></i>
             </span>
+            {{ site.busuanzi_count.page_pv_header }}
+              热度
+            <span class="" id="busuanzi_value_page_pv" >
+              ℃
+            </span>
+            {{ site.busuanzi_count.page_pv_footer }}
           {% endif %}
 
           {% if site.post_wordcount.wordcount or site.post_wordcount.min2read %}
