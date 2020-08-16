@@ -53,7 +53,22 @@
     }
   }
 
-  .post { margin: 30px 0; }
+  .post {
+    margin: 30px 0;
+  }
+
+  .post-block {
+
+  }
+
+  .post-block-cover {
+    float: left;
+    width: 100px;
+
+  }
+
+  .post-block-text {
+  }
 
   .post-header {
     position: relative;
