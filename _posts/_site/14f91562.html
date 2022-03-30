@@ -1,0 +1,267 @@
+<blockquote>
+  <p>摘要：Git 是一款主流分布式版本管理系统，Github 是提供 Git 服务的一个主流网站，Github Desktop 是其客户端。</p>
+</blockquote>
+
+<!-- more -->
+
+<hr />
+<h2 id="tortoisesvn">TortoiseSVN</h2>
+
+<p>应用：微信查 ip 上传到 SAE，本地和云应用同步，检出、导入、导出。免费送200云豆，每天12颗。</p>
+
+<p>1、curl模拟访问获取html页面</p>
+
+<p>2、解析html页面,用正则表达式将表格转换成数组;</p>
+
+<p>3、bootstrap 页面布局</p>
+
+<h2 id="svn-与-git-区别">SVN 与 Git 区别</h2>
+
+<ol>
+  <li>Git 是分布式的</li>
+  <li>没有分支，回滚显得混乱，用全局版本号代替</li>
+  <li>SVN：简单； Git：功能齐全</li>
+</ol>
+
+<h2 id="git-入门知识">Git 入门知识</h2>
+
+<ol>
+  <li><a href="https://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000">廖雪峰–史上最浅显易懂的Git教程</a></li>
+  <li><del><a href="https://github.com/xirong/my-git/blob/master/ixirong.com.md">Git入门指南使用资料汇总及文章推荐</a></del></li>
+</ol>
+
+<blockquote>
+  <p>版本控制的主要功能有备份、回滚、分支管理。</p>
+</blockquote>
+
+<h2 id="git-命令">Git 命令</h2>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 在 Master 分支上创建并切换到 dev 分支
+git branch dev master
+
+# 切换到 master 分支
+git checkout master
+
+# 在 Master 分支上创建并切换到 dev 分支
+git checkout -b dev master
+
+# 合并 dev 到当前分支
+# --no-ff 参数表示不执行快进式合并，不在当前分支留有 dev 的演进过程
+git merge --no-ff dev
+
+# 删除分支
+git branch -d fixbug-0.1
+</code></pre></div></div>
+
+<h3 id="通过-git--bashhttpsblogcsdnnetneuldparticledetails51883528版本回退"><del>通过 Git  Bash](https://blog.csdn.net/neuldp/article/details/51883528)版本回退</del></h3>
+
+<p>当不小心向远程仓库比如github做了一次错误的提交，想使本地和仓库回到某一个历史版本</p>
+
+<h5 id="1--可选--找到想要回到的-commit-id-版本号">1. [ 可选 ] 找到想要回到的 commit id （版本号）</h5>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. 在 GitHub Desktop 中根据 History-&gt;右键-&gt;Copy SHA 复制
+2. GitHub 网站
+3. Git Bash 命令行
+</code></pre></div></div>
+
+<h5 id="2--可选--进入本地仓库">2. [ 可选 ] 进入本地仓库</h5>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. 在本地仓库文件夹右键-&gt; Git Bash Here
+2. Git Bash 客户端通过 cd 命令
+3. 在 GitHub Desktop 中 `Ctrl + \` ` 在命令提示符中
+</code></pre></div></div>
+
+<h5 id="3-回退">3. 回退</h5>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 回退所有内容到上一个版本，省略文件名表示回退所有
+git reset HEAD^ `文件名`
+
+# 向前回退到第3个版本
+git reset –soft HEAD~3
+
+# 将本地的状态回退到和远程的一样
+# 这里origin是项目持有者的别称
+git reset --hard origin/master(easy way)
+git rebase FETCH_HEAD
+
+# 回退到某个版本
+git reset --hard `版本号`
+
+# 模式：git reset --&lt;mode&gt; [&lt;commit&gt;]
+# mode：
+#   --soft  退到某个版本，只回退了 commit 的信息，不会恢复到 index file 一级。如果还要提交，直接commit即可
+#   --mixed 此为默认方式，回退到某个版本，只保留源码，回退 commit 和 index 信息
+#   --hard  彻底回退到某个版本，本地的源码也会变为上一个版本的内容
+</code></pre></div></div>
+
+<h5 id="4-提交到远程仓库">4. 提交到远程仓库</h5>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git push --force
+</code></pre></div></div>
+
+<h2 id="git-分支管理策略">Git 分支管理策略</h2>
+
+<ol>
+  <li><a href="http://www.ruanyifeng.com/blog/2012/07/git.html">Git分支管理策略</a></li>
+  <li><a href="https://blog.csdn.net/cs958903980/article/details/53896411">Git 开发部署流程</a></li>
+  <li><a href="https://blog.csdn.net/ddnosh/article/details/78996628">Git 版本管理规范 </a></li>
+  <li><a href="https://www.oschina.net/translate/a-successful-git-branching-model">介绍一个成功的 Git 分支模型</a></li>
+  <li><a href="https://segmentfault.com/a/1190000003739324">使用 git 和 github 管理自己的项目—真实开发环境的策略</a></li>
+</ol>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"> </th>
+      <th style="text-align: center">分支</th>
+      <th style="text-align: center">命名</th>
+      <th style="text-align: center">创建自</th>
+      <th style="text-align: center">合并入</th>
+      <th style="text-align: left">功能</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">常设</td>
+      <td style="text-align: center">主分支</td>
+      <td style="text-align: center">master</td>
+      <td style="text-align: center">/</td>
+      <td style="text-align: center">/</td>
+      <td style="text-align: left">用于正式发布，是稳定可用的版本，发布后需打上 tag</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">常设</td>
+      <td style="text-align: center">开发分支</td>
+      <td style="text-align: center">develop</td>
+      <td style="text-align: center">master</td>
+      <td style="text-align: center">master</td>
+      <td style="text-align: left">用于日常开发，是功能最新的分支。</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">常设</td>
+      <td style="text-align: center">功能分支</td>
+      <td style="text-align: center">feature</td>
+      <td style="text-align: center">develop</td>
+      <td style="text-align: center">/</td>
+      <td style="text-align: left">==定制版、OEM版，==开发周期长，一般与develop分支处于并行关系</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">临时</td>
+      <td style="text-align: center">功能分支</td>
+      <td style="text-align: center">feature/weixin_recharge 按照功能点（而不是需求）命名</td>
+      <td style="text-align: center">develop</td>
+      <td style="text-align: center">本地仓库的develop</td>
+      <td style="text-align: left">新功能，==预发布成功后== 删除此分支</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">临时</td>
+      <td style="text-align: center">修补分支</td>
+      <td style="text-align: center"><del>fixbug</del> hotfix/#1 通过平台生成的问题编号来 命名</td>
+      <td style="text-align: center">master</td>
+      <td style="text-align: center">master &amp; develop</td>
+      <td style="text-align: left">生产环境紧急bug修复</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">临时</td>
+      <td style="text-align: center">预发布分支</td>
+      <td style="text-align: center">release/#1.2</td>
+      <td style="text-align: center">develop</td>
+      <td style="text-align: center">master &amp; develop</td>
+      <td style="text-align: left">待发布版本的提测及修复 bug，提交到 master 时需打 tag</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>release 分支 merge 到 master 分支后，需要打 tag，以便将来引用这个版本</p>
+
+  <p>临时分支使用完应删除</p>
+</blockquote>
+
+<p><img src="assets/20180107192018976.png" alt="20180107192018976" /></p>
+
+<h2 id="github-desktop-客户端">Github Desktop 客户端</h2>
+
+<ol>
+  <li><a href="https://blog.csdn.net/chenliguan/article/details/51072809">Github 的 SSH 配置</a></li>
+  <li><a href="https://blog.csdn.net/qq_25269835/article/details/70177314">GitHub for Windows 客户端的使用教程</a></li>
+</ol>
+
+<blockquote>
+  <p>使用迅雷下载 https://desktop.github.com/ 会快点</p>
+</blockquote>
+
+<h3 id="项目初始化">项目初始化</h3>
+
+<blockquote>
+  <p>项目最好存储在纯英文路径下</p>
+</blockquote>
+
+<h4 id="创建项目">创建项目</h4>
+
+<blockquote>
+  <p>一般在某一文件夹，如使用 IDE 创建项目文件夹之后，将此项目文件夹创建为 Git 项目。</p>
+</blockquote>
+
+<h4 id="添加本地项目">添加本地项目</h4>
+
+<blockquote>
+  <p>此时项目中应有 /.git 文件夹，表示这是一个 git 项目，操作是将其添加入本地仓库。</p>
+</blockquote>
+
+<h4 id="从-github-服务器克隆项目">从 Github 服务器克隆项目</h4>
+
+<blockquote>
+  <p>fork 指将别人的项目拷贝到自己的账户中。</p>
+
+  <p>clone 指将在 Github 网站上的项目克隆到本地计算机的仓库中，默认是自己的项目，可以通过 URL 克隆其他用户的项目。</p>
+
+  <p>克隆时本地文件夹可重命名。</p>
+</blockquote>
+
+<h3 id="remove-项目">remove 项目</h3>
+
+<blockquote>
+  <p>默认只是将项目移出本地仓库，勾选之后才删除项目到回收站。</p>
+</blockquote>
+
+<h3 id="更改本地项目存储位置">更改本地项目存储位置</h3>
+
+<blockquote>
+  <p>将本地项目移动到其它路径下</p>
+</blockquote>
+
+<ol>
+  <li><del>通过设置 Options-clone 里面的路径，v1.6.5 中没有发现这个功能</del></li>
+  <li>直接将项目文件夹移动到目标位置，打开 Github Desktop 项目时会提示重新定位（locate）。或手动将项目重新添加到本地仓库即可</li>
+</ol>
+
+<h3 id="通过-github-desktop-版本回退"><a href="https://www.cnblogs.com/lqcdsns/p/5265665.html">通过 GitHub Desktop 版本回退</a></h3>
+
+<h5 id="1-在本地仓库-commit-to-master-未-push-到远程仓库">1. 在本地仓库 commit to master 未 push 到远程仓库</h5>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>undo ##### 2. 已 push 到远程仓库
+
+History-&gt;右键-&gt;Reserve this commit
+commit to master
+push
+</code></pre></div></div>
+
+<h2 id="错误处理">错误处理</h2>
+
+<p><a href="https://www.jianshu.com/p/0acf732eab68">使用git时出现：warning: LF will be replaced by CRLF</a></p>
+
+<h3 id="提交失败">提交失败</h3>
+
+<ul>
+  <li>
+    <p><a href="https://segmentfault.com/q/1010000004014275/a-1020000004044485">Github 提交失败 fatal: unable to access</a></p>
+  </li>
+  <li>
+    <p>代理错误：<a href="https://blog.csdn.net/qq_27093465/article/details/71210203">Git push时报错：Failed connect to github.com:443; No error和The remote end hung up unexpectedly</a></p>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git config --global http.proxy "localhost:1080"
+git config --global https.proxy "localhost:1080"
+</code></pre></div>    </div>
+  </li>
+</ul>
