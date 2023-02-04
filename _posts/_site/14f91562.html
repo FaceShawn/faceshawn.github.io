@@ -5,182 +5,958 @@
 <!-- more -->
 
 <hr />
-<h2 id="tortoisesvn">TortoiseSVN</h2>
 
-<p>应用：微信查 ip 上传到 SAE，本地和云应用同步，检出、导入、导出。免费送200云豆，每天12颗。</p>
+<h2 id="idea-集成开发环境">IDEA 集成开发环境</h2>
 
-<p>1、curl模拟访问获取html页面</p>
+<h3 id="编辑器-ui界面">编辑器 UI界面</h3>
 
-<p>2、解析html页面,用正则表达式将表格转换成数组;</p>
+<h3 id="快捷键">快捷键</h3>
 
-<p>3、bootstrap 页面布局</p>
+<ul>
+  <li><a href="https://github.com/judasn/IntelliJ-IDEA-Tutorial/blob/master/keymap-introduce.md">Keymap Windows copy 快捷键用法</a></li>
+</ul>
 
-<h2 id="svn-与-git-区别">SVN 与 Git 区别</h2>
+<h5 id="ctrl">Ctrl</h5>
 
-<ol>
-  <li>Git 是分布式的</li>
-  <li>没有分支，回滚显得混乱，用全局版本号代替</li>
-  <li>SVN：简单； Git：功能齐全</li>
-</ol>
+<ul>
+  <li><code class="highlighter-rouge">Ctrl + D</code>	复制光标所在行 或 选中的内容，并插入到光标后</li>
+  <li><code class="highlighter-rouge">Ctrl + E</code>	显示最近打开的文件记录列表</li>
+  <li><code class="highlighter-rouge">Ctrl + F </code>    查找使用此类的成员</li>
+  <li><code class="highlighter-rouge">Ctrl + J</code>	插入自定义动态代码模板</li>
+  <li><code class="highlighter-rouge">Ctrl + U</code>     实现类跳转到接口的方法</li>
+  <li><code class="highlighter-rouge">Ctrl + Y</code>	删除光标所在行 或 选中行</li>
+  <li><code class="highlighter-rouge">Ctrl + /</code> 、<code class="highlighter-rouge">Ctrl + Shift + /</code>：注释单行、多行</li>
+  <li><code class="highlighter-rouge">Ctrl + \</code>、<code class="highlighter-rouge">Ctrl + Alt + N/B</code>：<em>根据 URL 直接跳转到对应的方法定义</em></li>
+  <li><code class="highlighter-rouge">Ctrl + ;</code> 基础代码补全</li>
+  <li><code class="highlighter-rouge">Ctrl + .</code> 自动补全？</li>
+  <li><code class="highlighter-rouge">Ctrl + [</code>、<code class="highlighter-rouge">Ctrl + ]</code> 移动光标到花括号开始、结束位置</li>
+  <li><code class="highlighter-rouge">Ctrl + Shift + [</code>	选中从光标到中括号开始位置</li>
+  <li><code class="highlighter-rouge">Ctrl + =/-</code>   展开、折叠分</li>
+  <li><code class="highlighter-rouge">Ctrl + Shift + =/-</code> 全部展开、折叠</li>
+  <li><code class="highlighter-rouge">Ctrl + F12</code>    Structure面板
+    <ul>
+      <li><code class="highlighter-rouge">Alt + 7</code>    方法大纲</li>
+    </ul>
+  </li>
+</ul>
 
-<h2 id="git-入门知识">Git 入门知识</h2>
+<h5 id="alt">Alt</h5>
 
-<ol>
-  <li><a href="https://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000">廖雪峰–史上最浅显易懂的Git教程</a></li>
-  <li><del><a href="https://github.com/xirong/my-git/blob/master/ixirong.com.md">Git入门指南使用资料汇总及文章推荐</a></del></li>
-</ol>
+<ul>
+  <li>Alt +  `	显示版本控制菜单</li>
+  <li><del><code class="highlighter-rouge">Alt + F1</code> + <code class="highlighter-rouge">1</code>、 <code class="highlighter-rouge">Alt + 1</code> + <code class="highlighter-rouge">1</code>：定位当前文件所在 Project 窗口中的位置，已用<code class="highlighter-rouge">Always Select Opened File</code>设为自动定位</del></li>
+  <li><code class="highlighter-rouge">Alt + F3</code>    在当前文件查找</li>
+  <li><code class="highlighter-rouge">Alt + Insert</code>	代码自动生成，如生成对象的 set / get 方法，构造函数，toString() 等</li>
+  <li><code class="highlighter-rouge">Alt + Enter</code>     查询控制台<code class="highlighter-rouge">Query Console</code>编辑器中，提示功能，如<code class="highlighter-rouge">SELECT *</code>语句选中<code class="highlighter-rouge">*</code>扩展成相关列、列添加别名前缀
+    <ul>
+      <li>Free MyBatis Plugin直接生成新方法的xml实现</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">Alt + F</code>      Find in file，在所有文件中查找字符串</li>
+</ul>
+
+<h5 id="shift">Shift</h5>
+
+<h5 id="ctrl--alt">Ctrl + Alt</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">Ctrl + Alt + S</code>	打开系统设置</li>
+  <li><code class="highlighter-rouge">Ctrl + Alt + 左方向键</code>	退回到上一个操作处/光标所在位置，与显卡调整屏幕方向的快捷键冲突</li>
+  <li><code class="highlighter-rouge">Ctrl + Alt + B/鼠标左键</code>    接口跳转到实现方法、XML 映射文件</li>
+  <li><code class="highlighter-rouge">Ctrl + Alt + C</code>	重构-快速提取常量</li>
+  <li><code class="highlighter-rouge">Ctrl + Alt + F</code>	重构-快速提取成员变量</li>
+  <li><code class="highlighter-rouge">Ctrl + Alt + L</code>    自动格式化、格式化SQL语句；</li>
+  <li><code class="highlighter-rouge">Ctrl + Alt + M</code>	重构-快速提取方法、接口</li>
+  <li><code class="highlighter-rouge">Ctrl + Alt + P</code>	重构-快速提取参数</li>
+  <li><code class="highlighter-rouge">Ctrl + Alt + V</code>	重构-快速提取变量</li>
+</ul>
+
+<h5 id="ctrl--shift">Ctrl + Shift</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">Ctrl + Shift + +</code>	展开所有代码</li>
+  <li><code class="highlighter-rouge">Ctrl + Shift + Space</code>	智能代码提示</li>
+  <li><code class="highlighter-rouge">Ctrl + Shift + "</code>	    最大化工具窗口、控制台</li>
+  <li><code class="highlighter-rouge">Ctrl + Shift + F12</code>	    编辑器最大化</li>
+  <li><del><code class="highlighter-rouge">Ctrl + Shift + F</code>    Find by XPath expression</del></li>
+  <li><code class="highlighter-rouge">Ctrl + Shift + R</code>	替换</li>
+  <li><code class="highlighter-rouge">Ctrl + Shift + T</code>	重新打开关闭的选项卡、<del>对当前类生成单元测试类，如果已存在的单元测试类则可进行选择</del></li>
+  <li><code class="highlighter-rouge">Ctrl + Shift + U</code>    变量大小写切换；方法继承关系表Diagram</li>
+</ul>
+
+<h5 id="alt--shift">Alt + Shift</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">Alt + Shift + 前方向键</code>	上移光标所在行</li>
+</ul>
+
+<h5 id="智能补全">智能补全</h5>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//Press Enter to insert, Tab to replace
+//ctrl + . select first default，自动补全
+//psvm + ctrl+.
+public static void main(String[] args) {}
+
+//sout
+System.out.println();
+//soutm
+System.out.println("Main.main");
+//soutp
+System.out.println("args = " + Arrays.deepToString(args));
+//soutv
+System.out.println("args = " + args);
+
+//123.var
+int i = 123;
+//new File().var
+File file = new File();
+
+//expression.if
+if (args.length &gt; 1) {}
+
+//variable.nn
+if (args != null) {}
+
+//args.for
+for (String arg : args) {}
+
+//args.fori
+for (int i = 0; i &lt; args.length; i++) {}
+
+//args.forr
+for (int i = args.length - 1; i &gt;= 0; i--) {}
+
+//statment.try
+//语句外层加try...catch
+
+//dep + Enter in pom.xml
+//生成依赖模板
+C:\Program Files\Java\jdk1.8.0_92
+D:\Develop\Java\jdk\jdk1.8.0_311\;D:\Develop\Java\jdk\jdk1.8.0_311\bin\;C:\Program Files\Common Files\Oracle\Java\javapath\
+</code></pre></div></div>
+
+<h3 id="常用插件">常用插件</h3>
+
+<ul>
+  <li>
+    <p><a href="https://github.com/judasn/IntelliJ-IDEA-Tutorial/blob/master/plugins-settings.md#插件推荐">插件推荐</a></p>
+  </li>
+  <li>
+    <p>IDE Eval Resetter 无限试用</p>
+  </li>
+  <li>
+    <p><strong>Rainbow Brackets</strong>（括号彩色插件）和Material Theme UI（主题插件）冲突，手动配置Rainbow Brackets来兼容Solarized Themes日晒主题的配色方案：</p>
+
+    <p>方案1（最佳颜色配置）</p>
+
+    <p>Color #1：E6B422</p>
+
+    <p>Color #2：43A047</p>
+
+    <p>Color #3：2196F3</p>
+
+    <p>Color #4：3F51B5</p>
+
+    <p>Color #5：00897B</p>
+
+    <p>方案2（稍微亮一些的 配色）</p>
+
+    <p>Color #1：E8B622</p>
+
+    <p>Color #2：59DD5D</p>
+
+    <p>Color #3：21A2FF</p>
+
+    <p>Color #4：E669DA</p>
+
+    <p>Color #5：00D1C1</p>
+  </li>
+  <li>
+    <p>jclasslib ByteCode Viewer 字节码查看器，反编译 .class 文件</p>
+  </li>
+  <li>
+    <p>Lombok：简化对象封装，通过为实体类添加<code class="highlighter-rouge">@Getter</code>和<code class="highlighter-rouge">@Setter</code>注解，替换手写的 Setter、Getter、toString、equals、hashCode 及非空判断等。</p>
+  </li>
+  <li>
+    <p>Free MyBatis Plugin：可在Mapper接口的方法和xml实现间自由跳转，也可用来一键生成某些xml实现。</p>
+  </li>
+  <li>
+    <p>MyBatis Log Plugin：把Mybatis输出的SQL日志还原成完整的SQL语句</p>
+  </li>
+  <li>
+    <p>RestfulToolkit：一套Restful服务开发辅助工具集，提供了项目中的接口概览信息，可根据URL跳转到对应的接口方法中去，内置了HTTP请求工具，对请求方法做了一些增强功能，功能很强大！</p>
+
+    <ul>
+      <li>右侧的<code class="highlighter-rouge">RestServices</code>按钮显示项目中接口的概览信息；</li>
+      <li>在接口方法上右键可生成查询参数、请求参数、请求URL；</li>
+      <li>在实体类上右键可直接生成实体类对应的JSON；</li>
+    </ul>
+  </li>
+  <li>
+    <p>Translation：选中内容，点击右键翻译源码注释等；</p>
+  </li>
+  <li>
+    <p><del>GsonFormat：在实体类名上右键<code class="highlighter-rouge">Generate -&gt; GsonFormat</code>，可根据JSON格式的字符串创建实体类</del></p>
+  </li>
+  <li>
+    <p>Grep Console：用于分析控制台日志，可对不同级别的日志进行不同颜色的高亮显示，还可按关键字搜索日志内容。</p>
+  </li>
+  <li>
+    <p>Alibaba Java Coding Guidelines：实时检测代码中不符合阿里巴巴《Java 开发手册》规约的地方</p>
+  </li>
+  <li>
+    <p>Maven Helper：用于快速查找项目中的依赖冲突并解决</p>
+
+    <ul>
+      <li>通过<code class="highlighter-rouge">pom.xml</code>文件底部的<code class="highlighter-rouge">依赖分析</code>标签页查看当前项目中的所有依赖；</li>
+    </ul>
+  </li>
+  <li>
+    <p>Statistic：通过顶部菜单中的<code class="highlighter-rouge">View-&gt;Tool Windows-&gt;Statistic</code>按钮统计当前项目中代码的行数和大小；</p>
+  </li>
+  <li>
+    <p>element：Element-UI支持插件，可对Element-UI中的标签进行智能提示</p>
+  </li>
+</ul>
+
+<h2 id="linux-开发">Linux 开发</h2>
+
+<h3 id="shell编程">Shell编程</h3>
+
+<h5 id="shell简单命令">Shell简单命令</h5>
+
+<p>netstat -an 这种的。</p>
+
+<h5 id="shell编程-1">shell编程</h5>
+
+<p>如排序一个字符串文件，找出一个文件中重复的字符串等</p>
+
+<h3 id="打包压缩">打包/压缩</h3>
+
+<p>tar [必要参数] [可选参数] [文件名]</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tar -cvf p.tar  #打包
+tar -xvf p.tar ./   #解包
+</code></pre></div></div>
+
+<h3 id="bash">bash</h3>
+
+<p>bash是一个命令处理器，是Linux的默认shell。</p>
+
+<h3 id="文件操作">文件操作</h3>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ls 命令
+-R //Recursion，递归展示子文件夹下的文件
+-r //reverse，倒序
+-l //详细信息
+
+mkdir命令
+-p //p表示若无上层文件夹，则新建
+
+// 给当前用户分配rwx(7)，同组分配-wx(5)，其他用户分配--x(1)的权限
+chmod 751 filename
+</code></pre></div></div>
+
+<h3 id="其他">其他</h3>
+
+<ul>
+  <li>&amp; // 连接命令</li>
+  <li>touch 新建文件</li>
+  <li>du -h –max-depth=2 /home #查看指定目录下文件/夹大小</li>
+  <li>tree -h -L 4 #树形显示</li>
+</ul>
+
+<h3 id="编辑器">编辑器</h3>
+
+<ul>
+  <li>Vi</li>
+  <li>Vim：Vi IMproved，升级版，在大多数Linux系统中都有。要求全部键盘操作.</li>
+  <li>Gvim：Vim的图形化界面，可跨平台。可用鼠标可视化操作。</li>
+</ul>
+
+<h4 id="普通模式">普通模式</h4>
+
+<ul>
+  <li>Vim启动后的默认模式。</li>
+</ul>
+
+<h5 id="文件编辑">文件编辑</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">w</code> 保存</li>
+  <li><code class="highlighter-rouge">q</code> 退出</li>
+  <li><code class="highlighter-rouge">wq</code></li>
+  <li><code class="highlighter-rouge">q!</code></li>
+  <li>普通模式命令往往需要一个操作符结尾。如命令”dd”删除当前行，但是第一个”d”的后面可以跟另外的移动命令来代替第二个”d”，如用移动到下一行的”j”键就可删除当前行和下一行。</li>
+  <li>还可指定命令重复次数，”2dd”（重复”dd”两次），和”dj”效果一样。</li>
+  <li><code class="highlighter-rouge">u</code>：undo，撤销上次操作</li>
+  <li><code class="highlighter-rouge">^R/ctrl+r</code>：redo，重做</li>
+  <li><code class="highlighter-rouge">:↑</code> 选择上一条命令，在本页执行？</li>
+  <li><code class="highlighter-rouge">:!!</code> 重复上一条系统命令</li>
+  <li><code class="highlighter-rouge">:!↑</code> 选择上一条系统命令</li>
+</ul>
+
+<blockquote>
+  <p>输入前几个字母，再使用tab或导航↑ 键即可以前的命令中自动补全</p>
+</blockquote>
+
+<h5 id="移动">移动</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">m-2</code> 上移一行</li>
+</ul>
+
+<h5 id="查找选择正则匹配">查找/选择/正则匹配</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">*</code> 选择所有当前单词</li>
+  <li><code class="highlighter-rouge">shift + h + v + g</code> 全选</li>
+  <li><code class="highlighter-rouge">/</code> 向后查找</li>
+  <li><code class="highlighter-rouge">%</code> 向前查找</li>
+  <li><code class="highlighter-rouge">n</code>  下一个</li>
+  <li><code class="highlighter-rouge">N</code>  上一个</li>
+</ul>
+
+<h4 id="插入模式命令模式">插入模式/命令模式?</h4>
+
+<ul>
+  <li><code class="highlighter-rouge">d</code> 半角？</li>
+  <li><code class="highlighter-rouge">dd</code> 剪切</li>
+  <li><code class="highlighter-rouge">dw</code> delete word 删除一个单词</li>
+  <li><code class="highlighter-rouge">p/P</code> 在光标后/前粘贴</li>
+  <li><code class="highlighter-rouge">y</code> 复制</li>
+  <li>大多数按键都会向文本缓冲区中插入文本。</li>
+</ul>
+
+<h5 id="替换">替换</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">s</code> switch替换</li>
+  <li><code class="highlighter-rouge">g</code> global全局</li>
+  <li><code class="highlighter-rouge">%</code> 每行的第一个位置</li>
+  <li><code class="highlighter-rouge">:%s/src/dst/g</code> 将全文所有的 src 替换为 dst</li>
+  <li><del><code class="highlighter-rouge">:s/src/dst</code>  将本行的第一个 src 替换为 dst</del></li>
+  <li><code class="highlighter-rouge">:s/src/dst/g</code>  将本行的所有 src 替换为 dst，使用<code class="highlighter-rouge">&amp;</code>重复文本替换</li>
+</ul>
+
+<h4 id="可视模式">可视模式</h4>
+
+<ul>
+  <li>移动命令会扩大高亮的文本区域。高亮区域可是字符、行或者是一块文本。</li>
+  <li>当执行一个非移动命令时，命令会被执行到这块高亮的区域上。</li>
+  <li>==Vim的”文本对象”也能和移动命令一样用在这个模式中。==</li>
+  <li><code class="highlighter-rouge">Vyp</code> 复制当前行</li>
+</ul>
+
+<h4 id="选择模式">选择模式</h4>
+
+<ul>
+  <li>可用鼠标或光标键高亮选择文本，不过输入任何字符的话，Vim会用这个字符替换选择的高亮文本块，并自动进入插入模式。</li>
+  <li>进入visual模式
+    <ul>
+      <li><code class="highlighter-rouge">v</code>：按字符选择</li>
+      <li><code class="highlighter-rouge">V</code>：按行选择</li>
+      <li><code class="highlighter-rouge">ctrl+V</code>：按块选择，可竖排选择</li>
+    </ul>
+  </li>
+  <li>光标移动命令（跳转，定位）
+    <ul>
+      <li><code class="highlighter-rouge">H</code>：Head，跳到本页开头</li>
+      <li><code class="highlighter-rouge">G</code>：跳到本页结尾</li>
+      <li><code class="highlighter-rouge">0或^</code>：跳到行首</li>
+      <li><code class="highlighter-rouge">$</code>：跳到行尾</li>
+      <li><code class="highlighter-rouge">b</code>：跳到上个单词首字符</li>
+      <li><code class="highlighter-rouge">e</code>：跳到下个单词尾字符</li>
+      <li><del><code class="highlighter-rouge">w</code>：跳到下个单词首字符</del></li>
+      <li><code class="highlighter-rouge">-</code>：跳到上一行行首</li>
+      <li><code class="highlighter-rouge">+</code>：跳到下一行行首</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="命令行模式">命令行模式</h4>
+
+<ul>
+  <li>执行命令（”:”键）</li>
+  <li>搜索（”/”和”?”键）</li>
+  <li>过滤命令（”!”键）</li>
+  <li>在命令执行之后，Vim返回到命令行模式之前的模式，通常是普通模式。</li>
+  <li><code class="highlighter-rouge">ctrl + n/p</code>  自动补全</li>
+</ul>
+
+<h4 id="ex模式">Ex模式</h4>
+
+<ul>
+  <li>这和命令行模式比较相似，在用”:visual”命令离开Ex模式前，可一次执行多条命令。</li>
+</ul>
+
+<h2 id="git-代码管理版本控制">Git 代码管理/版本控制</h2>
+
+<h3 id="认识git">认识Git</h3>
 
 <blockquote>
   <p>版本控制的主要功能有备份、回滚、分支管理。</p>
 </blockquote>
 
-<h2 id="git-命令">Git 命令</h2>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 在 Master 分支上创建并切换到 dev 分支
-git branch dev master
-
-# 切换到 master 分支
-git checkout master
-
-# 在 Master 分支上创建并切换到 dev 分支
-git checkout -b dev master
-
-# 合并 dev 到当前分支
-# --no-ff 参数表示不执行快进式合并，不在当前分支留有 dev 的演进过程
-git merge --no-ff dev
-
-# 删除分支
-git branch -d fixbug-0.1
-</code></pre></div></div>
-
-<h3 id="通过-git--bashhttpsblogcsdnnetneuldparticledetails51883528版本回退"><del>通过 Git  Bash](https://blog.csdn.net/neuldp/article/details/51883528)版本回退</del></h3>
-
-<p>当不小心向远程仓库比如github做了一次错误的提交，想使本地和仓库回到某一个历史版本</p>
-
-<h5 id="1--可选--找到想要回到的-commit-id-版本号">1. [ 可选 ] 找到想要回到的 commit id （版本号）</h5>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. 在 GitHub Desktop 中根据 History-&gt;右键-&gt;Copy SHA 复制
-2. GitHub 网站
-3. Git Bash 命令行
-</code></pre></div></div>
-
-<h5 id="2--可选--进入本地仓库">2. [ 可选 ] 进入本地仓库</h5>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. 在本地仓库文件夹右键-&gt; Git Bash Here
-2. Git Bash 客户端通过 cd 命令
-3. 在 GitHub Desktop 中 `Ctrl + \` ` 在命令提示符中
-</code></pre></div></div>
-
-<h5 id="3-回退">3. 回退</h5>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 回退所有内容到上一个版本，省略文件名表示回退所有
-git reset HEAD^ `文件名`
-
-# 向前回退到第3个版本
-git reset –soft HEAD~3
-
-# 将本地的状态回退到和远程的一样
-# 这里origin是项目持有者的别称
-git reset --hard origin/master(easy way)
-git rebase FETCH_HEAD
-
-# 回退到某个版本
-git reset --hard `版本号`
-
-# 模式：git reset --&lt;mode&gt; [&lt;commit&gt;]
-# mode：
-#   --soft  退到某个版本，只回退了 commit 的信息，不会恢复到 index file 一级。如果还要提交，直接commit即可
-#   --mixed 此为默认方式，回退到某个版本，只保留源码，回退 commit 和 index 信息
-#   --hard  彻底回退到某个版本，本地的源码也会变为上一个版本的内容
-</code></pre></div></div>
-
-<h5 id="4-提交到远程仓库">4. 提交到远程仓库</h5>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git push --force
-</code></pre></div></div>
-
-<h2 id="git-分支管理策略">Git 分支管理策略</h2>
+<h5 id="tortoisesvn-与-git-区别">TortoiseSVN 与 Git 区别</h5>
 
 <ol>
-  <li><a href="http://www.ruanyifeng.com/blog/2012/07/git.html">Git分支管理策略</a></li>
-  <li><a href="https://blog.csdn.net/cs958903980/article/details/53896411">Git 开发部署流程</a></li>
-  <li><a href="https://blog.csdn.net/ddnosh/article/details/78996628">Git 版本管理规范 </a></li>
-  <li><a href="https://www.oschina.net/translate/a-successful-git-branching-model">介绍一个成功的 Git 分支模型</a></li>
-  <li><a href="https://segmentfault.com/a/1190000003739324">使用 git 和 github 管理自己的项目—真实开发环境的策略</a></li>
+  <li>SVN：是集中式的版本控制系统，中央服务器，简单； CVS、Subversion等
+    <ol>
+      <li>保存一组基本文件和每个文件随时间逐步累积的差异。</li>
+      <li>增量多的话，得到最终文件耗时长。</li>
+      <li>缺点是必须联网才能工作；</li>
+      <li>易发生单点故障；严重依赖中央服务器，安全性低。</li>
+    </ol>
+  </li>
+  <li>Git：是分布式的版本控制系统；
+    <ol>
+      <li>用直接记录快照的方式，而非差异比较。对当前的全部文件制作一个快照并保存其索引。 跟踪并管理的是修改，而非文件。</li>
+      <li>为了高效，不再重新存储没有修改的文件，只保留一个链接指向之前存储的文件。</li>
+      <li>每个客户端都有代码仓库的完整镜像，<strong>不用联网</strong>；</li>
+      <li>多个镜像安全性高。实际应用时也有一台充当“中央服务器”的电脑，但仅是用来方便“交换”大家的修改，没有也可以。</li>
+      <li>强大的分支管理。</li>
+      <li>开源。</li>
+    </ol>
+  </li>
 </ol>
 
-<table>
-  <thead>
-    <tr>
-      <th style="text-align: center"> </th>
-      <th style="text-align: center">分支</th>
-      <th style="text-align: center">命名</th>
-      <th style="text-align: center">创建自</th>
-      <th style="text-align: center">合并入</th>
-      <th style="text-align: left">功能</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="text-align: center">常设</td>
-      <td style="text-align: center">主分支</td>
-      <td style="text-align: center">master</td>
-      <td style="text-align: center">/</td>
-      <td style="text-align: center">/</td>
-      <td style="text-align: left">用于正式发布，是稳定可用的版本，发布后需打上 tag</td>
-    </tr>
-    <tr>
-      <td style="text-align: center">常设</td>
-      <td style="text-align: center">开发分支</td>
-      <td style="text-align: center">develop</td>
-      <td style="text-align: center">master</td>
-      <td style="text-align: center">master</td>
-      <td style="text-align: left">用于日常开发，是功能最新的分支。</td>
-    </tr>
-    <tr>
-      <td style="text-align: center">常设</td>
-      <td style="text-align: center">功能分支</td>
-      <td style="text-align: center">feature</td>
-      <td style="text-align: center">develop</td>
-      <td style="text-align: center">/</td>
-      <td style="text-align: left">==定制版、OEM版，==开发周期长，一般与develop分支处于并行关系</td>
-    </tr>
-    <tr>
-      <td style="text-align: center">临时</td>
-      <td style="text-align: center">功能分支</td>
-      <td style="text-align: center">feature/weixin_recharge 按照功能点（而不是需求）命名</td>
-      <td style="text-align: center">develop</td>
-      <td style="text-align: center">本地仓库的develop</td>
-      <td style="text-align: left">新功能，==预发布成功后== 删除此分支</td>
-    </tr>
-    <tr>
-      <td style="text-align: center">临时</td>
-      <td style="text-align: center">修补分支</td>
-      <td style="text-align: center"><del>fixbug</del> hotfix/#1 通过平台生成的问题编号来 命名</td>
-      <td style="text-align: center">master</td>
-      <td style="text-align: center">master &amp; develop</td>
-      <td style="text-align: left">生产环境紧急bug修复</td>
-    </tr>
-    <tr>
-      <td style="text-align: center">临时</td>
-      <td style="text-align: center">预发布分支</td>
-      <td style="text-align: center">release/#1.2</td>
-      <td style="text-align: center">develop</td>
-      <td style="text-align: center">master &amp; develop</td>
-      <td style="text-align: left">待发布版本的提测及修复 bug，提交到 master 时需打 tag</td>
-    </tr>
-  </tbody>
-</table>
+<h5 id="git的三个区域">Git的三个区域</h5>
+
+<p>三种状态：</p>
+
+<ol>
+  <li><strong>已修改（modified）</strong>：表示已修改了文件，但还没添加到暂存区。
+    <ol>
+      <li>手动把文件恢复到上一个版本的状态；</li>
+      <li><code class="highlighter-rouge">git checkout -- readme.txt</code> <a href="#checkout">撤销readme.txt文件在工作区的全部修改</a>。</li>
+    </ol>
+  </li>
+  <li><strong>已暂存（staged）</strong>：表示对一个已修改文件的当前版本做了标记，使之包含在下次提交的快照中。
+    <ul>
+      <li><code class="highlighter-rouge">git reset HEAD readme.txt</code> 可撤销暂存区的修改，重新放回工作区。</li>
+    </ul>
+  </li>
+  <li><strong>已提交（committed）</strong>：数据已安全的保存在本地仓库中。
+    <ol>
+      <li>未把本地版本库推送到远程版本库：</li>
+      <li>已把错误修改提交推送到远程版本库：</li>
+    </ol>
+  </li>
+</ol>
+
+<p>三个工作区域/工作流：</p>
+
+<ol>
+  <li>工作目录（Working Directory）：持有实际文件；用<code class="highlighter-rouge">git add</code>把文件修改（快照）添加到暂存区；</li>
+  <li>暂存区（Index / Staging Area）：暂存文件修改，等待commit；用<code class="highlighter-rouge">git commit</code>提交更改到仓库，实际上就是一次性提交暂存区的所有修改（快照）到当前分支。与SVN的区别。</li>
+  <li>Git 仓库(.git directory、Repository)：永久记录文件或目录状态，存储着内容修改的历史提交记录。分布式开发 + 集中式管理。
+    <ol>
+      <li>远程仓库、origin 原始仓库、源仓库： 配有专用的服务器，为了多人共享而建立的数据库。汇总参与该项目的各个开发者的代码；存放趋于稳定和可发布的代码。只有项目管理者能对其进行较高权限的操作。</li>
+      <li>本地仓库：为了方便用户个人使用，在自己的机器上配置的数据库。</li>
+    </ol>
+  </li>
+</ol>
+
+<p><img src="assets/repository_area.png" alt="git-repo" style="zoom: 80%;" /></p>
+
+<p>基本的 Git 工作流程如下：</p>
+
+<p><img src="assets/basic-usage.svg" alt="img" style="zoom: 67%;" /></p>
+
+<h5 id="git-参考">Git 参考</h5>
+
+<ol>
+  <li><a href="https://marklodato.github.io/visual-git-guide/index-zh-cn.htm">图解Git</a></li>
+  <li><a href="https://rogerdudler.github.io/git-guide/index.zh.html">git - 简明指南</a></li>
+  <li><a href="https://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000">廖雪峰–史上最浅显易懂的Git教程</a></li>
+  <li><a href="https://segmentfault.com/a/1190000003728094">使用git和github管理自己的项目—基础操作学习</a></li>
+  <li><a href="http://www.cheat-sheets.org/saved-copy/git-cheat-sheet.pdf">Git Cheat Sheet</a></li>
+  <li><a href="https://learngitbranching.js.org/">Git 学习 可视化提交树</a></li>
+  <li><del><a href="https://github.com/xirong/my-git/blob/master/ixirong.com.md">Git入门指南使用资料汇总及文章推荐</a></del></li>
+</ol>
+
+<h3 id="git-命令">Git 命令</h3>
+
+<h4 id="git-常用命令思维导图"><a href="https://www.cnblogs.com/1-2-3/archive/2010/07/18/git-commands.html">Git 常用命令思维导图</a></h4>
+
+<p><img src="assets/2010072023345292.png" alt="img" style="zoom:100%;" /></p>
+
+<h4 id="head">HEAD</h4>
+
+<p>HEAD 是一个对当前检出记录的符号引用，指向正在其基础上进行工作的提交记录。</p>
 
 <blockquote>
-  <p>release 分支 merge 到 master 分支后，需要打 tag，以便将来引用这个版本</p>
-
-  <p>临时分支使用完应删除</p>
+  <p>实际上，通常情况下HEAD指向分支名，分支名指向当前分支上最近一次提交记录。</p>
 </blockquote>
 
-<p><img src="assets/20180107192018976.png" alt="20180107192018976" /></p>
+<p><strong>分离 HEAD</strong> 就是让其指向某个具体的提交记录而不是分支名。</p>
 
-<h2 id="github-desktop-客户端">Github Desktop 客户端</h2>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#在命令执行前的状态如下所示：HEAD -&gt; main -&gt; C1
+git checkout C1
+#变成了：HEAD -&gt; C1
+</code></pre></div></div>
+
+<p><strong>相对引用</strong>：用 <code class="highlighter-rouge">^</code>、<code class="highlighter-rouge">~&lt;n&gt;</code> 将HEAD向上移动 1 个、n个提交记录，可代替<commit>。</commit></p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git checkout &lt;commit id&gt;
+git checkout main^
+git checkout HEAD~1 #HEAD~1：历史版本库最新提交的第一父提交
+</code></pre></div></div>
+
+<h4 id="repository-仓库">Repository 仓库</h4>
+
+<ul>
+  <li><code class="highlighter-rouge">git clone &lt;server url&gt; [directory name]</code>：克隆远程仓库到本地目录，默认为./。<code class="highlighter-rouge">&lt;server url&gt;</code> 如<code class="highlighter-rouge">https://github.com/Snailclimb/test.git</code>或<code class="highlighter-rouge">username@host:/path/to/repository.git</code>。Git支持多种协议，默认的git://使用ssh，https速度慢，每次推送都必须输入口令，但某些公司内部只开放http端口。</li>
+  <li><code class="highlighter-rouge">git fetch</code></li>
+  <li><code class="highlighter-rouge">git init</code>：在当前目录中初始化仓库，创建一个名为 .git 的子目录（Git用来跟踪管理版本库的）。</li>
+  <li><code class="highlighter-rouge">git pull</code>：拉取远程仓库；获取（fetch）并合并（merge）远程改动，覆盖本地工作目录。Git会自动合并已有的变更点；但如果远程数据库和本地数据库的同一个地方都发生了修改，无法自动判断要选用哪一个修改，就会发生冲突，需要手动修正冲突。
+    <ul>
+      <li><code class="highlighter-rouge">--progress</code>：</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pull --progress origin: Fast-forward
+</code></pre></div></div>
+
+<ul>
+  <li><code class="highlighter-rouge">git push origin [branch name]</code>：将分支在本地仓库的提交历史推送/共享到远程仓库，二者保持同步。<code class="highlighter-rouge">push</code>前应先合并（pull），否则<code class="highlighter-rouge">push</code>将被拒绝。
+    <ul>
+      <li><code class="highlighter-rouge">--force</code></li>
+      <li><code class="highlighter-rouge">-u</code>：把本地的master分支内容推送到远程新的master分支，并关联起来；</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">git remote</code>
+    <ul>
+      <li><code class="highlighter-rouge">-v</code>：查看远程库信息</li>
+      <li><code class="highlighter-rouge">add origin &lt;server&gt;</code>：关联本地仓库和远程仓库，并指定远程仓库别名，<code class="highlighter-rouge">origin</code>是默认习惯命名，如<code class="highlighter-rouge">https://github.com/Snailclimb/test.git&gt;</code>，可用<code class="highlighter-rouge">origin</code>指代远程仓库地址</li>
+      <li><code class="highlighter-rouge">rename origin ori</code></li>
+      <li><code class="highlighter-rouge">rm origin</code>：删除远程库，解除了本地和远程的绑定关系，并不是物理上删除了远程库。</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 丢弃在本地的所有改动与提交：从服务器获取最新的版本历史，并将本地主分支指向它
+git fetch origin
+git reset --hard origin/master
+</code></pre></div></div>
+
+<h4 id="work-on-the-current-change">work on the current change</h4>
+
+<ul>
+  <li><code class="highlighter-rouge">git add &lt;filename&gt;</code>：添加文件到暂存区；修改文件来手动合并冲突后，标记为合并成功
+    <ul>
+      <li><code class="highlighter-rouge">git add -i</code>：交互式添加文件到暂存区</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">describe</code>：显示离当前提交最近的标签。</li>
+  <li><code class="highlighter-rouge">git mv README.md README</code>：对文件重命名，相当于<code class="highlighter-rouge">mv README.md README</code>、<code class="highlighter-rouge">git rm README.md</code>、<code class="highlighter-rouge">git add README</code> 三条命令的集合</li>
+  <li><code class="highlighter-rouge">git restore</code>：把文件从缓存区撤销，回到未被追踪的状态。</li>
+  <li><code class="highlighter-rouge">rm test.txt</code>：删除文件后，工作区和版本库不一致。先手动删除文件，然后使用<code class="highlighter-rouge">git rm &lt;file&gt;</code>和<code class="highlighter-rouge">git add&lt;file&gt;</code>效果是一样的。
+    <ul>
+      <li><code class="highlighter-rouge">git status</code> 显示哪些文件被删除了。</li>
+      <li>从版本库中删除该文件：<code class="highlighter-rouge">git rm &lt;filename&gt;</code> ，从暂存区域移除，然后提交；</li>
+      <li>错误删除后恢复：<code class="highlighter-rouge">git checkout -- test.txt</code>，用版本库中的最新版本，替换工作区的。</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="state">state</h4>
+
+<ul>
+  <li><code class="highlighter-rouge">git diff [&lt;source commit id&gt;] &lt;target commit id&gt; [--] [&lt;path&gt;…]</code>：显示提交间的差异
+    <ul>
+      <li><code class="highlighter-rouge">&lt;source commit id&gt;</code>：默认为工作目录，可为branch名等；
+        <ul>
+          <li><code class="highlighter-rouge">--cached</code>表示Index时，显示暂存区与HEAD的差异</li>
+        </ul>
+      </li>
+      <li><code class="highlighter-rouge">&lt;target commit id&gt;</code>：默认为暂存区，指定版本库（默认为HEAD）</li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="assets/diff.svg" alt="img" style="zoom: 60%;" /></p>
+
+<ul>
+  <li>
+    <p><code class="highlighter-rouge">git grep</code></p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">git log --&lt;option&gt;</code> ：列出所有提交</p>
+
+    <ul>
+      <li><code class="highlighter-rouge">-p</code> 或<code class="highlighter-rouge"> --patch</code>：按 <strong>补丁</strong> 的格式	显示每次提交引入的差异</li>
+      <li><del><code class="highlighter-rouge">--stat</code>：显示每次提交的文件修改统计信息。</del>
+        <ul>
+          <li><del><code class="highlighter-rouge">--shortstat</code>：只显示 –stat 中最后的行数修改添加移除统计。</del></li>
+        </ul>
+      </li>
+      <li><code class="highlighter-rouge">--name-status</code>：显示新增、修改、删除的文件清单。
+        <ul>
+          <li><del><code class="highlighter-rouge">--name-only</code>：仅在提交信息后显示已修改的文件清单。</del></li>
+        </ul>
+      </li>
+      <li><code class="highlighter-rouge">--pretty</code>：使用其他格式显示历史提交信息，可选 oneline、short、full、fuller 和 format。</li>
+      <li><del><code class="highlighter-rouge">--abbrev-commit</code>：短字符 commit-id，仅显示 SHA-1 校验和所有 40 个字符中的前几个字符。</del>
+        <ul>
+          <li><code class="highlighter-rouge">--oneline</code>：–pretty=oneline –abbrev-commit 合用的简写，压缩后的每一条提交记录只占一行的输出。</li>
+        </ul>
+      </li>
+      <li>
+        <p><code class="highlighter-rouge">--graph</code>：在日志旁以 ASCII 图形显示分支与合并历史。</p>
+      </li>
+      <li><del><code class="highlighter-rouge">--relative-date</code>：使用较短的相对时间而不是完整格式显示日期（如“2 weeks ago”）。</del></li>
+    </ul>
+
+    <p>常用选项：</p>
+
+    <ul>
+      <li><code class="highlighter-rouge">-&lt;n&gt;</code> ：只显示最近的n条提交。</li>
+      <li><code class="highlighter-rouge">--since</code> 和 <code class="highlighter-rouge">--after</code>：指定时间后的提交，可取2.weeks、2008-01-15</li>
+      <li><code class="highlighter-rouge">--until</code> 和<code class="highlighter-rouge">--before</code>：指定时间前的提交。</li>
+      <li><code class="highlighter-rouge">--author</code>：作者匹配指定字符串。</li>
+      <li><del><code class="highlighter-rouge">--committer</code>：提交者匹配指定字符串。</del></li>
+      <li><code class="highlighter-rouge">--grep</code>：搜索提交说明中的关键字。</li>
+      <li>
+        <p><del><code class="highlighter-rouge">-S</code>：添加或删除内容匹配指定字符串的提交。</del></p>
+      </li>
+      <li><code class="highlighter-rouge">[--] &lt;path&gt;</code>：指定某些文件或目录的路径。</li>
+      <li><code class="highlighter-rouge">--no-merges</code> ：隐藏合并提交</li>
+    </ul>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">git show</code>：用于显示各种类型的对象。</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">git stash</code>：可把当前工作现场“储藏”起来，等以后恢复现场后继续工作。查看工作区，就是干净的（除非有没有被Git管理的文件），因此可以放心的创建分支来修复bug了。</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">git status</code>：查看当前文件状态</p>
+  </li>
+</ul>
+
+<h4 id="基本操作">基本操作</h4>
+
+<h5 id="branch">branch</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">git branch &lt;branch name&gt;</code>：默认创建分支，基于这个提交及它所有的父提交进行新工作；分支是用来将特性开发绝缘开来的。</li>
+  <li><code class="highlighter-rouge">git branch</code>：查看所有分支，，当前分支前面会标一个<code class="highlighter-rouge">*</code>号。
+    <ul>
+      <li><code class="highlighter-rouge">-d &lt;branch name&gt;</code>：删除分支；即删除分支指针。</li>
+      <li><code class="highlighter-rouge">-f main HEAD~3</code>：让分支指向另一个提交，将分支强制移动到指定位置；将 main 分支强制指向 HEAD 的第 3 级父提交。</li>
+    </ul>
+  </li>
+</ul>
+
+<h5 id="cherry-pick">cherry-pick</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">git cherry-pick</code>：”复制”一个提交节点并在当前分支做一次完全一样的新提交。</li>
+</ul>
+
+<p><img src="assets/cherry-pick.svg" alt="img" style="zoom:60%;" /></p>
+
+<h5 id="commit">commit</h5>
+
+<ul>
+  <li>
+    <p><code class="highlighter-rouge">git commit </code>：给暂存区生成快照，并提交。每完成一个功能就提交一次，不要累计代码。</p>
+
+    <ol>
+      <li>提交时，用<strong>暂存区</strong>的文件创建一个新提交，并把此时的节点（HEAD）设为父节点，把当前分支（顺移）指向新的提交节点。</li>
+    </ol>
+
+    <p><img src="assets/commit-main.svg" alt="img" style="zoom: 55%;" /></p>
+
+    <ol>
+      <li>若当前分支<code class="highlighter-rouge">stable</code>是某次提交的祖父节点，提交后生成了<code class="highlighter-rouge">1800b</code>。<code class="highlighter-rouge">stable</code>分支就不再是<code class="highlighter-rouge">main</code>分支的祖父节点。此时，<code class="highlighter-rouge">merge</code>是必须的。</li>
+    </ol>
+
+    <p><img src="assets/commit-stable.svg" alt="img" style="zoom: 55%;" /></p>
+
+    <ol>
+      <li>当<code class="highlighter-rouge">HEAD</code>处于分离状态（不依附于任一分支）时，<code class="highlighter-rouge">commit</code>不会更新任何已命名的分支。可认为是在更新一个匿名分支。一旦切换到别的分支（如<code class="highlighter-rouge">main</code>），那么这个提交节点再也不会被引用到，会被丢弃掉。想保存这个状态，可用命令<code class="highlighter-rouge">git checkout -b &lt;name&gt;</code>来创建一个新分支。</li>
+    </ol>
+
+    <p><img src="assets/commit-detached.svg" alt="img" style="zoom:60%;" /></p>
+
+    <p><img src="assets/checkout-after-detached.svg" alt="img" style="zoom:60%;" /></p>
+
+    <ul>
+      <li>
+        <p><code class="highlighter-rouge">-m "备注"</code></p>
+      </li>
+      <li>
+        <p><code class="highlighter-rouge">-a/add</code>：跳过暂存区直接提交代码到仓库；自动把所有<strong>已跟踪过的文件</strong>暂存起来一并提交，从而跳过 git add 步骤。</p>
+      </li>
+      <li>
+        <p><code class="highlighter-rouge">--amend</code>：更改一次提交，用与当前提交相同的父节点进行一次新提交，旧的提交会被取消。添加漏掉的文件或修改提交信息，尝试重新提交.</p>
+
+        <p><img src="assets/commit-amend.svg" alt="img" style="zoom: 62%;" /></p>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h5 id="checkout">checkout</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">git checkout &lt;branch name&gt;</code>：切换分支，即<em>HEAD</em>标识会移动到指定分支，暂存区域和工作目录中的内容会和<em>HEAD</em>对应的提交节点一致。新提交节点（a47c3）中的所有文件都会被复制（到暂存区域和工作目录中）；只存在于老的提交节点（ed489）中的文件会被删除；不属于上述两者的文件会被忽略，不受影响。
+    <ul>
+      <li><code class="highlighter-rouge">-b &lt;new branch&gt; &lt;source branch&gt;</code> ：在source 分支（默认为当前分支）上创建分支，并切换过去。</li>
+      <li><code class="highlighter-rouge">git checkout &lt;&gt;</code>：如果既没指定文件名，也没指定分支名，而是一个标签、远程分支、SHA-1值或是像<em>main~3</em>类似的东西，就得到一个匿名分支，称作<em>detached HEAD</em>（被分离的<em>HEAD</em>标识）。这样可方便地在历史版本间互相切换。</li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="assets/checkout-branch.svg" alt="img" style="zoom:60%;" /></p>
+
+<p><img src="assets/checkout-detached.svg" alt="img" style="zoom:60%;" /></p>
+
+<ul>
+  <li><code class="highlighter-rouge">git checkout [HEAD] -- &lt;filename&gt;</code>：
+    <ul>
+      <li>当给定某个文件名（或打开<code class="highlighter-rouge">-p</code>选项）时，用于将指定<strong>历史提交节点</strong>（如果没有指定，默认为暂存区域）中的文件，拷贝到工作目录，并加到暂存区域中。用来丢弃本地修改。</li>
+      <li>文件自修改后还没放到暂存区，用当前历史提交节点覆盖工作目录；回到最近一次git commit到版本库后的状态；</li>
+      <li>已添加到暂存区后，又作了修改，用暂存区覆盖工作目录；回到最近一次git add添加到暂存区后的状态。</li>
+      <li>注意当前分支不会发生变化。已添加到暂存区的改动及新文件都不会受影响。</li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="assets/basic-usage-2.svg" alt="img" style="zoom: 67%;" /></p>
+
+<h5 id="merge">merge</h5>
+
+<ul>
+  <li>
+    <p><code class="highlighter-rouge">git merge &lt;branch name&gt;</code>：把不同分支合并起来。合并前，索引必须和当前提交相同，否则可能会有冲突。每次 merge 前先 pull 远程分支。</p>
+
+    <ul>
+      <li><code class="highlighter-rouge">git status</code> 检查冲突的文件；
+        <ul>
+          <li>手动解决冲突后，再add、commit。</li>
+        </ul>
+      </li>
+      <li>如果另一个分支是当前提交的祖父节点，那么什么也不做。</li>
+      <li><code class="highlighter-rouge">git merge main</code>如果当前提交是另一个分支的祖父节点，就导致<em>fast-forward</em>合并。指向只是简单的移动，并生成一个新的提交。</li>
+      <li><code class="highlighter-rouge">git merge other</code>否则就是一次真正的合并。默认把当前提交（<em>ed489</em> ）和另一提交（<em>33104</em>）及他们的共同祖父节点（<em>b325c</em>）进行一次三方合并。结果先保存当前目录和索引，然后和父节点（<em>33104</em>）一起做一次新提交。</li>
+    </ul>
+
+    <p><img src="assets/merge-ff.svg" alt="img" style="zoom:60%;" /></p>
+
+    <p><img src="assets/merge.svg" alt="img" style="zoom:60%;" /></p>
+
+    <ul>
+      <li><code class="highlighter-rouge">--no-ff</code>参数：表示不执行快进式（<strong>f</strong>ast-<strong>f</strong>orward、plain）合并，不在当前分支留有指定分支的演进过程。
+        <ul>
+          <li>用普通模式合并，合并后的历史有分支，能看出来曾经做过合并。而fast forward 快进模式，直接把master指向dev的当前提交，所以合并速度非常快；但看不出来曾经做过合并，删除分支后，会丢掉分支信息。</li>
+          <li>将feature分支（一组提交实现的整个功能）打包作为develop分支的一个commit节点合并进来。</li>
+          <li>常用于对feature分支实现的整个功能进行回退、简化日志信息。</li>
+        </ul>
+      </li>
+    </ul>
+
+    <p><img src="assets/25142847_b6mx.png" alt="img" style="zoom:75%;" /></p>
+  </li>
+</ul>
+
+<h5 id="rebase">rebase</h5>
+
+<ul>
+  <li>
+    <p><code class="highlighter-rouge">git rebase main</code>：合并分支。在当前分支（topic）上重演另一个分支（main）的历史，提交历史是线性的。 本质上是线性化的自动的<code class="highlighter-rouge">cherry-pick</code>。注意旧提交（169a6、2c33a）没有被引用，将被回收。</p>
+
+    <p><img src="assets/rebase.svg" alt="img" style="zoom:60%;" /></p>
+
+    <ul>
+      <li><code class="highlighter-rouge">--onto</code>：限制回滚范围。在<em>main</em>分支上重演当前分支从<em>169a6</em>以来的最近几个提交，即<em>2c33a</em>。</li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="assets/rebase-onto.svg" alt="img" style="zoom:60%;" /></p>
+
+<h5 id="reflog">reflog</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">git reflog</code>：查看命令历史，操作类型、commit id、注释。</li>
+</ul>
+
+<h5 id="reset">reset</h5>
+
+<ul>
+  <li>
+    <p><code class="highlighter-rouge">git reset --&lt;mode&gt; [&lt;commit id&gt;, 默认HEAD, origin/master] [file]</code>：作用于索引，分支指向不变；撤销暂存区的修改，重新放回工作区，用指定提交（默认为HEAD）覆盖暂存区。“改写历史”，原来指向的提交记录就跟从来没有提交过一样。 对远程分支无效。？省略文件名表示回退所有。</p>
+
+    <ul>
+      <li><del><code class="highlighter-rouge">-- filename</code>：撤销最后一次<code class="highlighter-rouge">git add files</code>；相当于<code class="highlighter-rouge">checkout file</code>；更新索引。</del></li>
+      <li><code class="highlighter-rouge">--soft</code> ：作用于仓库，回退到指定版本commit前的状态？。如果还要提交，直接commit即可。<del>索引和工作目录都不变。</del></li>
+      <li><code class="highlighter-rouge">--mixed</code>：默认方式。</li>
+      <li><code class="highlighter-rouge">--hard</code>： 作用于索引和工作目录。</li>
+    </ul>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#查找commit id
+git reflog
+  
+#恢复到因reset回退的commit
+git reset --hard &lt;commit id&gt;
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<p><img src="assets/reset-commit.svg" alt="img" style="zoom:60%;" /></p>
+
+<h5 id="revert">revert</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">git revert</code>：新提交记录引入<strong>更改</strong>用来撤销某个提交。回退状态。</li>
+</ul>
+
+<h5 id="switch">switch</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">git switch &lt;branch name&gt;</code>：切换分支
+    <ul>
+      <li><code class="highlighter-rouge">-c dev</code>：创建并切换到新的<code class="highlighter-rouge">dev</code>分支</li>
+    </ul>
+  </li>
+</ul>
+
+<h5 id="tag">tag</h5>
+
+<ul>
+  <li>
+    <p><code class="highlighter-rouge">git tag &lt;tag name&gt; &lt;commit id&gt;</code>：在指定提交上创建标签</p>
+
+    <ul>
+      <li><code class="highlighter-rouge">-d</code>：删除标签</li>
+    </ul>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#一次性推送全部尚未推送到远程的本地标签
+git push origin --tags
+  
+#标签已经推送到远程，要删除远程标签就麻烦一点，先从本地删除，然后从远程删除
+git tag -d v0.9
+git push origin :refs/tags/v0.9
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h4 id="其它-config等">其它 config等</h4>
+
+<ul>
+  <li><code class="highlighter-rouge">gitk</code>：内建的图形化 git</li>
+  <li><code class="highlighter-rouge">git config color.ui true</code>：彩色的 git 输出</li>
+  <li><code class="highlighter-rouge">git config format.pretty oneline</code>：显示历史记录时，每个提交的信息只显示一行</li>
+  <li><code class="highlighter-rouge">git config </code>
+    <ul>
+      <li><code class="highlighter-rouge">--global</code>参数，表示这台机器上所有的Git仓库都会用此配置；</li>
+      <li><code class="highlighter-rouge">--global user.email "you@example.com"</code>：配置邮件；</li>
+      <li><code class="highlighter-rouge">--global user.name "Your Name"</code> 配置用户名，否则后面的commit、push到远程库都会失败。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">git config</code>
+    <ul>
+      <li><code class="highlighter-rouge">--global alias.br branch</code>：配置别名</li>
+      <li><code class="highlighter-rouge">--global alias.ci commit</code></li>
+      <li><code class="highlighter-rouge">--global alias.co checkout</code></li>
+      <li><code class="highlighter-rouge">--global alias.st status</code></li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="git-分支管理策略">Git 分支管理策略</h3>
+
+<ol>
+  <li><a href="https://www.oschina.net/translate/a-successful-git-branching-model">介绍一个成功的 Git 分支模型</a></li>
+  <li><a href="https://segmentfault.com/a/1190000003739324">使用 git 和 github 管理自己的项目—分支管理策略实战</a></li>
+</ol>
+
+<ul>
+  <li>
+    <p>origin/master 主分支： 用于正式发布、线上生产环境。用于存放经过完全测试、代码reivew，已经完全稳定、任何时刻用户可用的代码，应随时保持代码的清洁。分支版本的设立、master版本的merge，统一由管理员操作。发布后需打上 tag。</p>
+
+    <ul>
+      <li>
+        <p>develop 开发分支：用于本地日常开发环境，用于开发者存放基本稳定代码、生成代码的最新隔夜版本（nightly）。</p>
+
+        <ul>
+          <li>
+            <p>feature/topic 功能分支：  通常为即将发布或未来发布版开发新的功能。合并到develop。分支版本的merge，一般先在本地仓库的feature分支merge到本地仓库的develop分支，然后将develop分支push到服务器上。</p>
+
+            <ul>
+              <li>删除分支：develop分支测试完毕，合入master主分支后。</li>
+              <li>不删除：开发周期长，与develop分支处于并行关系，自身有特定功能的feature分支。</li>
+            </ul>
+
+            <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt;&gt;&gt; git checkout develop
+# 回到develop分支
+      
+&gt;&gt;&gt; git merge --no-ff feature-discuss
+# 把做好的功能合并到develop中
+      
+&gt;&gt;&gt; git branch -d feature-discuss
+# 删除功能性分支
+      
+&gt;&gt;&gt; git push origin develop
+# 把develop提交到自己的远程仓库中
+</code></pre></div>            </div>
+          </li>
+          <li>
+            <p><del>feature/weixin_recharge 临时功能分支：按照功能点（而不是需求）命名，  用于开发新功能，预发布成功后删除。</del></p>
+          </li>
+          <li>
+            <p>release-1.2 预发布分支：用于线上测试环境，待发布版本的提测及细小修改、修复 bug，严禁增加大的新features。实际开发中用的较少。</p>
+
+            <ul>
+              <li>创建时机：develop分支达到了发布的理想状态后，至少所有此次要发布的features已合并到develop分支。从develop创建。创建后，所有未来准备发布的features可合并到develop分支。</li>
+              <li>必须合并到 master：需打 tag，以便将来引用这个版本。</li>
+              <li>必须合并到 develop：临时分支用完删除。</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <p>fixbug-0.1、hotfix/#1 、issue-101 临时修补分支：通过平台生成的问题编号来命名 ，生产环境紧急bug修复。可以基于master分支，必须合并回develop和master分支。与发布分支很相似。临时分支用完删除。</p>
+
+        <ol>
+          <li>在 master 分支上拉一个 hotfix 分支 hotfix/0.0.1；</li>
+          <li>修复后 merge 回 master 分支；</li>
+          <li>再 merge 回 develop 分支；</li>
+          <li>删除该分支；</li>
+          <li>应始终保证 master 和 develop 上都修复了该bug。</li>
+        </ol>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="assets/25142840_pKcL.png" alt="img" style="zoom: 67%;" /></p>
+
+<p>以<a href="https://blog.csdn.net/cs958903980/article/details/53896411">开发功能分支 feature/search-recommend</a>为例，工程师需要做以下步骤：</p>
+
+<ol>
+  <li>建立 develop 的分支 feature/search-recommend；</li>
+  <li>在该分支上进行开发，完成后进行本地提交；</li>
+  <li>切换到 develop 分支，pull拉取远程仓库最新版本；</li>
+  <li>此时本地 develop 分支是最新版本，然后 merge 分支 feature/search-recommend；
+    <ol>
+      <li>如果此时有冲突，清除后commit；</li>
+    </ol>
+  </li>
+  <li>把本地合并后的分支 develop push 到远程 develop；</li>
+  <li>在 develop 分支环境下进行测试；</li>
+  <li>一切ok，删除该功能分支；</li>
+  <li>切到 master 分支，pull 然后 merge develop，收工。</li>
+</ol>
+
+<p><img src="assets/20161227161427129.png" alt="git flow" style="zoom:67%;" /></p>
+
+<h3 id="github-desktop-客户端">Github Desktop 客户端</h3>
 
 <ol>
   <li><a href="https://blog.csdn.net/chenliguan/article/details/51072809">Github 的 SSH 配置</a></li>
@@ -191,41 +967,41 @@ git reset --hard `版本号`
   <p>使用迅雷下载 https://desktop.github.com/ 会快点</p>
 </blockquote>
 
-<h3 id="项目初始化">项目初始化</h3>
+<h5 id="项目初始化">项目初始化</h5>
 
 <blockquote>
   <p>项目最好存储在纯英文路径下</p>
 </blockquote>
 
-<h4 id="创建项目">创建项目</h4>
+<h5 id="创建项目">创建项目</h5>
 
 <blockquote>
-  <p>一般在某一文件夹，如使用 IDE 创建项目文件夹之后，将此项目文件夹创建为 Git 项目。</p>
+  <p>一般在某一文件夹，如使用 IDE 创建项目文件夹后，将此项目文件夹创建为 Git 项目。</p>
 </blockquote>
 
-<h4 id="添加本地项目">添加本地项目</h4>
+<h5 id="添加本地项目">添加本地项目</h5>
 
 <blockquote>
   <p>此时项目中应有 /.git 文件夹，表示这是一个 git 项目，操作是将其添加入本地仓库。</p>
 </blockquote>
 
-<h4 id="从-github-服务器克隆项目">从 Github 服务器克隆项目</h4>
+<h5 id="从-github-克隆项目">从 Github 克隆项目</h5>
 
 <blockquote>
   <p>fork 指将别人的项目拷贝到自己的账户中。</p>
 
-  <p>clone 指将在 Github 网站上的项目克隆到本地计算机的仓库中，默认是自己的项目，可以通过 URL 克隆其他用户的项目。</p>
+  <p>clone 指将在 Github 网站上的项目克隆到本地计算机的仓库中，默认是自己的项目，可通过 URL 克隆其他用户的项目。</p>
 
   <p>克隆时本地文件夹可重命名。</p>
 </blockquote>
 
-<h3 id="remove-项目">remove 项目</h3>
+<h5 id="remove-项目">remove 项目</h5>
 
 <blockquote>
-  <p>默认只是将项目移出本地仓库，勾选之后才删除项目到回收站。</p>
+  <p>默认只是将项目移出本地仓库，勾选后才删除项目到回收站。</p>
 </blockquote>
 
-<h3 id="更改本地项目存储位置">更改本地项目存储位置</h3>
+<h5 id="更改本地项目存储位置">更改本地项目存储位置</h5>
 
 <blockquote>
   <p>将本地项目移动到其它路径下</p>
@@ -236,22 +1012,28 @@ git reset --hard `版本号`
   <li>直接将项目文件夹移动到目标位置，打开 Github Desktop 项目时会提示重新定位（locate）。或手动将项目重新添加到本地仓库即可</li>
 </ol>
 
-<h3 id="通过-github-desktop-版本回退"><a href="https://www.cnblogs.com/lqcdsns/p/5265665.html">通过 GitHub Desktop 版本回退</a></h3>
+<h5 id="通过-github-desktop-版本回退"><a href="https://www.cnblogs.com/lqcdsns/p/5265665.html">通过 GitHub Desktop 版本回退</a></h5>
 
-<h5 id="1-在本地仓库-commit-to-master-未-push-到远程仓库">1. 在本地仓库 commit to master 未 push 到远程仓库</h5>
+<ol>
+  <li>
+    <p>在本地仓库 commit to master 未 push 到远程仓库</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>undo ##### 2. 已 push 到远程仓库
+    <p>undo</p>
+  </li>
+  <li>
+    <p>已 push 到远程仓库</p>
 
-History-&gt;右键-&gt;Reserve this commit
-commit to master
-push
-</code></pre></div></div>
+    <p>History-&gt;右键-&gt;Reserve this commit
+ commit to master
+ push</p>
+  </li>
+</ol>
 
-<h2 id="错误处理">错误处理</h2>
+<h3 id="错误处理">错误处理</h3>
 
 <p><a href="https://www.jianshu.com/p/0acf732eab68">使用git时出现：warning: LF will be replaced by CRLF</a></p>
 
-<h3 id="提交失败">提交失败</h3>
+<h5 id="提交失败">提交失败</h5>
 
 <ul>
   <li>
@@ -264,4 +1046,76 @@ push
 git config --global https.proxy "localhost:1080"
 </code></pre></div>    </div>
   </li>
+</ul>
+
+<h2 id="项目管理构建工具">项目管理/构建工具</h2>
+
+<h3 id="maven">Maven</h3>
+
+<p>标准化的 Java 项目管理和构建工具。</p>
+
+<h5 id="依赖管理">依赖管理</h5>
+
+<p><code class="highlighter-rouge">pom.xml</code>项目描述文件：</p>
+
+<ul>
+  <li>
+    <p>用<code class="highlighter-rouge">&lt;dependency&gt;</code>声明一个依赖后，Maven就会（从中央仓库、镜像仓库下载）自动下载依赖jar包及其父依赖、并缓存在本地（放到classpath中）。</p>
+  </li>
+  <li>
+    <p>插件：<code class="highlighter-rouge">&lt;plugins&gt;&lt;plugin&gt;</code></p>
+  </li>
+</ul>
+
+<h5 id="项目结构--标准目录结构">项目结构 / 标准目录结构</h5>
+
+<h5 id="构建流程">构建流程</h5>
+
+<p>标准化的构建流程，可自动化实现编译，打包，发布等。</p>
+
+<p>常用命令：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">mvn clean</code>：清理所有生成的class和jar；</li>
+  <li><code class="highlighter-rouge">mvn clean compile</code>：先清理，再执行到<code class="highlighter-rouge">compile</code>；</li>
+  <li><code class="highlighter-rouge">mvn clean test</code>：先清理，再执行<code class="highlighter-rouge">test</code>，因为执行<code class="highlighter-rouge">test</code>前必须执行<code class="highlighter-rouge">compile</code>，故不必指定<code class="highlighter-rouge">compile</code>；</li>
+  <li><code class="highlighter-rouge">mvn clean package</code>：先清理，再执行<code class="highlighter-rouge">package</code>。</li>
+</ul>
+
+<h5 id="模块管理">模块管理</h5>
+
+<p>抽取共用的<code class="highlighter-rouge">pom.xml</code>并继承，用<code class="highlighter-rouge">&lt;modules&gt;</code>编译多个模块。</p>
+
+<h3 id="gradle">Gradle</h3>
+
+<p>基于 JVM 的富有突破性构建工具。</p>
+
+<h3 id="docker-容器">Docker 容器</h3>
+
+<p>安装时，把原始环境一模一样地复制过来。</p>
+
+<ul>
+  <li>
+    <p>虚拟机</p>
+  </li>
+  <li>
+    <p>LXC Linux 容器</p>
+  </li>
+</ul>
+
+<p>Docker：是一个虚拟环境容器，可将开发环境、代码、配置文件等一并打包进去，并发布和应用到任意平台中。</p>
+
+<p>主要用途：</p>
+
+<ul>
+  <li>提供一次性的环境。如，本地测试他人的软件、持续集成时提供单元测试和构建的环境。</li>
+  <li>提供弹性的云服务。因为 Docker 容器可随开随关，很适合动态扩容和缩容。</li>
+  <li>组建微服务架构。通过多个容器，一台机器可跑多个服务，在本机就可模拟出微服务架构。</li>
+</ul>
+
+<p>容器编排技术：</p>
+
+<ul>
+  <li>Kubernetes</li>
+  <li>Swarm</li>
 </ul>

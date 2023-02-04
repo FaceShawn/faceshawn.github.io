@@ -1,28 +1,36 @@
 <blockquote>
-  <p>摘要：Spring框架，包括IoC和DI，Bean，AOP，事务等。</p>
+  <p>摘要：Spring 框架，包括 IoC 和 DI，Bean，AOP，设计模式，事务等；Spring MVC，包括 MVC、Java Web；Spring Boot，包括配置、自动装配、数据库、整合 Web、日志等；Spring Boot 整合 MyBatis、Security等。</p>
 </blockquote>
 
 <!-- more -->
 
-<h2 id="spring-框架">Spring 框架</h2>
+<h2 id="spring">Spring</h2>
+
+<p><a href="https://github.com/Snailclimb/JavaGuide/blob/main/docs/system-design/framework/spring/spring-knowledge-and-questions-summary.md">Spring常见问题总结</a></p>
 
 <h3 id="spring-概述">Spring 概述</h3>
 
-<p>Spring是轻量级的开源J2EE（容器）框架和中间层框架（万能胶）。</p>
+<p>Spring 是轻量级的开源 J2EE（容器）框架和中间层框架（万能胶）。</p>
 
-<p>优点：</p>
-<ul>
-  <li>非侵入式：对象可不依赖于Spring的API；（不改变现有的类结构，就能增强JavaBean的功能，Struts2等传统框架常要实现特定接口、继承特定类才能增强功能，改变了java类的结构）</li>
-  <li>松耦合：IoC</li>
-  <li>AOP</li>
-  <li>容器：管理对象的生命周期和配置</li>
-  <li>对单元测试支持比较好：框架中包含测试环境；支持 JUnit4，可通过注解方便地测试。</li>
-  <li>WEB框架：MVC</li>
-  <li>方便集成各种优秀框架：支持 Struts2、Hibernate、MyBatis等</li>
-  <li>为JavaEE 开发中一些 API（JDBC、JavaMail、远程调用等）提供了封装</li>
-  <li>事务管理：提供一个持续的事务管理接口，可扩展到上至本地事务下至全局事务（JTA）</li>
-  <li>声明式事务的支持：只通过配置就可完成事务管理，无须手动编程。</li>
-</ul>
+<h5 id="优点">优点</h5>
+
+<ol>
+  <li><strong>非侵入式</strong>：对象可不依赖于 Spring 的 API；（不改变现有的类结构，就能增强 Java Bean 的功能，Struts2 等传统框架常要实现特定接口、继承特定类才能增强功能，改变了 Java 类的结构）；</li>
+  <li><strong>方便集成各种优秀框架</strong>：支持 Struts2、Hibernate、MyBatis 等；
+    <ul>
+      <li>为 JavaEE 开发中一些 API（JDBC、JavaMail、远程调用等）提供了封装；</li>
+    </ul>
+  </li>
+  <li>支持<strong>WEB 框架</strong>：<a href="#MVC 设计模式">MVC 设计模式</a>；</li>
+  <li>支持与代码松耦合：（IoC 解耦）用 <strong>IoC 容器</strong>管理对象的生命周期和配置；对象发生改变，只需在配置文件中修改，而无须修改 Java 代码；</li>
+  <li>支持<strong>AOP</strong>：面向切面编程；</li>
+  <li>事务管理：提供一个持续的事务管理接口，可扩展到上至本地事务下至全局事务（JTA）；
+    <ul>
+      <li><strong>支持声明式事务</strong>：只通过配置就可完成事务管理，无须手动编程。</li>
+    </ul>
+  </li>
+  <li>对<strong>单元测试</strong>支持比较好：框架中包含测试环境；支持 JUnit4，可用注解方便地测试。</li>
+</ol>
 
 <h5 id="spring-framework-八大模块">Spring Framework 八大模块</h5>
 
@@ -30,9 +38,10 @@
   <li>Data Access/Integration 数据访问/集成
     <ul>
       <li>JDBC</li>
-      <li>ORM：提供与流行的”对象-关系”映射框架无缝集成的 API，包括 JPA、JDO、Hibernate 和 MyBatis 等。</li>
-      <li>JMS</li>
-      <li>TX事务</li>
+      <li>ORM：提供对象-关系映射框架的集成 API，包括 JPA、JDO、Hibernate 和 MyBatis 等。</li>
+      <li><del>OXM：提供了一个支持 Object/XML 映射的抽象层实现（Java 对象和 XML 数据间的映射），如 JAXB、Castor、XMLBeans、JiBX 和 XStream。</del></li>
+      <li>JMS：Java 消息服务。</li>
+      <li>TX 事务</li>
     </ul>
   </li>
   <li>Web
@@ -42,553 +51,2767 @@
   </li>
   <li>Core Container 核心容器：
     <ul>
-      <li>Beans 模块：包括IoC和DI</li>
+      <li>Beans 模块：包括 IoC 和 DI</li>
       <li>Core 模块</li>
-      <li>Context 模块</li>
-      <li>SpEL（Spring Express Language）</li>
+      <li>Context 上下文模块：ApplicationContext 接口</li>
+      <li>SpEL（Spring Express Language）表达式</li>
     </ul>
   </li>
   <li>AOP</li>
-  <li><del>Aspects：与 AspectJ 的集成提供支持</del></li>
+  <li><del>Aspects：支持 AspectJ 的集成</del></li>
   <li><del>Instrumentation</del></li>
   <li><del>Messaging</del></li>
-  <li><del>Test</del></li>
+  <li>Test：支持 Junit 和 TestNG 测试框架，模拟 Http 请求的功能。</li>
 </ol>
 
 <h3 id="ioc-设计思想">IoC 设计思想</h3>
 
+<h5 id="ioc-和-di">IoC 和 DI</h5>
+
+<p>在传统的 Java 应用中，一个类（调用者）想要调用（依赖）另一个类（被调用者）的成员变量或成员方法，通常会先通过 <code class="highlighter-rouge">new Object()</code> 创建对象。</p>
+
 <ol>
-  <li>
-    <p>控制反转（Inversion of Control）：new/创建对象的控制权，由开发者手动创建转移（反转）给第三方IoC容器管理。</p>
-  </li>
-  <li>
-    <p>依赖注入（Dependency Injection）：通过IoC容器管理对象间的依赖，容器在创建实例时，自动注入对象需要的外部资源。</p>
-  </li>
+  <li>IoC（<code class="highlighter-rouge">Inversion of Control</code>，控制反转）：new/创建对象的控制权，由开发者手动创建转移（反转）给（第三方） <code class="highlighter-rouge">IoC</code> 容器管理。</li>
+  <li>DI（<code class="highlighter-rouge">Dependency Injection</code>，依赖注入）：通过 <code class="highlighter-rouge">IoC</code> 容器<strong>管理对象间的依赖</strong>，容器在创建对象时，（根据依赖关系）将它依赖的对象自动注入当前对象（<del>可引用依赖的对象</del>）。</li>
 </ol>
 
-<p>二者含义相同，是从两个角度描述的同一个概念。</p>
+<p>二者含义相同，是从两个角度描述的同一概念。</p>
 
-<h5 id="ioc-容器的两种实现">IoC 容器的两种实现</h5>
+<h5 id="ioc-工作原理">IoC 工作原理</h5>
 
-<p>IoC 容器：管理对象的实例化（，初始化），（从创建到销毁的）整个生命周期。</p>
+<p>IoC 底层通过工厂模式、XML 解析、Java 的反射机制等技术，降低代码耦合度，主要步骤有：</p>
+
+<ol>
+  <li><a href="#Spring 框架中的设计模式">工厂模式</a>：可把 <strong>IoC 容器</strong>当做一个<strong>工厂</strong>，产品就是 Spring Bean；
+    <ul>
+      <li><a href="#IoC 容器">IoC 容器的两种实现</a>：通过 <code class="highlighter-rouge">BeanFactory</code>、<code class="highlighter-rouge">ApplicationContext</code> 接口创建 Bean 对象；</li>
+    </ul>
+  </li>
+  <li>XML 解析：在配置文件（如 Bean.xml）中，配置各个对象及对象间的依赖关系，容器启动时会加载并<strong>解析</strong>；
+    <ul>
+      <li>与代码<strong>松耦合</strong>、IoC 解耦原理：对象发生改变，只需在配置文件中修改，而无须修改 Java 代码；</li>
+    </ul>
+  </li>
+  <li>IoC 利用 <strong>Java 的反射机制</strong>：根据类名生成相应的对象，并根据依赖关系将此对象注入到依赖它的对象中。</li>
+</ol>
+
+<p>工厂方法：分为无参和有参，静态工厂和实例工厂。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 用静态工厂方法创建Bean
+class UserFactory {
+    public static UserDao getDao() {
+        // xml解析
+        String className = class属性值;
+        // 通过反射创建对象
+        Class clazz = Class.forName(className);
+        return (UserDao)clazz.newInstance();
+        // return new UserDao();
+    }
+}
+UserDao dao = UserFactory.getDao();
+</code></pre></div></div>
+
+<h5 id="ioc-容器">IoC 容器</h5>
+
+<p>IoC 容器：管理（Bean）对象（从创建到销毁的）整个生命周期，管理对象间的依赖及注入。</p>
 
 <p>IoC 容器的两种实现：</p>
 
 <ol>
-  <li>BeanFactory容器：Spring内部用；懒加载（获取对象时才创建对象）；简单，占内存少，启动快。用于初始化 Bean，并调用方法。</li>
-</ol>
+  <li>
+    <p><code class="highlighter-rouge">BeanFactory</code> 接口：Spring 内部用；懒加载（获取对象时才创建对象）；简单，占内存少，启动快。最常用 <code class="highlighter-rouge">XmlBeanFactory</code> 类实现接口。</p>
 
-<p>实现 BeanFactory 接口最常用的是 XmlBeanFactory 类</p>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Resource res = new ClassPathResource("appContext.xml"); 
-BeanFactory fact = new XmlBeanFactory(res);  
-Student stu = (Student) fac.getBean("student");
-</code></pre></div></div>
-
-<ol>
-  <li>ApplicationContext 容器：面向开发者；不管用没用到，容器启动时一次性创建所有 bean ；即时加载（加载配置文件时创建对象）；继承并扩展 BeanFactory，功能更完整；</li>
-</ol>
-
-<ul>
-  <li>ClassPathXmlApplicationContext：从 class path 加载配置文件，更常用；</li>
-  <li>FileSystemXmlApplicationContext：从参数指定位置加载配置文件，不常用。</li>
-  <li>XmlWebApplicationContext：从Web系统中的XML文件加载配置文件。</li>
-</ul>
-
-<p>二者都是通过 XML 配置文件加载 Bean 的，通常用后者，只有在系统资源较少时，才考虑用 BeanFactory。</p>
-
-<p>主要区别在于 Bean 的某一属性没有注入时，</p>
-<ul>
-  <li>BeanFacotry 加载后，第一次调用 getBean() 会抛出异常，</li>
-  <li>ApplicationContext 会在初始化时自检所依赖的属性是否注入。</li>
-</ul>
-
-<h5 id="属性注入的方式">属性注入的方式</h5>
-
-<p>Spring Framework 中仅有前两种：</p>
-
-<ol>
-  <li>构造器注入：XML配置文件中，用 <constructor-arg> 标签给构造方法的参数赋值，包含：
-</constructor-arg>    <ul>
-      <li>value 用于注入基本数据类型及字符串类型的值；</li>
-      <li>ref 用于注入已定义好的 Bean；</li>
-      <li>type 用来指定对应的构造函数；</li>
-      <li>index 指定参数位置。</li>
-    </ul>
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import  org.springframework.beans.factory.BeanFactory;
+   
+Resource res = new ClassPathResource("appContext.xml"); 
+BeanFactory fact = new XmlBeanFactory(res); 
+   
+Student stu = (Student) fact.getBean("student");
+stu.getMsg();
+</code></pre></div>    </div>
   </li>
-  <li>setter()注入：通过调用默认无参构造器或无参static工厂方法，实例化bean对象，并调用setXxx()设置其属性。</li>
+  <li>
+    <p><code class="highlighter-rouge">ApplicationContext</code> 接口：面向开发者，用的更多；继承并扩展 <code class="highlighter-rouge">BeanFactory</code>，功能更完整；即时加载（加载配置文件时创建并初始化<strong>所有对象</strong>）；不管用没用到，容器启动时<strong>一次性</strong>创建所有 Bean ；</p>
+
+    <ol>
+      <li><code class="highlighter-rouge">ClassPathXmlApplicationContext</code>：从 <code class="highlighter-rouge">classpath</code> 加载配置文件，更常用；</li>
+      <li><code class="highlighter-rouge">FileSystemXmlApplicationContext</code>：从指定位置加载配置文件，不常用；</li>
+      <li><code class="highlighter-rouge">XmlWebApplicationContext</code>：从Web系统中的 XML 文件加载配置文件。</li>
+    </ol>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> BeanFactory beanFactory = new ClassPathXmlApplicationContext("beans.xml");
+</code></pre></div>    </div>
+  </li>
 </ol>
 
-<p>配置文件中，用 <property> 为每个属性注入值。</property></p>
+<p>二者都是通过 XML 配置文件加载 Bean 的，通常用后者，只有在系统资源较少时，才考虑用 <code class="highlighter-rouge">BeanFactory</code>。主要区别在于 Bean 的某一属性<strong>没有注入</strong>时：</p>
 
 <ol>
-  <li>注解自动注入，大部分
+  <li><code class="highlighter-rouge">BeanFacotry</code> 加载后，第一次调用 getBean() 会抛出异常；</li>
+  <li><code class="highlighter-rouge">ApplicationContext</code> 在初始化时就自动检测所依赖的属性是否注入。</li>
+</ol>
+
+<h5 id="依赖注入的方式">依赖注入的方式</h5>
+
+<p>依赖注入本质上是 Spring Bean 属性注入的一种，只不过这个属性是一个对象。</p>
+
+<h3 id="spring-bean-定义">Spring Bean 定义</h3>
+
+<p>Bean：由 IoC 容器创建并管理的对象。</p>
+
+<h5 id="bean-属性注入的方式">Bean 属性注入的方式</h5>
+
+<ol>
+  <li>构造器注入：XML 配置文件中，用 <code class="highlighter-rouge">&lt;constructor-arg&gt;</code> 标签给构造方法的参数赋值；
     <ul>
-      <li>@Configuration：配置类？</li>
-      <li>@Autowired：基于类型自动注入，默认是byType，可通过@Qualifile改为byName</li>
-      <li>@Resource：默认（指定值）是byName，找不到（与名称匹配的bean）（or不指定值）时用byType，相同的类型在IOC容器中不能有两个</li>
-      <li>@Qualifier(“userDAO”)：限定要自动注入的bean的id，一般和@Autowired联用，指定bean的名称</li>
-      <li>@ComponentScan：扫描器？</li>
-      <li>@Value：注入简单类型数据 （jdk8种基本数据类型+String类型）</li>
+      <li>缺点：没有部分注入；任意修改都会创建一个新实例；</li>
     </ul>
   </li>
-  <li>
-    <p>接口注入/工厂方法</p>
+  <li><code class="highlighter-rouge">setter()</code> 注入：通过调用默认无参构造器或无参 static 工厂方法，实例化 Bean 对象，并调用 setXxx() 设置<code class="highlighter-rouge">&lt;property&gt;</code>属性；
+    <ul>
+      <li>缺点：会覆盖 setter 属性；适用于设置少量属性。</li>
+    </ul>
   </li>
-  <li>
-    <p><del>p名称空间注入</del>：setter()的优化</p>
+  <li>接口注入/工厂方法；</li>
+  <li>短命名空间注入：
+    <ol>
+      <li>c：<code class="highlighter-rouge">&lt;bean&gt;</code> 中嵌套的 <code class="highlighter-rouge">&lt;contructor&gt;</code> 元素，构造器注入的优化；</li>
+      <li>p：<code class="highlighter-rouge">&lt;bean&gt;</code> 中嵌套的 <code class="highlighter-rouge">&lt;property&gt;</code> 元素，setter() 注入的优化；</li>
+    </ol>
   </li>
   <li>泛型注入</li>
+  <li><del>基于Groovy DSL 配置（很少见）</del></li>
 </ol>
 
-<h5 id="构造器注入和-setter-注入">构造器注入和 setter() 注入</h5>
+<h5 id="基于-xml-配置文件的属性注入">基于 XML 配置文件的属性注入</h5>
 
-<p>构造函数注入	setter 注入</p>
-<ul>
-  <li>没有部分注入；有部分注入</li>
-  <li>不会覆盖 setter 属性；会覆盖 setter 属性</li>
-  <li>任意修改都会创建一个新实例	；任意修改不会创建一个新实例</li>
-  <li>适用于设置很多属性；适用于设置少量属性</li>
-</ul>
+<p>配置文件：描述如何创建对象和哪些组件需要哪些服务。用于定义 Bean 的属性值、作用域、依赖关系。</p>
 
-<h3 id="spring-bean">Spring Bean</h3>
-
-<p>Bean：由 IoC 容器管理的对象。根据配置元数据创建。</p>
-
-<h5 id="工厂模式">工厂模式</h5>
-
-<p>工厂方法：分为无参和有参，静态工厂和实例工厂。</p>
-
-<p>用静态工厂方法创建Bean</p>
-
-<p>IoC底层原理：</p>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//工厂模式
-class UserFactory {
-    public static UserDao getDao() {
-    //xml解析
-    String className = class属性值;
-    //通过反射创建对象
-    Class clazz = Class.forName(className);
-    return (UserDao)clazz.newInstance();
-    
-    //return new UserDao();
-    }
-}
-
-UserDao dao = UserFactory.getDao();
-</code></pre></div></div>
-
-<h5 id="配置文件">配置文件</h5>
-
-<p>描述如何创建对象和哪些组件需要哪些服务。用于定义 Bean 的属性值和作用域，Bean 间的依赖关系</p>
-
-<p>格式：</p>
-<ol>
-  <li>Properties 配置文件：key-value 形式，只能赋值，不能进行其他操作，用于简单的属性配置。</li>
-  <li>XML 配置文件：树形结构，结构清晰灵活，内容繁琐，用于大型复杂的项目。</li>
-</ol>
-
-<h5 id="配置元数据方式实现bean">配置（元数据）方式/实现Bean</h5>
-
-<p>1）基于xml配置Bean：</p>
-<ul>
-  <li>bean 标签：要创建的对象；</li>
-  <li>id: 对象的唯一标识，不可重复；</li>
-  <li>class: bean 的完全限定名，即从 package name 到 class name；</li>
-  <li>property：给属性赋值，name 的名称取决于 set() 后的参数；</li>
-  <li>用 constructor 赋值，name 的名称取决于参数列表；</li>
-  <li>指定 abstarct=”true”而不指定 class 属性，定义为 Bean 定义模板，只能被继承，不能被实例化。</li>
-  <li>通过 parent 属性指定继承的父 Bean。</li>
-</ul>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//创建对象：默认执行无参构造器
-&lt;bean id="user" class="com.spring5.User" name=""&gt;
-    &lt;--!1. 用set方法注入属性--&gt;
-    //注入基本数据类型（8大基本数据类+String）
-    &lt;property name="bname" value="java"&gt;&lt;/property&gt;
-
-    //注入null和特殊符号属性
-    &lt;property name = "email"&gt;&lt;null/&gt;&lt;/property&gt;
-
-    &lt;property name="auther" name=""&gt;&lt;/property&gt;
-    &lt;property name="address"&gt;
-        &lt;value&gt;&lt;!CDATA[&lt;&lt;南京&gt;&gt;]&gt;&lt;/value&gt;
-    
-    //注入聚合对象
-    //注入外部bean属性
-    &lt;property name="userDao" ref=userDaoImpl"&gt;&lt;/property&gt;
-    &lt;property&gt;
-    
-    //注入内部bean同内部类
-    //员工属于一个部门
-    &lt;property name="dept"&gt;
-        &lt;bean id="dept" class="..."&gt;
-            &lt;propert name="dname" value="security"&gt;&lt;/property&gt;
-        &lt;/bean&gt;
-    &lt;/property&gt;
-    
-    //级联赋值
-    &lt;property name="dept" ref="dept"&gt;&lt;/property&gt;
-    
-    //注入集合，创建类，定义数组、List、Set、Map属性，生成set方法
-    &lt;property name="courses"&gt;
-        //注入数组类型属性
-        &lt;array&gt;
-            &lt;value&gt;java&lt;/value&gt;
-        &lt;/array&gt;
-        //注入List集合属性
-        //注入Map属性
-        //在集合里设置对象类型的值
-    &lt;/property&gt;
-    
-    &lt;--!2. 用有参构造注入属性--&gt;
-    &lt;constructor-arg name="oname" index=0  value="China"&gt;&lt;/constructor-arg&gt;
-    
-&lt;/bean&gt;
-
-&lt;bean id="userDaoImpl" class="com.at.spring5.dao.UserDaoImpl"&gt;&lt;/bean&gt;
-
-    public Orders(String oname) {
-        this.oname = oname;
-    }
-    
-psvm ctrl+.
-</code></pre></div></div>
-
-<p>2）基于注解的配置，在Java类中用注解设置依赖关系</p>
-
-<p>Spring 配置文件（xml或properties）中启用注解装配，如：</p>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;beans&gt;
-&lt;context:annotation-config/&gt;
-&lt;!-- bean definitions go here --&gt;
-&lt;/beans&gt;
-</code></pre></div></div>
-
-<p>3）基于 Java API 配置Bean，（把Java代码当作配置文件，）会用到注解：Java配置类？</p>
-<ul>
-  <li>@Configuration 表明是 JavaConfig配置类，用于（通过简单调用同类中的其他 @Bean 方法来）配置/定义Bean间的依赖关系。</li>
-  <li>@ComponentScan 用特定注解标注的类统一扫描加载到Spring容器</li>
-  <li>@Bean 替代 <bean></bean> 元素；将该方法返回的Bean对象加载到Spring容器，可用@Bean的name属性自定义，默认为方法名。</li>
-  <li>@Import 允许从另一个Java/XML配置文件加载bean定义。</li>
-</ul>
-
-<p>要实现注入只需将要注入的Bean的类型作为参数，调用该类的带参构造器构建Bean，
-或：先创建这个类的对象，然后调用该对象的set方法进行注入，以被注入的Bean的方法为参数</p>
-
-<p>Spring Boot中彻底抛弃了xml配置，后期推荐用此方式</p>
-
-<p>4） <del>基于Groovy DSL配置（很少见）</del></p>
-
-<h5 id="将类声明为-bean-的注解">将类声明为 bean 的注解</h5>
-
-<p>一般用 @Autowired 注解自动装配 bean，要想把类标识成可用于自动装配的 bean 类,采用以下注解可实现：</p>
-
-<ul>
-  <li>@Component：泛指组件，用于任意层次，同@Name，较少用</li>
-  <li>@Repository：用于Dao（数据访问/持久？）层</li>
-  <li>@Service： 用于Service业务（逻辑）层，同@Component；</li>
-  <li>@Controller：用于控制层，接受用户请求并调用 Service 层返回数据给前端页面。同@Component；</li>
-</ul>
-
-<h5 id="component-vs-bean">@Component VS @Bean</h5>
-
-<ul>
-  <li>作用对象: @Component 注解作用于类，而@Bean作用于方法。</li>
-  <li>@Component常通过类路径扫描来自动侦测及自动装配到Bean容器；@Bean 常在方法中定义产生这个 bean,告诉Spring这是某个类的示例，当用它时还给我。</li>
-  <li>@Bean 的自定义性更强，很多地方只能通过 @Bean 来注册bean。如引用第三方库中的类需装配到 Spring容器时</li>
-</ul>
-
-<h5 id="bean-作用域">Bean 作用域</h5>
-
-<p>Spring 5：</p>
+<p>格式有：</p>
 
 <ol>
-  <li>
-    <p>singleton：默认值，单例模式，容器中只有一个共享的Bean实例，由BeanFactory维护。存储在高速缓存中，只要 id 与该 Bean 定义相匹配，都会返回该缓存对象。适用于无会话状态的 Bean（如 DAO 层、Service 层）。</p>
-  </li>
-  <li>
-    <p>prototype：每次获取 Bean 时，容器都会创建一个新的 Bean 实例。适用于需保持会话状态的 Bean（如 Struts2 的 Action 类）。</p>
-  </li>
-  <li>request：每次 HTTP 请求都会创建一个新的 bean，仅在当前 request 内有效（在请求完成后，bean会失效并被GC回收）。</li>
-  <li>session：同一个 HTTP Session 共享一个 Bean 实例。</li>
-  <li>application：类似于 singleton，同一个 Web 应用（可能有多个 IoC 容器）共享一个 Bean 实例。</li>
-  <li>websocket：作用域是 WebSocket。</li>
-</ol>
-
-<p>后4个只能在 Web 环境下（XmlWebApplicationContext）使用，如果用 ClassPathXmlApplicationContext 加载这些作用域中的任意一个的 Bean，会抛出异常。</p>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>配置 bean 的作用域
-
-1. xml 方式：
-&lt;bean id="" class="" scope="singleton"&gt;&lt;/bean&gt;
-
-2. 注解方式：
-@Bean
-@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public Person personPrototype() {
-    return new Person();
-}
-</code></pre></div></div>
-
-<h5 id="bean生命周期">Bean生命周期</h5>
-
-<h5 id="同名bean的优先级">同名Bean的优先级</h5>
-
-<ul>
-  <li>同一个配置文件内，以最上面定义的为准</li>
-  <li>不同配置文件中的，后解析的配置文件会覆盖先解析的</li>
-  <li>同文件中@Bean（最先注册）的优先级&gt;@ComponentScan</li>
-</ul>
-
-<h3 id="beans-自动装配">Beans 自动装配</h3>
-
-<p>Bean装配/依赖注入：在 IoC 容器中，Bean 与 Bean 间建立依赖关系。装配方式即依赖注入方式。</p>
-
-<p>手动装配 bean：XML 配置中通过 <constructor-arg>和 <property> 中的 ref 属性，手动维护 Bean 与 Bean 间的依赖关系。</property></constructor-arg></p>
-
-<p>自动装配 bean：Spring 容器依据规则，为指定的 Bean 从应用的上下文（AppplicationContext 容器）中查找所依赖的 Bean，并自动建立 Bean 间的依赖关系。</p>
-
-<h4 id="五种规则">五种规则</h4>
-
-<ul>
-  <li>no：默认设置，表示不用自动装配，Bean 依赖必须通过 ref 元素引用定义。</li>
-  <li>byName：根据 Property 的 name 自动装配/注入对象依赖项，如果一个 Bean 的 name 和另一个 Bean 中的 Property 的 name 相同，则自动装配这个 Bean 到 Property 中。</li>
-  <li>byType：根据 Property 的数据类型（Type）自动装配，如果一个 Bean 的数据类型兼容另一个 Bean 中 Property 的数据类型，则自动装配。</li>
-  <li>constructor：类似于 byType，根据构造方法参数的数据类型，进行 byType 模式的自动装配。</li>
-  <li>autodetect：如果 Bean 中有默认的构造方法，则用 constructor 模式，否则用 byType 模式。</li>
-</ul>
-
-<h5 id="ioc容器自动装配bean的方式">IoC容器自动装配Bean的方式</h5>
-
-<ol>
-  <li>XML：applicationContext.xml配置文件
+  <li><code class="highlighter-rouge">Properties</code> 配置文件：key-value 形式，只能赋值，不能进行其他操作；用于简单的属性配置。</li>
+  <li><code class="highlighter-rouge">XML</code> 配置文件：树形结构清晰灵活，内容繁琐，用于大型复杂的项目。
     <ul>
-      <li>根据名字来装配</li>
-      <li>根据类型类装配</li>
+      <li><code class="highlighter-rouge">&lt;bean&gt;</code>的常用属性：见下；
+        <ul>
+          <li><code class="highlighter-rouge">ref</code>：用于注入已定义好的 Bean；</li>
+          <li><code class="highlighter-rouge">autowire</code> 属性：设置<a href="#自动装配的五种规则">自动装配的规则</a>；</li>
+        </ul>
+      </li>
+      <li><code class="highlighter-rouge">&lt;bean&gt;</code>的其它属性：
+        <ul>
+          <li><code class="highlighter-rouge">parent</code> 属性：指定继承的父 Bean。</li>
+          <li>指定 <code class="highlighter-rouge">abstarct="true"</code> 而不指定 class 属性，表示为 Bean 定义模板（抽象类？），只能被继承，不能被实例化。</li>
+          <li><code class="highlighter-rouge">value</code>：用于注入基本数据类型及字符串类型的值；</li>
+          <li><code class="highlighter-rouge">type</code>：用来指定对应的构造函数；</li>
+          <li><code class="highlighter-rouge">index</code>：指定参数位置；</li>
+        </ul>
+      </li>
+      <li><code class="highlighter-rouge">&lt;property&gt;</code>：给属性注入值，name 的名称取决于 setXxx() 后的参数；
+```
+// Beans.xml</li>
     </ul>
   </li>
 </ol>
+<beans>
+    // bean 标签: 要创建的对象，默认执行无参构造器
+    // id: Bean 的唯一标识符
+    // class: Bean的实现类，指定从 package 到 class name 的完全限定名
+    // name: 
+    // scope: Bean 的作用域
+    <bean id="user" class="com.spring5.User" name="" scope="">
+        &lt;--! 1. 用（有参）构造器注入属性--&gt;
+        &lt;constructor-arg name="oname" index=0 type="" value="China"&gt;
+        &lt;/constructor-arg&gt;
+        
+        &lt;--! 2. 用set方法注入属性，通过property标签实现属性注入--&gt;
+        // 注入8大基本数据类类 + String
+        <property name="bname" value="java"></property>
+        // 注入外部bean属性
+        <property name="userDao" ref="userDaoImpl"></property>
+        // 注入集合，创建类，定义数组、List、Set、Map属性，生成set方法
+        <property name="courses">
+            // 注入数组类型属性
+            // 注入List集合属性
+            <list>
+                <value>java</value>
+            </list>
+            // 注入Map属性
+            // 在集合里设置对象类型的值
+        </property>
+    </bean>
+</beans>
 
-<p>配置 <bean> 元素的 autowire 属性，值有：</bean></p>
+<p>// 类中
+public Orders(String oname) {
+    this.oname = oname;
+}</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+##### Bean 作用域
 
-<p>局限：</p>
-<ul>
-  <li>用 <constructor-arg> 和 <property> 设置指定依赖项，将覆盖自动装配。</property></constructor-arg></li>
-  <li>基本元数据类型（简单属性，如原数据类型，字符串和类）无法自动装配。</li>
-  <li>不精确</li>
-</ul>
+Bean 作用域：指 Spring IoC 容器创建的 Bean 对象相对于其他 Bean 的请求可见范围。在装配 Bean 时就必须指明，可通过 XML 或注解方式配置。
 
-<h5 id="如何解决循环依赖">如何解决循环依赖</h5>
+</code></pre></div></div>
+<ol>
+  <li>XML 方式：</li>
+</ol>
+<bean class="" scope="singleton"></bean>
 
 <ol>
-  <li>构造器的：直接抛出BeanCurrentlylnCreationException异常。</li>
-  <li>单例模式下的setter（默认的单例Bean中，属性互相引用）：通过三级缓存处理。</li>
+  <li>注解方式：
+@Bean
+//@Scope(“singleton”)
+@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+public Person personPrototype() {
+ return new Person();
+}
+```</li>
+</ol>
+
+<p><strong>基本作用域</strong>：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">singleton</code>：单例模式，默认值，在整个Spring IoC 容器中只有一个<strong>共享</strong>的 Bean 实例，由 BeanFactory 维护。一旦创建成功，<strong>可重复使用</strong>。存储在高速缓存中，用于<strong>无会话状态</strong>的 Bean（如 DAO 层、Service 层）。</li>
+  <li><code class="highlighter-rouge">prototype</code>：原型模式，每次获取 Bean 时，容器都会创建一个新的 Bean 实例；创建成功后不再跟踪和维护 Bean 实例的状态。用于需保持会话状态的 Bean（如 Struts2 的 Action 类）。</li>
+</ol>
+
+<p><strong>Web 作用域</strong>：只能在 Web 环境（<code class="highlighter-rouge">XmlWebApplicationContext</code>）下用，如果用 <code class="highlighter-rouge">ClassPathXmlApplicationContext</code> 加载这些作用域中的任意一个的 Bean，会抛出异常。</p>
+
+<ol>
+  <li><code class="highlighter-rouge">request</code>：每次 HTTP request 请求都会产生一个新的（不同的）Bean 实例，仅在当前 request 内有效（在请求完成后，Bean 会被 <strong>GC</strong> 回收）。</li>
+  <li><code class="highlighter-rouge">session</code>：每个 HTTP Session 会产生一个新的 Bean，仅在当前 session 内有效。同一个 Session 共享一个 Bean 实例。</li>
+  <li><del><code class="highlighter-rouge">global-session</code></del>：每个全局的 HTTP Session、用 session 定义的 Bean 都将产生一个新实例。典型情况下，仅在用 portlet context 时有效。</li>
+  <li><code class="highlighter-rouge">application</code>：类似于 singleton，同一个 <strong>Web 应用</strong>（可能有多个 IoC 容器）共享一个 Bean 实例。</li>
+  <li><del><code class="highlighter-rouge">websocket</code></del>：作用域是 WebSocket。</li>
+</ol>
+
+<h5 id="bean-生命周期">Bean 生命周期</h5>
+
+<p><img src="assets/bean_life_cycle.png" alt="img" style="zoom: 50%;" /></p>
+
+<p>spring bean 在初始化和销毁时可触发自定义回调操作。</p>
+
+<ol>
+  <li>实例化 Bean 对象（3步）；</li>
+  <li>初始化 Bean 对象（4步）；
+    <ol>
+      <li><del>初始化顺序：类构造器 &gt; <code class="highlighter-rouge">@PostConstruct</code> &gt; <code class="highlighter-rouge">InitializingBean</code> &gt; <code class="highlighter-rouge">init-method</code></del></li>
+      <li><del>初始化时实现的方法：</del>
+        <ol>
+          <li>通过 Java 提供的 <code class="highlighter-rouge">@PostConstruct</code> 注解；</li>
+          <li>通过实现 Spring 提供的 <code class="highlighter-rouge">InitializingBean</code> 接口，并重写其 <code class="highlighter-rouge">afterPropertiesSet()</code> 方法；</li>
+          <li>通过 Spring 的 xml bean 配置或 bean 注解指定初始化方法，如自定义 <code class="highlighter-rouge">initMethod</code>方法通过 <code class="highlighter-rouge">@Bean</code> 注解指定。</li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+  <li>销毁 Bean 对象（4步）；
+    <ol>
+      <li><del>销毁顺序：<code class="highlighter-rouge">@PreDestroy</code> &gt; <code class="highlighter-rouge">DisposableBean</code> 接口&gt; <code class="highlighter-rouge">destroyMethod</code></del></li>
+      <li><del>销毁时实现的方法：</del>
+        <ol>
+          <li>通过 Java 提供的 <code class="highlighter-rouge">@PreDestroy</code> 注释；</li>
+          <li>通过实现 spring 提供的 <code class="highlighter-rouge">DisposableBean</code> 接口，并重写其 <code class="highlighter-rouge">destroy</code> 方法；</li>
+          <li>通过 spring 的 xml bean 配置或 bean 注解指定销毁方法，如下面实例的 <code class="highlighter-rouge">destroyMethod</code> 方法通过 <code class="highlighter-rouge">@bean</code> 注解指定。</li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+</ol>
+
+<h5 id="同名-bean-的优先级">同名 Bean 的优先级</h5>
+
+<ol>
+  <li>同一个配置文件内，以最早定义的为准；</li>
+  <li>不同配置文件中，后解析的配置文件会覆盖先解析的；</li>
+  <li>同文件中 <code class="highlighter-rouge">@Bean</code>的优先级（最先注册）&gt; <code class="highlighter-rouge">@ComponentScan</code>；</li>
+</ol>
+
+<h3 id="bean-自动装配">Bean 自动装配</h3>
+
+<p>Bean 装配/依赖注入（<strong>装配方式即依赖注入方式</strong>）：在 IoC 容器中，Bean 与 Bean 间建立依赖关系。</p>
+
+<ol>
+  <li>手动装配 Bean：XML 配置文件中，通过 <code class="highlighter-rouge">&lt;constructor-arg&gt;</code>和 <code class="highlighter-rouge">&lt;property&gt;</code> 中的 <code class="highlighter-rouge">ref</code> 属性，手动维护 Bean 间的依赖关系。</li>
+  <li>自动装配 Bean：Spring 容器依据规则，为指定的 Bean 从应用的上下文（AppplicationContext 容器）中查找所依赖的 Bean，并自动建立 Bean 间的依赖关系。
+    <ol>
+      <li>基于 XML 配置文件自动装配 Bean；</li>
+      <li>基于注解装配 Bean；</li>
+    </ol>
+  </li>
+</ol>
+
+<p>如何解决循环依赖：</p>
+
+<ol>
+  <li>构造器的：直接抛出 <code class="highlighter-rouge">BeanCurrentlylnCreationException</code> 异常。</li>
+  <li>单例模式下的 <code class="highlighter-rouge">setter</code>（默认的单例 Bean 中，属性互相引用）：通过三级缓存处理。</li>
   <li>非单例：无法处理。</li>
 </ol>
 
-<h3 id="基于注解的配置">基于注解的配置</h3>
+<h5 id="自动装配的五种规则">自动装配的五种规则</h5>
 
-<h5 id="controller-vs-resposebody-vs-restcontroller">@Controller VS @ResposeBody VS @RestController</h5>
-
-<ul>
-  <li>
-    <p>@Controller：返回一个视图/页面，用于传统的Spring MVC 前后端不分离的情况。扫描该类下有 @RequestMapping 的方法，根据注解信息生成一个对应的处理器对象</p>
-  </li>
-  <li>
-    <p>@ResponseBody：将 Controller 返回的对象转换为指定格式，并写入HTTP 响应对象的 body，常用来返回 JSON（较多）或 XML 数据。</p>
-  </li>
-</ul>
-
-<p>还需配合相应的支持 JSON 格式化的 HttpMessageConverter 实现类才能返回 JSON 格式，如Spring MVC 默认用 MappingJackson2HttpMessageConverter。</p>
-
-<ul>
-  <li>@RestController：只返回对象（对象数据直接以 JSON 或 XML 格式（由客户端的 ACCEPT 请求头决定）写入 HTTP 响应中），属于 RESTful Web/API服务，最常用的前后端分离框架的情况。</li>
-</ul>
-
-<p>开发 RESTful Web服务，Spring 4 后新加：
-@Controller + @ResponseBody= @RestController。</p>
-
-<h5 id="requestmapping-vs-getmapping">RequestMapping VS @GetMapping</h5>
-
-<p>@RequestMapping：配置处理器的 HTTP 请求方法，URI等信息，将请求和方法进行映射</p>
-
-<ul>
-  <li>@RequestMapping：可注解在类（一般是配置这个控制器的 URI 前缀）和方法上；@GetMapping 仅可注册在方法上</li>
-  <li>@RequestMapping：可进行 GET、POST、PUT、DELETE 等请求方法；@GetMapping 是 @RequestMapping 的 GET 请求方法的特例，用于提高清晰度。</li>
-</ul>
-
-<h5 id="requestparam-和-pathvariable-两个注解的区别">@RequestParam 和 @PathVariable 两个注解的区别</h5>
-
-<p>都用于方法参数，
-获取参数值的方式不同，@RequestParam 的参数从请求携带的参数中获取，而 @PathVariable 注解从请求的 URI 中获取</p>
-
-<h3 id="aop">AOP</h3>
-
-<p>AOP（面向切面编程）：将与业务无关却为业务模块所共同调用的逻辑（交叉业务逻辑，如事务处理、日志管理、权限控制等）封装成切面。</p>
-
-<p>便于减少系统的重复代码，降低模块间的耦合度，并有利于未来的可拓展性和可维护性。</p>
-
-<h5 id="代理模式spring-aop">代理模式：Spring AOP</h5>
-
-<p>Spring AOP VS AspectJ AOP</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;!-- 通过 autowire 属性设置自动装配的规则--&gt;
+&lt;bean id="employee" class="net.bian.Employee" autowire="byName" ref=""&gt;
+</code></pre></div></div>
 
 <ol>
-  <li>Spring AOP 基于动态代理/运行时增强，不需专门的编译过程和类加载器：
+  <li><code class="highlighter-rouge">no</code>：默认设置，表示不用自动装配，必须通过 <code class="highlighter-rouge">ref</code> 属性设置依赖的 Bean。</li>
+  <li><code class="highlighter-rouge">byName</code>：根据 Bean 中 <code class="highlighter-rouge">&lt;Property&gt;</code> 的 <code class="highlighter-rouge">name</code> 属性（查找对应的 Bean）自动装配/注入对象依赖。</li>
+  <li><code class="highlighter-rouge">byType</code>：根据 Property 兼容的<strong>数据类型</strong>自动装配。</li>
+  <li><code class="highlighter-rouge">constructor</code>：类似 byType，根据<strong>构造方法参数</strong>的数据类型，进行 <code class="highlighter-rouge">byType</code> 模式的自动装配。</li>
+  <li><code class="highlighter-rouge">autodetect</code>：如果 Bean 中有默认的构造方法，则用 <code class="highlighter-rouge">constructor</code> 模式，否则用 <code class="highlighter-rouge">byType</code> 模式。</li>
+</ol>
+
+<h5 id="基于-xml-自动装配bean">基于 XML 自动装配Bean</h5>
+
+<p><code class="highlighter-rouge">applicationContext.xml</code> 配置文件</p>
+
+<ol>
+  <li>根据名字装配；</li>
+  <li>根据类型装配；</li>
+</ol>
+
+<p>局限：</p>
+<ol>
+  <li>用 <code class="highlighter-rouge">&lt;constructor-arg&gt;</code> 和 <code class="highlighter-rouge">&lt;property&gt;</code> 设置指定依赖项，将覆盖自动装配；</li>
+  <li>基本元数据类型（简单属性，如原数据类型、字符串和类）无法自动装配；</li>
+  <li>不精确。</li>
+</ol>
+
+<h5 id="声明-bean-的注解">声明 Bean 的注解</h5>
+
+<p>Spring Boot 彻底抛弃了 XML 配置，推荐基于 Java API 配置 Bean，在 Java 类中用注解设置依赖关系。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Spring 配置文件（xml或properties）中启用注解装配
+&lt;beans&gt;
+	&lt;context:annotation-config/&gt;
+&lt;/beans&gt;
+</code></pre></div></div>
+
+<p>常用注解：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">@Component</code>：通用的注解，可标注<strong>任意类</strong>为 <code class="highlighter-rouge">Spring</code> 组件（Java Bean 对象），并添加到容器中。用于不知道属于哪层的 Bean。同 <code class="highlighter-rouge">@Name</code>，较少用。</li>
+  <li><code class="highlighter-rouge">@Bean</code>：替代 <code class="highlighter-rouge">&lt;bean /&gt;</code> 元素；将该方法<strong>返回的 Bean 对象</strong>加载到 Spring 容器；可用 name 属性自定义，默认为方法名。</li>
+  <li><code class="highlighter-rouge">@Repository</code>：用于 Dao（数据持久化）层，数据库相关操作。</li>
+  <li><code class="highlighter-rouge">@Service</code>： 用于 Service（业务逻辑）层，主要涉及一些复杂的逻辑，需用到 Dao 层。</li>
+  <li><code class="highlighter-rouge">@Controller</code>：用于控制层，接受用户请求并调用 Service 层返回数据给前端页面。</li>
+</ol>
+
+<p><code class="highlighter-rouge">@Component</code> VS <code class="highlighter-rouge">@Bean</code></p>
+
+<ol>
+  <li>位置：<code class="highlighter-rouge">@Component</code> 注解作用于类，而 <code class="highlighter-rouge">@Bean</code> 作用于方法。</li>
+  <li>作用对象：<code class="highlighter-rouge">@Component</code> （常通过类路径扫描来）自动装配<strong>当前类的对象</strong>到容器；<code class="highlighter-rouge">@Bean</code> 将该方法返回的对象加载到 Spring 容器。</li>
+  <li><code class="highlighter-rouge">@Bean</code> 自定义性更强，多处只能用 @Bean 来注册 Bean。如引用第三方库中的类需装配到 Spring 容器时。</li>
+</ol>
+
+<h5 id="基于注解装配-bean">基于注解装配 Bean</h5>
+
+<ol>
+  <li><code class="highlighter-rouge">@Autowired</code>：用于 setter()、构造函数或字段上。步骤：
+    <ol>
+      <li>默认用 <code class="highlighter-rouge">byType</code> 的方式自动注入 Bean 到（同样被 Spring 容器管理的）当前 Bean 中（即自动导入对象到类中），如：Service 类注入到 Controller 类中；</li>
+      <li>同一个实体类有多个实现类（配置多个 Bean）时<strong>类型相同</strong>，IOC 不知该注入哪个实现类，这时改为 <code class="highlighter-rouge">byName</code> 的方式注入，默认根据标注的成员变量名作为 id，查找 Bean，进行装配；</li>
+      <li>仍失败，则通过 <code class="highlighter-rouge">@Qualifiler</code> 指明目标 Bean 的 id（变量名）；</li>
+      <li>检查属性是否正常装配（设置），无法找到匹配的 Bean 装配会抛出异常；设置 <code class="highlighter-rouge">required=false</code> 允许属性不被设置，则不抛出异常。</li>
+      <li><a href="https://blog.csdn.net/weixin_44296929/article/details/109527112">@Autowired注解使用的自动装配方式</a></li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">@Resource</code>：默认（指定值）是 <code class="highlighter-rouge">byName</code>，找不到与名称匹配的 Bean（或该属性为空、不指定值）时用 <code class="highlighter-rouge">byType</code>，自动用标注处的变量或方法名作为 Bean 名；相同类型在 IOC 容器中只能有一个。</li>
+  <li><code class="highlighter-rouge">@Qualifier("userDAO")</code>：限定要自动注入的 Bean 的 id，一般和 <code class="highlighter-rouge">@Autowired</code> 联用，指定 Bean的名称。</li>
+</ol>
+
+<p><code class="highlighter-rouge">@Controller</code> VS <code class="highlighter-rouge">@ResposeBody</code> VS <code class="highlighter-rouge">@RestController</code></p>
+
+<ol>
+  <li><code class="highlighter-rouge">@Controller</code>：单独使用（不加 <code class="highlighter-rouge">@ResponseBody</code>）返回一个视图/页面，用于（传统 Spring MVC）前后端不分离的情况。
     <ul>
-      <li>JDK 动态代理：被代理的类至少实现一个接口</li>
-      <li>CGLIB 动态代理/子类代理：目标类没有实现接口</li>
+      <li>若扫描该类下有 <code class="highlighter-rouge">@RequestMapping</code> 方法，根据注解信息生成对应的处理器对象。</li>
     </ul>
   </li>
-  <li>AspectJ 基于静态代理/编译时增强：
+  <li><code class="highlighter-rouge">@ResponseBody</code>：将 Controller 返回的对象转换为指定格式，并写入 HTTP 响应对象的响应 body 中，常用来返回 JSON（较多）或 XML 数据。</li>
+  <li><code class="highlighter-rouge">@RestController</code> = <code class="highlighter-rouge">@Controller</code> + <code class="highlighter-rouge">@ResponseBody</code>：表示 REST 风格的控制器 Bean。返回 JSON 或 XML 格式（由客户端的 ACCEPT 请求头决定）的对象数据，并直接写入 HTTP 响应体中。属于 RESTful Web/API服务，最常用的前后端分离框架的情况。
     <ul>
-      <li>性能更好，功能更全，需特定的编译器处理</li>
+      <li><del>无需用 <code class="highlighter-rouge">@ResponseBody</code> 注解每个方法。</del>
+        <h3 id="aop">AOP</h3>
+      </li>
     </ul>
   </li>
 </ol>
+
+<p>AOP（面向切面编程）：将与业务无关却被业务模块所共同调用的逻辑（交叉业务逻辑，如事务处理、日志管理、权限控制等）封装成切面。主要作用是通过不修改源码的方式、将非核心功能代码织入来实现对方法的增强。</p>
+
+<p>通过预编译方式和运行期动态代理实现程序功能的统一维护。可对业务逻辑的各部分进行隔离，从而降低耦合度，提高程序的可重用性。</p>
+
+<h5 id="aop-实现原理">AOP 实现原理</h5>
+
+<p>基于代理模式，主要分为两种方式：</p>
+
+<ol>
+  <li>AspectJ AOP 基于<strong>静态代理</strong>/编译时增强；</li>
+  <li>Spring AOP 基于<strong>动态代理</strong>/运行时增强；</li>
+</ol>
+
+<p><a href="https://www.cnblogs.com/xuwc/p/13889490.html">AOP 实现原理代码示例</a></p>
 
 <h5 id="aspectj-aop">AspectJ AOP</h5>
 
 <ol>
   <li>
-    <p>基于XML的声明式 AspectJ/开发AOP：
-指通过 Spring 配置文件定义切面、切入点及通知，都必须定义在 <aop:config> 元素（将定义好的 Bean 转换为切面 Bean）中。</aop:config></p>
+    <p>基于 XML 的<strong>声明式</strong> AspectJ / 开发AOP：指通过 Spring 配置文件定义切面、切入点及通知，都必须定义在 <code class="highlighter-rouge">&lt;aop:config&gt;</code> 元素（将定义好的 Bean 转换为切面 Bean）中。在 XML 文件中添加<code class="highlighter-rouge">&lt;aop:aspectj-autoproxy&gt;</code> 启用 <code class="highlighter-rouge">@AspectJ</code>。</p>
   </li>
   <li>
-    <p>基于注解的声明式 AspectJ：
-启用 @AspectJ 注解有以下两种方法：
-1）使用@Configuration和@EnableAspectJAutoProxy注解：</p>
+    <p>基于注解的声明式 AspectJ：启用 <code class="highlighter-rouge">@AspectJ</code> 注解有以下两种方法：</p>
+
+    <ol>
+      <li>
+        <p>用 <code class="highlighter-rouge">@Configuration</code> 和 <code class="highlighter-rouge">@EnableAspectJAutoProxy</code> 注解；</p>
+
+        <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Configuration
+@EnableAspectJAutoProxy
+public class Appconfig {}
+</code></pre></div>        </div>
+      </li>
+      <li></li>
+    </ol>
   </li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Configuration 
-@EnableAspectJAutoProxy
-public class Appconfig {
+<h5 id="代理工厂静态方法">代理工厂（静态方法）</h5>
+
+<ol>
+  <li>把 AOP 加入 IOC 容器中；</li>
+  <li>把 UserDao 放入容器中；</li>
+  <li>在配置文件中开启注解扫描，用工厂静态方法来创建代理类对象。</li>
+</ol>
+
+<h5 id="通知">通知</h5>
+
+<p>通知（Advice）：描述了切面要完成的工作及何时执行。如，日志切面需在接口调用前后分别记录当前时间，取差值计算调用时长。</p>
+
+<ul>
+  <li>
+    <p><code class="highlighter-rouge">@Aspect</code>：用于定义切面；切面是通知和切点的结合，定义了何时、何地应用通知功能。</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">@Pointcut</code>：切点，定义切点表达式，指定了通知被应用的范围。如，日志切面的应用范围是所有 Controller 层的接口方法。格式：</p>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// execution(方法修饰符 返回类型 方法所属的包.类名.方法名称(方法参数)
+@Pointcut("execution(public * com.macro.mall.controller.*.*(..))||execution(public * com.macro.mall.*.controller.*.*(..))")
+public void webLog() {
+}
+</code></pre></div>    </div>
+  </li>
+  <li>连接点（JoinPoint）：通知功能被应用的时机。如，接口方法被调用时就是日志切面的连接点。</li>
+  <li>引入（Introduction）：在无需修改现有类的情况下，向现有类添加新方法或属性。</li>
+  <li>
+    <p>织入（Weaving）：把切面应用到目标对象，并创建新代理对象的过程。</p>
+  </li>
+  <li><code class="highlighter-rouge">@Before</code>：前置通知，通知方法会在目标方法调用前执行；</li>
+  <li><code class="highlighter-rouge">@After</code>：后置通知，通知方法会在目标方法返回或抛出异常后执行；</li>
+  <li><code class="highlighter-rouge">@AfterReturning</code>：返回通知，通知方法会在目标方法返回后执行；</li>
+  <li><code class="highlighter-rouge">@AfterThrowing</code>：异常通知，通知方法会在目标方法抛出异常后执行；</li>
+  <li><code class="highlighter-rouge">@Around</code>：环绕通知，通知方法会将目标方法封装起来；通知包裹了目标方法，在目标方法调用前和后、执行自定义的行为。</li>
+</ul>
+
+<p>创建切面步骤：</p>
+
+<ol>
+  <li>添加日志信息封装类 WebLog：用于封装需记录的日志信息，包括操作的描述、时间、消耗时间、url、请求参数和返回结果等信息。</li>
+  <li>添加切面类 WebLogAspect：定义了一个日志切面，在环绕通知中获取日志需要的信息，并应用到 Controller 层中所有的 public 方法中。</li>
+</ol>
+
+<h3 id="spring-框架中的设计模式">Spring 框架中的设计模式</h3>
+
+<ol>
+  <li>工厂模式：<a href="#IoC 容器">IoC 容器的两种实现</a>：通过 <code class="highlighter-rouge">BeanFactory</code>、<code class="highlighter-rouge">ApplicationContext</code> 接口创建 Bean 对象；</li>
+  <li>单例模式：Bean 默认为单例模式，只有一个实例；Spring 中 Bean 的默认作用域就是 singleton。Spring 可通过 XML 或注解方式<a href="#Bean 作用域">配置 Bean 的作用域</a>来实现单例。Spring 通过 <code class="highlighter-rouge">ConcurrentHashMap</code> （线程安全）实现单例注册表的特殊方式实现单例模式。
+    <ol>
+      <li>xml : <code class="highlighter-rouge">&lt;bean id="userService" class="top.UserService" scope="singleton"/&gt;</code></li>
+      <li>注解：<code class="highlighter-rouge">@Scope(value = "singleton")</code></li>
+    </ol>
+  </li>
+  <li>代理模式：AOP 用到 JDK 的动态代理和 CGLIB 字节码生成技术；</li>
+  <li>适配器/包装器（Wrapper）模式 : 可根据客户的需求动态切换不同的数据源，使接口不兼容的类一起工作。Spring AOP 的增强或通知、Spring MVC 适配 Controller。</li>
+  <li>装饰者模式：</li>
+  <li>观察者模式：定义对象间的依赖关系，一个对象发生改变时，所有依赖它的对象都会被动更新。如，事件驱动模型（如每次添加商品时都需重新更新索引，<code class="highlighter-rouge">ApplicationListener</code> （listener 的实现））。</li>
+  <li>模板方法：用来解决代码重复的问题。如 <code class="highlighter-rouge">RestTemplate, JmsTemplate, JpaTemplate、jdbcTemplate、hibernateTemplate</code> 等对数据库操作的类。</li>
+</ol>
+
+<h3 id="spring-事务管理">Spring 事务管理</h3>
+
+<p>事务管理：按照给定的事务规则来执行提交或回滚操作。</p>
+
+<ol>
+  <li>编程式事务：编写代码实现管理事务，难维护；</li>
+  <li><strong>声明式事务</strong>：分离事务管理和业务逻辑代码，实际是通过 AOP 实现；不需编程，只需通过<strong>在 XML 文件中配置或直接基于注解</strong>实现。实现声明式事务的方式：
+    <ol>
+      <li>基于XML（<code class="highlighter-rouge">&lt;tx&gt;</code> 和 <code class="highlighter-rouge">&lt;aop&gt;</code> 命名空间）的声明式事务管理：推荐，最大特点是与 Spring AOP 结合紧密，可充分利用切点表达式的强大支持，更灵活。</li>
+      <li>基于 <code class="highlighter-rouge">@Transactional</code> 的全注解方式：简化，使用最多。</li>
+    </ol>
+  </li>
+</ol>
+
+<h5 id="transactional"><code class="highlighter-rouge">@Transactional</code></h5>
+
+<ul>
+  <li>作用于类：表示该类所有的 public 方法都配置相同的事务属性信息；</li>
+  <li>作用于方法：方法的事务会覆盖类的事务配置信息。</li>
+</ul>
+
+<h5 id="事务传播行为规则">事务传播行为/规则</h5>
+
+<p>支持当前事务：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">PROPAGATION_REQUIRED</code>：支持当前事务，如果当前没有事务，新建一个事务。最常见。</li>
+  <li><code class="highlighter-rouge">PROPAGATION_SUPPORTS</code>：支持当前事务，如果当前没有事务，以非事务方式执行。</li>
+  <li><code class="highlighter-rouge">PROPAGATION_MANDATORY</code>：支持当前事务，如果当前没有事务，抛出异常。</li>
+</ul>
+
+<p>挂起当前事务：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">PROPAGATION_REQUIRES_NEW</code>：新建事务，如果当前存在事务，把当前事务挂起。</li>
+  <li><code class="highlighter-rouge">PROPAGATION_NOT_SUPPORTED</code>：以非事务方式执行操作，如果当前存在事务，把当前事务挂起。</li>
+  <li><code class="highlighter-rouge">PROPAGATION_NEVER</code>：以非事务方式执行，如果当前存在事务，抛出异常。</li>
+</ul>
+
+<p>嵌套：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">PROPAGATION_NESTED</code>：如果当前存在事务，则在嵌套事务内执行。如果当前没有事务，进行与 <code class="highlighter-rouge">PROPAGATION_REQUIRED</code>类似的操作。</li>
+</ul>
+
+<h2 id="spring-mvc">Spring MVC</h2>
+
+<p>是一个基于 MVC 设计模式的轻量级 Web 开发框架，本质上相当于 Servlet，本身是 Spring 框架的一部分。</p>
+
+<h3 id="mvc-设计模式">MVC 设计模式</h3>
+
+<p>Model 1 时代：</p>
+<ol>
+  <li>数据模型层（Model）：应用程序的主体部分，负责数据逻辑（业务规则）的处理和实现数据操作/存取。</li>
+  <li>视图层（View）：负责格式化数据并呈现给用户；包括数据展示、用户交互、数据验证、界面设计等功能。</li>
+  <li>控制层（Controller）：负责接收并转发请求，对请求进行处理后，指定视图并将响应结果发送给客户端。</li>
+</ol>
+
+<p>Model 2 时代，早期 Java Web MVC 开发模式：</p>
+<ol>
+  <li>JavaBean + JSP；</li>
+  <li>JavaBean + JSP + Servlet
+    <ol>
+      <li>Java Bean（Model，即 dao 和 bean）</li>
+      <li>JSP（View）</li>
+      <li>Servlet（Controller，可在 JSP 中实现）</li>
+    </ol>
+  </li>
+</ol>
+
+<p>Spring MVC 时代：</p>
+<ol>
+  <li>持久层（Dao 数据库操作 / Entity 实体类 / Model）：可整合 MyBatis、Hibernate 和 JdbcTemplate 等技术。</li>
+  <li>表现层（View）：提供与 Spring MVC、Struts2 框架的整合。</li>
+  <li>控制层（Controller）：</li>
+  <li>业务逻辑层（Service）：处理业务逻辑。处理请求和响应事件，“事件”包括<strong>用户的行为</strong>和<strong>数据的改变</strong>。管理事务和记录日志等。<code class="highlighter-rouge">service + serviceImpl、dao + daoImpl</code> 。</li>
+</ol>
+
+<h3 id="spring-mvc-vs-structs2">Spring MVC VS Structs2</h3>
+
+<ol>
+  <li>
+    <p>Spring MVC 基于方法开发，会将 URL 信息与 Controller 类的某个方法绑定并进行映射，请求参数作为该方法的形参，生成 Handler 对象，只包含一个 method 方法。Struts2 基于类开发，Action 类中所有方法的请求参数都是成员变量，方法越多，类越乱。</p>
+  </li>
+  <li>
+    <p>Spring MVC 支持单例开发模式，而 Struts2 由于只能通过类的成员变量接受参数，无法用单例模式。</p>
+  </li>
+</ol>
+
+<h3 id="spring-mvc-工作原理流程说明">Spring MVC 工作原理/流程说明</h3>
+
+<ol>
+  <li>把 url 映射到 Controller上：
+    <ol>
+      <li>客户端（浏览器）发送请求到 DispatcherServlet；</li>
+      <li>DispatcherServlet 根据请求信息调用 HandlerMapping；</li>
+      <li>解析请求到对应的 Handler（即 Controller）；</li>
+    </ol>
+  </li>
+  <li>HandlerAdapter 适配器根据 Handler 调用真正的处理器处理请求，并处理相应的业务逻辑；</li>
+  <li>处理器处理完业务后，会返回一个 <code class="highlighter-rouge">ModelAndView</code> 对象，Model 是返回的数据对象，View 是逻辑上的 View；ModelAndView 对象返回的方式：
+    <ul>
+      <li><code class="highlighter-rouge">ViewResolver</code> 会根据逻辑 View 查找实际的 View；</li>
+      <li><code class="highlighter-rouge">DispaterServlet</code> 把返回的 Model 传给 View（视图渲染）；</li>
+    </ul>
+  </li>
+  <li>把 View 返回给请求者（浏览器）。</li>
+</ol>
+
+<h2 id="spring-boot">Spring Boot</h2>
+
+<h3 id="概述">概述</h3>
+
+<h5 id="spring-boot-特点">Spring Boot 特点</h5>
+
+<p>简化 Spring 项目配置：</p>
+
+<ol>
+  <li>
+    <p>部署方便：提供嵌入式 HTTP 服务器，如 <a href="#Tomcat">Tomcat</a> （作为默认的嵌入式 <code class="highlighter-rouge">Servlet</code> 容器）、 Jetty、Undertow，可轻松开发和测试 Web 应用程序；直接运行入口函数即可启动项目/作为独立应用程序运行；</p>
+  </li>
+  <li>
+    <p>管理依赖关系：提供一系列的 <code class="highlighter-rouge">starter</code> 项目对象模型（POMS）来简化 Maven 配置（引入依赖）；</p>
+  </li>
+  <li>
+    <p><strong>自动配置</strong>、开箱即用：提供大量默认配置；通过注解和（<code class="highlighter-rouge">@Configuration</code>）配置类替换传统繁杂的 xml 配置文件，以 JavaBean 形式配置。快速搭建开发环境；</p>
+  </li>
+  <li>
+    <p>方便集成整合 Spring 生态系统，如 Spring JDBC、Spring ORM、Spring Data、Spring Security 等；</p>
+  </li>
+  <li>
+    <p>强大的数据库事务管理功能；</p>
+  </li>
+  <li>
+    <p>项目可打包成 jar 文件，可用<code class="highlighter-rouge">java–jar xx.jar</code> 命令以 jar 包的形式独立运行；</p>
+  </li>
+  <li>
+    <p>自带应用监控；</p>
+  </li>
+  <li>
+    <p>集成 Junit，测试方便；</p>
+  </li>
+</ol>
+
+<h5 id="spring-vs-spring-boot">Spring VS Spring Boot</h5>
+
+<ol>
+  <li>Spring：主要功能是依赖注入，用于简化 Java EE 企业应用程序开发；</li>
+  <li>Spring Boot：主要功能是自动配置，用于简化 Spring  开发。</li>
+  <li>Spring MVC： 是一个面向 HTTP 的 Web 应用程序开发框架。</li>
+</ol>
+
+<h5 id="pojo-分层领域模型">POJO 分层领域模型</h5>
+
+<p><code class="highlighter-rouge">POJO</code>（Plain Ordinary Java Object）: 指只有 setter / getter / toString 的简单类，包括 DO / DTO / BO / VO 等。</p>
+
+<ol>
+  <li><code class="highlighter-rouge">DO</code>（Data/Domain Object）：数据/领域对象，从现实世界中抽象出的有形或无形的业务实体。</li>
+  <li><code class="highlighter-rouge">PO</code>（Persistent Object）：持久化对象，与持久层（通常是关系型数据库表）数据结构一 一对应的 POJO 类，通过 DAO 层向上传输数据源对象。</li>
+  <li><code class="highlighter-rouge">DTO</code>（Data Transfer Object）：数据传输对象，泛指用于展示层与服务层间的数据传输对象。存放参数类型定义类；</li>
+  <li><code class="highlighter-rouge">BO</code>（Business Object）：业务对象，可由 Service 层输出的封装业务逻辑的对象。</li>
+  <li><code class="highlighter-rouge">VO</code>（View Object）：视图对象，通常是 Web 向<strong>模板渲染引擎层</strong>传输的对象。用于展示层，把某个指定页面（或组件）的所有数据封装起来。</li>
+  <li><code class="highlighter-rouge">Query</code>：数据查询对象，各层接收上层的查询请求。注意超过 2 个参数的查询封装，禁止使用 Map 类传输。</li>
+</ol>
+
+<h5 id="ssm-架构">SSM 架构</h5>
+
+<blockquote>
+  <p>至少在项目里做过。介绍项目时，用一个业务流程来说 spring mvc 如何做的。</p>
+</blockquote>
+
+<p><code class="highlighter-rouge">Spring + Spring MVC + Mybatis </code>。</p>
+
+<h5 id="spring-boot-体系结构">Spring Boot 体系结构</h5>
+
+<ol>
+  <li>common：存放通用类，如工具类和通用返回结果。</li>
+  <li><del>component：存放组件。</del></li>
+  <li>config 层：存放 Java 配置类。</li>
+  <li><strong>Controler 控制层</strong>：存放控制器，负责接收并转发（原始数据和）请求、调用 service 层处理请求和响应事件，指定视图并将响应结果发送给客户端。用于组织不同层面，路由解析，控制流程，页面访问控制和交互，对外暴露 Rest API 接口。</li>
+  <li><strong>Service 业务逻辑层</strong>：（用数据访问层提供的接口）处理业务逻辑；<del>执行授权和验证</del>。处理请求和响应事件，“事件”包括<strong>用户的行为</strong>和<strong>数据的改变</strong>。
+    <ul>
+      <li>serviceImpl</li>
+    </ul>
+  </li>
+  <li><strong>DAO 数据访问 / 持久层</strong>：<del>将业务对象与数据库行进行相互转换</del>。常用<code class="highlighter-rouge">@Mapper</code>修饰，存放自定义的<code class="highlighter-rouge">Mapper</code>接口。</li>
+  <li><strong>DTO 数据传输对象层</strong>：存放自定义的传输对象，如请求参数和返回结果。
+    <ul>
+      <li>面向表现层（界面UI），通过 UI 的需求来定义 DTO；实现了表现层与 Model 间的解耦，表现层不引用 Model。如果开发过程中模型改变了而界面没变，就只需改 Model 而不需去改表现层。要维护 DTO 与 Model 间的映射关系。</li>
+    </ul>
+  </li>
+  <li><del>mbg</del>：MyBatis Generator 代码生成器和生成的代码；
+    <ul>
+      <li>mapper：生成的 mapper.xml 映射文件；</li>
+      <li><strong>Entity 实体层 / Model / Bean</strong> ：CRUD，面向业务逻辑层，通过业务来定义 Model。</li>
+    </ul>
+  </li>
+  <li>resource
+    <ul>
+      <li><strong>展示层</strong>：负责处理 HTTP 请求，将 JSON 参数转换为对象，对请求进行身份验证并将其传输到业务层。由视图（即前端部分）组成。</li>
+      <li>dao/mapper：mapper.xml 映射文件；</li>
+      <li>application.yml：SpringBoot 配置文件；</li>
+      <li>generatorConfig.xml：配置数据库连接，Mybatis generator 生成 model、mapper 接口及mapper.xml 的路径。</li>
+    </ul>
+  </li>
+</ol>
+
+<h3 id="spring-配置">Spring 配置</h3>
+
+<h5 id="配置文件格式">配置文件格式</h5>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 1. properties 格式
+server.port = 8080
+// 表示文档间隔
+---
+
+// 2. yml 格式
+// 不支持 @PropertySource 注解导入配置
+// spring-boot-starter-web 或 spring-boot-starter 都集成了 SnakeYAML 库，引用任一个，Spring Boot 都会自动添加库到 classpath 下
+server:
+	port: 8080
+// 以缩进来控制层级关系
+// 键值对间必须有空格
+// 大小写敏感
+// 字符串不需加引号
+// 双引号不转义, 单引号转义特殊字符，如"\n"为换行 
+</code></pre></div></div>
+
+<h5 id="配置绑定">配置绑定</h5>
+
+<p>配置绑定：读取（全局）配置文件中的属性值并绑定到 JavaBean 上，如数据库配置。用于容器中的组件。</p>
+
+<ol>
+  <li>
+    <p><code class="highlighter-rouge">@ConfigurationProperties(prefix = "person") </code>：用在<strong>类名</strong>上，读取配置文件中（以<code class="highlighter-rouge">"person"</code>为前缀）的所有配置数据，并与此 JavaBean （用<code class="highlighter-rouge">@Component</code> 等标注）中的所有属性绑定；支持松散语法绑定。</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">@Value("${url}")</code>：用在<strong>属性</strong>上，只读取配置文件中的某一个配置，与当前属性绑定；只支持基本数据类型 + String 类型，支持 SpEL 表达式。<strong>不推荐</strong>。与 <a href="Lombok 常用注解">Lombok 常用注解</a>重名；</p>
+  </li>
+</ol>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  import org.springframework.beans.factory.annotation.Value;
+  @Value("${aliyun.oss.accessKeyId}")
+  private String ALIYUN_OSS_ACCESSKEYID;
+</code></pre></div></div>
+
+<ol>
+  <li><code class="highlighter-rouge">@PropertySource(value = "classpath:person.properties")</code>：读取指定位置的配置文件；如与 Spring Boot 无关的（与 person 相关的）<strong>自定义配置</strong>移动到 <code class="highlighter-rouge">src/main/resources/person.properties</code>中。不常用。</li>
+</ol>
+
+<h5 id="导入配置文件">导入配置文件</h5>
+
+<ol>
+  <li><code class="highlighter-rouge">@Import</code>： 允许从另一个 Java/XML 配置文件加载 Bean 定义。</li>
+  <li><code class="highlighter-rouge">@ImportResource(locations = {"classpath:/beans.xml"})</code>：用于主启动类上，加载 Spring 配置文件，<code class="highlighter-rouge">src/main/resources/beans.xml</code>。</li>
+  <li>推荐用全注解方式加载 Spring 配置：
+    <ul>
+      <li><code class="highlighter-rouge">@Configuration</code>：定义配置类，相当于 Spring 的配置文件；</li>
+      <li>配置类内可有一个或多个被 @Bean 注解的方法，<del>会被 <code class="highlighter-rouge">AnnotationConfigApplicationContext</code> 或 <code class="highlighter-rouge">AnnotationConfigWebApplicationContext</code> 类扫描</del>，构建 Bean 定义（相当于 Spring 配置文件中的 <code class="highlighter-rouge">&lt;bean&gt;</code> 标签），方法的返回值会以组件的形式添加到容器中，组件的 id 就是方法名。</li>
+      <li>优先级低于 <code class="highlighter-rouge">.properties/.yml</code> 配置文件。</li>
+    </ul>
+  </li>
+</ol>
+
+<h5 id="多环境配置切换">多环境配置/切换</h5>
+
+<ol>
+  <li>创建 <code class="highlighter-rouge">application-{profile}.properties</code> 文件，如：<code class="highlighter-rouge">application-dev.properties</code> 用于开发环境；</li>
+  <li>在 <code class="highlighter-rouge">application.properties</code> 文件中添加 <code class="highlighter-rouge">spring.profiles.active=dev</code>；</li>
+</ol>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 命令行激活：将 Spring Boot 项目打包成 JAR 文件
+// 命令行窗口，跳转到 JAR 文件所在目录，执行以下命令，
+// 启动该项目，并激活开发环境的 Profile。
+java -jar helloworld-0.0.1-SNAPSHOT.jar  --spring.profiles.active=dev
+</code></pre></div></div>
+
+<h5 id="配置文件优先级">配置文件优先级</h5>
+
+<p>Spring Boot 启动时会扫描以下位置的 <code class="highlighter-rouge">application.properties/.yml</code> 文件，作为默认配置文件。</p>
+
+<ol>
+  <li><code class="highlighter-rouge">file:./config/*/</code>（jar包外的）</li>
+  <li><code class="highlighter-rouge">file:./config/</code></li>
+  <li><code class="highlighter-rouge">file:./</code></li>
+  <li><code class="highlighter-rouge">classpath:/config/</code></li>
+  <li><code class="highlighter-rouge">classpath:/</code></li>
+</ol>
+
+<blockquote>
+  <p>注：file: 指当前项目根目录；</p>
+</blockquote>
+
+<p>优先级：序号越小优先级越高。</p>
+
+<ol>
+  <li>根目录下的优先级高于当前项目的类路径下的；</li>
+  <li>
+    <p>先加载 <code class="highlighter-rouge">config/</code> 文件夹，子文件高于父文件夹；</p>
+  </li>
+  <li>相同位置的 .properties 的优先级高于 .yml；</li>
+  <li>带 <code class="highlighter-rouge">-{profile}</code> 优先级高于不带的。</li>
+</ol>
+
+<p>加载顺序：</p>
+
+<ol>
+  <li>存在相同的配置内容时，高优先级的内容会覆盖低优先级的内容；</li>
+  <li>存在不同的配置内容时，配置内容取并集。</li>
+</ol>
+
+<h5 id="classpath">classpath</h5>
+
+<p><code class="highlighter-rouge">classpath</code>：指当前项目的类路径，常用 <code class="highlighter-rouge">classpath:文件名</code> 引用 <code class="highlighter-rouge">classpath</code> 路径下的文件。用来指示 JVM 搜索 <code class="highlighter-rouge">.class</code> 文件位置的环境变量。</p>
+
+<ol>
+  <li>用 maven 构建（build）项目时，默认的 classpath 指向 <code class="highlighter-rouge">target/classes/</code>；</li>
+  <li>用 maven 打包（package）项目时，默认的 classpath 指向 war 内部的 <code class="highlighter-rouge">WEB-INF/classes/</code>；</li>
+</ol>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// springboot项目默认的classpath及工程编译后的位置
+./src/main/java/ # 将.java文件按照包文件结构编译成.class存入target/classes/
+./src/main/resources/ # 将static/、templates/目录按结构拷贝入target/classes/
+./src/test/java/ # 将文件编译进target/test-classes/目录中
+./target/
+
+// 获取springboot项目默认的classpath
+String classpath = ResourceUtils.getURL("classpath:").getPath();
+</code></pre></div></div>
+
+<h4 id="自动装配原理">自动装配原理</h4>
+
+<blockquote>
+  <p>开箱即用</p>
+</blockquote>
+
+<p>自动装配：通过注解或简单配置在 Spring Boot 帮助下实现某块功能。</p>
+
+<h5 id="spring-factories-机制">Spring Factories 机制</h5>
+
+<ul>
+  <li>
+    <p>Spring Boot 通过 <code class="highlighter-rouge">@EnableAutoConfiguration</code> 开启自动装配，基于 <a href="#IoC 容器">Spring Factories 机制</a>实现自动装配。</p>
+  </li>
+  <li>
+    <p>通过 <code class="highlighter-rouge">SpringFactoriesLoader</code>（spring-core 包里） 自动扫描所有 Jar 包<strong>类路径</strong>下的 <code class="highlighter-rouge">META-INF/spring.factories </code> 文件，最终加载其中的自动配置类（即通过 <code class="highlighter-rouge">@Conditional</code> 按需加载的配置类）实现自动装配。</p>
+  </li>
+  <li>
+    <p>想要其生效必须引入 <code class="highlighter-rouge">spring-boot-starter-xxx</code> 包实现起步依赖。</p>
+  </li>
+</ul>
+
+<h5 id="springbootapplication"><code class="highlighter-rouge">@SpringBootApplication</code></h5>
+
+<p>Spring Boot 启动类上的核心注解，实现自动装配的关键，主要组合包含以下 3 个注解：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">@EnableAutoConfiguration</code>：启用自动配置机制。也可关闭，如关闭数据源自动配置：<code class="highlighter-rouge">@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class })</code>。Spring Boot 中几乎所有默认配置都是通过配置类 <code class="highlighter-rouge">XxxAutoConfiguration</code> 配置的。</li>
+  <li><code class="highlighter-rouge">@Configuration</code>：允许在上下文中注册额外的 Bean 或<a href="#导入配置文件">导入其他配置类</a>。用于声明配置类，（通过简单调用同类中的其他 @Bean 方法来）配置/定义 Bean 间的依赖关系。同 <code class="highlighter-rouge">@Component</code>。
+    <ul>
+      <li><code class="highlighter-rouge">@SpringBootConfiguration</code>：组合了 <code class="highlighter-rouge">@Configuration</code>，实现配置文件的功能；</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">@ComponentScan</code>： 扫描 <code class="highlighter-rouge">@Component （@Service，@Controller）</code>标注的 Bean，装配（加载）到容器中，默认会扫描该类所在包及其子包下所有的类。</li>
+</ol>
+
+<h3 id="spring-boot-starter">Spring Boot Starter</h3>
+
+<p>只需在 Maven  pom.xml 配置中引入 starter 依赖，Spring Boot 就能自动扫描到要加载的信息并启动相应的默认配置。通过少量注解和简单配置就能用第三方组件提供的功能。</p>
+
+<h5 id="库依赖">库依赖</h5>
+
+<ol>
+  <li>一方库：本工程内部子项目模块依赖的库（jar 包）；</li>
+  <li>二方库：公司内部发布到中央仓库，可供公司内部其它应用依赖的库（jar 包）；</li>
+  <li>三方库：公司之外的开源库（jar 包）。</li>
+</ol>
+
+<h5 id="gav-定义规则">GAV 定义规则</h5>
+
+<blockquote>
+  <p>二方库依赖。</p>
+</blockquote>
+
+<p>一般，<code class="highlighter-rouge">包名根目录 = groupId + artifactId</code>，唯一。</p>
+
+<ol>
+  <li><code class="highlighter-rouge">GroupId</code> 格式：<code class="highlighter-rouge">com.{公司/BU/组织域名}.业务线.[子业务线]</code>，最多 4 级。如，<code class="highlighter-rouge">com.taobao.jstorm</code> 或 <code class="highlighter-rouge">com.alibaba.dubbo.register</code>。</li>
+  <li><code class="highlighter-rouge">ArtifactId</code> 格式：<code class="highlighter-rouge">产品线名/项目名-模块名</code>。语义不重复不遗漏，先到中央仓库查证一下。</li>
+  <li><code class="highlighter-rouge">Version</code>：主版本号.次版本号.修订号
+    <ol>
+      <li>主版本号：产品方向改变，或大规模 API 不兼容，或架构不兼容升级；</li>
+      <li>次版本号：保持相对兼容性，增加主要功能特性，影响范围极小的 API 不兼容修改；</li>
+      <li>修订号：保持完全兼容性，修复 BUG、新增次要功能特性等。</li>
+    </ol>
+  </li>
+</ol>
+
+<h5 id="工作原理启动过程">工作原理/启动过程</h5>
+
+<ol>
+  <li>Spring Boot 在启动时，会去依赖的 Starter 包中寻找 <code class="highlighter-rouge">resources/META-INF/spring.factories</code> 文件，根据文件中配置的 jar 包扫描项目所依赖的 jar 包；</li>
+  <li>根据 spring.factories 配置加载 <code class="highlighter-rouge">AutoConfigure</code> 类；</li>
+  <li>根据 <code class="highlighter-rouge">@Conditional</code> 注解的条件，进行自动配置并将 Bean 注入 Spring Context；</li>
+</ol>
+
+<p>按照约定去读取 Spring Boot Starter 的配置信息，再根据配置信息对资源进行初始化，并注入到 Spring 容器中。</p>
+
+<h5 id="spring-boot-starter-parent">spring-boot-starter-parent</h5>
+
+<blockquote>
+  <p>版本仲裁中心。</p>
+</blockquote>
+
+<ol>
+  <li>默认 JDK 版本（Java 8）；</li>
+  <li>默认字符集（UTF-8）；</li>
+  <li>统一管理部分常用依赖，版本仲裁；</li>
+  <li>资源过滤；</li>
+  <li>默认插件配置；</li>
+  <li>识别 <code class="highlighter-rouge">application.properties/.yml</code> 类型的配置文件。</li>
+</ol>
+
+<h5 id="常用-starter">常用 starter</h5>
+
+<ol>
+  <li>spring-boot-starter-web：提供了嵌入的 Servlet 容器、web开发需要的 servlet 与 jsp 支持及 Spring MVC 的依赖，并为 Spring MVC 提供了大量自动配置；</li>
+  <li>spring-boot-starter-data-jpa：数据库支持；</li>
+  <li>spring-boot-starter-data-Redis</li>
+  <li>spring-boot-starter-data-solr？</li>
+  <li>mybatis-spring-boot-starter</li>
+  <li>spring-boot-devtools：LiveReload 自动刷新，将文件更新自动部署到服务器并重启。</li>
+</ol>
+
+<h3 id="数据库事务问题">数据库（事务问题）</h3>
+
+<h5 id="jdbcormjpa">JDBC、ORM、JPA</h5>
+
+<ol>
+  <li><strong>JDBC</strong>（<code class="highlighter-rouge">Java DataBase Connectivity</code>）：是 Java 连接数据库操作的<strong>原生接口</strong>，所有框架操作数据库必须要用的，由数据库厂商提供。</li>
+  <li><strong>JdbcTemplate</strong> 通用 <code class="highlighter-rouge">JDBC</code> 操作数据库：位于 <code class="highlighter-rouge">spring-jdbc-x.x.x.jar</code> 包中，还需导入 <code class="highlighter-rouge">spring-tx-x.x.x.jar</code> 包用来处理事务和异常。Spring Boot 为 <code class="highlighter-rouge">JdbcTemplate</code> 提供了默认自动配置，可直接用 <code class="highlighter-rouge">@Autowired</code> 或构造函数注入到 Bean 中使用。
+    <ul>
+      <li>JdbcTemplate 是 Spring JDBC 核心包（core）中的核心类，可通过配置文件、注解、Java 配置类等形式获取数据库的相关信息，实现对 JDBC 开发过程中的驱动加载、连接的开启和关闭、SQL 语句的创建与执行、异常处理、事务处理、数据类型转换等<strong>操作的封装</strong>。</li>
+    </ul>
+  </li>
+  <li><strong>ORM</strong>（<code class="highlighter-rouge">Object Relational Mapping</code>，对象关系映射）框架：采用元数据来描述对象与关系映射的细节，一般用 XML 格式，存放在专门的<strong>对象映射文件</strong>中。是对象持久化的核心，是对 <code class="highlighter-rouge">JDBC</code> 的封装。</li>
+  <li><strong>JPA</strong>（<code class="highlighter-rouge">Java Persistence API</code>）：用于对象持久化的 API，是一种规范，是 ORM 框架的<strong>统一接口标准</strong>（统一了 Java 应用程序访问 ORM 框架的规范），实现用同样的方式访问不同的 ORM 框架。</li>
+  <li><strong>Spring Data JPA</strong>：是 Spring Data 的子模块，用 <code class="highlighter-rouge">Hibernate</code> 框架实现，（对 JPA 规范的抽象，没有实现 JPA 规范），用于简化数据访问层，可通过命名规范、注解的方式较快的<strong>编写 SQL</strong>。</li>
+</ol>
+
+<h5 id="hibernate-与-mybatis">Hibernate 与 MyBatis</h5>
+
+<ol>
+  <li><strong>Hibernate</strong>：是一个开源<strong>全自动</strong>化的 ORM 框架，对 JDBC 进行了非常轻量级的对象封装，将 <code class="highlighter-rouge">POJO</code> 与数据库表建立<strong>映射关系</strong>，可自动生成 SQL 语句并执行。封装了基本的 DAO 层操作，有较好的数据库移植性。</li>
+</ol>
+
+<ul>
+  <li>面向对象，着力于对象（与对象）间的关系，用于解决计算机逻辑问题，考虑的是对象的整个生命周期（包括对象的创建、持久化、状态的改变和行为等），持久化只是对象的一种状态。</li>
+</ul>
+
+<ol>
+  <li><strong>MyBatis</strong>：是一个持久化、<strong>半自动</strong>化（只支持将数据库查出的数据映射到 <code class="highlighter-rouge">POJO</code> 实体类上，而 <code class="highlighter-rouge">POJO</code> 到数据库的映射则需编写 <code class="highlighter-rouge">SQL</code> 语句实现）的<code class="highlighter-rouge">ORM</code>框架，不是依照 <code class="highlighter-rouge">JPA</code> 规范。</li>
+</ol>
+
+<ul>
+  <li>
+    <p>面向关系模型，着力于 <code class="highlighter-rouge">POJO</code> 与 <code class="highlighter-rouge">SQL</code> 间的映射关系，用于解决数据的高效存取问题。</p>
+  </li>
+  <li>可用简单的 XML 或注解来配置和映射原生信息，将接口和 <code class="highlighter-rouge">POJO</code> 映射成数据库中的记录。<strong>主要依赖于</strong> <code class="highlighter-rouge">SQL</code> 的编写与 <code class="highlighter-rouge">ResultMap</code> 查询结果集的映射，需额外维护。</li>
+  <li><del>支持定制化 <code class="highlighter-rouge">SQL</code> 优化、存储过程及高级映射。避免了几乎所有的 <code class="highlighter-rouge">JDBC</code> 代码和手动设置参数及获取结果集。</del></li>
+</ul>
+
+<p>区别：查询关联对象（或关联集合对象）时，</p>
+<ol>
+  <li><code class="highlighter-rouge">Hibernate</code> 可根据对象关系模型直接获取，所以是<strong>全自动</strong>的。</li>
+  <li>而 <code class="highlighter-rouge">MyBatis</code> 需手动编写 SQL 来完成，所以称为<strong>半自动</strong>的。</li>
+</ol>
+
+<p>选型：</p>
+
+<ol>
+  <li>
+    <p>进行底层编程，对性能要求高，用 JDBC；</p>
+  </li>
+  <li>
+    <p>直接操作数据库表，没有过多的定制，用 Hibernate；</p>
+  </li>
+  <li>
+    <p>灵活使用 SQL语句，用 MyBatis；</p>
+  </li>
+</ol>
+
+<p><a href="https://blog.csdn.net/xihuanyuye/article/details/81201441">Spring Data JPA、 MyBatis与Hibernate到底该用谁</a></p>
+
+<p><a href="https://github.com/CodingDocs/springboot-guide">SpringBoot Guide</a></p>
+
+<p><a href="https://snailclimb.gitee.io/springboot-guide/#/./docs/basis/springboot-jpa">Spring Boot JPA 基础：常见操作解析</a></p>
+
+<p><a href="https://snailclimb.gitee.io/springboot-guide/#/./docs/basis/springboot-jpa-lianbiao">JPA 中非常重要的连表查询就是这么简单</a></p>
+
+<h5 id="jdbc-访问数据库">JDBC 访问数据库</h5>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;!-- pom.xml 中引入依赖 --&gt;
+&lt;!-- 1. 导入JDBC的场景启动器 --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-data-jdbc&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;!-- 2. 导入数据库驱动 --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;mysql&lt;/groupId&gt;
+    &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;
+    &lt;scope&gt;runtime&lt;/scope&gt;
+&lt;/dependency&gt;
+
+&lt;!-- application.properties 中 --&gt;
+&lt;!-- 3. 配置数据源 --&gt;
+## 数据库连接
+# useUnicode=true&amp;characterEncoding=UTF-8 表示使用Unicode字符集，指定字符从数据库取出后和存入前的编码、解码格式
+# useSSL=false 表示在高版本禁用SSL
+
+# 用来配置数据源连接池？控制重连特性；其中，
+# autoReconnect=true 表示当数据库连接异常中断时自动重连
+# failOverReadOnly=false 表示自动重连成功后，连接不设置为只读
+
+spring.datasource.url=jdbc:mysql://localhost:3306/campusdate?useUnicode=true&amp;characterEncoding=UTF-8&amp;useSSL=false&amp;autoReconnect=true&amp;failOverReadOnly=false
+spring.datasource.username=root
+spring.datasource.password=root
+spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+
+## 自动建表（实体类维护数据表）方式
+# create 表示每次重启项目（加载 hibernate）时，根据实体类重新生成新表结构，会导致数据丢失；
+# create-drop 表示每次加载  hibernate 时，根据实体类生成新表，当 sessionFactory（项目）关闭时自动删除表结构；hsqldb, h2, derby等内嵌数据库默认设置
+# update 表示第一次加载 hibernate 时，根据实体类自动建表；以后加载 hibernate 时，表结构随实体类自动更新，且保留数据库中的数据；
+# validate 表示每次加载 hibernate 时，只验证实体类和数据表是否一致，不对数据库进行任何更改。
+# none 表示啥都不做；其它非内嵌数据库默认设置
+# spring.jpa.properties.hibernate.hbm2ddl.auto=update
+spring.jpa.hibernate.ddl-auto=update
+
+# hibernate在操作时在控制台打印真实的sql语句，方便调试
+spring.jpa.show-sql=true
+# 表示格式化输出的json字符串
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL5Dialect
+</code></pre></div></div>
+
+<h5 id="jpa-各层常用注解">JPA 各层常用注解</h5>
+
+<p>Controller 控制层：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">@Controller</code></li>
+</ul>
+
+<p>Service 业务层：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">@Service</code></li>
+  <li><code class="highlighter-rouge">@Autowired</code></li>
+</ul>
+
+<p>Repository 数据接口层：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">CrudRepository</code> 接口：继承了 <code class="highlighter-rouge">Repository</code> 接口，并新支持对实体类的增删改查等方法；</li>
+  <li><code class="highlighter-rouge">PagingAndSortingRepository</code> 接口：继承了 <code class="highlighter-rouge">CrudRepository</code> 接口，并新支持分页、排序及根据条件查询等方法；</li>
+  <li><code class="highlighter-rouge">JpaRepository</code> 接口：包括 JPA 提供的增删改、分页查询及排序查询等。</li>
+</ol>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Repository
+public interface PersonRepository extends JpaRepository&lt;Person, Long&gt; {
 }
 </code></pre></div></div>
 
-<p>2）基于XML配置：
-在 XML 文件中添加以下内容启用 @AspectJ。</p>
-<aop:aspectj-autoproxy>
+<ul>
+  <li><a href="http://www.imooc.com/wiki/springbootlesson/jpa.html">Spring Boot 使用 JPA</a> 测试类</li>
+</ul>
 
+<h5 id="entity-数据持久层常用注解">Entity 数据持久层常用注解</h5>
 
-##### 代理工厂（静态方法）
+<ul>
+  <li><code class="highlighter-rouge">@Entity</code>：标注在类上，表示数据库持久化类，对应一个数据库实体。
+    <ul>
+      <li><code class="highlighter-rouge">[name]</code>可选属性默认为所标注实体类的名称。因用类反射机制 <code class="highlighter-rouge">Class.newInstance()</code> 方法创建实例的需要，至少有一个无参构造方法。也可标注抽象类。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">@NamedQuery</code>：</li>
+  <li><code class="highlighter-rouge">@NamedQueries</code>：定义多个</li>
+</ul>
 
-- 把AOP加入IOC容器中
-- 把UserDao放入容器中
-- 在配置文件中开启注解扫描，用工厂静态方法来创建代理类对象
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Entity
+@NamedQuery(name="UserEntity.findAll", query="SELECT u FROM UserEntity u")
+public class UserEntity implements Serializable {}
 
+// 在自己实现的DAO的xxxRepository接口里定义同名方法，先找是否有同名的NamedQuery，如果有，则不按照接口定义的方法解析。
+public List&lt;UserModel&gt; findByAge(int age);
 
-### Spring 框架中用到的设计模式
+@NamedQueries(value = { 
+	@NamedQuery(name = User.QUERY_FIND_BY_LOGIN, query = "select u from User u where u." + User.PROP_LOGIN + " = :username"), 
+	@NamedQuery(name = "getUsernamePasswordToken", query = "select new com.weibo.vo.TokenBO(u.username, u.password) from User u where u." + User.PROP_LOGIN + " = :username")
+	}) 
+</code></pre></div></div>
 
-1. 工厂模式：通过 BeanFactory、ApplicationContext 创建Bean对象；
+<ul>
+  <li><code class="highlighter-rouge">@Query</code>：标注在继承 <code class="highlighter-rouge">JpaRepository</code> 接口的自定义查询方法上，指定要执行的查询语句；</li>
+  <li><code class="highlighter-rouge">@Modifying</code>：支持更新类的 Query 语句，配合 <code class="highlighter-rouge">@Transactional</code> <a href="#Spring 事务管理">Spring 事务管理</a> 使用；</li>
+</ul>
 
-2. 单例模式：Bean默认为单例模式，只有一个实例；Spring 中 bean 的默认作用域就是 singleton(单例)的。Spring 实现单例的方式：
-- xml : <bean id="userService" class="top.snailclimb.UserService" scope="singleton" />
-- 注解：@Scope(value = "singleton")
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// like后的参数需在前/后加“%”
+// nativeQuery=true表示指定本地查询
+@Query(value="select * from tbl_user where name like %?1", nativeQuery=true)
+public List&lt;UserModel&gt; findByUidOrAge(String name);
 
-3. 代理模式：AOP用到JDK的动态代理和CGLIB字节码生成技术；
+@Modifying
+@Query(value = "update UserModel o set o.name=:newName where o.name like %:nn")
+public int findByUidOrAge(@Param("nn") String name, @Param("newName") String newName);
+</code></pre></div></div>
 
-4. 模板方法：用来解决代码重复的问题。如 RestTemplate, JmsTemplate, JpaTemplate、jdbcTemplate、hibernateTemplate 等以 Template 结尾的对数据库操作的类。
+<ul>
+  <li><code class="highlighter-rouge">@Table</code>：标注在类名前，设置数据库表名；</li>
+</ul>
 
-5. 观察者模式：定义对象间的依赖关系，一个对象发生改变时，所有依赖它的对象都会被动更新，如事件驱动模型（如每次添加商品时都需重新更新索引，ApplicationListener（listener的实现））。
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Entity
+@Table(name = "tb_contact", schema = "test", uniqueConstraints = {   
+        @UniqueConstraint(columnNames = {"name", "email" }),  
+        @UniqueConstraint(columnNames = {"col1", "col2" })  
+}) 
+// name 属性表示实体对应表名，默认为实体名;
+// catalog 和 schema 属性表示目录名或数据库名，根据不同的数据类型有所不同;
+// uniqueConstraints 属性表示该实体所关联的唯一约束条件，可有多个唯一约束，默认没有，需配合@UniqueContraint用;
+public class ContactEO implements Serializable {}
+</code></pre></div></div>
 
-6. 适配器/包装器(Wrapper)模式 : 可根据客户的需求动态切换不同的数据源，使接口不兼容的类一起工作。Spring AOP 的增强或通知(Advice)、spring MVC 适配Controller。
+<ul>
+  <li><code class="highlighter-rouge">@Temporal</code>：时间；</li>
+  <li><code class="highlighter-rouge">@Column</code>：表示持久化属性映射表中的字段。标注在 <code class="highlighter-rouge">getter()</code> 或属性前。
+    <ol>
+      <li><strong>unique</strong> 属性：表示该字段是否为唯一标识，默认为 false。也可用<code class="highlighter-rouge">@Table</code>标记中的<code class="highlighter-rouge">@UniqueConstraint</code>。</li>
+      <li><strong>nullable</strong> 属性：表示该字段是否可为 null，默认为 true（允许为 null）。</li>
+      <li><strong>insertable</strong> 属性：表示在用 “INSERT” SQL 脚本插入数据时，是否需插入该字段的值。多用于只读属性，如主键和外键等。这些字段值通常是自动生成的。</li>
+      <li><strong>updatable</strong>，同上。</li>
+      <li><strong>columnDefinition</strong> 属性：表示创建表时，该字段创建的SQL语句，一般用于通过 Entity 生成表定义时。如<code class="highlighter-rouge">@Column(columnDefinition = "tinyint(1) default 1")</code>，设置字段类型和默认值。</li>
+      <li><strong>table</strong> 属性：表示当映射多个表时，指定表中的字段。默认值为主表名。</li>
+      <li><strong>length</strong> 属性：表示该字段的长度，当字段的类型为 varchar 时才有效，默认为255个字符。</li>
+      <li><strong>precision</strong> 和 <strong>scale</strong> 属性：表示精度，当字段类型为 double 时，precision 表示数值的总长度，scale 表示小数点所占的位数。</li>
+    </ol>
+  </li>
+</ul>
 
-7. 装饰者模式: 
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Temporal(TemporalType.TIMESTAMP)
+@Column(name = "create_time", unique = false)
+private Date createTime;
+</code></pre></div></div>
 
+<ul>
+  <li><code class="highlighter-rouge">@Id</code>：标注在属性上，表示该字段对应数据库中的列为主键。能够标识为主键的属性类型有
+    <ol>
+      <li>基本数据类型及其对应的封装类：Byte、Short、Integer、Long、Character；</li>
+      <li>大数值类型：<code class="highlighter-rouge">java.math.BigInteger</code>；</li>
+      <li>字符串类型：<code class="highlighter-rouge">java.lang.String</code>；</li>
+      <li>时间日期型：
+        <ul>
+          <li><code class="highlighter-rouge">java.util.Date</code></li>
+          <li><code class="highlighter-rouge">java.sql.Date</code></li>
+        </ul>
+      </li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">@GeneratedValue</code>：指定主键生成策略。
+    <ul>
+      <li><strong>strategy</strong> 属性：表示生成主键的策略，有
+        <ul>
+          <li>GenerationType.<strong>TABLE</strong>：用一个特定的数据库表格来保存主键；</li>
+          <li>GenerationType.<strong>SEQUENCE</strong>：用序列机制生成主键，不支持主键自增长，如 Oracle、PostgreSQL；</li>
+          <li>GenerationType.<strong>IDENTITY</strong>：主键自增长，如 MySQL ；</li>
+          <li>GenerationType.<strong>AUTO</strong>：默认，把主键生成策略交给持久化引擎，以上三种选一；</li>
+        </ul>
+      </li>
+      <li>generator 属性：为不同策略类型所对应的生成规则名。与<code class="highlighter-rouge">@GenericGenerator</code>搭配使用。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">@TableGenerator</code></li>
+  <li><code class="highlighter-rouge">@SequenceGenerator</code></li>
+</ul>
 
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Id
+@GeneratedValue(strategy=GenerationType.AUTO)
+private String id;
+</code></pre></div></div>
 
-### JDBC/JdbcTemplate
+<ul>
+  <li><code class="highlighter-rouge">@Transient</code>：声明不与数据库映射的字段，不需保存进数据库 。</li>
+  <li><code class="highlighter-rouge">@Basic</code>
+    <ul>
+      <li>fetch 属性：表示获取值的方式，默认为 EAGER 表示即时/非延迟加载，LAZY 表示惰性/延迟加载。</li>
+      <li>optional 属性：表示是否可为 null，不能用于 Java 基本数据型。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">@Lob</code>：声明为大字段。</li>
+</ul>
 
-位于 spring-jdbc-x.x.x.jar 包中，还需导入 spring-tx-x.x.x.jar 包用来处理事务和异常。
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Lob</span>
+<span class="c1">// 指定 Lob 类型数据的获取策略</span>
+<span class="nd">@Basic</span><span class="o">(</span><span class="n">fetch</span> <span class="o">=</span> <span class="n">FetchType</span><span class="o">.</span><span class="na">EAGER</span><span class="o">)</span>
+<span class="c1">// columnDefinition 属性指定数据表对应的 Lob 字段类型</span>
+<span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"content"</span><span class="o">,</span> <span class="n">columnDefinition</span> <span class="o">=</span> <span class="s">"LONGTEXT NOT NULL"</span><span class="o">)</span>
+<span class="kd">private</span> <span class="n">String</span> <span class="n">content</span><span class="o">;</span>
+</code></pre></div></div>
 
-### JPA？
+<ul>
+  <li><code class="highlighter-rouge">@Enumerated(EnumType.STRING)</code>：枚举类型的字段；</li>
+  <li><code class="highlighter-rouge">@CreatedDate</code>：表示为创建时间字段，在这个实体被 insert 时会设置值；</li>
+  <li><code class="highlighter-rouge">@CreatedBy</code>：表示为创建人，在这个实体被 insert 时会设置值；</li>
+  <li><code class="highlighter-rouge">@LastModifiedDate</code>、<code class="highlighter-rouge">@LastModifiedBy</code>同理；</li>
+  <li><code class="highlighter-rouge">@EnableJpaAuditing</code>：开启 JPA 审计功能。</li>
+</ul>
 
-```
-//用 JPA 在数据库中非持久化一个字段
+<h5 id="lombok-常用注解">Lombok 常用注解</h5>
 
-@Entity(name="USER")
-public class User {
+<p><code class="highlighter-rouge">Lombok</code> 插件：通过为实体类添加注解来自动生成（替换）通用方法，简化 <code class="highlighter-rouge">POJO</code> 对象封装，更简洁。</p>
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "ID")
+<ol>
+  <li><code class="highlighter-rouge">@Data</code>：用在类上，相当于同时使用多个注解；生成通常与简单<code class="highlighter-rouge">POJO</code>关联的所有样板和<code class="highlighter-rouge">bean</code>；<code class="highlighter-rouge">RequiredArgsConstructor</code>；</li>
+</ol>
+
+<ul>
+  <li><code class="highlighter-rouge">@Value</code>：用在类上，和 <code class="highlighter-rouge">@Data</code>类似，区别在于所有成员变量默认定义为 <code class="highlighter-rouge">private final</code> 修饰，且不生成 <code class="highlighter-rouge">setter()</code> 方法；与 Spring 用于绑定 <code class="highlighter-rouge">@Configuration</code> <a href="#配置绑定">配置</a>的注解 <code class="highlighter-rouge">@Value</code> 重名，注意 import 路径；</li>
+</ul>
+
+<ol>
+  <li><code class="highlighter-rouge">@Getter</code> / <code class="highlighter-rouge">@Setter</code>：用在类/属性上；</li>
+</ol>
+
+<ul>
+  <li>若字段的类型为<code class="highlighter-rouge">boolean</code>，则为`isXxx；</li>
+  <li>用在类上时， <code class="highlighter-rouge">@Setter(AccessLevel.PUBLIC) </code>，指定访问级别为<code class="highlighter-rouge">PUBLIC，PROTECTED，PACKAGE，PRIVATE，NONE</code>。</li>
+  <li><code class="highlighter-rouge">@Getter(lazy=true)</code>：可替代经典的 <code class="highlighter-rouge">Double Check Lock</code> 样板代码；</li>
+</ul>
+
+<ol>
+  <li><code class="highlighter-rouge">@ToString</code>：用在类上，自动覆写 <code class="highlighter-rouge">toString()</code> 方法，默认打印所有非静态字段；更常用 <code class="highlighter-rouge">@Override</code> 重写 <code class="highlighter-rouge">toString()</code> 方法的方式实现；</li>
+</ol>
+
+<ul>
+  <li>类上<code class="highlighter-rouge">@ToString(exclude=”id”)</code>、字段上用 <code class="highlighter-rouge">@ToString.Exclude</code>注释：排除 id 属性；</li>
+  <li><code class="highlighter-rouge">@ToString(onlyExplicitlyIncluded = true)</code>，配合用 <code class="highlighter-rouge">@ToString.Include</code> 在字段上标记要包含的每个字段；</li>
+  <li><code class="highlighter-rouge">@ToString(callSuper=true, includeFieldNames=true)</code>：调用父类的 <code class="highlighter-rouge">toString()</code>方法，将父类实现的输出包含到输出中，包含所有属性；</li>
+</ul>
+
+<ol>
+  <li><code class="highlighter-rouge">@EqualsAndHashCode</code>：用在类上，自动生成 <code class="highlighter-rouge">equals()</code> 方法和 <code class="highlighter-rouge">hashCode()</code> 方法，包括所有非静态变量和非 transient 的变量；</li>
+</ol>
+
+<ul>
+  <li>Java 规定重写 <code class="highlighter-rouge">equals()</code> 必须重写 <code class="highlighter-rouge">hashCode()</code>；</li>
+  <li><code class="highlighter-rouge">@EqualsAndHashCode.Include </code>和 <code class="highlighter-rouge">@EqualsAndHashCode(onlyExplicitlyIncluded = true)</code>来精确指定要使用的字段或方法。</li>
+</ul>
+
+<ol>
+  <li>
+    <p><code class="highlighter-rouge">@NonNull</code>：用在方法参数上，如果为空，则抛出 NPE；</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">@NoArgsConstructor, @RequiredArgsConstructor, @AllArgsConstructor</code>：用在类上，自动生成无参构造、使用所有参数的构造函数、所有 <code class="highlighter-rouge">@NonNull</code> 属性作为参数的构造函数；</p>
+  </li>
+  <li>指定 <code class="highlighter-rouge">staticName = "of"</code>参数：生成返回类对象的静态工厂方法；</li>
+  <li><code class="highlighter-rouge">@NoArgsConstructor</code>：生成无参构造函数。
+    <ol>
+      <li>如果字段由 final 修饰，则将导致编译器错误，除非使用<code class="highlighter-rouge">@NoArgsConstructor(force = true)</code>，否则所有 final 字段都将初始化为 <code class="highlighter-rouge">0 / false / null</code>；</li>
+      <li>对于具有约束（如<code class="highlighter-rouge">@NonNull</code>）的字段，不会生成任何检查。</li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">@RequiredArgsConstructor</code>：为每个需特殊处理的字段生成有1个参数的构造函数。
+    <ol>
+      <li>所有未初始化的 final 字段；</li>
+      <li>所有未声明其位置的、未标记为<code class="highlighter-rouge">@NonNull</code>的字段。</li>
+    </ol>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">@AllArgsConstructor</code>：为每个字段生成有1个参数的构造函数。标有<code class="highlighter-rouge">@NonNull</code>的字段将对这些参数进行非空检查。</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">@Cleanup</code>：自动管理资源，用在局部变量前，在当前变量范围内即将执行完毕退出前自动清理资源，生成 <code class="highlighter-rouge">try-finally</code> 这样的代码来关闭流；用于确保已分配的资源被释放（<code class="highlighter-rouge">IO</code>的连接关闭）。</p>
+  </li>
+  <li><code class="highlighter-rouge">@Builder</code>：只能标注到类上，生成类当前流程的一种链式（流式）构造工厂，如：</li>
+</ol>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="nx">User</span> <span class="nx">buildUser</span> <span class="o">=</span> <span class="nx">User</span><span class="p">.</span><span class="nx">builder</span><span class="p">().</span><span class="nx">username</span><span class="p">(</span><span class="s2">"riemann"</span><span class="p">).</span><span class="nx">password</span><span class="p">(</span><span class="s2">"123"</span><span class="p">).</span><span class="nx">build</span><span class="p">();</span>
+  <span class="nx">Person</span><span class="p">.</span><span class="nx">builder</span><span class="p">().</span><span class="nx">name</span><span class="p">(</span><span class="s2">"Adam"</span><span class="p">).</span><span class="nx">city</span><span class="p">(</span><span class="s2">"San"</span><span class="p">).</span><span class="nx">job</span><span class="p">(</span><span class="s2">"Mythbusters"</span><span class="p">).</span><span class="nx">build</span><span class="p">();</span>
+</code></pre></div></div>
+
+<ol>
+  <li>
+    <p><code class="highlighter-rouge">@SneakyThrows</code>：自动抛出受检异常，而无需显式在方法上使用 <code class="highlighter-rouge">throws</code> 语句；</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">@Synchronized</code>：用在方法上，将方法声明为同步的，并自动加锁；自动添加到同步机制，生成的代码并不是直接锁方法，而是锁代码块。</p>
+  </li>
+</ol>
+
+<ul>
+  <li>而锁对象是一个私有的属性<code class="highlighter-rouge">$lock</code>或<code class="highlighter-rouge">$LOCK</code>，而 <code class="highlighter-rouge">synchronized</code> 关键字锁对象是this，锁在this或自己的类对象上存在副作用，不能阻止非受控代码去锁this或类对象，这可能会导致竞争条件或其它线程错误；</li>
+</ul>
+
+<ol>
+  <li><code class="highlighter-rouge">@Log</code>：根据不同的注解生成不同类型的 log 静态常量对象，但实例名称都是 log，有六种可选实现类：</li>
+</ol>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Creates 即 创建的类型，如 private static final java.util.logging.Logger 
+@Log
+Creates log = java.util.logging.Logger.getLogger(LogExample.class.getName());
+@CommonsLog
+Creates log = org.apache.commons.logging.LogFactory.getLog(LogExample.class);
+@Log4j
+Creates log = org.apache.log4j.Logger.getLogger(LogExample.class);
+@Log4j2
+Creates log = org.apache.logging.log4j.LogManager.getLogger(LogExample.class);
+// 最常用
+@Slf4j
+Creates log = org.slf4j.LoggerFactory.getLogger(LogExample.class);
+@XSlf4j
+Creates log = org.slf4j.ext.XLoggerFactory.getXLogger(LogExample.class);
+</code></pre></div></div>
+
+<ul>
+  <li><code class="highlighter-rouge">@Accessors</code>：用于配置<code class="highlighter-rouge">lombok</code>如何生成和查找<code class="highlighter-rouge">getter</code>和<code class="highlighter-rouge">setter</code>。
+    <ul>
+      <li>对<code class="highlighter-rouge">getter</code>和<code class="highlighter-rouge">setter</code>的<code class="highlighter-rouge">bean</code>命名规范；</li>
+      <li>参数 <code class="highlighter-rouge">chain=true</code>时，类的所有属性的<code class="highlighter-rouge">setter</code>方法返回值为<code class="highlighter-rouge">this</code>，支持链式写法。</li>
+    </ul>
+  </li>
+</ul>
+
+<h5 id="数据类型转换">数据类型转换</h5>
+
+<p>Java 数据类型与数据库中的类型转换是由 JPA 实现框架自动转换的，所以不同的JPA实现框架转换的规则也不太一样。如 MySQL 中，varchar 和 char 类型都转化为 String 类型，Blob 和 Clob 类型可以转化成 Byte[] 型。</p>
+
+<ol>
+  <li>基本数据类型及其对应的封装类：Byte、Short、Integer、Long、Character；</li>
+  <li>字节和字符型数组：byte[]、Byte[]、char[]、Character[]</li>
+  <li>大数值类型
+    <ul>
+      <li>java.math.BigInteger</li>
+      <li>java.math.BigDecimal</li>
+    </ul>
+  </li>
+  <li>字符串类型：java.lang.String</li>
+  <li>日期时间类型
+    <ul>
+      <li>java.util.Date</li>
+      <li>java.util.Calendar</li>
+      <li>java.sql.Date</li>
+      <li>java.sql.Time</li>
+      <li>java.sql.Timestamp</li>
+    </ul>
+  </li>
+  <li>用户自定义的枚举型</li>
+  <li>Entity类型：标注为@Entity的类</li>
+  <li>包含Entity类型的集合Collection类
+    <ul>
+      <li>java.util.Collection</li>
+      <li>java.util.Set</li>
+      <li>java.util.List</li>
+      <li>java.util.Map</li>
+    </ul>
+  </li>
+  <li>嵌入式（embeddable）类</li>
+</ol>
+
+<h3 id="整合-druid-连接池">整合 Druid 连接池</h3>
+
+<blockquote>
+  <p>为 HikariCP。C3P0</p>
+</blockquote>
+
+<p>连接池、数据源自动配置；<code class="highlighter-rouge">DataSourceAutoConfiguration</code> 类；</p>
+
+<ol>
+  <li>Druid：Alibaba 开源的高性能数据库连接池。加入了强大的监控功能，可实时观察数据库连接池和 SQL 的运行情况，帮助用户及时排查出系统中存在的问题。</li>
+  <li>HikariCP：Spring Boot 默认数据源</li>
+  <li>C3P0</li>
+  <li>DBCP</li>
+</ol>
+
+<p>整合 Druid：</p>
+
+<ol>
+  <li>引入依赖；</li>
+</ol>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;!--添加 druid 的 starter--&gt;
+&lt;dependency&gt;
+   &lt;groupId&gt;com.alibaba&lt;/groupId&gt;
+   &lt;artifactId&gt;druid-spring-boot-starter&lt;/artifactId&gt;
+   &lt;version&gt;1.1.17&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre></div></div>
+
+<ol>
+  <li>自定义方式需创建数据源配置类；</li>
+  <li>在 application.yml 配置文件中添加下数据源配置，会与 Druid 数据源中的属性进行绑定；
+    <ul>
+      <li>配置类创建 Druid 数据源对象时，应尽量避免将数据源信息（如 url、username 和 password 等）硬编码到代码中，而应通过 <code class="highlighter-rouge">@ConfigurationProperties("spring.datasource")</code> 注解，将数据源属性与配置文件中以 <code class="highlighter-rouge">spring.datasource</code> 开头的配置绑定。</li>
+    </ul>
+  </li>
+</ol>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>		######## JDBC 通用配置 ############### 
+...
+      	######## Druid 连接池的配置 ###############
+spring:
+  datasource:
+    druid:
+      initial-size: 5 # 初始化连接大小
+      min-idle: 5 # 最小连接池数量
+      max-active: 20 # 最大连接池数量
+      max-wait: 60000 # 获取连接时最大等待时间，毫秒
+      time-between-eviction-runs-millis: 60000 # 配置间隔多久进行一次检测，检测需关闭的空闲连接，毫秒
+      min-evictable-idle-time-millis: 300000 # 配置连接在池中最小生存时间，毫秒
+      validation-query: SELECT 1 FROM DUAL # 测试连接
+      test-while-idle: true # 申请连接时检测，建议为true，不影响性能，且保证安全性
+      test-on-borrow: false # 获取连接时执行检测，建议关闭，影响性能
+      test-on-return: false # 归还连接时执行检测，建议关闭，影响性能
+      pool-prepared-statements: false # 是否开启PSCache，对支持游标的数据库性能提升巨大，oracle建议开启，mysql建议关闭
+      max-pool-prepared-statement-per-connection-size: 20 # 开启poolPreparedStatements后生效
+      filters: stat,wall # 配置扩展插件，常用的插件有=&gt;stat:监控统计，wall:防御sql注入
+      connection-properties: 'druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000' # 打开mergeSql功能;慢SQL记录
+</code></pre></div></div>
+
+<ol>
+  <li>Spring Boot 提供的默认测试类；</li>
+</ol>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">net</span><span class="p">.</span><span class="n">biancheng</span><span class="p">.</span><span class="n">www</span><span class="p">;</span>
+
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">junit</span><span class="p">.</span><span class="n">jupiter</span><span class="p">.</span><span class="n">api</span><span class="p">.</span><span class="n">Test</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">beans</span><span class="p">.</span><span class="n">factory</span><span class="p">.</span><span class="n">annotation</span><span class="p">.</span><span class="n">Autowired</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">boot</span><span class="p">.</span><span class="n">test</span><span class="p">.</span><span class="n">context</span><span class="p">.</span><span class="n">SpringBootTest</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">org</span><span class="p">.</span><span class="n">springframework</span><span class="p">.</span><span class="n">jdbc</span><span class="p">.</span><span class="n">core</span><span class="p">.</span><span class="n">JdbcTemplate</span><span class="p">;</span>
+
+<span class="n">import</span> <span class="n">javax</span><span class="p">.</span><span class="n">sql</span><span class="p">.</span><span class="n">DataSource</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">java</span><span class="p">.</span><span class="n">sql</span><span class="p">.</span><span class="n">SQLException</span><span class="p">;</span>
+
+<span class="p">@</span><span class="n">SpringBootTest</span>
+<span class="n">class</span> <span class="n">SpringBootAdminexApplicationTests</span> <span class="p">{</span>
+    <span class="p">//</span> <span class="err">数据源组件</span>
+    <span class="p">@</span><span class="n">Autowired</span>
+    <span class="n">DataSource</span> <span class="n">dataSource</span><span class="p">;</span>
+    <span class="p">//</span> <span class="err">用于访问数据库的组件</span>
+    <span class="p">@</span><span class="n">Autowired</span>
+    <span class="n">JdbcTemplate</span> <span class="n">jdbcTemplate</span><span class="p">;</span>
+    
+    <span class="p">@</span><span class="n">Test</span>
+    <span class="n">void</span> <span class="n">contextLoads</span><span class="p">()</span> <span class="n">throws</span> <span class="n">SQLException</span> <span class="p">{</span>
+        <span class="nf">System</span><span class="p">.</span><span class="n">out</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s2">"默认数据源为："</span> <span class="p">+</span> <span class="n">dataSource</span><span class="p">.</span><span class="nf">getClass</span><span class="p">());</span>
+        <span class="nf">System</span><span class="p">.</span><span class="n">out</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s2">"数据库连接实例："</span> <span class="p">+</span> <span class="n">dataSource</span><span class="p">.</span><span class="n">getConnection</span><span class="p">());</span>
+        <span class="p">//</span> <span class="err">访问数据库</span>
+        <span class="k">Integer</span> <span class="n">i</span> <span class="p">=</span> <span class="n">jdbcTemplate</span><span class="p">.</span><span class="n">queryForObject</span><span class="p">(</span><span class="s2">"SELECT count(*) from `user`"</span><span class="p">,</span> <span class="k">Integer</span><span class="p">.</span><span class="n">class</span><span class="p">);</span>
+        <span class="nf">System</span><span class="p">.</span><span class="n">out</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s2">"user 表中共有"</span> <span class="p">+</span> <span class="n">i</span> <span class="p">+</span> <span class="s2">"条数据。"</span><span class="p">);</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div></div>
+
+<ol>
+  <li>内置提供的名为 <code class="highlighter-rouge">StatViewServlet</code> 的 Servlet，可开启 Druid 内置监控页面功能， 展示 Druid 的统计信息；
+    <ul>
+      <li>需将该 Servlet 配置在 Web 应用中的 WEB-INF/web.xml 中；</li>
+    </ul>
+  </li>
+  <li>内置提供的 StatFilter，可开启 Druid 的 SQL 监控功能；</li>
+  <li>内置提供了 WallFilter，可开启防火墙功能，防御 SQL 注入攻击。</li>
+</ol>
+
+<h3 id="整合-redis">整合 Redis</h3>
+
+<blockquote>
+  <p>以验证码为例。</p>
+</blockquote>
+
+<ol>
+  <li>在 pom.xml 添加 Mevan 依赖；</li>
+  <li>修改 SpringBoot 配置文件 application.yml；
+    <ul>
+      <li>在 <code class="highlighter-rouge">spring</code> 节点下添加 Redis 配置；</li>
+      <li>在根节点下添加 Redis 自定义 key 的配置；</li>
+    </ul>
+  </li>
+  <li>Service 层：添加 <code class="highlighter-rouge">RedisService</code> 接口用于定义常用 Redis 操作；</li>
+  <li>注入 <code class="highlighter-rouge">StringRedisTemplate</code>，实现 <code class="highlighter-rouge">RedisService</code> 接口；</li>
+  <li>Controller 层：添加 <code class="highlighter-rouge">UmsMemberController</code>；
+    <ul>
+      <li>添加根据电话获取验证码的接口和校验验证码的接口；</li>
+    </ul>
+  </li>
+  <li>Service 层：添加 <code class="highlighter-rouge">UmsMemberService</code> 接口及其实现类；
+    <ul>
+      <li>生成验证码时，将自定义的 Redis 键值 + 手机号生成一个 Redis 的 key，以验证码为 value 存入到 Redis中，并设置过期时间（如120s）；</li>
+      <li>校验验证码时根据手机号码来获取 Redis 里存储的验证码，并与传入的验证码比对。
+        <h3 id="整合-hibernate">整合 Hibernate</h3>
+      </li>
+    </ul>
+  </li>
+</ol>
+
+<p>JSR（Java Specification Requests） 是一套 Java Bean 参数校验的标准，定义了很多常用校验注解，可直接加在 Java Bean 的属性上。</p>
+
+<h5 id="spring-validation-验证框架">Spring validation 验证框架</h5>
+
+<p><code class="highlighter-rouge">spring-boot-starter-validation</code> 依赖。推荐用 JSR 注解，即所在 package 为 <code class="highlighter-rouge">javax.validation.constraints</code>，而不是<code class="highlighter-rouge">org.hibernate.validator.constraints</code>。</p>
+
+<ul>
+  <li><code class="highlighter-rouge">@Valid</code>：用于方法级别验证、标记成员属性以进行验证。
+    <ol>
+      <li>可注解位置：可用在方法、构造函数、方法参数和<strong>成员属性</strong>上；</li>
+      <li>分组：无分组功能；</li>
+      <li>嵌套验证：二者用在方法入参上都无法单独提供嵌套验证功能，需配合 <code class="highlighter-rouge">@Valid</code> 进行嵌套验证；
+        <ul>
+          <li>能用在<strong>成员属性</strong>上，用于标记嵌套的成员对象；</li>
+        </ul>
+      </li>
+      <li>如果验证失败，将抛出 <code class="highlighter-rouge">MethodArgumentNotValidException</code>。</li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">@Validated</code>：
+    <ol>
+      <li>可注解位置：可用在类型、方法和方法参数上，不能用在成员属性上；</li>
+      <li>分组：提供<strong>分组</strong>功能，在入参验证时，根据不同的分组采用不同的验证机制；</li>
+      <li>嵌套验证：不能用在成员属性上。</li>
+    </ol>
+  </li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public class Prop {
+
+    @NotNull(message = "pid不能为空")
+    @Min(value = 1, message = "pid必须为正整数")
+    private Long pid;
+
+    @NotBlank(message = "pidName不能为空")
+    private String pidName;
+}
+
+public class Item {
+
+    @NotNull(message = "id不能为空")
+    @Min(value = 1, message = "id必须为正整数")
     private Long id;
 
-    @Column(name="USER_NAME")
-    private String userName;
-
-    private String secrect;
-
+	@Valid // 嵌套验证，必须用@Valid标记嵌套成员对象，且@Validated不能用在成员属性上；不加则不会对props里的Prop对象进行字段验证，即入参验证不检查pid和pidname
+    @NotNull(message = "props不能为空")
+    @Size(min = 1, message = "至少有一个属性")
+    private List&lt;Prop&gt; props;
 }
-```
 
-### Spring 事务管理
+@RestController
+public class ItemController {
 
-事务管理：按照给定的事务规则来执行提交或回滚操作。
+    @RequestMapping("/item/add")
+    public void addItem(@Validated Item item, BindingResult bindingResult) { // @Validated修饰入参
+        doSomething();
+    }
+}
 
-1. 编程式事务：编写代码实现管理事务，难维护；
-2. 声明式事务：分离事务管理和业务逻辑代码，实际是通过 AOP 实现；不需编程，只需通过在 XML 文件中配置或直接基于注解实现；实现声明式事务的方式：？
-- 基于XML（<tx> 和<aop>命名空间）的声明式事务管理：推荐，最大特点是与 Spring AOP 结合紧密，可充分利用切点表达式的强大支持，更加灵活。
-- 基于 @Transactional 的全注解方式：简化，使用最多
+@RestController
+@RequestMapping("/api")
+@Validated
+public class PersonController {
+    @GetMapping("/person/{id}")
+    public ResponseEntity&lt;Integer&gt; getPersonByID(@Valid @PathVariable("id") @Max(value=5, message="超过id范围") Integer id) {
+        return ResponseEntity.ok().body(id);
+    }
+}
+</code></pre></div></div>
 
-##### 事务传播行为/规则
+<h5 id="字段验证注解">字段验证注解</h5>
 
-- PROPAGATION_REQUIRED: 支持当前事务，如果当前没有事务，就新建一个事务。最常见
-- PROPAGATION_SUPPORTS: 支持当前事务，如果当前没有事务，就以非事务方式执行。
-- PROPAGATION_MANDATORY: 支持当前事务，如果当前没有事务，就抛出异常。
-- PROPAGATION_REQUIRES_NEW: 新建事务，如果当前存在事务，把当前事务挂起。
-- PROPAGATION_NOT_SUPPORTED: 以非事务方式执行操作，如果当前存在事务，就把当前事务挂起。
-- PROPAGATION_NEVER: 以非事务方式执行，如果当前存在事务，则抛出异常。
-- PROPAGATION_NESTED:如果当前存在事务，则在嵌套事务内执行。如果当前没有事务，则进行与 PROPAGATION_REQUIRED类似的操作。
+<ul>
+  <li><code class="highlighter-rouge">@NotNull(message = "name不能为空")</code>：元素不为 null；可为 empty（没有 size 的约束）；
+    <ul>
+      <li><code class="highlighter-rouge">@NotEmpty</code>：用于集合类（String类、Collection、Map、数组），不能为 null 或 空<code class="highlighter-rouge">empty（size&gt;0）</code>（String、Collection、Map的 <code class="highlighter-rouge">isEmpty() </code>方法）；</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">@NotBlank</code>：只用于 String，不能为 null，且必须包含一个非空白字符（trim() 后 size&gt;0）；</li>
+</ul>
 
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1.String name = null;
+2.String name = "";
+3.String name = " ";
+@NotNull:  false, true,	 true
+@NotEmpty: false, false, true
+@NotBlank: false, false, false
+</code></pre></div></div>
 
+<ul>
+  <li><code class="highlighter-rouge">@AssertTrue</code>/<code class="highlighter-rouge">@AssertFalse</code>：被注释的元素必须为 true/ false；</li>
+  <li><code class="highlighter-rouge">@Pattern(regex=, flag=)</code>：被注释的元素必须符合指定的正则表达式；</li>
+  <li><code class="highlighter-rouge">@Email</code>：被注释的元素必须是 Email 格式；</li>
+  <li><code class="highlighter-rouge">@Size(min=4, max=15)</code>：元素大小必须在指定范围内；
+    <ul>
+      <li><code class="highlighter-rouge">@Min(value)</code>/<code class="highlighter-rouge">@Max(value)</code>：元素必须是一个数字，值必须 <code class="highlighter-rouge">&gt;= / &lt;=</code> 指定值；</li>
+      <li><code class="highlighter-rouge">@DecimalMin(value)</code>/<code class="highlighter-rouge">@DecimalMax(value)</code>：被注释的元素必须是一个数字，值必须 <code class="highlighter-rouge">&gt;= / &lt;=</code> 指定值；</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">@Digits(integer, fraction)</code>：被注释的元素必须是一个数字，其值必须在可接受的范围内；</li>
+  <li><code class="highlighter-rouge">@Past</code>/<code class="highlighter-rouge">@Future</code>：被注释的元素必须是一个过去/将来的日期。</li>
+</ul>
 
+<h3 id="整合-thymeleaf">整合 Thymeleaf</h3>
 
-## Spring MVC
+<p><code class="highlighter-rouge">@ThymeleafAutoConfiguration</code>：自动配置类；</p>
 
-是一个基于 MVC 设计模式的轻量级 Web 开发框架，本质上相当于 Servlet，本身是 Spring 框架的一部分。
+<p>ThymeleafProperties 配置类通过 <code class="highlighter-rouge">@ConfigurationProperties</code> 注解将配置文件（application.properties/yml） 中前缀为 spring.thymeleaf 的配置和这个类中的属性绑定。如：</p>
 
+<ul>
+  <li>Thymeleaf 模板的默认位置在 <code class="highlighter-rouge">resources/templates</code> 目录下，默认的后缀是 html，即只要将 HTML 页面放在<code class="highlighter-rouge">classpath:/templates/</code>下，Thymeleaf 就能自动进行渲染。</li>
+</ul>
 
-### MVC 设计模式
+<h5 id="配置-thymeleaf">配置 thymeleaf</h5>
 
-Model 1 时代：
-1. 数据模型层（Model）：应用程序的主体部分，负责数据逻辑（业务规则）的处理和实现数据操作（即在数据库中存取数据）。
-2. 视图层（View）：负责格式化数据并呈现给用户；包括数据展示、用户交互、数据验证、界面设计等功能。
-3. 控制层（Controller）：负责接收并转发请求，对请求进行处理后，指定视图并将响应结果发送给客户端。
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>spring:
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+</code></pre></div></div>
 
-Model 2 时代，早期 JavaWeb MVC 开发模式：
-1. JavaBean + JSP；
-2. JavaBean + JSP + Servlet
-- Java Bean(Model，即 dao 和 bean）
-- JSP（View）
-- Servlet（Controller，可在JSP中实现）
+<h3 id="整合web">整合Web</h3>
 
-Spring MVC 时代：
-- 业务逻辑层（Service/Controller）：可以管理事务和记录日志等；业务逻辑相关的部分无法单独处理，但 service+serviceImpl、dao+daoImpl 又太冗余，于是将其单独列为业务逻辑层
-- 持久层（Dao数据库操作/Entity实体类/Model）：可以整合 MyBatis、Hibernate 和 JdbcTemplate 等技术。
-- 表现层（View）：提供了与 Spring MVC、Struts2 框架的整合
+<h4 id="java-web">Java Web</h4>
 
+<h5 id="服务器">服务器</h5>
 
-### Spring MVC VS Structs2
+<ul>
+  <li>
+    <p>Web 服务器：指能为发出请求的浏览器（客户端）提供文档的程序。</p>
 
-1. Spring MVC 基于方法开发，会将 URL 信息与 Controller 类的某个方法绑定并进行映射，请求参数作为该方法的形参，生成 Handler 对象，只包含一个 method 方法。
-Struts2 基于类开发，Action 类中所有方法的请求参数都是成员变量，方法越多，类越乱。
+    <ul>
+      <li>Nginx：轻量级的 Web 服务器、反向代理服务器，由于内存占用少，启动极快，高并发能力强，在互联网项目中广泛应用。</li>
+      <li>Apache HTTP 服务器：用 C 语言实现的 HTTP Web 服务器。</li>
+    </ul>
+  </li>
+  <li>
+    <p>应用服务器：</p>
 
-2. Spring MVC 支持单例开发模式，而 Struts2 由于只能通过类的成员变量接受参数，无法用单例模式。
+    <ul>
+      <li>
+        <p>Tomcat：是一个开源 <code class="highlighter-rouge">Servlet 容器 /Web容器</code>，作为 Servlet 容器 ，负责处理客户端请求，把请求传送给 Servlet，并将 Servlet 的响应返回给客户端。简单来说，Tomcat 主要实现了 2 个核心功能：</p>
 
+        <ol>
+          <li>处理 <code class="highlighter-rouge">Socket</code> 连接，负责网络字节流与 <code class="highlighter-rouge">Request</code> 和 <code class="highlighter-rouge">Response</code> 对象的转化。用来管理和运行、支持 Java Servlet、JavaServer Pages （JSP）、Java 表达式语言、 Java WebSocket 技术 。</li>
+          <li>加载和管理 <code class="highlighter-rouge">Servlet</code>，及具体处理 <code class="highlighter-rouge">Request</code> 请求。Servlet 容器（<strong>重点理解</strong>）：是一个（基于 Java）运行在服务器端的 Web 组件 / 接口，由 Servlet 容器管理，用于交互式的浏览和修改数据，生成动态 Web 内容。 按照 Servlet 规范编写的 Java 类，被编译为平台独立的字节码，可被动态地加载到支持 Java 的 Web 服务器中运行。
+            <ul>
+              <li>执行过程</li>
+            </ul>
+          </li>
+        </ol>
+      </li>
+      <li>
+        <p>Jetty、Undertow：</p>
+      </li>
+    </ul>
+  </li>
+</ul>
 
-### Spring MVC 工作原理详解/流程说明
+<h5 id="tomcat">Tomcat</h5>
 
-1. 客户端（浏览器）发送请求到 DispatcherServlet。
-2. DispatcherServlet 根据请求信息调用 HandlerMapping。
-3. 解析请求到对应的 Handler（即 Controller）。
-4. HandlerAdapter 适配器根据 Handler调用真正的处理器处理请求，并处理相应的业务逻辑。
-5. 处理器处理完业务后，会返回一个 ModelAndView 对象，Model 是返回的数据对象，View 是逻辑上的 View。
+<p><img src="assets/tomcat_server_response.png" alt="在这里插入图片描述" style="zoom: 30%;" /><img src="assets/tomcat_request.png" alt="img" style="zoom:42%;" /></p>
 
-6. ViewResolver 会根据逻辑 View 查找实际的 View。
-7. DispaterServlet 把返回的 Model 传给 View（视图渲染）。
-8. 把 View 返回给请求者（浏览器）
-</aop></tx></aop:aspectj-autoproxy>
+<p>Tomcat 运行机制：Tomcat 服务器接受客户请求并做出响应的过程：</p>
+
+<ol>
+  <li>客户端（通常都是浏览器）访问Web服务器，发送HTTP请求。</li>
+  <li>Web 服务器接收到请求后，传递给（Servlet 容器 ）Tomcat。</li>
+  <li>Servlet 容器（根据url等信息决定）加载对应 Servlet，从线程池中取出一个空闲线程（产生 Servlet 实例后），调用对应 Servlet 的 service() 方法返回一个 response 对象，向其传递表示请求和响应的对象。</li>
+  <li>Servlet 实例使用请求对象得到客户端的请求信息，然后进行相应的处理。</li>
+  <li>Servlet 实例将处理结果通过响应对象发送回客户端，容器负责确保响应正确送出，同时将控制返回给Web服务器。</li>
+</ol>
+
+<h5 id="其它">其它</h5>
+
+<ul>
+  <li>CDN 加速</li>
+  <li>持续集成/持续部署
+    <ul>
+      <li>Jenkins</li>
+    </ul>
+  </li>
+  <li>代码质量检查
+    <ul>
+      <li>Sonar</li>
+    </ul>
+  </li>
+  <li>日志收集与分析：ELK</li>
+</ul>
+
+<h5 id="java-web-项目常用架构">Java Web 项目常用架构</h5>
+
+<ul>
+  <li>前端通过 Bootstrap 搭建页面框架；</li>
+  <li>SpringBoot 搭建 Java 后端环境（请求处理交由Servlet，返回的数据可通过 AJAX 或 JSP）；
+    <ul>
+      <li>用 Maven 管理项目、jar 包，自动下载 jar 包；</li>
+      <li>DAO 层用 DbUtils 组件完成，MySQL 作为数据库。</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="5-种常见的请求类型">5 种常见的请求类型</h4>
+
+<ul>
+  <li><code class="highlighter-rouge">GET</code>：请求从服务器获取特定资源，如 GET /users（获取所有学生）；</li>
+  <li><code class="highlighter-rouge">POST</code>：在服务器上创建一个新的资源，如 POST /users（创建学生）；</li>
+  <li><code class="highlighter-rouge">PUT</code>：更新服务器上的资源，如 PUT /users/12（更新编号为 12 的学生）；</li>
+  <li><code class="highlighter-rouge">DELETE</code>：从服务器删除指定的资源，如 DELETE /users/12（删除编号为 12 的学生）；</li>
+  <li><code class="highlighter-rouge">PATCH</code>：更新服务器上的资源（可看作是部分更新），较少用。</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@GetMapping("/users")
+//&lt;==&gt;@RequestMapping(value = "/users", method = RequestMethod.GET)
+public ResponseEntity&lt;List&lt;User&gt; &gt; getAllUsers() {
+	return userRepository.findAll();
+}
+
+@PostMapping("/users")
+public ResponseEntity&lt;User&gt; createUser(@Valid @RequestBody UserCreateRequest userCreateRequest) {
+	return userRespository.save(userCreateRequest);
+}
+
+@PutMapping("/users/{userId}")
+public ResponseEntity&lt;User&gt; updateUser(@PathVariable(value = "userId") Long userId, @Valid @RequestBody UserUpdateRequest userUpdateRequest) {
+  ......
+}
+
+@DeleteMapping("/users/{userId}")
+public ResponseEntity deleteUser(@PathVariable(value = "userId") Long userId){
+  ......
+}
+
+@PatchMapping("/profile")
+public ResponseEntity updateStudent(@RequestBody StudentUpdateRequest stuUpdateRequest) {
+	stuRepository.updateDetail(stuUpdateRequest);
+	return ResponseEntity.ok().build();
+}
+</code></pre></div></div>
+
+<h4 id="rest">REST</h4>
+
+<ul>
+  <li>
+    <p>REST：代表着抽象状态转移，根据 HTTP 协议从客户端发送数据到服务端，如：服务端的一本书以 XML 或 JSON 格式传递到客户端；</p>
+  </li>
+  <li>
+    <p>REST API：利用 HTTP 中 get、post、put/patch、delete 及其他 HTTP 方法构成 REST 中数据资源的增删改查操作；</p>
+  </li>
+</ul>
+
+<h5 id="requestmapping-vs-getmapping">@RequestMapping VS @GetMapping</h5>
+
+<p>都用于处理常见的 HTTP 请求类型：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">@RequestMapping</code>：配置处理器的 HTTP 请求方法、URI 等信息，将 HTTP 请求映射到（特定的处理程序）方法。可标注在类（一般是配置此控制器的 URI 前缀）和方法上；</li>
+  <li><code class="highlighter-rouge">@GetMapping</code>：仅可标注在方法上。</li>
+</ul>
+
+<h5 id="requestparam-vs-pathvariable">@RequestParam VS @PathVariable</h5>
+
+<p>用于前后端传值</p>
+
+<ul>
+  <li><code class="highlighter-rouge">@RequestParam</code> ：用于从 URL（Uniform Resource Locator，统一资源定位符，是 URI 的子集；通过标识定位地址，如家庭住址） 获取查询参数。最适合 Web 应用程序。如果 URL 中不存在查询参数，则可指定默认值。</li>
+  <li><code class="highlighter-rouge">@PathVariable</code>：用于从 URI（Uniform Resource Identifier，统一资源标识符，如身份证号）中获取路径参数。最适合 RESTful Web 服务。可在一个方法中定义多个。</li>
+</ul>
+
+<p>区别：</p>
+
+<ul>
+  <li>都用于提取方法参数；</li>
+  <li>获取参数值的方式不同，<code class="highlighter-rouge">@RequestParam</code> 从请求携带的参数中获取参数，而 <code class="highlighter-rouge">@PathVariable</code> 从请求的 URI 中获取。</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 如果请求的 url 是：/klasses/123456/teachers?type=web
+// 则获取到的数据就是：klassId=123456, type=web
+@GetMapping("/klasses/{klassId}/teachers")
+public List&lt;Teacher&gt; getKlassRelatedTeachers(
+	@PathVariable("klassId") Long klassId,
+	@RequestParam(value = "type", required = false) String type ) {
+	...
+}
+</code></pre></div></div>
+
+<h5 id="requestxxx-系列">@RequestXxx 系列</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">@RequestBody</code>： 用于将 HTTP 请求与方法参数中的对象绑定。在内部，用 <strong>HTTP MessageConverters</strong> 转换请求的正文。当用于注解方法参数时，会将传入的 HTTP 请求主体绑定到该参数。一个请求方法只可有一个 <code class="highlighter-rouge">@RequestBody</code>，但可有多个 <code class="highlighter-rouge">@RequestParam</code> 和 <code class="highlighter-rouge">@PathVariable</code>。
+    <ul>
+      <li>用于读取 Request 请求的 body 部分且<strong>Content-Type 为 application/json</strong> 格式的数据，接收到数据后会自动将数据绑定到 Java 对象上去。系统会用 <code class="highlighter-rouge">HttpMessageConverter</code> 或自定义的 <code class="highlighter-rouge">HttpMessageConverter </code>将请求的 body 中的 json 字符串转换为 Java 对象。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">@RequestHeader</code>：用于获取有关 HTTP 请求标头的详细信息。将此注解用作<strong>方法参数</strong>。注解的可选元素是<strong>名称，必填，值，defaultValue。</strong> 对于标题中的每个细节，应指定单独的注解。可在一种方法中多次使用。</li>
+  <li><code class="highlighter-rouge">@RequestAttribute</code>：将方法参数绑定到请求属性。提供了从控制器方法方便地访问请求属性的方法。可访问服务器端填充的对象。</li>
+</ul>
+
+<h5 id="required">@Required</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">@Required</code>：用于 Bean 设置方法。表示在配置时用必需的属性填充带注解的 Bean，否则将引发异常 <code class="highlighter-rouge">BeanInitilizationException</code> 。</li>
+</ul>
+
+<h5 id="ajaxjson">AJAX、JSON</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">@JsonIgnoreProperties({"userRoles"})</code>：作用在类上，用于过滤掉特定字段不返回或不解析；</li>
+  <li><code class="highlighter-rouge">@JsonIgnore</code>：用于属性上，同<code class="highlighter-rouge">@JsonIgnoreProperties</code>；</li>
+  <li><code class="highlighter-rouge">@JsonFormat</code>：用来格式化 JSON 数据。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@JsonFormat</span><span class="o">(</span><span class="n">shape</span><span class="o">=</span><span class="n">JsonFormat</span><span class="o">.</span><span class="na">Shape</span><span class="o">.</span><span class="na">STRING</span><span class="o">,</span> <span class="n">pattern</span><span class="o">=</span><span class="s">"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"</span><span class="o">,</span> <span class="n">timezone</span><span class="o">=</span><span class="s">"GMT"</span><span class="o">)</span>
+<span class="kd">private</span> <span class="n">Date</span> <span class="n">date</span><span class="o">;</span>
+</code></pre></div></div>
+
+<ul>
+  <li><code class="highlighter-rouge">@JsonUnwrapped</code>：扁平化对象。</li>
+</ul>
+
+<h3 id="swagger-ui-接口文档">Swagger-UI 接口文档</h3>
+
+<p>Swagger：可动态地根据注解生成在线API文档。是一套基于 OpenAPI 规范构建的开源工具，可帮助设计、构建、记录及使用 Rest API。</p>
+
+<p>作用： 前后端分离的情况下，只需少量注解即可生成一份自带 UI 界面的 Rest API 文档，包括接口需要的参数及返回值，还可直接对 API 调试。</p>
+
+<h5 id="配置文件">配置文件</h5>
+
+<p><code class="highlighter-rouge">config/SwaggerConfig.java</code></p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Configuration
+@EnableSwagger2
+public class SwaggerConfig extends BaseSwaggerConfig {
+
+    @Override
+    public SwaggerProperties swaggerProperties() {
+        return SwaggerProperties.builder()
+                .apiBasePackage("com.macro.mall.controller")
+                .title("mall后台系统")
+                .description("mall后台相关接口文档")
+                .contactName("macro")
+                .version("1.0")
+                .enableSecurity(true)
+                .build();
+    }
+}
+</code></pre></div></div>
+
+<h5 id="常用注解">常用注解</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">@EnableSwagger2</code></li>
+  <li>用于生成相关文档信息：
+    <ul>
+      <li><code class="highlighter-rouge">@Api</code>：修饰 Controller 类；</li>
+      <li><code class="highlighter-rouge">@ApiOperation</code>：修饰 Controller 类中的接口方法；</li>
+      <li><code class="highlighter-rouge">@ApiParam</code>：修饰接口参数；</li>
+      <li><code class="highlighter-rouge">@ApiModelProperty</code>：修饰实体类的属性，用于实体类是请求参数或返回结果时；</li>
+    </ul>
+  </li>
+</ul>
+
+<h5 id="整合-swagger-ui">整合 Swagger-UI</h5>
+
+<ol>
+  <li>
+    <p>添加项目依赖；</p>
+  </li>
+  <li>
+    <p>添加 Swagger-UI 的 Java 配置文件；</p>
+  </li>
+  <li>
+    <p>给 XxxController 添加 Swagger 注解；</p>
+  </li>
+  <li>
+    <p>修改 MyBatis Generator 注释的生成规则，运行代码生成器重新生成 mbg 包中的代码；</p>
+  </li>
+</ol>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  /**
+   * 自定义注释生成器
+   */
+  public class CommentGenerator extends DefaultCommentGenerator {
+  	public void addFieldComment(...) {
+          ...
+          // 给model的字段添加@ApiModelProperty注解来取代原来的方法注释
+          field.addJavaDocLine("@ApiModelProperty(value = \"" + remarks + "\")");
+      }
+      // 使其能在import中导入@ApiModelProperty，否则需手动导入该类，在需要生成大量实体类时，非常麻烦
+      public void addJavaFileComment(...) {
+      ...
+      }
+  }
+</code></pre></div></div>
+
+<ol>
+  <li>访问Swagger-UI接口文档地址：http://localhost:8080/swagger-ui.html</li>
+</ol>
+
+<p>参考：</p>
+
+<ul>
+  <li><a href="https://snailclimb.gitee.io/springboot-guide/#/./docs/basis/swagger">springboot-guide Swagger </a></li>
+  <li><a href="https://github.com/Snailclimb/spring-security-jwt-guide">从零入门 ！Spring Security With JWT（含权限验证）后端部分代码</a></li>
+</ul>
+
+<h3 id="统一日志框架">统一日志框架</h3>
+
+<h4 id="分类">分类</h4>
+
+<p>应用中不可直接用日志系统中的 API，而应依赖使用日志框架中的 API，使用门面模式的日志框架，（解耦）有利于维护各个类的日志处理方式统一。</p>
+
+<p>Mybatis 通过使用内置的日志工厂提供日志功能。</p>
+
+<p>日志系统：JUL、<del>Log4j、</del>Log4j2、<strong>Logback</strong>等。</p>
+
+<p>日志门面（框架）：</p>
+
+<ul>
+  <li>Spring Boot：默认用 <strong>SLF4J 日志门面+ Logback 日志系统</strong><del>实现的组合</del>来搭建日志系统；</li>
+  <li>Spring：Apache Commons Logging，原名 JCL（Jakarta Commons Logging）；应用部署在一个类路径已包含 Commons Logging 的环境中（如 Tomcat 和 WebShpere应用服务器），MyBatis 会把它作为日志工具，而不是自定义的其它日志工具，需显式地在 MyBatis 配置文件 mybatis-config.xml 里用<code class="highlighter-rouge">&lt;setting name="logImpl" value="LOG4J"/&gt;</code>配置。</li>
+  <li>Hibernate：jboss-logging。</li>
+</ul>
+
+<h4 id="elasticsearch--logstash--kibana">Elasticsearch + LogStash + Kibana</h4>
+
+<p>ELK 是常用的日志处理系统。SpringBoot 配置 LogBack，将日志发送给 Logstash，再转发给 Elasticsearch。<a href="https://github.com/macrozheng/mall-learning/blob/master/docs/technology/mall_tiny_elk.md">SpringBoot应用整合ELK实现日志收集</a></p>
+
+<ul>
+  <li>Elasticsearch：用于存储收集到的日志信息；</li>
+  <li>Logstash 日志收集器：用于收集日志；可理解为一个管道，或中间件。功能是从定义的输入源inputs（stdin、日志文件、数据库等）读取信息，经过filters过滤器处理，输入到定义好的outputs输出源（stdout、elesticsearch、HDFS等）。
+    <ul>
+      <li><a href="https://www.yisu.com/zixun/89177.html">springboot集成LogStash的步骤</a></li>
+    </ul>
+  </li>
+  <li>Kibana：通过Web端的可视化界面来查看日志。</li>
+</ul>
+
+<p><img src="assets/ELK.jpg" alt="springboot集成LogStash的步骤" style="zoom:60%;" /></p>
+
+<h4 id="logback">Logback</h4>
+
+<blockquote>
+  <p>结合项目说下，怎么用 AOP 输出日志。</p>
+</blockquote>
+
+<h5 id="spring-boot-配置文件">Spring Boot 配置文件</h5>
+
+<p>logging 部分配置</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># application-dev.yml
+logging:
+  level:
+    root: info # 设置应用的日志打印级别
+    com.macro.mall: debug
+    
+logstash:
+  host: localhost
+
+---
+# application-prod.yml
+logging:
+  file:
+    path: /var/logs
+  level:
+    root: info
+    com.macro.mall: info
+    
+logstash:
+  host: logstash
+
+---
+# application.property格式
+# 设置应用的日志打印级别
+logging.level.com.glmapper.spring.boot=INFO
+# 输出位置
+logging.path=./logs
+</code></pre></div></div>
+
+<h5 id="logbackxml-配置文件"><code class="highlighter-rouge">logback.xml</code> 配置文件</h5>
+
+<p><code class="highlighter-rouge">src/mian/resource/logback-spring.xml</code></p>
+
+<p>想用 Spring 扩展 profile 支持，要以 logback-spring.xml 命名，其他如 property 需改为springProperty。</p>
+
+<p>文件中主要标签有：</p>
+
+<ul>
+  <li>
+    <p><code class="highlighter-rouge">&lt;configuration&gt;</code></p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">&lt;include&gt;</code>：导入其他项目配置的 logback.xml 文件，<a href="https://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#howto.logging.logback">Configure Logback for Logging console-appender.xml</a></p>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;!--引用默认日志配置--&gt;
+&lt;include resource="org/springframework/boot/logging/logback/defaults.xml"/&gt;
+&lt;!--使用默认的控制台日志输出实现--&gt;
+&lt;include resource="org/springframework/boot/logging/logback/console-appender.xml"/&gt;
+</code></pre></div>    </div>
+  </li>
+  <li><code class="highlighter-rouge">&lt;property name="" value=""&gt;</code>：用来定义变量，可用<code class="highlighter-rouge">${name}</code>将值插入到<code class="highlighter-rouge">logger</code>上下文中。</li>
+  <li>
+    <p><code class="highlighter-rouge">&lt;springProperty name="" scope="" source="" defaultValue=""&gt;</code>：</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">&lt;appender name="" class=""&gt;</code>：日志打印组件。让应用知道怎么打、打印到哪里、打印成什么样。通过<code class="highlighter-rouge">logger</code>或<code class="highlighter-rouge">root</code>的<code class="highlighter-rouge">appender-ref</code>指定某个具体的<code class="highlighter-rouge">appender</code>；</p>
+
+    <ul>
+      <li><code class="highlighter-rouge">&lt;filter&gt;</code>：作为过滤器；可用任意条件对日志进行过滤。</li>
+    </ul>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">&lt;logger name="org.mybatis.example.BlogMapper"&gt;</code>：用来设置某个包、或具体某个类的日志打印级别、及指定<code class="highlighter-rouge">appender</code>。告诉应用哪些按照哪个appender 打印。</p>
+  </li>
+  <li><code class="highlighter-rouge">&lt;root level=""&gt;</code>：根 logger，也是一种 logger，且只有一个level属性。</li>
+</ul>
+
+<h5 id="日志文件隔离">日志文件隔离</h5>
+
+<p>一、通过控制台打印日志：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>private static final Logger LOGGER = LoggerFactory.getLogger(HelloController.class);
+
+@Autowired
+private TestLogService testLogService;
+
+@GetMapping("/hello")
+public String hello(){
+
+    LOGGER.info("this is info");
+    LOGGER.error("this is error");
+    testLogService.printLogToSpecialPackage();
+    return "hello spring boot";
+}
+</code></pre></div></div>
+
+<p>二、直接输出到日志文件</p>
+
+<p>三、输出到 LogStash</p>
+
+<p><a href="https://juejin.cn/post/6844903641535479821">看完这个不会配置 logback ，请你吃瓜！</a></p>
+
+<h3 id="异常处理">异常处理</h3>
+
+<ol>
+  <li><code class="highlighter-rouge">@ControllerAdvice</code> ：定义全局异常处理类；</li>
+  <li><code class="highlighter-rouge">@ExceptionHandler</code> ：声明异常处理方法；</li>
+</ol>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@ControllerAdvice
+@ResponseBody
+public class GlobalExceptionHandler {
+
+    /**
+     * 请求参数异常处理
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity&lt;?&gt; handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, HttpServletRequest request) {
+       ....
+    }
+}
+</code></pre></div></div>
+
+<h3 id="filter-过滤器">Filter 过滤器</h3>
+
+<blockquote>
+  <p>结合项目说下，是怎么用AOP，通过拦截器拦截非法请求。</p>
+</blockquote>
+
+<p>Filter 过滤器（<strong>重点理解</strong>）：主要用来过滤用户请求，允许对用户请求进行前置和后置处理，如实现 URL 级别的权限控制、过滤非法请求等。是面向切面编程（AOP）的具体实现。依赖于 Servlet 容器，属于 Servlet 规范的一部分。</p>
+
+<h5 id="listener-监听器">Listener 监听器</h5>
+
+<blockquote>
+  <p>（简单过一下）</p>
+</blockquote>
+
+<p>监听器：是 Servlet 规范中定义的一种特殊类。用于监听 <code class="highlighter-rouge">servletContext、HttpSession和servletRequest</code> 等域对象的创建和销毁事件、属性发生修改的事件。</p>
+
+<ul>
+  <li>Spring Boot 里的监听器实际上底下就是 Spring 和 Spring MVC 相关的东西，再下面就是 Servlet；</li>
+  <li>用 <code class="highlighter-rouge">@Configuration</code> 创建配置类。</li>
+</ul>
+
+<p>用于在事件发生前、后做一些必要的处理。主要用于：</p>
+
+<ol>
+  <li>系统启动时加载初始化信息；</li>
+  <li>统计在线人数和用户；</li>
+  <li>统计网站访问量；</li>
+  <li>记录用户访问路径。</li>
+</ol>
+
+<p>事件的发布与监听属于观察者模式；和MQ相比，偏向于处理“体系内”的某些逻辑。</p>
+
+<p>步骤：</p>
+
+<ol>
+  <li>自定义事件；</li>
+  <li>自定义（用于处理某种事件的）监听器；<code class="highlighter-rouge">@EventListener</code>；</li>
+  <li>注册监听器；<code class="highlighter-rouge">@Component</code>；</li>
+  <li>发布事件（监听到该事件的监听器自动进行相关逻辑处理）。</li>
+</ol>
+
+<p><img src="assets/listener_example.png" alt="在这里插入图片描述" style="zoom:50%;" /></p>
+
+<h3 id="国际化">国际化</h3>
+
+<h3 id="参考列表">参考列表</h3>
+
+<ul>
+  <li><a href="http://c.biancheng.net/spring_boot/">Spring Boot 框架入门教程（快速学习版）</a></li>
+  <li><a href="https://javaguide.cn/system-design/framework/spring/spring-common-annotations.htm">Spring/Spring Boot 常用注解总结</a></li>
+</ul>
+
+<h2 id="spring-boot-整合-mybatis">Spring Boot 整合 MyBatis</h2>
+
+<ul>
+  <li><a href="https://snailclimb.gitee.io/springboot-guide/#/./docs/basis/springboot-mybatis">优雅整合 SpringBoot+Mybatis</a></li>
+  <li><del><a href="https://snailclimb.gitee.io/springboot-guide/#/./docs/basis/springboot-mybatis-mutipledatasource">优雅整合 SpringBoot+Mybatis 多数据源</a></del></li>
+  <li><a href="https://mybatis.org/mybatis-3/zh/index.html">MyBatis 3 手册</a></li>
+</ul>
+
+<p>用于简化复杂的 JDBC 代码。</p>
+
+<h3 id="功能架构">功能架构</h3>
+
+<ol>
+  <li>API 接口层：提供给外部使用的接口 API，用来操作数据库。接收请求、调用数据处理层来完成具体的数据处理。</li>
+  <li>数据处理层：根据调用请求完成一次数据库操作。负责具体的 SQL 查找、解析、执行和结果映射等。</li>
+  <li>基础支撑层：将共用功能抽取出来作为最基础的组件，为上层的数据处理层提供最基础的功能支撑，包括连接管理、事务管理、配置加载和缓存处理。</li>
+</ol>
+
+<h3 id="优缺点">优缺点</h3>
+
+<p><strong>优点：</strong></p>
+
+<ol>
+  <li><strong>解耦 SQL 与程序代码</strong>：通过提供 DAL 层，将业务逻辑和数据访问逻辑分离，使系统的设计更清晰，更易维护、单元测试。</li>
+  <li>灵活：不会对应用程序或数据库的<strong>现有设计</strong>强加任何影响。SQL 写在 XML 里，便于统一管理和优化。</li>
+  <li><strong>简单易学</strong>：本身很小，没有任何第三方依赖，最简单安装只要两个 jar 文件 + 配置几个 SQL 映射文件。通过文档和源代码，可比较完全的掌握设计思路和实现。</li>
+  <li>提供映射标签，支持对象与数据库的 ORM 字段关系映射。</li>
+  <li>提供 XML 标签，<strong>支持动态 SQL</strong>。</li>
+</ol>
+
+<p><strong>缺点：</strong></p>
+
+<ol>
+  <li>SQL 语句依赖于数据库，<strong>移植性差</strong>。</li>
+  <li>虽然简化了数据绑定代码，但整个底层数据库查询实际还是要自己写，<strong>编写SQL语句工作量很大</strong>，尤其是字段多、关联表多时，不适合快速数据库修改。</li>
+  <li><strong>二级缓存机制</strong>不佳。</li>
+</ol>
+
+<h3 id="引入依赖">引入依赖</h3>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.mybatis.spring.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;mybatis-spring-boot-starter&lt;/artifactId&gt;
+    &lt;version&gt;2.2.0&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre></div></div>
+
+<h3 id="配置-mybatis">配置 MyBatis</h3>
+
+<h5 id="spring-boot-配置-mybatis">Spring Boot 配置 MyBatis</h5>
+
+<blockquote>
+  <p>Spring Boot 在配置文件（application.properties/yml）中配置 MyBatis。</p>
+</blockquote>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 使用 MyBatis，必须提前配置数据源信息，如数据库 URL、用户名、密码和驱动等。
+############ MyBatis 配置 ############
+mybatis:
+  # 指定 mapper.xml 的位置
+  mapper-locations: 
+    - classpath:dao/*.xml # ./mall-admin/src/main/java/resource/dao/*.xml
+    - classpath*:com/**/mapper/*.xml # ./mall-mgb/src/main/java/com.macro.mall.mapper/*.xml
+  # 类型别名包：在此处指明扫描实体类的包后，在 XxxMapper.xml 中实体类就可不写全路径名
+  type-aliases-package: net.biancheng.www.bean
+  configuration:
+    # 默认即开启驼峰命名法
+    map-underscore-to-camel-case: true  
+</code></pre></div></div>
+
+<h5 id="xml-配置-mybatis">XML 配置 MyBatis</h5>
+
+<blockquote>
+  <p>了解</p>
+</blockquote>
+
+<p>XML 配置文件：<code class="highlighter-rouge">mybatis-config.xml</code>，包含对 MyBatis 系统的核心设置，主要用于构建 <code class="highlighter-rouge">SqlSessionFactory</code>。元素标签有：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">configuration</code>（配置）
+    <ol>
+      <li><code class="highlighter-rouge">&lt;properties resource="org/mybatis/config.properties"&gt;</code> -&gt; <code class="highlighter-rouge">SqlSessionFactoryBuilder.build()</code> 传入的属性：用于替换需动态配置的属性值；</li>
+      <li><code class="highlighter-rouge">settings</code>（设置）：<code class="highlighter-rouge">cacheEnabled</code>、<code class="highlighter-rouge">lazyLoadingEnabled</code> 延迟加载等；</li>
+      <li><code class="highlighter-rouge">typeAliases</code>（类型别名）：给 Java 类型的全限定类名设置别名；</li>
+      <li><code class="highlighter-rouge">typeHandlers</code>（类型处理器）：MyBatis 在设置（<code class="highlighter-rouge">PreparedStatement</code>）预处理语句中的参数或从结果集中取出一个值时， 将获取到的值以合适的方式转换成 Java 类型。枚举类型。</li>
+      <li><code class="highlighter-rouge">objectFactory</code>（对象工厂）：实例化目标类；</li>
+      <li><code class="highlighter-rouge">plugins</code>（插件）：仅可编写针对 <code class="highlighter-rouge">ParameterHandler</code> 、 <code class="highlighter-rouge">ResultSetHandler</code> 、 <code class="highlighter-rouge">StatementHandler</code> 、 <code class="highlighter-rouge">Executor</code> 这 4 种接口的插件，MyBatis 用 JDK 的动态代理，为需拦截的接口生成代理对象，来实现接口方法拦截功能；每当执行这 4 种接口对象的方法时，就会进入拦截方法，具体就是 <code class="highlighter-rouge">InvocationHandler</code> 的 <code class="highlighter-rouge">invoke()</code> 方法。
+        <ul>
+          <li>实现 MyBatis 的 <code class="highlighter-rouge">Interceptor</code> 接口并重写 <code class="highlighter-rouge">intercept()</code> 方法，给插件编写注解，指定要拦截哪个接口的哪些方法，在配置文件中配置编写的插件。</li>
+        </ul>
+      </li>
+      <li><code class="highlighter-rouge">environments</code>（环境配置）：可配置多个环境，每个 SqlSessionFactory 实例选择一种环境。
+        <ul>
+          <li><code class="highlighter-rouge">environment</code>（环境变量）</li>
+        </ul>
+        <ul>
+          <li><code class="highlighter-rouge">transactionManager</code>（事务管理器）：决定事务作用域和控制方式；Spring 不必配置，会用自带的管理器来覆盖前面的配置。
+            <ol>
+              <li><code class="highlighter-rouge">JDBC</code>：直接用 JDBC 的提交和回滚功能，依赖从数据源获得的连接来管理事务作用域；在关闭连接时启用自动提交。</li>
+              <li><code class="highlighter-rouge">MANAGED</code>：从不提交或回滚一个连接，让容器来管理事务的整个生命周期（如 JEE 应用服务器的上下文）。</li>
+            </ol>
+          </li>
+          <li><code class="highlighter-rouge">dataSource</code>（数据源）：获取数据库连接实例，连接池；
+            <ol>
+              <li><code class="highlighter-rouge">UNPOOLED</code>：每次请求时打开和关闭连接；</li>
+              <li><code class="highlighter-rouge">POOLED</code>：使用连接池，使并发 Web 应用快速响应请求；</li>
+              <li><code class="highlighter-rouge">JNDI</code>：在如 EJB 或应用服务器这类容器中用；</li>
+            </ol>
+          </li>
+        </ul>
+      </li>
+      <li><code class="highlighter-rouge">databaseIdProvider</code>（数据库厂商标识）</li>
+      <li><code class="highlighter-rouge">mappers</code>（映射器）
+        <ul>
+          <li><code class="highlighter-rouge">mapper</code>：指定 XML 映射文件路径，包含 SQL 代码和映射定义信息。</li>
+        </ul>
+      </li>
+    </ol>
+  </li>
+</ul>
+
+<h3 id="sqlsession-实例">SqlSession 实例</h3>
+
+<p>当 Mybatis 与（Spring 等）依赖注入框架搭配使用时，<code class="highlighter-rouge">SqlSession</code> 将被创建并注入，不需用 <code class="highlighter-rouge">SqlSessionFactoryBuilder</code> 或 <code class="highlighter-rouge">SqlSessionFactory</code>。参考 <code class="highlighter-rouge">Mybatis-Spring</code></p>
+
+<p>获取 <code class="highlighter-rouge">SqlSession</code> 实例：</p>
+
+<h5 id="sqlsessionfactorybuilder-类">SqlSessionFactoryBuilder 类</h5>
+
+<p><code class="highlighter-rouge">SqlSessionFactoryBuilder</code>： 可从 XML 配置文件、注解或 <code class="highlighter-rouge">Java Configuration</code> 配置类来构建出 <code class="highlighter-rouge">SqlSessionFactory</code> 实例。一旦创建 ，就不再需要。</p>
+
+<ol>
+  <li>
+    <p>用 XML 配置文件构建 <code class="highlighter-rouge">SqlSessionFactory</code> 实例：</p>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 用 Resources 工具类加载 mybatis-config.xml 文件，构造 InputStream 输入流实例
+String resource = "org/mybatis/builder/mybatis-config.xml";
+InputStream inputStream = Resources.getResourceAsStream(resource);
+   
+SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
+SqlSessionFactory factory = builder.build(inputStream);
+   
+// env: 加载 environment 元素体中指定的环境，包括数据源和事务管理器，&lt;environment id="dev"&gt;
+// props: 读取作为方法参数传递的属性
+// SqlSessionFactory build(InputStream inputStream, [String env,] [Properties props])
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>注解；</p>
+  </li>
+  <li>
+    <p>用 Java 配置类 <code class="highlighter-rouge">config/MyBatisConfig.java</code> 构建 <code class="highlighter-rouge">SqlSessionFactory</code> 实例：</p>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Configuration
+@EnableTransactionManagement
+@MapperScan({"com.macro.mall.mapper","com.macro.mall.dao"})
+public class MyBatisConfig {
+}
+   	
+SqlSessionFactory build(Configuration config)
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h5 id="sqlsessionfactory-类">SqlSessionFactory 类</h5>
+
+<p><code class="highlighter-rouge">SqlSessionFactory</code>：基于 MyBatis 的应用的核心，用于创建、获取 <code class="highlighter-rouge">SqlSession</code> 实例，在应用的运行期间一直存在。创建方法有：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 创建的SqlSession具备如下特性：
+// - 事务处理：事务作用域开启（即不自动提交）。autoCommit=true 表示自动提交（对很多数据库和 JDBC 驱动来说，等同关闭事务支持）
+// - 数据库连接：由当前环境配置的 DataSource 实例中获取 Connection 对象。
+// - 事务隔离级别：用驱动或数据源的默认设置。
+// - 语句执行：不复用PreparedStatement 预处理语句，也不批量处理更新（包括插入和删除）语句。
+SqlSession openSession()
+
+SqlSession openSession(boolean autoCommit)
+SqlSession openSession(Connection connection)
+SqlSession openSession(TransactionIsolationLevel level)
+
+// ExecutorType 枚举参数用来设置语句执行
+SqlSession openSession(ExecutorType execType)
+SqlSession openSession(ExecutorType execType, boolean autoCommit)
+SqlSession openSession(ExecutorType execType, Connection connection)
+SqlSession openSession(ExecutorType execType, TransactionIsolationLevel level)
+
+// 返回 Configuration 实例，可在运行时用来检查 MyBatis 配置
+Configuration getConfiguration();
+</code></pre></div></div>
+
+<h5 id="sqlsession-类">SqlSession 类</h5>
+
+<p><code class="highlighter-rouge">SqlSession</code>：MyBatis 的主要接口。不是线程安全的，因此不能被共享。包含：</p>
+
+<ol>
+  <li>所有执行语句的方法（在数据库执行 SQL 命令所需的所有方法，可直接执行已映射的 SQL 语句）；</li>
+  <li>管理事务的方法；</li>
+  <li>及获取映射器实例的方法。</li>
+</ol>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>try (SqlSession session = sqlSessionFactory.openSession()) {
+	Blog blog = (Blog) session.selectOne("org.eg.BlogMapper.selectBlog", 101);
+}
+
+// 更简洁的方式：用与指定语句的参数和返回值相匹配的接口（如 BlogMapper.class）
+try (SqlSession session = sqlSessionFactory.openSession()) {
+	BlogMapper mapper = session.getMapper(BlogMapper.class);
+	Blog blog = mapper.selectBlog(101);
+}
+
+// 语句执行方法
+&lt;T&gt; T selectOne(String statement, Object parameter)
+&lt;E&gt; List&lt;E&gt; selectList(String statement, Object parameter)
+&lt;T&gt; Cursor&lt;T&gt; selectCursor(String statement, Object parameter)
+&lt;K,V&gt; Map&lt;K,V&gt; selectMap(String statement, Object parameter, String mapKey)
+int insert(String statement, Object parameter)
+int update(String statement, Object parameter)
+int delete(String statement, Object parameter)
+// 还有 select 方法的三个高级版本，允许限制返回行数的范围，或提供自定义结果处理逻辑，常用于数据集非常庞大时
+
+// 立即批量更新方法
+// 设置为 ExecutorType.BATCH 时，可清除（执行）缓存在 JDBC 驱动类中的批量更新语句
+List&lt;BatchResult&gt; flushStatements()
+
+// 事务控制方法，用由 Connection 实例控制的 JDBC 事务管理器时起作用
+// 设置了自动提交或使用了外部事务管理器，不起作用
+// MyBatis-Spring 等提供了声明式事务处理
+void commit()
+void commit(boolean force)
+void rollback()
+void rollback(boolean force)
+
+// 本地缓存
+每当创建一个新 session，MyBatis 就会创建与之相关联的本地缓存，保存任何在 session 执行过的查询结果；当再次执行参数相同的查询时，不需再实际查询数据库。在做出修改、事务提交或回滚，及关闭 session 时清空。
+默认情况下，本地缓存数据的生命周期等同于整个 session 的周期。由于缓存会被用来解决循环引用问题和加快重复嵌套查询的速度，所以无法将其完全禁用。
+void clearCache()
+
+// 确保 SqlSession 被关闭
+void close()
+
+// 使用映射器
+上述的各个 insert、update、delete 和 select 方法都很强大，但也有些繁琐，并不符合类型安全，对 IDE 和单元测试也不友好。因此，用映射器类来执行映射语句更常见。
+&lt;T&gt; T getMapper(Class&lt;T&gt; type)
+</code></pre></div></div>
+
+<h3 id="创建实体类">创建实体类</h3>
+
+<blockquote>
+  <p>略</p>
+</blockquote>
+
+<h3 id="在dao层创建映射器类">在DAO层创建映射器类</h3>
+
+<p>映射器类：<code class="highlighter-rouge">XxxDao.java / XxxMapper.java</code>，实现 Mapper 接口或由 <code class="highlighter-rouge">@Mapper </code> 修饰的类；映射器类就是一个仅需声明与 SqlSession 方法（映射器方法）相匹配的接口。</p>
+
+<ul>
+  <li>映射器接口不需去实现任何接口或继承自任何类，只要方法签名可被用来唯一识别对应的映射语句即可。</li>
+  <li>映射器接口可继承自其他接口。在用 XML 绑定映射器接口时，保证语句处于合适的命名空间中即可。</li>
+  <li>字符串参数 ID 无需匹配，而是由方法名匹配映射语句的 ID。</li>
+  <li>返回类型必须匹配期望的结果类型，包括：原始类型、Map、POJO 和 JavaBean。</li>
+</ul>
+
+<p>映射器类上的注解：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">@Mapper</code>：用于定义 Mybatis 映射器接口（Dao 层接口）。告诉 Spring 框架此接口的实现类由 Mybatis 负责创建，并将其实现类对象存储到 Spring 容器中。不支持重载。</li>
+  <li><code class="highlighter-rouge">@MapperScan(basePackages = "top.snailclimb.dao")</code> ：（当 mapper 接口较多时），用于Spring Boot 主启动类上；表示动态扫描指定包（DAO接口所在包）下的 mapper 接口，相当于每个 mapper 接口上都标注 <code class="highlighter-rouge">@Mapper</code>。</li>
+</ul>
+
+<p><strong>配置 Mapper 映射的两种方式：</strong></p>
+
+<ol>
+  <li>注解： 用来映射简单语句，代码更简洁，但 SQL 有变化时需重新编译代码。</li>
+  <li>
+    <p><code class="highlighter-rouge">XML Mapper</code> 映射文件：用 XML 来映射复杂语句（如：嵌套联合语句？映射）。与映射器接口同名，<code class="highlighter-rouge">XxxDao.xml/XxxMapper.xml</code>，MyBatis 会自动查找并加载。</p>
+
+    <ol>
+      <li>
+        <p>在 Spring 配置文件（<code class="highlighter-rouge">application.properties/yml</code>）中指定扫描映射文件的位置；</p>
+
+        <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mybatis:
+  mapper-locations:
+    - classpath:dao/*.xml
+    - classpath*:com/**/mapper/*.xml
+</code></pre></div>        </div>
+      </li>
+      <li>
+        <p>在 MyBatis 配置文件中通过<code class="highlighter-rouge">&lt;Mappers&gt;</code>指定位置。</p>
+      </li>
+    </ol>
+  </li>
+</ol>
+
+<h5 id="一全注解方式">一、全注解方式</h5>
+
+<p>在映射器类中用常用注解标识 <code class="highlighter-rouge">SqlSession</code> 方法：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">@Select</code>：用于方法上，取代 XML 中的 <code class="highlighter-rouge">&lt;select&gt;</code> 标签。
+    <ul>
+      <li><code class="highlighter-rouge">@Param</code>：用于方法参数向映射器（动态 SQL <code class="highlighter-rouge">${}、#{}</code>）传参；</li>
+    </ul>
+    <ul>
+      <li><code class="highlighter-rouge">@ResultType</code>：<code class="highlighter-rouge">@Select </code>方法返回类型是 void 时，用结果处理器。
+      - <code class="highlighter-rouge">@ResultMap</code>：指定 XML 映射中 <code class="highlighter-rouge">&lt;resultMap&gt;</code> 元素的 id。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">@Insert</code></li>
+  <li><code class="highlighter-rouge">@Update</code></li>
+  <li><code class="highlighter-rouge">@Delete</code></li>
+</ol>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 1. Dao层开发
+
+// UserDao.java
+@Mapper
+public interface UserDao {
+     // 通过名字查询用户信息
+    @Select("SELECT * FROM user WHERE name = #{name}")
+    User findUserByName(@Param("name") String name);
+
+    // 插入用户信息
+    @Insert("INSERT INTO user(name, age) VALUES(#{name}, #{age})")
+    void insertUser(@Param("name") String name, @Param("age") Integer age);
+
+    // 根据 id 更新用户信息
+    @Update("UPDATE user SET name = #{name},age = #{age} WHERE id = #{id}")
+    void updateUser(@Param("name") String name, @Param("age") Integer age, @Param("id") int id);
+}
+
+// 2. Service层开发
+// 3. Controller层开发
+</code></pre></div></div>
+
+<h5 id="二mapper-映射文件">二、Mapper 映射文件</h5>
+
+<p>可理解为 Dao 接口实现类的地位。</p>
+
+<p><a href="#https://mybatis.org/mybatis-3/zh/sqlmap-xml.html#">SQL 映射文件</a>的顶级元素（按照应被定义的顺序）：</p>
+
+<p><code class="highlighter-rouge">&lt;mapper namespace="com.macro.mall.dao.UmsRoleDao"&gt;</code>：（用 XML 绑定映射器接口时），namespace 属性用于设置 DAO 接口的全限定名。</p>
+
+<ol>
+  <li>
+    <p><code class="highlighter-rouge">cache</code>：命名空间的缓存配置。</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">cache-ref</code>：引用其他命名空间的缓存配置。</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">&lt;resultMap&gt; </code>：描述如何从数据库结果集中加载对象。最复杂也最强大的元素。逐一定义列名和对象属性名间的映射关系，MyBatis 通过反射创建对象，同时用反射给对象的属性逐一赋值并返回。常用于</p>
+
+    <ol>
+      <li><code class="highlighter-rouge">constructor</code>：用于在实例化类时，注入结果到构造方法中；
+        <ul>
+          <li>Executor 执行器、批处理；</li>
+          <li>类型处理器（typeHandlers）：处理枚举类型；</li>
+        </ul>
+      </li>
+      <li>
+        <p><code class="highlighter-rouge">&lt;id /&gt;</code>：一个 ID 结果；标记出作为 ID 的结果可帮助提高整体性能；</p>
+      </li>
+      <li>
+        <p><code class="highlighter-rouge">&lt;result /&gt;</code>：注入到字段或 JavaBean 属性的普通结果；</p>
+
+        <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;id column="id" jdbcType="BIGINT" property="id" /&gt;
+&lt;result column="member_id" jdbcType="BIGINT" property="memberId" /&gt;
+</code></pre></div>        </div>
+      </li>
+      <li>
+        <p><code class="highlighter-rouge">association</code>： 一个复杂类型的关联；许多结果将包装成这种类型；</p>
+
+        <ul>
+          <li>嵌套结果映射 – 关联可是 <code class="highlighter-rouge">resultMap</code> 元素，或是对其它结果映射的引用；</li>
+        </ul>
+      </li>
+      <li><code class="highlighter-rouge">&lt;collection /&gt;</code>：一个复杂类型的集合；
+        <ul>
+          <li>嵌套结果映射 – 集合可以是 <code class="highlighter-rouge">resultMap</code> 元素，或是对其它结果映射的引用；</li>
+        </ul>
+      </li>
+      <li><code class="highlighter-rouge">discriminator</code> – 使用结果值来决定使用哪个 <code class="highlighter-rouge">resultMap</code>；</li>
+    </ol>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;resultMap id="orderDetailResultMap" type="com.macro.mall.dto.OmsOrderDetail" extends="com.macro.mall.mapper.OmsOrderMapper.BaseResultMap"&gt;
+    &lt;collection property="orderItemList" resultMap="com.macro.mall.mapper.OmsOrderItemMapper.BaseResultMap" columnPrefix="item_"/&gt;
+&lt;/resultMap&gt;
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p><del><code class="highlighter-rouge">parameterMap</code> – 老式风格的参数映射。已废弃，现用行内参数映射 parameterType属性。</del></p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">&lt;sql&gt;</code> – 可被其他语句引用的可重用语句块。（在加载阶段）参数可静态地确定下来。</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">&lt;select id=""&gt; &lt;/select&gt;</code> – 映射查询语句</p>
+
+    <ul>
+      <li>通过 <code class="highlighter-rouge">resultType</code> 属性的值查找 map 等基础类型、或 [ <code class="highlighter-rouge">&lt;mapper&gt;</code>的 <code class="highlighter-rouge">namespace</code> 属性值，即映射器类的全限定名，省略表示本文件的 ] + <code class="highlighter-rouge">&lt;resultType&gt;</code> 的 <code class="highlighter-rouge">id</code> ；</li>
+      <li>语句参数映射：如果 User 类型的参数对象传递到了语句中，会查找 id、username 属性，然后将值传入预处理语句的参数中。
+        <ul>
+          <li><code class="highlighter-rouge">#{}</code>：是 SQL 的参数占位符，预编译处理时会被替换为 <code class="highlighter-rouge">?</code>，在 SQL 执行前，调用<del><code class="highlighter-rouge">JDBC</code>中的</del> <code class="highlighter-rouge">PreparedStatement</code> 的 set 方法，按序、安全地设置参数值。
+            <ol>
+              <li>自动进行 JDBC 类型转换，将传入的数据当作字符串，自动加双引号。</li>
+              <li>能很大程度防止 SQL 注入，优先用 <code class="highlighter-rouge">#{}</code>。
+                <ol>
+                  <li><strong>SQL注入</strong>发生在编译过程中，因为注入了某些特殊字符，最后被编译成了恶意的执行操作。</li>
+                  <li>而预编译机制可以很好的防止 SQL 注入。预编译完成后，SQL 的结构已经固定，即便用户输入非法参数，也不会对 SQL 的结构产生影响，从而避免了潜在的安全风险。</li>
+                </ol>
+              </li>
+              <li>一般用来传字段名；传多个参数时，参数名必须对应与当前表关联 <code class="highlighter-rouge">[实体类的属性名]或[Map集合关键字]</code>。</li>
+            </ol>
+          </li>
+          <li><code class="highlighter-rouge">${value}</code>：是 Properties 文件中的变量占位符，属于静态文本替换。
+            <ol>
+              <li>不自动进行 JDBC 类型转换，将传入的数据直接显式地生成在 SQL 中，不加双引号。</li>
+              <li>在<code class="highlighter-rouge">JDBC</code>不支持用占位符的地方，只能用<code class="highlighter-rouge">${}</code>。
+                <ul>
+                  <li>如用 <code class="highlighter-rouge">order/group by ${colName}</code> 排序、分组的动态参数，在 SQL 语句中直接插入，不会修改或转义字符串。<code class="highlighter-rouge">#{}</code>会自动加双引号，出现 <code class="highlighter-rouge">order by "id"</code> 的错误。</li>
+                  <li>可用于标签属性值和 SQL 内部。</li>
+                </ul>
+              </li>
+              <li>一般用于传入数据库对象，如传入表名。</li>
+            </ol>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">&lt;insert&gt; &lt;/insert&gt;</code> – 映射插入语句</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">update</code> – 映射更新语句</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">delete</code> – 映射删除语句</p>
+  </li>
+</ol>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 语句接收一个 int（或 Integer）类型的参数，返回 HashMap 类型的对象
+&lt;select id="selectPerson" parameterType="int" resultType="hashmap"&gt;
+  SELECT * FROM PERSON WHERE ID = #{id}
+&lt;/select&gt;
+
+// 基本等价于 JDBC 代码：
+// #{id}，告诉 MyBatis 创建一个预处理语句的参数，在JDBC中由 `?` 来标识
+String selectPerson = "SELECT * FROM PERSON WHERE ID=?";
+PreparedStatement ps = conn.prepareStatement(selectPerson);
+ps.setInt(1, id); // 向预处理语句传参
+
+&lt;select
+  id="selectPerson"
+  parameterType="int"
+  parameterMap="deprecated"
+  resultType="hashmap"
+  resultMap="personResultMap"
+  flushCache="false"
+  useCache="true"
+  timeout="10000"
+  fetchSize="256"
+  statementType="PREPARED"
+  resultSetType="FORWARD_ONLY"&gt; 
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">select</code> 元素的属性：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">id</code>：在命名空间中唯一的标识符，用来引用此语句。对应 DAO 接口中的方法名，方法参数就是传递给 SQL 的参数。
+    <ul>
+      <li>Dao 接口里的方法可重载，但同一 namspace 下的 id 不允许重复。重载需满足以下条件：
+        <ul>
+          <li>仅有一个无参方法和一个有参方法；</li>
+          <li>多个有参方法时，参数数量必须一致，且使用相同的 <code class="highlighter-rouge">@Param</code> ，或使用 <code class="highlighter-rouge">param1</code> 这种。</li>
+          <li>id 相同，对应同一段<code class="highlighter-rouge">MappedStatement</code>标签，用动态 SQL 处理不同的参数列表。</li>
+        </ul>
+      </li>
+      <li>Dao 接口的工作原理：MyBatis 运行时会用 <strong>JDK 动态代理</strong>为 Dao 接口生成 <code class="highlighter-rouge">proxy</code> 代理对象，用于拦截接口方法，转而执行 <code class="highlighter-rouge">MappedStatement</code> 所代表的 SQL，返回 SQL 执行结果。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">parameterType</code>：参数类的完全限定名或别名。MyBatis 可通过 TypeHandler 推断出具体传入语句的参数，默认值为 unset。</li>
+  <li><code class="highlighter-rouge">resultType</code>：返回类型的类，完全限定名或别名。如果是集合，应是集合包含的类型，而不是 <code class="highlighter-rouge">List</code>。
+    <ul>
+      <li>MyBatis 会在幕后自动创建一个 <code class="highlighter-rouge">ResultMap</code>，再根据属性名来映射列到 JavaBean 的属性上。如果列名和属性名不能匹配上，可在 <code class="highlighter-rouge">select</code> 语句中设置列别名来完成匹配。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">resultMap</code>：指定外部 resultMap 的命名（id）引用。</li>
+  <li><del>flushCache</del>： true 表示任何时候只要语句被调用，都会导致本地缓存和二级缓存被清空，默认值：false。</li>
+  <li><del>useCache</del>： true 表示本条语句的结果被二级缓存，默认值：select 元素为 true。</li>
+  <li><del>timeout</del>：在抛出异常前，驱动程序等待数据库返回请求结果的秒数。默认值为 unset（依赖驱动）。</li>
+  <li><del>fetchSize</del>：驱动程序每次批量返回的结果行数。默认值为 unset（依赖驱动）。</li>
+  <li><del>statementType</del>：STATEMENT，PREPARED 或 CALLABLE ，让 MyBatis 分别用 Statement，PreparedStatement 或 CallableStatement，默认值：PREPARED。</li>
+  <li><del>resultSetType</del>：FORWARD_ONLY，SCROLL_SENSITIVE 或 SCROLL_INSENSITIVE，默认值为 unset （依赖驱动）。</li>
+  <li><del>databaseId</del>：如果配置了 databaseIdProvider，MyBatis 会加载所有不带 databaseId 或匹配当前 databaseId 的语句；如果带或不带的语句都有，则忽略不带的。</li>
+  <li><del>resultOrdered</del>：仅针对嵌套结果 select 语句适用： true，假设包含了嵌套结果集或分组，当返回一个主结果行时，就不会有对前面结果集引用的情况。使得在获取嵌套的结果集时不至于导致内存不够用。默认值：false。</li>
+  <li><del>resultSets</del>：仅对多结果集的情况适用，将列出语句执行后返回的结果集并每个结果集给一个名称，用逗号分隔。</li>
+</ol>
+
+<p>仅对 insert 和 update 有用的属性：</p>
+
+<ul>
+  <li>useGeneratedKeys： MyBatis 使用 JDBC 的 getGeneratedKeys 方法来取出由数据库内部生成的主键（如：像 MySQL 和 SQL Server 等关系数据库管理系统的自动递增字段），默认值：false。</li>
+  <li><del>keyProperty</del>：唯一标记一个属性，MyBatis 会通过 getGeneratedKeys 的返回值或通过 insert 语句的 selectKey 子元素设置它的键值，默认：unset。</li>
+  <li><del>keyColumn</del>：通过生成的键值设置表中的列名，仅在某些数据库（像 PostgreSQL）是必须的，当主键不是表的第一列时需设置。</li>
+</ul>
+
+<h3 id="动态sql">动态SQL</h3>
+
+<p>目的：<del>在 XML 映射文件内，以标签的形式编写动态 SQL，</del>用于逻辑判断和动态拼接 SQL 语句的功能。</p>
+
+<p><strong>动态 sql 的执行原理</strong>：使用 OGNL 从 SQL 参数对象中计算表达式的值，再动态拼接 SQL。</p>
+
+<p>元素种类：</p>
+
+<ol>
+  <li>
+    <p><code class="highlighter-rouge">&lt;if&gt; &lt;/if&gt;</code>：动态 SQL 最常见情景是根据（ <code class="highlighter-rouge">@param</code> 传入的方法参数作为）条件判断，并拼接到 where 子句；</p>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;if test="queryParam.createTime!=null and queryParam.createTime!=''"&gt;
+	AND create_time LIKE concat(#{queryParam.createTime},"%")
+&lt;/if&gt;
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>choose (when, otherwise)：同 switch；</p>
+  </li>
+  <li>
+    <p>trim (where, set)</p>
+  </li>
+  <li>
+    <p>foreach：</p>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;foreach item="item" index="index" collection="list" open="ID in (" separator="," close=")" nullable="true"&gt;
+  	#{item}
+&lt;/foreach&gt;
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>bind：允许在 OGNL 表达式外创建一个变量，并绑定到当前的上下文；</p>
+  </li>
+  <li>
+    <p>script：在带注解的映射器接口类中使用动态 SQL；</p>
+  </li>
+</ol>
+
+<p><strong>SQL语句构建器</strong>：通过<strong>SQL工具类</strong>处理动态SQL典型问题，如加号、引号、换行、格式化问题、嵌入条件的逗号管理及 AND 连接。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>private String selectPersonSql() {
+  return new SQL() .toString();
+}
+</code></pre></div></div>
+
+<h3 id="分页">分页</h3>
+
+<p>MyBatis 用 RowBounds 对象进行分页，是针对 ResultSet 结果集执行的内存分页，而非物理分页；</p>
+
+<p>物理分页的实现方式：</p>
+
+<ol>
+  <li>在 SQL 内直接书写带有物理分页的参数 <code class="highlighter-rouge">Limit offset</code>；</li>
+  <li>用分页插件。基本原理是用 MyBatis 提供的插件接口，实现自定义插件，在插件的拦截方法内拦截待执行的 SQL 并重写 SQL，根据 dialect 方言，添加对应的物理分页语句和参数。</li>
+</ol>
+
+<p><strong>PagerHelper</strong></p>
+
+<blockquote>
+  <p>SpringBoot 整合 PagerHelper 就自动整合了 MyBatis。</p>
+</blockquote>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PageHelper.startPage(pageNum, pageSize);
+// 之后进行查询操作将自动进行分页
+List&lt;PmsBrand&gt; brandList = brandMapper.selectByExample(new PmsBrandExample());
+// 通过构造PageInfo对象获取分页信息，如当前页码、总页数、总条数
+PageInfo&lt;PmsBrand&gt; pageInfo = new PageInfo&lt;PmsBrand&gt;(list);
+</code></pre></div></div>
+
+<h5 id="mybatis-generator">Mybatis generator</h5>
+
+<p>MyBatis 的代码生成器，可根据数据库生成 model、mapper.xml、mapper 接口和 Example，通常情况下的单表查询不用再手写 mapper。</p>
+
+<h2 id="spring-boot-整合-spring-security-权限">Spring Boot 整合 Spring Security 权限</h2>
+
+<blockquote>
+  <p>系统设计 安全 认证和授权</p>
+</blockquote>
+
+<p>整合 Spring Security 和 JWT 实现后台用户的<strong>登录和授权功能</strong>，同时改造Swagger-UI 的配置使其可自动记住登录令牌进行发送。</p>
+
+<p>认证和鉴权：</p>
+
+<ul>
+  <li>Session 和 Cookie；</li>
+  <li><code class="highlighter-rouge">Spring Security + OAuth2</code>：强大的可高度定制的<strong>认证和授权框架</strong>，对 Spring 应用来说是一套 Web 安全标准。
+    <ul>
+      <li><code class="highlighter-rouge">JWT（JSON WEB TOKEN）</code>：是（基于 RFC 7519 标准定义的）一种可安全传输的的 JSON 对象，由于使用了数字签名，所以是可信任和安全的。</li>
+    </ul>
+  </li>
+  <li>SSO 单点登录；</li>
+  <li>Apache <strong>Shiro</strong>：强大易用的 Java 安全框架，提供了认证、授权、加密和会话管理功能。</li>
+</ul>
+
+<h3 id="jwt-实现认证和授权的原理">JWT 实现认证和授权的原理</h3>
+
+<ol>
+  <li>用户调用登录接口，登录成功后获取到 JWT 的 token；</li>
+  <li>之后用户每次调用接口都在 http 的请求 header 中添加一个 Authorization 头，值为 JWT 的token；</li>
+  <li>后台程序通过对 Authorization 头中信息解码及数字签名校验来获取其中的用户信息，从而实现认证和授权。</li>
+</ol>
+
+<h3 id="整合-spring-security-及-jwt">整合 Spring Security 及 JWT</h3>
+
+<ol>
+  <li>在 <code class="highlighter-rouge">pom.xml</code> 中添加项目依赖；
+    <ul>
+      <li>Hutool 之 StrUtil 工具类；</li>
+    </ul>
+  </li>
+  <li>添加生成和解析 <code class="highlighter-rouge">JWT token</code> 的工具类；</li>
+  <li>添加 Spring Security 的配置类，<code class="highlighter-rouge">com.macro.mall.security.config.SecurityConfig</code>
+    <ol>
+      <li><code class="highlighter-rouge">configure(HttpSecurity httpSecurity)</code>：用于配置需拦截的 URL 路径、白名单 URL、JWT 过滤器及抛出异常后的处理器；</li>
+      <li><code class="highlighter-rouge">configure(AuthenticationManagerBuilder auth)</code>：用于配置 <code class="highlighter-rouge">UserDetailsService</code> 及<code class="highlighter-rouge">PasswordEncoder</code>；</li>
+      <li>添加 <code class="highlighter-rouge">RestfulAccessDeniedHandler() RestAuthenticationEntryPoint()</code>；</li>
+    </ol>
+  </li>
+  <li>添加 <code class="highlighter-rouge">AdminUserDetails</code>；</li>
+  <li>添加 <code class="highlighter-rouge">JwtAuthenticationTokenFilter</code>，在用户名和密码校验前添加的过滤器，如果请求中有 JWT 的 token 且有效，会取出 token 中的用户名，然后调用 Spring Security 的 API 进行登录操作。</li>
+  <li>登录注册功能实现
+    <ul>
+      <li>添加 <code class="highlighter-rouge">UmsAdminController</code> 类，实现后台用户登录、注册及获取权限的接口；
+        <ul>
+          <li>添加 <code class="highlighter-rouge">UmsAdminService</code> 接口、<code class="highlighter-rouge">UmsAdminServiceImpl</code> 类；</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>修改 Swagger 的配置，实现调用接口自带 Authorization 头，就可访问需登录的接口了。</p>
+  </li>
+  <li>给 <code class="highlighter-rouge">PmsBrandController</code> 接口中的方法添加访问权限。</li>
+</ol>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  @PreAuthorize("hasAuthority('pms:brand:read')")
+  public CommonResult&lt;List&lt;PmsBrand&gt;&gt; getBrandList() {
+      return CommonResult.success(brandService.listAllBrand());
+  }
+</code></pre></div></div>
+
+<h3 id="敏感词过滤">敏感词过滤</h3>
+
+<h3 id="数据脱敏">数据脱敏</h3>
+
+<h3 id="定时任务">定时任务</h3>
+
+<p>https://github.com/Snailclimb/JavaGuide/blob/main/docs/system-design/schedule-task.md</p>
