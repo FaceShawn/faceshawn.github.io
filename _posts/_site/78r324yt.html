@@ -4,9 +4,13 @@
 
 <!-- more -->
 
+<h2 id="目录">目录</h2>
+
+<p>[TOC]</p>
+
 <h2 id="集合框架容器类">集合框架（容器类）</h2>
 
-<p>所有集合类都位于 java.util 包下，用于表示和操作对象集合，包含大量集合接口及其实现类和操作算法。</p>
+<p>所有集合类都位于 <code class="highlighter-rouge">java.util</code> 包下，用于表示和操作对象集合，包含大量集合接口及其实现类和操作算法。</p>
 
 <p>集合类 VS 数组：</p>
 
@@ -17,9 +21,9 @@
 
 <h3 id="集合框架继承关系图">集合框架继承关系图</h3>
 
-<p><img src="assets/1362965-20190118094735724-2129767713.png" alt="img" style="zoom: 67%;" /></p>
+<p><img src="assets/1362965-20190118094735724-2129767713.png" alt="img" style="zoom: 80%;" /></p>
 
-<p><img src="assets/1362965-20190118095106326-273814633.png" alt="img" style="zoom:67%;" /></p>
+<p><img src="assets/1362965-20190118095106326-273814633.png" alt="img" style="zoom:80%;" /></p>
 
 <p><img src="assets/collection-impl.gif" alt="collection-impl" style="zoom: 80%;" /></p>
 
@@ -31,10 +35,10 @@
 </code></pre></div></div>
 
 <ol>
-  <li>List：有序、可重复，允许多个 <code class="highlighter-rouge">null</code> 元素；可用iterator遍历或<code class="highlighter-rouge">get(index)</code>随机访问特定元素；</li>
-  <li>Queue：有序、可重复，允许多个 <code class="highlighter-rouge">null</code> 元素；先进先出，用于排队；</li>
-  <li>Set：无序、不可重复，最多只能有一个 <code class="highlighter-rouge">null</code> 元素；只可用iterator遍历；</li>
-  <li>Map：无序、key 不可重复 value 可重复，允许一个key和多个 value 为 <code class="highlighter-rouge">null</code>。</li>
+  <li><code class="highlighter-rouge">List</code>：有序、可重复，允许多个 <code class="highlighter-rouge">null</code> 元素；可用 <code class="highlighter-rouge">iterator</code> 遍历或 <code class="highlighter-rouge">get(index)</code> 随机访问特定元素；</li>
+  <li><code class="highlighter-rouge">Queue</code>：有序、可重复，允许多个 <code class="highlighter-rouge">null</code> 元素；先进先出，用于排队；</li>
+  <li><code class="highlighter-rouge">Set</code>：无序、不可重复，最多只能有一个 <code class="highlighter-rouge">null</code> 元素；只可用 <code class="highlighter-rouge">iterator</code> 遍历；</li>
+  <li><code class="highlighter-rouge">Map</code>：无序、<code class="highlighter-rouge">key</code> 不可重复 <code class="highlighter-rouge">value</code> 可重复，允许一个 <code class="highlighter-rouge">key</code> 和多个 <code class="highlighter-rouge">value</code> 为 <code class="highlighter-rouge">null</code>。</li>
 </ol>
 
 <h3 id="collection-接口及分类">Collection 接口及分类</h3>
@@ -45,7 +49,7 @@
 
 <p>重写<code class="highlighter-rouge">toString()</code>来打印内容，否则默认打印地址。</p>
 
-<p>一、List 接口</p>
+<h4 id="一list-接口">一、List 接口</h4>
 
 <ol>
   <li><code class="highlighter-rouge">ArrayList</code> 类
@@ -61,12 +65,12 @@
   <li><code class="highlighter-rouge">LinkedList</code> 类</li>
   <li><code class="highlighter-rouge">Vector</code> 类
     <ul>
-      <li><code class="highlighter-rouge">Stack</code> 类</li>
+      <li><code class="highlighter-rouge">Stack</code> 类：如 <code class="highlighter-rouge">Stack&lt;Integer&gt; stack = new Stack&lt;&gt;()</code> 但一般用 <code class="highlighter-rouge">Deque&lt;Integer&gt; stack = new ArrayDeque&lt;&gt;()</code> 来实现，效率更高。</li>
     </ul>
   </li>
 </ol>
 
-<p>二、<code class="highlighter-rouge">Queue</code> 接口</p>
+<h4 id="二queue-接口">二、Queue 接口</h4>
 
 <ol>
   <li><code class="highlighter-rouge">Deque</code> 双端队列接口：同时实现了栈和队列的功能；
@@ -91,7 +95,7 @@
   <li><code class="highlighter-rouge">ConcurrentLinkedQueue</code> : 高效的并发队列，是非阻塞队列，用链表实现。可看做线程安全的 <code class="highlighter-rouge">LinkedList</code>。</li>
 </ol>
 
-<p>三、Set 接口</p>
+<h4 id="三set-接口">三、Set 接口</h4>
 
 <ol>
   <li><code class="highlighter-rouge">HashSet</code> 类：实现了 <code class="highlighter-rouge">Set</code> 接口，存储对象；底层基于 HashMap、但有键无值；元素不可重复，最多只能有一个null元素；用 <code class="highlighter-rouge">add()</code> 添加元素、<code class="highlighter-rouge">contains()</code>；
@@ -102,39 +106,74 @@
   <li><code class="highlighter-rouge">TreeSet</code> 类：实现了 <code class="highlighter-rouge">Set</code> 和 <code class="highlighter-rouge">SortedSet</code> 接口；底层基于 TreeMap、但有键无值。</li>
 </ol>
 
-<p>四、Map 接口</p>
+<h4 id="四map-接口">四、Map 接口</h4>
 
 <ol>
-  <li><code class="highlighter-rouge">HashMap</code> 类：实现了Map接口，存储键值对；底层是 数组和链表（链表散列/链表数组，用于解决哈希冲突）；键不可重复、值可重复，允许一个key和多个value为null；用 <code class="highlighter-rouge">put()</code> 添加元素、<code class="highlighter-rouge">containsKey()</code>；比 HashSet 快（因为是使用唯一的键来获取对象）；非线程安全；
+  <li><code class="highlighter-rouge">HashMap</code> 类：实现了Map接口，存储键值对；底层是 数组和链表（链表散列/链表数组，用于解决哈希冲突）；键不可重复、值可重复，允许一个 key 和多个 value 为null；用 <code class="highlighter-rouge">put()</code> 添加元素、<code class="highlighter-rouge">containsKey()</code>；比 HashSet 快（因为是使用唯一的键来获取对象）；非线程安全；
     <ol>
       <li><code class="highlighter-rouge">LinkedHashMap</code> 类：JDK1.8 后在解决哈希冲突时先进行数组扩容；</li>
-      <li><code class="highlighter-rouge">ConcurrentHashMap</code> 类：<strong>线程安全</strong>的 HashMap，唯一区别是其中的核心数据如 value 及链表都是 volatile（窝le滔）修饰的，保证了获取时的可见性；key 和 value 都不允许为 null。</li>
+      <li><code class="highlighter-rouge">ConcurrentHashMap</code> 类：<strong>线程安全</strong>的 HashMap，唯一区别是其中的核心数据如 value 及链表都是 volatile（窝le滔）修饰的，保证了获取时的可见性；key 和 value 都<strong>不允许为 null</strong>。</li>
       <li><code class="highlighter-rouge">ConcurrentSkipListMap</code> : 跳表的实现。是一个 Map，用跳表的数据结构进行快速查找。</li>
     </ol>
   </li>
-  <li>
-    <p><code class="highlighter-rouge">HashTable</code> 类：<strong>基本淘汰不用</strong>；<strong>线程安全</strong>，内部的方法基本都经过 synchronized 修饰；数组+链表组成；key 和 value 都不允许为 null，否则抛出 NullPointerException；</p>
-  </li>
+  <li><code class="highlighter-rouge">HashTable</code> 类：<strong>基本淘汰不用</strong>；<strong>线程安全</strong>，内部的方法基本都经过 synchronized 修饰；数组+链表组成；key 和 value 都<strong>不允许为 null</strong>，否则抛出 NPE；</li>
   <li><code class="highlighter-rouge">TreeMap</code> 类：实现 <code class="highlighter-rouge">SortMap</code> 接口；基于红黑树（自平衡的排序二叉树）<code class="highlighter-rouge">=&gt;</code> 对8个包装类、String <strong>根据 Key</strong> 自动升序（默认从大到小）排序，可定制排序方式；</li>
 </ol>
+
+<table>
+  <thead>
+    <tr>
+      <th>集合类</th>
+      <th>Key</th>
+      <th>Value</th>
+      <th>Super</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1. HashMap</td>
+      <td><strong>允许一个为null</strong></td>
+      <td><strong>允许为null</strong></td>
+      <td>AbstractMap</td>
+      <td>线程不安全</td>
+    </tr>
+    <tr>
+      <td>1.2 ConcurrentHashMap</td>
+      <td>不允许为null</td>
+      <td>不允许为null</td>
+      <td>AbstractMap</td>
+      <td><strong>分段锁技术</strong></td>
+    </tr>
+    <tr>
+      <td>2. Hashtable</td>
+      <td>不允许为null</td>
+      <td>不允许为null</td>
+      <td><strong>Dictionary</strong></td>
+      <td><strong>线程安全</strong></td>
+    </tr>
+    <tr>
+      <td>3. TreeMap</td>
+      <td>不允许为null</td>
+      <td><strong>允许为null</strong></td>
+      <td>AbstractMap</td>
+      <td>线程不安全</td>
+    </tr>
+  </tbody>
+</table>
 
 <p>注意，以下都是<strong>线程不安全</strong>的：</p>
 
 <ul>
-  <li>
-    <p>ArrayList, LinkedList,</p>
-  </li>
-  <li>
-    <p>HashSet，TreeSet，</p>
-  </li>
-  <li>
-    <p>HashMap, TreeMap。</p>
-  </li>
+  <li>ArrayList, LinkedList,</li>
+  <li>HashSet, TreeSet,</li>
+  <li>HashMap, TreeMap.</li>
 </ul>
 
 <p>List中没有而ArrayList中独有的方法不能被List对象使用，即<strong>多态</strong>。</p>
 
 <p>用多态方式调用方法时：先检查父类中是否有该方法，</p>
+
 <ul>
   <li>如果没有，则编译错误；</li>
   <li>如果有，再去调用子类的同名方法。</li>
@@ -147,10 +186,10 @@
 <p>二者都不是线程安全的</p>
 
 <ol>
-  <li>底层实现方式：ArrayList 基于动态数组；LinkedList 基于双向链表（通过 <code class="highlighter-rouge">getLast()</code>源码可见为双向）。</li>
-  <li>按位查找：ArrayList 用 <code class="highlighter-rouge">get(index)</code> 随机访问，快；LinkedList 指定位置 index 查找为O(n)，顺序访问。</li>
+  <li>底层实现方式：ArrayList 基于<strong>动态</strong>数组；LinkedList 基于双向链表（通过 <code class="highlighter-rouge">getLast()</code> 源码可见为双向）。</li>
+  <li>按位查找：ArrayList 用 <code class="highlighter-rouge">get(index)</code> 随机访问，快；LinkedList 指定位置 index 查找，效率为O(n)，顺序访问。</li>
   <li>插入和删除：ArrayList 效率受元素位置影响，对尾部增删O(1)，指定位置 i 增删为O(n) ；LinkedList先查再增删，增删效率不受元素位置影响，均O(1)。</li>
-  <li>扩容机制：ArrayList 为新建数组并拷贝原数组；LinkedList 基于双向链表，不需要扩容。</li>
+  <li>扩容机制：ArrayList 为新建数组并<strong>拷贝</strong>原数组；LinkedList 基于双向链表，不需要扩容。</li>
   <li>内存空间：从单个元素说，LinkedList 空间开销大，保存前后节点的指针。</li>
 </ol>
 
@@ -162,10 +201,10 @@ List&lt;String&gt; list = ["A", "B", "C"];
 
 List&lt;String&gt; list = new ArrayList&lt;String&gt;() ;
 
-lists.add("hello");
-lists.remove(0);
-lists.set(1, "world");
-lists.get(2);
+list.add("hello");
+list.remove(0);
+list.set(1, "world");
+list.get(2);
 
 List&lt;String&gt; list = new ArrayList&lt;&gt;(2);
 list.add("guan");
@@ -215,9 +254,9 @@ int top = stack.getFirst(); // top index=0
 
 <h5 id="deque-双端队列">Deque 双端队列</h5>
 
-<p><code class="highlighter-rouge">Deque</code>是一个比<code class="highlighter-rouge">Stack</code>和<code class="highlighter-rouge">Queue</code>功能更强大的接口，同时实现了栈和队列的功能。<code class="highlighter-rouge">ArrayDeque</code>和<code class="highlighter-rouge">LinkedList</code>实现了<code class="highlighter-rouge">Deque</code>接口。</p>
+<p><code class="highlighter-rouge">Deque</code> 是一个比 <code class="highlighter-rouge">Stack</code> 和 <code class="highlighter-rouge">Queue</code> 功能更强大的接口，同时实现了栈和队列的功能。<code class="highlighter-rouge">ArrayDeque</code> 和 <code class="highlighter-rouge">LinkedList</code> 实现了 <code class="highlighter-rouge">Deque</code> 接口。</p>
 
-<p><img src="assets/deque_method.png" alt="img" /></p>
+<p><img src="assets/deque_method.png" alt="img" style="zoom:100%;" /></p>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public interface Deque&lt;E&gt; extends Queue&lt;E&gt; {
     // *** Deque methods ***
@@ -263,20 +302,26 @@ int top = stack.getFirst(); // top index=0
 
 <h3 id="hashcode-vs-equals">hashCode() VS equals()</h3>
 
-<p><code class="highlighter-rouge">hashCode()</code>：用于确定本对象在哈希表中的索引位置（如内存地址 =&gt; 整数），大大减少 equals() 的调用次数，从而提高效率。如 HashSet、HashMap 及 HashTable 等散列集合。</p>
+<p><code class="highlighter-rouge">hashCode()</code>：用于确定本对象在哈希表中的索引位置（如内存地址 =&gt; 整数），大大减少 <code class="highlighter-rouge">equals()</code> 的调用次数，从而提高效率。如 <code class="highlighter-rouge">HashSet、HashMap 及 HashTable</code> 等散列集合。</p>
 
 <ul>
-  <li>定义在 Object 类中，意味着任何类（包括数组）都实现了此方法；</li>
+  <li>定义在 <code class="highlighter-rouge">Object</code> 类中，意味着任何类（包括数组）都实现了此方法；</li>
   <li>是本地方法，即用 c/c++ 实现。</li>
 </ul>
 
-<p>hashCode() VS equals()：</p>
+<p><code class="highlighter-rouge">hashCode()</code> VS <code class="highlighter-rouge">equals()</code>：</p>
 
-<p>两个对象相等（引用指向同一个对象，对象的内存地址相等） <code class="highlighter-rouge">&lt;=&gt;</code> <code class="highlighter-rouge">A.equals(B)</code> 返回 true，默认比较内存地址 <code class="highlighter-rouge">=&gt;</code> 两个对象 hashcode 相同：</p>
-<ol>
-  <li>两个对象 hashcode 相同 <code class="highlighter-rouge">=&gt;</code> <code class="highlighter-rouge">A.equals(B)</code> 不一定返回true <code class="highlighter-rouge">=&gt;</code> 对象不一定相等（哈希算法，散列，冲突）；</li>
-  <li>两个对象 hashcode 不同 <code class="highlighter-rouge">=&gt;</code> 两对象一定不相等。</li>
-</ol>
+<p><strong>两个对象相等</strong>（引用指向同一个对象，对象的内存地址相等）：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">&lt;=&gt;</code> <code class="highlighter-rouge">A.equals(B)</code> 返回 true，默认比较内存地址；</li>
+  <li><code class="highlighter-rouge">=&gt;</code> 两个对象 hashcode 相同：
+    <ol>
+      <li>两个对象 hashcode 相同 <code class="highlighter-rouge">=&gt;</code> <code class="highlighter-rouge">A.equals(B)</code> 不一定返true <code class="highlighter-rouge">=&gt;</code> 对象不一定相等（哈希算法，散列，冲突）；</li>
+      <li>但两个对象 hashcode 不同 <code class="highlighter-rouge">=&gt;</code> 两对象一定不相等。</li>
+    </ol>
+  </li>
+</ul>
 
 <p>重写 equals() 时必须重写 hashCode()：</p>
 
@@ -293,13 +338,14 @@ int top = stack.getFirst(); // top index=0
 <p>Set 如何去重：Set 通过重写 hashCode 和 equals 实现去重。</p>
 
 <p>调用 <code class="highlighter-rouge">add()</code> 添加元素时（用 HashMap 的 <code class="highlighter-rouge">put()</code> 实现，判断返回值为 true 以确保不重复），判断是否已有此对象：</p>
+
 <ul>
   <li>Set 用元素（HashMap 用 key）的内存地址计算 hashcode 值，判断 hashCode 是否已存在：
     <ul>
       <li>如不存在，则没有重复元素、直接插入；</li>
       <li>若已存在，则用 equals() 判断两对象是否相等，比较地址（是否为同一对象）：
         <ul>
-          <li>若二者不等则通过拉链法（附到链表数组的对应链表中）解决哈希冲突，插入成功，返回 true；</li>
+          <li>若二者不等则通过<strong>拉链法</strong>（附到<strong>链表数组</strong>的对应链表中）解决<strong>哈希冲突</strong>，插入成功，返回 true；</li>
           <li>若相等则 Set 加入失败，返回 false（HashMap 直接覆盖，返回旧的 value 值）。</li>
         </ul>
       </li>
@@ -307,9 +353,10 @@ int top = stack.getFirst(); // top index=0
   </li>
 </ul>
 
-<p>Set为何无序：基于哈希表存储，数组 + 链表 + 红黑树 + 哈希算法（链址法：CRUD性能都很好）</p>
+<p>Set为何无序：基于哈希表存储，数组 + 链表 + <strong>红黑树</strong> + 哈希算法（链址法：CRUD性能都很好）</p>
 
-<p>TreeSet 引用类型排序</p>
+<p>TreeSet 引用类型排序：</p>
+
 <ol>
   <li>类重写比较器规则接口 Comparable；重写 compareTo() 或 compare()；</li>
   <li>直接为集合设置比较器 Comparable 对象，重写比较方法，二者都有时用集合。</li>
@@ -364,7 +411,7 @@ Set&lt;Employee&gt; e1 = new TreeSet&lt;&gt;(new Comparator&lt;Employee&gt;() {
 <h5 id="hashmap-vs-hashtable">HashMap VS HashTable</h5>
 
 <ol>
-  <li>null：HashMap 允许一个key和多个value为null；HashTable 键值均不允许为 null，否则会抛出 NullPointerException；</li>
+  <li><code class="highlighter-rouge">null</code>：HashMap 允许一个key和多个value为null；HashTable 键值均不允许为 null，否则会抛出 <code class="highlighter-rouge">NullPointerException</code>；</li>
   <li>线程安全：HashMap 是非线程安全的；HashTable 是线程安全的。</li>
 </ol>
 
@@ -376,6 +423,7 @@ Set&lt;Employee&gt; e1 = new TreeSet&lt;&gt;(new Comparator&lt;Employee&gt;() {
 
 <pre><code class="language-Java">Map&lt;String, Integer&gt; maps = new HashMap&lt;&gt;();
 
+//
 maps.put("Java", 12);
 maps.put(null, null);
 Integer v = maps.get("Java");
@@ -386,6 +434,7 @@ maps.clear();
 maps.containsKey("Java");
 maps.containsValue(10);
 
+//
 Set&lt;String&gt; keys = maps.keySet();
 for(String key : keys) {
   System.out.println(key);
@@ -411,6 +460,12 @@ for (String item : list) {
     // remove 元素请用 iterator 方式，如果并发操作，需对 iterator 对象加锁。
 }
 
+for (char ch : t.toCharArray()) { // not keysSet, need.keySet()
+    // 遍历T，初始化需要的字符及数量
+    int value = need.getOrDefault(ch, 0);
+    need.put(ch, value + 1); // t = “aba”
+}       
+        
 // for-each 实现原理：通过迭代器 Iterator + has.next()
 // 反编译后，对应.class文件
 ArrayList&lt;String&gt; list = new ArrayList();

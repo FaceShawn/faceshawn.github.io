@@ -4,6 +4,10 @@
 
 <!-- more -->
 
+<h2 id="目录">目录</h2>
+
+<p>[TOC]</p>
+
 <h2 id="技术栈">技术栈</h2>
 
 <ul>
@@ -12,18 +16,10 @@
 
     <ol>
       <li>
-        <p><del>Hexo 博客框架</del></p>
-
-        <blockquote>
-          <p>mater 分支作为服务器，hexo 分支作为代码托管仓库进行版本控制；可将 MarkDown 文件生成网页，并用 Git 发布到仓库的 mater 分支</p>
-        </blockquote>
+        <p><del>Hexo 博客框架</del>：mater 分支作为服务器，hexo 分支作为代码托管仓库进行版本控制；可将 MarkDown 文件生成网页，并用 Git 发布到仓库的 mater 分支。<strong>缺点</strong>：需要手动生成网页、发布过程复杂、切换分支。</p>
       </li>
       <li>
-        <p>Jekyll</p>
-
-        <blockquote>
-          <p><a href="https://docs.github.com/cn/github/working-with-github-pages">GitHub Pages 官方使用入门文档</a>推荐，可创建博客网站或者已有项目的doc网站</p>
-        </blockquote>
+        <p>Jekyll（音 J call）：<a href="https://docs.github.com/cn/github/working-with-github-pages">GitHub Pages 官方使用入门文档</a>，推荐，可创建博客网站或者已有项目的<strong>doc静态网站</strong>。</p>
       </li>
     </ol>
   </li>
@@ -48,34 +44,34 @@
 <h5 id="创建-github-项目">创建 GitHub 项目</h5>
 
 <ul>
-  <li>项目名：[username].github.io （替换为自己的用户名，注意是用户名不是昵称）</li>
-  <li>勾选初始化 README.md，默认自动创建 master 分支，此分支作为服务器</li>
-  <li>类型选择public</li>
+  <li>项目名：<code class="highlighter-rouge">[username].github.io</code> （替换为自己的用户名，注意是用户名不是昵称）；</li>
+  <li>勾选初始化 <code class="highlighter-rouge">README.md</code>，默认自动创建 <code class="highlighter-rouge">master </code>分支，此分支作为服务器；</li>
+  <li>类型选择 <code class="highlighter-rouge">public</code>。</li>
 </ul>
 
 <h5 id="分支策略">分支策略</h5>
 
 <ol>
-  <li>Jekyll：创建gh-pages分支，博客发布于此分支</li>
-  <li><del>Hexo：创建 hexo 分支来备份源文件，设置为默认分支</del></li>
+  <li>Jekyll：创建<code class="highlighter-rouge">gh-pages</code>分支，博客发布于此分支；</li>
+  <li><del>Hexo：创建 hexo 分支来备份源文件，设置为默认分支。</del></li>
 </ol>
 
-<h5 id="设置为-github-pages-仓库">设置为 GitHub Pages 仓库</h5>
+<h5 id="将项目设置为-github-pages-仓库">将项目设置为 GitHub Pages 仓库</h5>
 
 <blockquote>
   <p>每个用户可创建一个 GitHub Pages 仓库，用户可以通过访问 [username].github.io 访问此项目</p>
 </blockquote>
 
 <ol>
-  <li>设置<strong>Source</strong>
+  <li>设置<strong>Source</strong>：
     <ul>
-      <li>branch选择gh-pages，None表是不发布。</li>
+      <li>branch选择<code class="highlighter-rouge">gh-pages</code>，None表示不发布。</li>
       <li>folder选择root，doc表示使用此分支的docs文件夹作为站点内容。</li>
     </ul>
   </li>
-  <li>在项目设置中设置私有域名（Custom domain，可选，若不设置则博客网址默认为 [username].github.io），会在项目中自动创建一个CNAME保存此域名，添加完成后等待 DNS 解析的生效，解析记录生效到全球可能需要几分钟时间</li>
-  <li>选择主题（可在后面设置个性化主题，可选）</li>
-  <li>勾选 Enforce HTTPS （强制使用 https，可选）</li>
+  <li>在项目设置中设置私有域名（Custom domain，可选，若不设置则博客网址默认为 <code class="highlighter-rouge">[username].github.io</code>），会在项目中自动创建一个<code class="highlighter-rouge">CNAME</code>保存此域名，添加完成后等待 DNS 解析的生效，解析记录生效到全球可能需要几分钟时间。</li>
+  <li>选择主题（可在后面设置个性化主题，可选）。</li>
+  <li>勾选 <code class="highlighter-rouge">Enforce HTTPS </code>（强制使用 https，可选）。</li>
 </ol>
 
 <h2 id="搭建本地环境">搭建本地环境</h2>
@@ -106,16 +102,12 @@ git --version
 <h5 id="设置-ssh-连接到-github">设置 SSH 连接到 GitHub</h5>
 
 <blockquote>
-  <p>用来使本地和 GitHub 通信</p>
+  <p>用于本地和 GitHub 通信</p>
 </blockquote>
 
 <ol>
-  <li>设置用户名、邮箱</li>
+  <li>设置用户名、邮箱：注意用户名不是昵称。</li>
 </ol>
-
-<blockquote>
-  <p>注意用户名不是昵称</p>
-</blockquote>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git config --global user.name "your_name"
 git config --global user.email "your_email@example.com"
@@ -168,11 +160,11 @@ Hi your_name! You've successfully authenticated, but GitHub does not provide she
 <h5 id="用-github-desktop-将项目克隆到本地博客目录">用 GitHub Desktop 将项目克隆到本地博客目录</h5>
 
 <ul>
-  <li><strong>此时分支应为 hexo或gh-pages</strong></li>
-  <li>本地博客目录地址如 <code class="highlighter-rouge">D:\username.github.io</code>，克隆时可对目录起别名，如<code class="highlighter-rouge">D:\Blog</code></li>
+  <li><strong>此时分支应为 hexo 或 gh-pages</strong>；</li>
+  <li>本地博客目录地址如 <code class="highlighter-rouge">D:\username.github.io</code>，克隆时可对目录起别名，如<code class="highlighter-rouge">D:\Blog</code>。</li>
 </ul>
 
-<h2 id="用jekyll搭建博客">用Jekyll搭建博客</h2>
+<h2 id="用-jekyll-搭建博客">用 Jekyll 搭建博客</h2>
 
 <h3 id="windows-下安装-jekyll"><del><a href="http://jekyllcn.com/docs/installation/">Windows 下安装 Jekyll</a></del></h3>
 
@@ -181,7 +173,7 @@ Hi your_name! You've successfully authenticated, but GitHub does not provide she
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 重新打开终端
 ruby -v
 gem -v
-#因为源地址被墙，需要切换地址（旧版说使用淘宝源的已经不可用，淘宝官网有说明，如果切换失败可以去查看最新）
+#因为源地址被墙，需要切换地址（旧版说使用淘宝源的已经不可用，如果切换失败可以去查看最新）
 gem sources --add https://gems.ruby-china.com/ --remove https://rubygems.org/
 #查看地址是否替换成功
 gem sources -l	#确保显示的只有 gems.ruby-china.com
@@ -207,7 +199,7 @@ cd xxx.github.io
 jekyll new . --force
 </code></pre></div></div>
 
-<p>WINDOWS 下可能还会遇到一个 timezone 的问题，可以参考 <a href="https://github.com/tzinfo/tzinfo/wiki/Resolving-TZInfo::DataSourceNotFound-Errors">这个答案</a> 在 Gemfile 中添加 gem ‘tzinfo-data’, platforms: [:mingw, :mswin, :x64_mingw] （有 64 位区分，具体看原文）， 然后执行 gem install tzinfo-data</p>
+<p>Windows 下可能还会遇到一个 timezone 的问题，可以参考 <a href="https://github.com/tzinfo/tzinfo/wiki/Resolving-TZInfo::DataSourceNotFound-Errors">这个答案</a>，在 Gemfile 中添加 <code class="highlighter-rouge">gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]</code> （有 64 位区分，具体看原文）， 然后执行 <code class="highlighter-rouge">gem install tzinfo-data</code>。</p>
 
 <h5 id="mac-下配置">MAC 下配置</h5>
 
@@ -217,59 +209,33 @@ jekyll new . --force
 
 <h5 id="jekyll-结构">Jekyll 结构</h5>
 
-<p>站点中内容的主要类型是页面和帖子，主题包括默认布局、包含和样式表，它们将自动应用到站点上的新页面和帖子</p>
-
-<p>__posts 博客内容
- _pages 其他需要生成的网页，如About页
- _layouts 网页排版模板
- _includes 被模板包含的HTML片段，可在_config.yml中修改位置
- assets 辅助资源 css布局 js脚本 图片等
- _data 动态数据
- _sites 最终生成的静态网页
- _config.yml 网站的一些配置信息
- index.html 网站的入口</p>
+<p>站点中内容的主要类型是页面和帖子，主题包括默认布局、包含和样式表，它们将自动应用到站点上的新页面和帖子。</p>
 
 <ul>
+  <li><code class="highlighter-rouge">_posts</code> 博客内容</li>
+  <li><code class="highlighter-rouge">_pages </code>其他需要生成的网页，如About页。</li>
+  <li><code class="highlighter-rouge">_layouts</code> ：网页排版模，存放页面模板，md或html文件的内容会填充模板。</li>
+  <li><code class="highlighter-rouge">_includes</code> 被模板包含的HTML片段，可在<code class="highlighter-rouge">_config.yml</code>中修改位置。可以复用在其它页面被include的html页面。</li>
+  <li><code class="highlighter-rouge">assets</code>：原生的资源文件，辅助资源、css布局、js脚本、图片等。</li>
+  <li><code class="highlighter-rouge">_data </code>动态数据</li>
+  <li><code class="highlighter-rouge">_sites </code>最终生成的静态网页</li>
+  <li><code class="highlighter-rouge">_config.yml</code>：全局配置文件，网站的一些配置信息</li>
   <li>
-    <p><code class="highlighter-rouge">_layouts</code> （存放页面模板，md或html文件的内容会填充模板）</p>
+    <p><code class="highlighter-rouge">index.html, index.md, README.md</code>：网站的入口，首页index.html优先级最高，如果没有index，默认启用README.md文件。</p>
   </li>
-  <li>
-    <p><code class="highlighter-rouge">_sass</code>（存放样式表）</p>
-  </li>
-  <li>
-    <p><code class="highlighter-rouge">_includes</code> （可以复用在其它页面被include的html页面）</p>
-  </li>
-  <li>
-    <p><code class="highlighter-rouge">_posts</code>（博客文章页面）</p>
+  <li><code class="highlighter-rouge">_sass</code>（存放样式表）</li>
+  <li>自定义文件和目录</li>
+</ul>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 文件名格式：
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 文件名格式：
 年-月-日-标题.markdown
-  
+
 # 文件顶部必须有下面的 YAML 头信息：
 ---
 layout: post
 title: Blogging Like a Hacker
 ---
-</code></pre></div>    </div>
-  </li>
-  <li>
-    <p><code class="highlighter-rouge">assets</code>（原生的资源文件）</p>
-  </li>
-  <li>
-    <ul>
-      <li><code class="highlighter-rouge">js</code></li>
-      <li><code class="highlighter-rouge">css</code></li>
-      <li><code class="highlighter-rouge">image</code></li>
-    </ul>
-  </li>
-  <li>
-    <p><code class="highlighter-rouge">_config.yml</code> （全局配置文件）</p>
-  </li>
-  <li>
-    <p><code class="highlighter-rouge">index.html, index.md, README.md</code> （首页index.html优先级最高，如果没有index，默认启用README.md文件）</p>
-  </li>
-  <li>`自定义文件和目录</li>
-</ul>
+</code></pre></div></div>
 
 <h3 id="windows下安装-jekyll-theme-next"><a href="http://theme-next.simpleyyt.com/getting-started.html#validate-next-theme">Windows下安装 jekyll-theme-next</a></h3>
 
@@ -283,7 +249,7 @@ title: Blogging Like a Hacker
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ gem install bundler
 </code></pre></div></div>
 
-<p>下载 NexT 主题：</p>
+<p>下载 NexT 主题，此时不用<strong>在本地手动创建</strong> Jekyll 项目：</p>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ git clone https://github.com/Simpleyyt/jekyll-theme-next.git
 $ cd jekyll-theme-next #文件夹改为xxx.github.io
@@ -302,7 +268,8 @@ $ cd jekyll-theme-next #文件夹改为xxx.github.io
    GitHub Metadata: No GitHub API authentication could be found. Some fields may be missing or have incorrect data.
    GitHub Metadata: Error processing value 'description':
 
-# jekyll运行应该不与github挂钩，仔细看字段GitHub Metadata: Error processing value 'description':，我把_config.yml中空的description加了描述之后就不会出现了，然后本地运行OK
+# jekyll运行应该不与github挂钩，仔细看字段GitHub Metadata: Error processing value 'description'，
+# 把_config.yml中空的description加了描述之后就不会出现了，然后本地运行OK
 </code></pre></div></div>
 
 <h3 id="如何使用">如何使用</h3>
@@ -310,7 +277,7 @@ $ cd jekyll-theme-next #文件夹改为xxx.github.io
 <h5 id="添加新页面"><a href="https://docs.github.com/cn/github/working-with-github-pages/adding-content-to-your-github-pages-site-using-jekyll#adding-a-new-page-to-your-site">添加新页面</a></h5>
 
 <blockquote>
-  <p>页面是指与某个特定日期没有关联的独立内容，例如默认 的<code class="highlighter-rouge">about.md</code> 文件对应<code class="highlighter-rouge">/about</code>页面。</p>
+  <p>页面：是指与某个特定日期没有关联的独立内容，例如默认 的<code class="highlighter-rouge">about.md</code> 文件对应<code class="highlighter-rouge">/about</code>页面。</p>
 </blockquote>
 
 <h5 id="添加新博客"><a href="https://docs.github.com/cn/github/working-with-github-pages/adding-content-to-your-github-pages-site-using-jekyll#adding-a-new-post-to-your-site">添加新博客</a></h5>
@@ -319,12 +286,12 @@ $ cd jekyll-theme-next #文件夹改为xxx.github.io
   <p>帖子是博客文章。 默认包含 <code class="highlighter-rouge">_posts</code>目录，其中的文件对应博客。</p>
 </blockquote>
 
-<h5 id="jekyll的模板编程语言liquid">Jekyll的模板编程语言Liquid</h5>
+<h5 id="jekyll-的模板编程语言-liquid">Jekyll 的模板编程语言 Liquid</h5>
 
 <ul>
   <li>变量 `` 被嵌入在页面中，会在静态页面生成的时候被替换成具体的数值。常用的<a href="https://jekyllrb.com/docs/variables">全局变量对象</a>有：
     <ul>
-      <li><code class="highlighter-rouge">site</code>对象：对应的是网站范围，自定义变量放在<code class="highlighter-rouge">_config.yml</code>中，比如<code class="highlighter-rouge">title:自定义标题</code>使用``访问，<code class="highlighter-rouge">2023-02-04 14:27:59 +0800</code>等；</li>
+      <li><code class="highlighter-rouge">site</code>对象：对应的是网站范围，自定义变量放在<code class="highlighter-rouge">_config.yml</code>中，比如<code class="highlighter-rouge">title:自定义标题</code>使用``访问，<code class="highlighter-rouge">2025-07-17 23:34:54 +0800</code>等；</li>
       <li><code class="highlighter-rouge">page</code>对象：对应的是单个页面，自定义变量放在每个页面的最开头，比如：<code class="highlighter-rouge">/91307687</code></li>
     </ul>
   </li>
@@ -343,6 +310,8 @@ jekyll serve
 </code></pre></div></div>
 
 <h3 id="个性化">个性化</h3>
+
+<p>其它见 Hexo 中的<a href="#添加头像">个性化</a>。</p>
 
 <h5 id="更改主题">更改主题</h5>
 
@@ -437,7 +406,7 @@ deploy:
 
 <p>至此博客搭建和源文件通过 GItHub Desktop 进行版本控制并备份在远程仓库 hexo 分支基本功能已经完成。</p>
 
-<p>在本地博客目录（username.github.io）下 <code class="highlighter-rouge">右键 -&gt; Git Bash Here</code> 。</p>
+<p>在本地博客目录（<code class="highlighter-rouge">username.github.io</code>）下 <code class="highlighter-rouge">右键 -&gt; Git Bash Here</code> 。</p>
 
 <h5 id="写博客">写博客</h5>
 
@@ -626,8 +595,11 @@ theme: next
   <li>打开根目录下的 <code class="highlighter-rouge">_config.yml</code> 文件，修改站点配置文件：</li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># permalink: :year/:month/:day/:title/
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 文章的永久链接格式
+# permalink: :year/:month/:day/:title/
+# 永久链接中各部分的默认值
 # permalink_defaults:
+# 永久链接解决方案，对标题+时间进行md5然后再转base64，保存在front-matter中
 permalink: posts/:abbrlink.html		# posts 用复数是为了全站统一格式
 abbrlink:
 alg: crc32  # 算法：crc16(default) and crc32
@@ -650,7 +622,7 @@ hexo g -d
 
 <ul>
   <li>
-    <p>伺此后再修改文件名，而永久链接不变。</p>
+    <p>自此后再修改文件名，而永久链接不变。</p>
   </li>
   <li>
     <p><a href="https://github.com/Rozbo/hexo-abbrlink">hexo-abbrlink 源码</a></p>
@@ -737,13 +709,13 @@ TTL：10分钟
     <p><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />图床</p>
   </li>
   <li class="task-list-item">
-    <p><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />博客 logo</p>
+    <p><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />博客 logo</p>
   </li>
   <li class="task-list-item">
     <p><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><a href="https://www.zhihu.com/question/21193762/answer/328086675">docs folder</a> ：提出了一种更简洁的方法，实现失败</p>
   </li>
   <li class="task-list-item">
-    <p><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />MarkDown 前景展望只需要上传 md 源文件及配置，即可按照配置渲染 md</p>
+    <p><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />MarkDown 前景展望只需要上传 md 源文件及配置，即可按照配置渲染 md</p>
   </li>
   <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />畅言评论 留言板</li>
   <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />图床 图片放大</li>
@@ -773,5 +745,5 @@ TTL：10分钟
   <li><a href="https://docs.github.com/cn/github/working-with-github-pages">GitHub Pages 官方文档</a></li>
   <li><a href="https://docs.github.com/cn/github/working-with-github-pages/setting-up-a-github-pages-site-with-jekyll">用 Jekyll 设置 GitHub Pages 站点</a></li>
   <li><a href="https://juejin.im/post/6844903797123203086">使用 Jekyll 搭建 Github Pages 个人博客</a></li>
-  <li><a href="https://zhuanlan.zhihu.com/p/51240503"></a></li>
+  <li><a href="https://zhuanlan.zhihu.com/p/51240503">Github Pages + jekyll 全面介绍极简搭建个人网站和博客</a></li>
 </ul>
