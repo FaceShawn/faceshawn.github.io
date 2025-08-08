@@ -113,7 +113,7 @@
     <ol>
       <li><code class="highlighter-rouge">LinkedHashMap</code> 类：JDK1.8 后在解决哈希冲突时先进行数组扩容；</li>
       <li><code class="highlighter-rouge">ConcurrentHashMap</code> 类：<strong>线程安全</strong>的 HashMap，唯一区别是其中的核心数据如 value 及链表都是 volatile（窝le滔）修饰的，保证了获取时的可见性；key 和 value 都<strong>不允许为 null</strong>。</li>
-      <li><code class="highlighter-rouge">ConcurrentSkipListMap</code> : 跳表的实现。是一个 Map，用跳表的数据结构进行快速查找。</li>
+      <li><code class="highlighter-rouge">ConcurrentSkipListMap</code> : <strong>跳表</strong>的实现。是一个 Map，用跳表的数据结构进行快速查找。</li>
     </ol>
   </li>
   <li><code class="highlighter-rouge">HashTable</code> 类：<strong>基本淘汰不用</strong>；<strong>线程安全</strong>，内部的方法基本都经过 synchronized 修饰；数组+链表组成；key 和 value 都<strong>不允许为 null</strong>，否则抛出 NPE；</li>
@@ -195,7 +195,9 @@
 
 <h5 id="arraylist-常用方法">ArrayList 常用方法</h5>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 经典代码，ArrayList几乎实现了List的所有接口
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import java.util.ArrayList;
+
+// 经典代码，ArrayList几乎实现了List的所有接口
 List&lt;String&gt; list = new ArrayList&lt;&gt;();
 List&lt;String&gt; list = ["A", "B", "C"];
 
@@ -205,6 +207,7 @@ list.add("hello");
 list.remove(0);
 list.set(1, "world");
 list.get(2);
+list.size();
 
 List&lt;String&gt; list = new ArrayList&lt;&gt;(2);
 list.add("guan");
@@ -213,15 +216,46 @@ String[] array = list.toArray([arr]); // 集合转数组, arr为用于存储元�
 // 直接使用 toArray 无参方法，返回值只能是 Object[]类，若强转其它类型数组将出现 ClassCastException
 // 使用 toArray 带参方法，数组空间大小的 length == 0时，动态创建与 size 相同的数组，性能最好
 
+// 初始化一个包含元素 1, 3, 5 的 ArrayList nums
+ArrayList&lt;Integer&gt; nums = new ArrayList&lt;&gt;(Arrays.asList(1, 3, 5));
+
 工具类 Arrays.asList() 把数组转换成集合时，不能用其修改集合的方法， add/remove/clear，一般只用来遍历
+
+import java.util.Collections;
+
+int n = 10;
+// 初始化 ArrayList，大小为 10，元素值都为 0
+ArrayList&lt;Integer&gt; nums = new ArrayList&lt;&gt;(Collections.nCopies(n, 0));
 </code></pre></div></div>
 
 <h5 id="linkedlist-常用方法">LinkedList 常用方法</h5>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>void addFirst(E e)/addLast(e)
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import java.util.Arrays;
+import java.util.LinkedList;
+
+// 初始化链表
+LinkedList&lt;Integer&gt; lst = new LinkedList&lt;&gt;(Arrays.asList(1, 2, 3, 4, 5));
+
+lst.isEmpty());
+// 获取链表的大小
+lst.size()
+
+void addFirst(E e)/addLast(e)
 E getFirst()/getLast()
 E removeFirst()/removeLast()
- 
+// 在链表中插入元素
+// 移动到第三个位置
+lst.add(2, 99);
+// 删除链表中某个元素
+lst.remove(1);
+
+// 遍历链表
+// 输出：1 99 3 4 5
+for(int val : lst) {
+	System.out.print(val + " ");
+}
+//-------
+
 // 队列
 List&lt;String&gt; queue = new LinkedList&lt;&gt;();
 queue.addLast("hello");
@@ -258,7 +292,11 @@ int top = stack.getFirst(); // top index=0
 
 <p><img src="assets/deque_method.png" alt="img" style="zoom:100%;" /></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public interface Deque&lt;E&gt; extends Queue&lt;E&gt; {
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import java.util.Queue;
+import java.util.Deque;
+import java.util.LinkedList;
+
+public interface Deque&lt;E&gt; extends Queue&lt;E&gt; {
     // *** Deque methods ***
     // 在头部插入元素，队列满返回false；用于Deque实现类为有限容量时
     boolean offerFirst(E e);
@@ -292,9 +330,11 @@ int top = stack.getFirst(); // top index=0
     E pop();
 
     // *** Collection methods ***
+    // 在Deque接口下没有，但Deque继承了Collections接口，因此方法有定义，使用不会报错
     boolean remove(Object o);
     boolean contains(Object o);
-    public int size();
+    int size();
+    bool isEmpty();
     Iterator&lt;E&gt; iterator();
     Iterator&lt;E&gt; descendingIterator();
 }
@@ -421,7 +461,10 @@ Set&lt;Employee&gt; e1 = new TreeSet&lt;&gt;(new Comparator&lt;Employee&gt;() {
 
 <h5 id="map-常用api">Map 常用API</h5>
 
-<pre><code class="language-Java">Map&lt;String, Integer&gt; maps = new HashMap&lt;&gt;();
+<pre><code class="language-Java">import java.util.HashMap;
+import java.util.Map;
+
+Map&lt;String, Integer&gt; maps = new HashMap&lt;&gt;();
 
 //
 maps.put("Java", 12);
@@ -431,6 +474,8 @@ maps.remove("Java");
 
 maps.clear();
 
+maps.isEmpty()
+maps.size();
 maps.containsKey("Java");
 maps.containsValue(10);
 
@@ -525,11 +570,14 @@ maps.forEach((K, V) -&gt; {
 
 <p>都是静态方法</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//常用方法:
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import java.util.Collections;
+
+//常用方法:
 List&lt;String&gt; names = new ArrayList&lt;&gt;();
 
 Collections.addAll(names, "Tom")
 Collections.sort(names); //对 List排序
+Collections.singletonList();//创建不可变的单元素列表
 
 //排序：
 void reverse(List list)//反转
@@ -545,8 +593,11 @@ boolean replaceAll(List list, Object oldVal, Object newVal)//用新元素替换�
 
 int max(Collection coll, [Comparator c])//返回最大元素，排序规则由Comparatator类控制。
 int min(Collection coll, [Comparator c])
+int min = (int) Collections.min(Arrays.asList(numbers));
 
 void fill(List list, Object obj)//用指定元素代替list中的所有元素
+int n = 10;
+Collections.nCopies(n, 0);
 int frequency(Collection c, Object o)//统计元素出现次数
 int indexOfSubList(List list, List target)//统计target在list中第一次出现的索引，找不到则返回-1，类比int lastIndexOfSubList(List source, list target)
 </code></pre></div></div>

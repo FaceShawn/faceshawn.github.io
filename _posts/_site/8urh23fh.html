@@ -260,23 +260,25 @@ public class UmsAdminServiceImpl implements UmsAdminService {
 
 <p>基本数据类型都是直接存储在内存中的内存栈上的。</p>
 
+<p>基本数据类型对应的<a href="#包装类型和常量池缓存机制">包装类型</a>。</p>
+
 <ol>
-  <li>布尔型 <code class="highlighter-rouge">boolean</code> 占用大小根据实现 JVM 不同有所差异，官方手册没有明确说明，<strong>逻辑上占1Byte</strong>：
+  <li><strong>布尔型</strong> <code class="highlighter-rouge">boolean</code> 占用大小根据实现 JVM 不同有所差异，官方手册没有明确说明，<strong>逻辑上占1Byte</strong>：
     <ul>
-      <li>根据《Java虚拟机规范》里的结论，如果boolean单独使用、最终被编译为int 类型，则占4字节；如果以boolean数组使用、最终会被编码为 byte 数组，则占1字节；</li>
+      <li>根据《Java虚拟机规范》里的结论，如果<strong>boolean单独使用</strong>、最终被编译为 int 类型，则占<strong>4字节</strong>；如果以boolean数组使用、最终会被编码为 <strong>byte 数组</strong>，则占<strong>1字节</strong>；</li>
       <li>默认值 false：不能转换成任何数据类型，true != 1；</li>
     </ul>
   </li>
-  <li>字符型 <code class="highlighter-rouge">char</code> 2Byte ‘u0000’：0 ~ 65535.</li>
-  <li>4种整型：
+  <li><strong>字符型</strong> <code class="highlighter-rouge">char</code> 2Byte ‘u0000’：0 ~ 65535.</li>
+  <li>4种<strong>整型</strong>：
     <ol>
-      <li><code class="highlighter-rouge">byte</code> 1Byte 默认值0：取值范围-128~127；</li>
+      <li><code class="highlighter-rouge">byte</code> 1Byte 默认值0：取值范围 <code class="highlighter-rouge">-128~127</code>；</li>
       <li><code class="highlighter-rouge">short</code> 2Byte 0：2^15-1 = 32,767；</li>
       <li><code class="highlighter-rouge">int</code> 4Byte 0：2^31-1 = 2,147,483,647（21亿）；</li>
       <li><code class="highlighter-rouge">long</code> 8Byte 0L：<a href="#常用类">BigInteger类</a>。</li>
     </ol>
   </li>
-  <li>2种浮点型：
+  <li>2种<strong>浮点型</strong>：
     <ol>
       <li><code class="highlighter-rouge">float</code> 4Byte 0F：</li>
       <li><code class="highlighter-rouge">double</code> 8Byte 0D：</li>
@@ -325,15 +327,15 @@ double price = 12.254(D);
 <p>区别：</p>
 
 <ol>
-  <li>根本：数据类型；引用数据类型（面向对象的<strong>类</strong>），有类的特性（封装、继承、多态等）。</li>
-  <li>存储位置：基本数据类型定义的变量，用作<strong>局部变量</strong>（直接存放在 VM 栈的局部变量表中，占用空间小），用作 <strong><code class="highlighter-rouge">static</code> 成员变量</strong>（存放在方法区），用作<strong>非 <code class="highlighter-rouge">static</code> 成员变量</strong>（存放在堆中）；而用包装类实例化的对象，一律存放在堆中。</li>
-  <li>默认值：基本数据类型有默认值（int = 0）且不是 <code class="highlighter-rouge">null</code>；包装类型若不赋值则为 <code class="highlighter-rouge">null</code>。</li>
+  <li><strong>根本</strong>：一种数据类型；一种引用数据类型（面向对象的<strong>类</strong>），有类的特性（封装、继承、多态等）。</li>
+  <li><strong>存储位置</strong>：基本数据类型定义的变量，用作<strong>局部变量</strong>（直接存放在 VM 栈的局部变量表中，占用空间小），用作 <strong><code class="highlighter-rouge">static</code> 成员变量</strong>（存放在方法区），用作<strong>非 <code class="highlighter-rouge">static</code> 成员变量</strong>（存放在堆中）；而用包装类实例化的对象，一律存放在堆中。</li>
+  <li><strong>默认值</strong>：基本数据类型有默认值（int = 0）且不是 <code class="highlighter-rouge">null</code>；包装类型若不赋值则为 <code class="highlighter-rouge">null</code>。</li>
   <li>泛型：基本类型不可用于泛型；包装类型可以。</li>
 </ol>
 
 <h5 id="包装类型和常量池缓存机制">包装类型和常量池缓存机制</h5>
 
-<p>基本数据类型对应的包装类型，及其放入常量池的取值：</p>
+<p><a href="#四大类八小类基本数据类型">基本数据类型</a>对应的包装类型，及其放入常量池的取值：</p>
 
 <ol>
   <li><code class="highlighter-rouge">Boolean</code>：<code class="highlighter-rouge">TRUE/FALSE</code> 两个常量，用于表示布尔值 <code class="highlighter-rouge">true 和 false</code>；</li>
@@ -343,7 +345,7 @@ double price = 12.254(D);
   <li><code class="highlighter-rouge">String</code> 类型：所有字面量都会进入<a href="#数组">常量池</a>；</li>
 </ol>
 
-<p>包装类在常量池的值会<strong>复用</strong>已有对象的缓存数据，可直接用 <code class="highlighter-rouge">==</code> 判断；其它范围的值，必须全部用 <code class="highlighter-rouge">equals()</code> 比较；如：</p>
+<p>包装类在常量池的值会<strong>复用</strong>已有对象的缓存数据，可直接用 <code class="highlighter-rouge">==</code> 判断；其它范围的值，必须全部用 <code class="highlighter-rouge">equals()</code> 比较。如：</p>
 
 <ol>
   <li>对于 <code class="highlighter-rouge">Integer var = 40</code> 在 -128 至 127 间的赋值，会自动装箱（转为包装类对象），Integer 对象通过 <strong><code class="highlighter-rouge">IntegerCache.cache</code></strong> 产生，会复用（缓存中的）已有对象；此区间外的所有数据都在<strong>堆</strong>上产生，不复用已有对象。</li>
@@ -358,33 +360,33 @@ double price = 12.254(D);
 
 <ol>
   <li>
-    <p>将包装类型变量直接赋值给对应基本数据类型时；</p>
+    <p>将包装类型变量直接<strong>赋值</strong>给对应基本数据类型时；</p>
   </li>
   <li>
-    <p>当要访问包装类对象的真实数据值时，如进行数学运算、比较大小、输出对象的值、三目运算符数据类型对齐。</p>
+    <p>当要访问包装类对象的<strong>真实数据值</strong>时，如进行数学运算、比较大小、输出对象的值、三目运算符数据类型对齐。</p>
   </li>
 </ol>
 
-<p>频繁拆/装箱，也会严重影响系统的性能，应尽量避免不必要的拆/装箱操作。</p>
+<p>频繁装箱/拆箱，会严重影响系统的性能，应尽量避免不必要的装箱/拆箱操作。</p>
 
 <p>自动拆箱可能导致 NPE，需进行 NPE 检查。见下<a href="#数据类型转换">三目运算符</a>。</p>
 
 <ul>
   <li>手动装箱：<code class="highlighter-rouge">Integer.valueOf(128)</code></li>
-  <li>手动拆箱：<code class="highlighter-rouge">i3.intValue()</code></li>
+  <li>手动拆箱：<code class="highlighter-rouge">变量.intValue()</code></li>
 </ul>
 
 <pre><code class="language-Java">// 装箱
-Integer ig1 = new Integer(128); // 手动装箱，基本数据类型 =&gt; 堆内存中的包装类对象
-Integer ig2 = 128; // 自动装箱，调用 Integer.valueOf(128)；Double、Float的valueOf()类似
+Integer i1 = new Integer(128); // 手动装箱，基本数据类型 =&gt; 堆内存中的包装类对象
+Integer i2 = 128; // 自动装箱，调用 Integer.valueOf(128)；Double、Float的valueOf()类似
 
 // 比较包装类对象
-ig1 == ig2? // false，比较引用，常量池外的值不复用，两个不同对象的地址不同；若为[-128, 127]，则复用已有对象，地址相同，返回true
-ig1.equals(ig2)? // true，不同对象的值相等
+i1 == i2? // false，比较引用，常量池外的值不复用，两个不同对象的地址不同；若为[-128, 127]，则复用已有对象，地址相同，返回true
+i1.equals(i2)? // true，不同对象的值相等
 
 // 拆箱
-int i3 = ig2.intValue(); // 手动拆箱，包装类对象 =&gt; 基本数据类型
-int i3 = ig2; // 自动拆箱，调用 ig2.intValue()/xxxValue()
+int i3 = i2.intValue(); // 手动拆箱，包装类对象 =&gt; 基本数据类型
+int i3 = i2; // 自动拆箱，调用 i2.intValue()/xxxValue()
 
 // 初始值为不可达到的长度，s.length() + 1 也行
 int subStrMinLen = Integer.MAX_VALUE;
@@ -395,11 +397,11 @@ int subStrMinLen = Integer.MAX_VALUE;
 <p>继承自 <code class="highlighter-rouge">Object</code> 类的方法：</p>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>String str = ”128”; // 内容为纯数字
-Integer ig1 = Integer.valueOf(str); // 字符串 =&gt; 包装类对象
-String str = ig1.toString(); // 包装类对象 =&gt; 字符串
+Integer i1 = Integer.valueOf(str); // 字符串 =&gt; 包装类对象，类似手动装箱
+String str = i1.toString();        // 包装类对象 =&gt; 字符串
 
-// 转为int
-int i3 = Integer.valueOf(str); // （推荐，经典代码）字符串 =&gt; 包装类对象 =&gt; （自动拆箱）基本数据类型
+// str 转为int
+int i3 = Integer.valueOf(str);   // 字符串 =&gt; 包装类对象 =&gt;（自动拆箱）赋值给基本数据类型，（推荐，经典代码）
 int i4 = Integer.parserInt(str); // 字符串 =&gt; 基本数据类型
 </code></pre></div></div>
 
@@ -628,13 +630,44 @@ new Person("张三", 30).tell();
 <p>面向对象和面向过程的主要区别在于：解决问题的方式不同；</p>
 
 <ul>
-  <li>
-    <p>面向过程：把解决问题的过程拆成一个个方法并执行；</p>
-  </li>
-  <li>
-    <p>面向对象：先抽象出对象，用对象执行方法的方式解决问题。一般更易维护、复用、扩展。如<a href="#包装类">包装类</a>，一切皆对象。</p>
-  </li>
+  <li>面向过程：把解决问题的过程拆成一个个方法并执行；</li>
+  <li><strong>面向对象</strong>：先抽象出对象，用对象执行方法的方式解决问题。一般更易维护、复用、扩展。如<a href="#包装类">包装类</a>，一切皆对象。</li>
 </ul>
+
+<h3 id="面向对象思想">面向对象思想</h3>
+
+<p>主要包括：</p>
+
+<ol>
+  <li>三大特性：封装、继承、多态。</li>
+  <li>UML 类间关系（数据库中）：
+    <ol>
+      <li>实现关系 <code class="highlighter-rouge">---△</code></li>
+      <li>泛化关系 <code class="highlighter-rouge">——△</code></li>
+      <li>聚合关系 <code class="highlighter-rouge">——◇</code></li>
+      <li>组合关系 <code class="highlighter-rouge">——◆</code></li>
+      <li>依赖关系 <code class="highlighter-rouge">---&gt;</code></li>
+      <li>关联关系  <code class="highlighter-rouge">——&gt;</code>  <code class="highlighter-rouge">——</code></li>
+    </ol>
+  </li>
+  <li>设计原则（设计模式中）S.O.L.I.D
+    <ol>
+      <li>S 单一职责</li>
+      <li>O 开闭原则</li>
+      <li>L 里氏替换</li>
+      <li>I 接口<strong>隔离</strong></li>
+      <li>D 依赖倒转</li>
+      <li>D 迪米特原则</li>
+      <li>H 合成/聚合复用</li>
+    </ol>
+  </li>
+</ol>
+
+<h3 id="封装继承多态">封装、继承、多态</h3>
+
+<blockquote>
+  <p>见面向对象思想。</p>
+</blockquote>
 
 <h3 id="thissuper-关键字">this、super 关键字</h3>
 
@@ -645,40 +678,7 @@ new Person("张三", 30).tell();
   <li>在 static 方法中，this、super 不可用。</li>
 </ol>
 
-<h3 id="封装">封装</h3>
-
-<p>定义：指把对象的成员变量/属性隐藏在内部，不允许外部对象直接访问，通过（可被外界访问的）public 方法来操作属性。控制对外隐藏和暴露哪些数据。基本单位是类。如 POJO 类的 getter/setter 方法。</p>
-
-<h3 id="继承">继承</h3>
-
-<p>继承：指子类可<strong>使用</strong>父类的所有属性和方法。子类 is a 父类。</p>
-
-<p>继承的特点：</p>
-
-<ol>
-  <li>
-    <p>子类<strong>拥有</strong>父类所有的属性和方法（包括私有属性和私有方法），但无法访问父类中的私有属性和方法，仅拥有。</p>
-
-    <ol>
-      <li>子类不能继承父类的构造器；</li>
-      <li>子类可重写父类的方法；</li>
-      <li>继承后变量和方法的访问顺序：就近原则。</li>
-    </ol>
-  </li>
-  <li>
-    <p><strong>单继承</strong>（不支持多重继承）：程序结构更清晰、便于维护。多重继承会使类型转换、构造方法的调用顺序变复杂，影响性能。</p>
-
-    <ol>
-      <li>若支持多重继承：类 C 继承自类 A 和类 B，如果类 A 和 B 都有自定义的成员方法 f()，则调用类 C.f() 会产生二义性；</li>
-      <li>通过实现多个接口、间接支持多重继承：接口由于只包含方法定义，不能有方法的实现，类 C 不能直接调用方法，需实现具体的 f() 才能调用，不会产生二义性。</li>
-    </ol>
-  </li>
-  <li>
-    <p>对于父类的包访问权限、成员变量/方法，如果子类和父类在<strong>同一个包</strong>下，则子类能继承，否则子类不能继承；</p>
-  </li>
-</ol>
-
-<p><code class="highlighter-rouge">super</code> 主要用法：</p>
+<p><code class="highlighter-rouge">super</code> 用于继承，主要用法：</p>
 
 <ol>
   <li><code class="highlighter-rouge">super.成员变量/方法</code>：用于在子类中，调用父类的同名成员变量或方法；</li>
@@ -688,87 +688,6 @@ new Person("张三", 30).tell();
       <li>若父类的构造器都带参，则必须用 <code class="highlighter-rouge">super(param1, ...)</code> 显式调用一次。</li>
     </ol>
   </li>
-</ol>
-
-<h5 id="方法重载-vs-重写">方法重载 VS 重写</h5>
-
-<ul>
-  <li>重载（overload）：同一个类中，多个同名方法根据不同的传参来执行不同的逻辑处理；</li>
-  <li>重写/覆盖、覆写（override）：子类<strong>继承</strong>父类已有的方法，并重新实现其内部逻辑、功能。遵循两同两小一大。</li>
-</ul>
-
-<p>区别：</p>
-
-<ol>
-  <li>方法名都<strong>相同</strong>。</li>
-  <li>发生范围：重载在同一个类；重写在子类中。</li>
-  <li>参数列表（类型、个数、顺序） ：重载至少一个不同；重写一定<strong>相同</strong>。</li>
-  <li>返回值类型、异常：重载可不同（只有返回值不同不算重载）；<strong>两小</strong>：重写子类的返回值类型、异常范围（<code class="highlighter-rouge">RunTimeException</code>）&lt;= 父类（<code class="highlighter-rouge">Exception</code>）。</li>
-  <li>访问修饰符：重载可不同；<strong>一大</strong>：重写，子类访问权限（只能是 <code class="highlighter-rouge">public，而非private</code>）&gt;= 父类（<code class="highlighter-rouge">protected</code>），即子类修饰符不能做更严格的限制；
-    <ul>
-      <li>另外父类方法修饰符为 <code class="highlighter-rouge">private/final/static</code>或构造器时（都不能被继承），子类不能重写，但被 static 修饰的方法能被再次声明。</li>
-      <li><a href="#反射机制">反射机制</a>。</li>
-    </ul>
-  </li>
-  <li>发生阶段：重载实现的是<strong>编译时</strong>的多态性（即前绑定）；重写实现的是<strong>运行时</strong>的多态性（即后绑定）。</li>
-</ol>
-
-<h3 id="多态">多态</h3>
-
-<p>多态：即<strong>一个接口，多个方法</strong>。指多个子类继承并重写父类的同一属性或方法，或多个子类实现接口并覆盖接口中的同一方法，并将父类引用指向子类对象。</p>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 引用的自动类型转换，指存在继承关系的对象类型转换
-Animal animal = new Dog(); // 向上转型，把Dog类型转换为Animal类型
-animal.run();
-
-// 引用的强制类型转换，编译正常，运行可能报错ClassCastException类型转换异常，建议在强转前判断对象的真实类型
-Dog dog = (Dog) animal; // 向下转型，把Animal类型转换为Dog类型
-animal.run();
-
-Animal animal = new Cat();
-if (animal instanceof Cat) {
-    Cat cat = (Cat) animal; // 向下转型
-}
-</code></pre></div></div>
-
-<p>实现多态有 3 个必要条件：</p>
-
-<ol>
-  <li>子类继承父类/实现接口；</li>
-  <li>方法重写；</li>
-  <li>父类引用指向子类对象（向上转型）或接口的引用变量指向其实现类的实例对象。</li>
-</ol>
-
-<p>分类：</p>
-
-<ol>
-  <li>编译时多态：是静态的，主要指<strong>方法重载</strong>。编译后变成不同的方法；</li>
-  <li>运行时多态：是动态的，即通常所说的多态性，指继承父类和实现接口时，可用父类引用指向子类对象。引用类型变量发出的方法调用的到底是哪个类中的方法，必须在程序运行期间才能确定。</li>
-</ol>
-
-<p>特征：</p>
-
-<ol>
-  <li>对于方法的调用：编译看左边，运行看右边？
-    <ol>
-      <li>如果子类重写了父类方法，真正执行的是子类覆盖的方法；</li>
-      <li>如果子类没有覆盖父类的方法，执行的是父类的方法。</li>
-    </ol>
-  </li>
-  <li>对于变量：编译、运行都看左边。</li>
-</ol>
-
-<p>优势：</p>
-
-<ol>
-  <li>父类作为方法的形参（入参）用来传递对象；</li>
-  <li>便于类与类间解耦，右边对象可组件化切换，改换业务。</li>
-</ol>
-
-<p>劣势：</p>
-
-<ol>
-  <li>编译看左边，不能调用子类独有的方法。</li>
 </ol>
 
 <h3 id="值传递-vs-引用传递">值传递 VS 引用传递</h3>
@@ -1193,16 +1112,17 @@ public static void run(ArrayList&lt;? super Car&gt;) {
   <li>这种动态获取类信息及调用对象方法的功能称为Java语言的<strong>反射机制</strong>。</li>
 </ul>
 
-<p><img src="assets/java-basic-reflection-3.png" alt="img" style="zoom:65%;" /></p>
+<p><img src="assets/java-basic-reflection-3.png" alt="img" style="zoom:80%;" /></p>
 
 <h5 id="应用场景">应用场景</h5>
 
-<p>多用于框架的底层原理，是框架的灵魂。通过反射可在运行时分析类及执行类中方法；获取、调用任意一个类的所有属性和方法。</p>
+<p>多用于<strong>框架</strong>的底层原理，是框架的灵魂。通过反射可在运行时分析类及执行类中方法；获取、调用任意一个类的所有属性和方法。</p>
 
 <ol>
   <li>Spring/Spring Boot、MyBatis 等<strong>框架</strong>中都大量使用反射机制，框架中<strong>动态代理</strong>的实现也依赖反射；
     <ul>
       <li>动态代理机制：JDK提供的（如 <code class="highlighter-rouge">Proxy.newProxyInstance()</code> ）没有实现类、但在运行期动态创建接口对象的方式。通过 <code class="highlighter-rouge">Proxy</code> 创建代理对象，然后将接口方法“代理”给 <code class="highlighter-rouge">InvocationHandler</code> 完成的。</li>
+      <li>MyBatis 通过<strong>反射</strong>创建对象，同时用反射给对象的属性逐一赋值并返回。<code class="highlighter-rouge">&lt;resultMap&gt; </code> 元素。</li>
     </ul>
   </li>
   <li><strong>注解</strong>的实现用到反射。Spring 中通过 <code class="highlighter-rouge">@Component</code> 注解声明一个类为 Spring Bean、 通过 <code class="highlighter-rouge">@Value </code> 注解就读取到配置文件中的值：基于反射分析类，获取到类/属性/方法/参数上的注解，之后就可做进一步的处理。</li>
@@ -1862,13 +1782,23 @@ System.out.println("平均数 : " + stats.getAverage());
 
 <p><a href="#数组">Arrays 数组</a></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>int min = (int) Collections.min(Arrays.asList(numbers));
+<p>详细方法见 Java 集合框架中。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import java.util.Collections;
+
+int min = (int) Collections.min(Arrays.asList(numbers));
 
 //创建可变的列表
-Arrays.asList(numbers)
+Arrays.asList(nums)
 
 //创建不可变的单元素列表
 Collections.singletonList()
+
+int n = 10;
+Collections.nCopies(n, 0)
+
+// 交换 nums[0] 和 nums[1]
+Collections.swap(nums, 0, 1);
 </code></pre></div></div>
 
 <h5 id="collectorstolist">Collectors.toList()</h5>
@@ -2281,11 +2211,28 @@ l + 1 == Long.MIN_VALUE; // true
 
 <h3 id="bigdecimal-类">BigDecimal 类</h3>
 
-<p>作用：为了避免精度丢失，可用 <code class="highlighter-rouge">BigDecimal</code> 来进行<strong>浮点数间的运算和比较大小</strong>；</p>
+<p>作用：为了避免精度丢失，可用 <code class="highlighter-rouge">Big'Decimal</code> 来进行<strong>浮点数间的运算和比较大小</strong>；</p>
 
 <h5 id="浮点数精度陷阱">浮点数精度陷阱</h5>
 
 <p>二进制无法精确表示浮点数：由于计算机（用<strong>尾数 + 阶码</strong>的编码方式）保存浮点数，二进制<strong>尾数</strong>宽度有限，无限循环的小数存储在计算机时，只能被截断；计算机内存放的值与实际值存在误差，导致浮点数精度陷阱。</p>
+
+<ul>
+  <li>在Java中float的精度为 7~ 8位有效数字，double精度为：16~17位有效数字</li>
+  <li>float和double只能用来做<strong>科学计算</strong>或者是工程计算，存在精度丢失问题，</li>
+  <li>而涉及到较大数据，对精度有严格要求的计算中<code class="highlighter-rouge">BigDecimal</code>是首选，比如金融、银行业务、涉及到货币的业务上的计算。</li>
+  <li>构造函数：
+    <ul>
+      <li>String 构造方法是完全可预知的；</li>
+      <li>参数类型为double的构造方法的结果有一定的不可预知性，如果传入的参数必须是double类型时，可以通过 <code class="highlighter-rouge">Double.toString(double b)</code> 方法转换成字符串传入，或者直接使用 <code class="highlighter-rouge">BigDecimal.valueOf(double b) </code>来进行接收处理。</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 输出1.10000000000888178
+// 0.1无法准确的表示为double
+BigDecimal a = new BigDecimal(1.1);
+</code></pre></div></div>
 
 <p>因此，浮点数间的等值判断，</p>
 
@@ -2304,7 +2251,7 @@ a == b？// 预期返回true，实际为false
 //e.g.2 累加
 float f1 = 0.0f;
 for (int i = 0; i &lt; 11; it+) {
-    f1 += 0.1f; // 自加11次，输出 1.1000001，有误差
+    f1 += 0.1f; // 自加11次，输出 1.1000001？，有误差
 }
 float f2 = 0.1f * 11; // 乘以11，输出 1.1
 f1 == f2? // 返回false
@@ -2326,8 +2273,8 @@ f1 == f2? // 返回false
     <p>用 <code class="highlighter-rouge">BigDecimal</code> 类来保存值，再进行浮点数的运算操作。推荐创建 <code class="highlighter-rouge">BigDecimal</code> 对象的方式：</p>
 
     <ol>
-      <li><code class="highlighter-rouge">BigDecimal(String val)</code>构造方法；</li>
-      <li><code class="highlighter-rouge">BigDecimal.valueOf(double val)</code> 静态方法：内部其实执行了 Double 的 toString，按 double 实际能表达的精度对尾数进行截断；</li>
+      <li><code class="highlighter-rouge">BigDecimal(String val)</code> 构造方法；</li>
+      <li><code class="highlighter-rouge">BigDecimal.valueOf(double val)</code> 静态方法：内部其实执行了 Double 的 toString，按 double 实际能表达的精度对<strong>尾数</strong>进行截断；</li>
       <li><code class="highlighter-rouge">BigDecimal(double)</code>：存在精度损失风险，在精确计算或值比较的场景中可能会导致业务逻辑异常。</li>
     </ol>
   </li>
@@ -2341,11 +2288,13 @@ BigDecimal x = a.subtract(b); // 0.1，减法
 BigDecimal y = b.subtract(c); // 0.1
 
 // 大小比较
-x.compareTo(y)? // true，只比较值、忽略精度
-Objects.equals(x, y)? // 会比较值和精度，1.0与1.00返回false
+x.compareTo(y) // true，只比较值、忽略精度
+Objects.equals(x, y) // 会比较值和精度，例如1.0与1.00返回false
 </code></pre></div></div>
 
-<p>常见方法：</p>
+<h5 id="常见方法">常见方法</h5>
+
+<p>加减乘除：</p>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>BigDecimal a = new BigDecimal("1.0");
 BigDecimal b = new BigDecimal("0.9");
@@ -2362,6 +2311,60 @@ BigDecimal c = a.setScale(3, RoundingMode.HALF_DOWN);
 
 BigDecimal.doubleValue(); // 返回double
 </code></pre></div></div>
+
+<p>其他方法：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//保留小数位（newScale：保留几位小数，roundingMode：舍入模式）
+BigDecimal setScale(int newScale, int roundingMode)
+//取余运算
+BigDecimal remainder(BigDecimal divisor);
+//求相反数
+BigDecimal negate();
+//比较大小（左边比右边数大返回1，相等返回0，比右边小返回-1）
+int compareTo(BigDecimal val);
+
+//将BigDecimal对象中的值以整数返回
+int intValue() 
+double doubleValue()
+float floatValue()
+long longValue()
+String toString()
+</code></pre></div></div>
+
+<p>舍入模式（Rounding Mode）：是<code class="highlighter-rouge">BigDecimal</code>类中的静态变量，包括了八种常见舍入规则，比如四舍五入法、银行家舍入法等。</p>
+
+<ol>
+  <li><code class="highlighter-rouge">ROUND_UP</code>：<strong>正数向上取整，负数向下取整</strong>。向<strong>远离零</strong>的方向舍入。舍弃非零部分，并将非零舍弃部分相邻的一位数字加一</li>
+  <li><code class="highlighter-rouge">ROUND_DOWN</code>：向<strong>接近零</strong>的方向舍入。舍弃非零部分，同时不会非零舍弃部分相邻的一位数字加一，采取截取行为。</li>
+  <li><code class="highlighter-rouge">ROUND_CEILING</code>：<strong>正负均向上取整</strong>。取右边最近的整数，向<strong>正无穷</strong>的方向舍入。如果为正数，舍入结果同ROUND_UP一致；如果为负数，舍入结果同ROUND_DOWN一致。注意：此模式不会减少数值大小。</li>
+  <li><code class="highlighter-rouge">ROUND_FLOOR</code>：取左边最近的正数，向<strong>负无穷</strong>的方向舍入。如果为正数，舍入结果同ROUND_DOWN一致；如果为负数，舍入结果同ROUND_UP一致。注意：此模式不会增加数值大小。</li>
+  <li><code class="highlighter-rouge">ROUND_HALF_UP</code>：<strong>四舍五入</strong>。向“最接近”的数字舍入。负数先取绝对值再四舍五入再负数。</li>
+  <li><code class="highlighter-rouge">ROUND_HALF_DOWN</code>：<strong>五舍六入</strong>。向“最接近”的数字舍入。负数先取绝对值再五舍六入再负数。</li>
+  <li><code class="highlighter-rouge">ROUND_HALF_EVEN</code>：<strong>银行家舍入法</strong>。向离<strong>零最近</strong>的方向舍入，如果两个方向离零的距离相等，则选择偶数方向。在重复进行一系列计算时，此舍入模式可以将<strong>累加错误</strong>减到最小。
+    <ol>
+      <li>四舍六入：</li>
+      <li>被舍位为5时两种情况：
+        <ol>
+          <li><strong>五后非零</strong>：如果5后面有非零数字，则无论前面的数字为何，都应进位。<code class="highlighter-rouge">90.501 ≈ 91%</code>、<code class="highlighter-rouge">90.51 ≈ 91%</code></li>
+          <li>如果5后面没有数字（或都是零），则需要查看5前面的数字：
+            <ul>
+              <li>五后零前偶：如果<strong>5前面的数字</strong>是偶数，则舍去5。<code class="highlighter-rouge">90.50 ≈ 90%</code></li>
+              <li>五后零前奇：如果5前面的数字是奇数，则进位。<code class="highlighter-rouge">9.50 ≈ 10%</code></li>
+            </ul>
+          </li>
+        </ol>
+      </li>
+      <li><del>源码定义：</del>
+        <ol>
+          <li>如果舍弃部分左边的数字奇数，则舍入行为与 <code class="highlighter-rouge">ROUND_HALF_UP</code> 相同，四舍五入；</li>
+          <li>如果为偶数，则舍入行为与 <code class="highlighter-rouge">ROUND_HALF_DOWN </code>相同，五舍六入。</li>
+          <li>被舍位为5时两种情况，如果前一位为奇数，则入位，否则舍去。</li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">ROUND_UNNECESSARY</code>：断言请求的操作具有精确的结果，因此<strong>不需要舍入</strong>。如果对获得精确结果的操作指定此舍入模式，则抛出ArithmeticException。</li>
+</ol>
 
 <h3 id="枚举类">枚举类</h3>
 

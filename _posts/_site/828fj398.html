@@ -31,7 +31,7 @@ stu.sayName();
   <li>若无则加载 Student 类：加载类信息到方法区。</li>
 </ol>
 
-<p>3）new 创建 student 对象：</p>
+<p>3）new 创建 student 对象（简化版）：</p>
 
 <ol>
   <li>在（VM 栈中的）局部变量表创建变量 <code class="highlighter-rouge">stu</code>，字面量<code class="highlighter-rouge">"Tom"</code>放在方法区；</li>
@@ -40,6 +40,96 @@ stu.sayName();
 </ol>
 
 <p>4) 执行方法：根据 stu 引用找到 Student 对象，获取 <code class="highlighter-rouge">sayName()</code> 的字节码地址并执行。</p>
+
+<h3 id="new-对象的流程">new 对象的流程</h3>
+
+<p>new 一个对象的流程（详细版）：加载并初始化类、创建对象。</p>
+
+<ol>
+  <li><strong>类加载</strong>：检查当前类是否已被加载？
+    <ol>
+      <li>若已被加载、则直接返回；</li>
+      <li>否则尝试用 ClassLoader 加载 .class 文件到内存；</li>
+      <li>初始化静态成员变量；</li>
+    </ol>
+  </li>
+  <li>执行 new，申请一片内存空间；（为新对象在堆中）<strong>分配内存</strong>，若内存不够则先执行<a href="#回收策略">GC</a>；
+    <ul>
+      <li>不包括任何静态变量；</li>
+    </ul>
+  </li>
+  <li><strong>初始化为零值（默认值）</strong>；
+    <ol>
+      <li>JVM 将分配到的内存空间都初始化为零值（不包括对象头），</li>
+      <li><del>保证了对象的实例字段在 Java 代码中可以不赋初始值就直接使用，程序能访问到这些字段的<strong>数据类型所对应的零值</strong>。</del></li>
+    </ol>
+  </li>
+  <li><strong>设置对象头</strong>；例如这个对象是那个类的实例、如何才能找到类的元数据信息、对象的哈希码、对象的 GC 分代年龄等信息。</li>
+  <li><strong>执行 init 方法</strong>：（按照程序员的意愿）<strong>初始化对象</strong>；
+    <ul>
+      <li>初始化顺序：是先初始化<strong>父类</strong>再初始化子类，先执行实例代码块、然后是构造方法（初始化成员变量？）；</li>
+    </ul>
+  </li>
+  <li>如果有 <code class="highlighter-rouge">Student stu = new Student("Tom");</code> 引用，则：
+    <ol>
+      <li>在（VM 栈中的）局部变量表创建变量 <code class="highlighter-rouge">stu</code>，字面量<code class="highlighter-rouge">"Tom"</code>放在方法区；</li>
+      <li>把堆内对象的首地址（引用）<strong>赋值</strong>给（vm 栈中的）变量 <code class="highlighter-rouge">stu</code>；</li>
+    </ol>
+  </li>
+</ol>
+
+<blockquote>
+  <p>类的实例化/创建对象的顺序：</p>
+
+  <ul>
+    <li>先静态、先父后子；</li>
+    <li>按在代码中出现的顺序依次执行。</li>
+  </ul>
+</blockquote>
+
+<p>执行顺序：（优先级从高到低）静态代码块 &gt; 构造代码块 &gt; 构造方法 &gt; 普通方法。</p>
+
+<ul>
+  <li>其中静态代码块只执行一次。构造代码块在每次创建对象是都会执行。</li>
+</ul>
+
+<p>类加载时？执行静态代码块和静态初始化语句：</p>
+
+<ol>
+  <li>初始化父类静态成员变量、静态初始化块/静态代码块（只执行一次）：static 成员变量和 static 语句块的执行顺序同代码中的顺序一致；</li>
+  <li>子类静态成员、静态初始化块；</li>
+</ol>
+
+<p>创建对象执行顺序：</p>
+
+<ol>
+  <li>初始化对象父类的实例成员变量，执行实例初始化块；</li>
+  <li>父类构造器、构造方法；</li>
+  <li>初始化子类实例成员变量，执行实例初始化块；</li>
+  <li>子类构造器；</li>
+  <li>普通代码块；</li>
+</ol>
+
+<p>对象在堆内存的存储布局：</p>
+
+<ol>
+  <li><strong>对象头</strong>：
+    <ul>
+      <li>MarkWord：存储哈希码、分代年龄、（锁状态标志位、）线程持有的（轻/重量级）锁、偏向锁线程ID等信息。</li>
+      <li>存储类型指针：指向类的元数据指针，确定对象是属于哪个类的实例。数组长度。</li>
+    </ul>
+  </li>
+  <li>
+    <p>实例数据：存储代码中所定义的各种类型的字段信息。</p>
+  </li>
+  <li>对齐填充：起占位作用。HotSpot 要求对象的起始地址必须是8的整数倍。。</li>
+</ol>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>String str = new String("hello");
+// 变量str放在VM栈上的局部变量表中
+// 用new创建出来的String对象放在堆中
+// 而"hello"这个字面量放在方法区的运行时常量池
+</code></pre></div></div>
 
 <h3 id="字节码执行机制">字节码执行机制</h3>
 
@@ -195,66 +285,9 @@ stu.sayName();
 
 <p>对于<code class="highlighter-rouge">equals()、instanceof()</code>等方法来判断对象相等或所属关系都需基于同一个 ClassLoader。</p>
 
-<h5 id="通过类创建对象">通过类创建对象</h5>
-
-<p><strong>类的实例化/创建对象的顺序：</strong></p>
-
-<ul>
-  <li>先静态、先父后子；</li>
-  <li>按在代码中出现的顺序依次执行；</li>
-</ul>
-
-<p>按需加载类：</p>
-
-<ol>
-  <li>初始化父类静态成员变量、静态初始化块/静态代码块（只执行一次）：static 成员变量和 static 语句块的执行顺序同代码中的顺序一致；</li>
-  <li>子类静态成员、静态初始化块；</li>
-</ol>
-
-<p>创建对象：</p>
-
-<ol>
-  <li>初始化对象父类的实例成员变量，执行实例初始化块；</li>
-  <li>父类构造器；</li>
-  <li>初始化子类实例成员变量，执行实例初始化块；</li>
-  <li>子类构造器；</li>
-  <li>普通代码块；</li>
-</ol>
-
-<p><strong>创建对象的步骤</strong>：</p>
-
-<ol>
-  <li>类加载：JVM 遇到一条 new 指令时，执行类加载，完成后可确定所需内存大小；</li>
-  <li>（为新对象在堆中）分配内存（若内存不够则先执行<a href="#回收策略">GC</a>）；</li>
-  <li>将成员变量初始化为0值；</li>
-  <li><strong>设置对象头</strong>；</li>
-  <li><strong>执行 init 方法</strong>：初始化成员变量，执行实例化代码块，调用类的构造方法，并把堆内对象的首地址（引用）赋值给（vm 栈中的）变量。</li>
-</ol>
-
-<p><strong>对象在堆内存的存储布局</strong>：</p>
-
-<ol>
-  <li>对象头：
-    <ul>
-      <li>MarkWord：存储哈希码、分代年龄、（锁状态标志位、）线程持有的（轻/重量级）锁、偏向锁线程ID等信息。</li>
-      <li>存储类型指针：指向类的元数据指针，确定对象是属于哪个类的实例。数组长度。</li>
-    </ul>
-  </li>
-  <li>
-    <p>实例数据：存储代码中所定义的各种类型的字段信息。</p>
-  </li>
-  <li>对齐填充：起占位作用。HotSpot 要求对象的起始地址必须是8的整数倍。。</li>
-</ol>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>String str = new String("hello");
-// 变量str放在VM栈上的局部变量表中
-// 用new创建出来的String对象放在堆中
-// 而"hello"这个字面量放在方法区的运行时常量池
-</code></pre></div></div>
-
 <h3 id="jvm-内存分配机制">JVM 内存分配机制</h3>
 
-<p><img src="assets/JVM内存分配.png" style="zoom: 50%;" /></p>
+<p><img src="assets/JVM内存分配.png" style="zoom: 50%;" /> <img src="assets/5778d113-8e13-4c53-b5bf-801e58080b97.png" width="350px" /></p>
 
 <p>自动内存管理：最核心的是堆内存中对象的分配与回收。</p>
 

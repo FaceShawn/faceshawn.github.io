@@ -86,6 +86,8 @@ public static void swap(T[] arr, int i, int j) {
 
 <p>前缀和技巧：<code class="highlighter-rouge">preSum[i] = sum(nums[0, ..., i-1])</code>，表示前 <code class="highlighter-rouge">i-1</code> 项的累加和。</p>
 
+<p>主要用于：快速计算一个区间内的元素和。</p>
+
 <p>主要适用场景是：不修改原始数组的情况下，<strong>频繁查询</strong>某区间的累加和。时间复杂度降为 <code class="highlighter-rouge">O(1)</code>。</p>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>private int[] preSums;
@@ -118,6 +120,8 @@ for (int i = 1; i &lt;= n; i++) { // i = 1
 <h5 id="差分数组">差分数组</h5>
 
 <p><a href="https://labuladong.online/algo/data-structure/diff-array/">差分数组</a>主要适用场景是：频繁对原始数组某区间的元素值进行增减。类似环比。</p>
+
+<p>主要用于：快速修改整个区间的元素。</p>
 
 <p><code class="highlighter-rouge">diff</code> 数组：<code class="highlighter-rouge">diff[0] = nums[0]</code>，<code class="highlighter-rouge">diff[i] = nums[i] - nums[i-1]</code>，表示相邻元素间的差值。</p>
 
@@ -206,6 +210,12 @@ for (int i = 1; i &lt;= n; i++) { // i = 1
     <p><img src="assets/0eeix.gif" alt="img" style="zoom:80%;" /></p>
   </li>
 </ul>
+
+<h5 id="数组处理滑动窗口"><a href="#滑动窗口">数组处理滑动窗口</a></h5>
+
+<p>见下字符串中。</p>
+
+<h5 id="二分搜索"><a href="#二分查找">二分搜索</a></h5>
 
 <h4 id="经典例题">经典例题</h4>
 
@@ -483,7 +493,7 @@ ans.reverse();
 <h3 id="链表">链表</h3>
 
 <blockquote>
-  <p>数组 VS 链表 、ArrayList VS LinkedList。</p>
+  <p>数组 VS 链表 、ArrayList VS LinkedList。链表相关的题目套路比较固定，主要是双指针技巧。</p>
 </blockquote>
 
 <h5 id="头指针-vs-虚拟头结点">头指针 VS 虚拟头结点</h5>
@@ -797,12 +807,20 @@ Stack&lt;Character&gt; stack = new Stack&lt;&gt;();
 
 <h5 id="priorityqueue-优先队列">PriorityQueue 优先队列</h5>
 
-<p>出队顺序按照优先级的队列；常用于找最值，往往用<a href="#堆">堆</a>来实现。用于有动态添加、删除数据且需获得最值的场景。手撕算法典型题包括：</p>
+<p>出队顺序按照优先级的队列；常用于找最值，往往用<a href="#堆">二叉堆</a>来实现。用于有动态添加、删除数据且需获得最值的场景。手撕算法典型题包括：</p>
 
 <ol>
   <li><a href="#3.2堆排序">堆排序</a>；</li>
   <li><a href="#第K个元素">第K个元素</a>；</li>
   <li><a href="#图的搜索、遍历">带权图的遍历</a>等。</li>
+</ol>
+
+<p>要理解以下关键点：</p>
+
+<ol>
+  <li>优先级队列是一种能自动排序的数据结构，增删元素的复杂度是 <code class="highlighter-rouge">O*(log*N)</code>，底层使用二叉堆实现。</li>
+  <li>二叉堆是一种拥有特殊性质的完全二叉树。</li>
+  <li>优先级队列（二叉堆）的核心方法是 <code class="highlighter-rouge">swim, sink</code>，用来维护二叉堆的性质。</li>
 </ol>
 
 <p>至少需支持下述操作：</p>
@@ -825,6 +843,12 @@ Stack&lt;Character&gt; stack = new Stack&lt;&gt;();
 <h5 id="单调栈单调队列">单调栈、单调队列</h5>
 
 <p>单调栈：每次新元素入栈后，栈内的元素都保持有序。用途不广，只处理一类典型的问题。</p>
+
+<ul>
+  <li>用于：快速计算下一个更大/更小元素、上一个更大/更小元素。</li>
+</ul>
+
+<p>单调队列：普通队列 + api，用于快速计算整个队列的最大/最小值。</p>
 
 <p><img src="assets/monotonous-stack-after.svg" alt="img" style="zoom: 67%;" /></p>
 
@@ -896,6 +920,8 @@ Stack&lt;Character&gt; stack = new Stack&lt;&gt;();
 
 <h3 id="哈希表">哈希表</h3>
 
+<p>哈希表的原理是什么？为什么它的增删查改效率是 O(1)？</p>
+
 <p>哈希表：又称散列表，通过散列函数把键映射到一个<strong>大数组</strong>里，实现快速存取数据的功能。</p>
 
 <p>解决散列冲突的方法：</p>
@@ -904,6 +930,25 @@ Stack&lt;Character&gt; stack = new Stack&lt;&gt;();
   <li>拉链法：需要链表特性，操作简单，但需额外的空间存指针；</li>
   <li>线性探查法：需要数组特性，以便连续寻址，不需指针的存储空间，但操作稍复杂。</li>
 </ol>
+
+<p>为什么不能依赖哈希表的<strong>遍历顺序</strong>？</p>
+
+<ul>
+  <li></li>
+</ul>
+
+<p>key 必须是不可变的？</p>
+
+<ul>
+  <li></li>
+</ul>
+
+<p>加强哈希表：</p>
+
+<ul>
+  <li>用链表加强哈希表：LinkedHashMap</li>
+  <li>用数组加强哈希表：ArrayHashMap</li>
+</ul>
 
 <h5 id="经典例题-4">经典例题</h5>
 
@@ -920,6 +965,16 @@ Stack&lt;Character&gt; stack = new Stack&lt;&gt;();
   </li>
 </ul>
 
+<h3 id="跳表">跳表</h3>
+
+<p>跳表（Skip List）：基于链表实现的有序列表，使得包含n个元素的有序序列的<strong>查找和插入</strong>操作的平均时间复杂度都是 O(logn)，优于数组的 O(n)复杂度。对并发友好。</p>
+
+<p>实现：快速的查询效果是通过维护一个多层次的<strong>链表</strong>（<code class="highlighter-rouge">ConcurrentSkipListMap</code>）实现的，实现了快速查询效果将平均时间复杂度降到了O(logn)。这是一个典型的用空间换时间数据结构。</p>
+
+<p>缺点：就是“以空间换时间”方式存在一定数据冗余。</p>
+
+<p>应用：<strong>Redis</strong>中的有序集合对象的底层数据结构就使用了跳表。</p>
+
 <h3 id="堆">堆</h3>
 
 <h5 id="定义">定义</h5>
@@ -932,6 +987,10 @@ Stack&lt;Character&gt; stack = new Stack&lt;&gt;();
 </ul>
 
 <p>用途：用于只关心最值：<strong>多次</strong>插入数据或 pop 最值后，再<strong>多次获取</strong>剩余元素的最（最大或最小）值（插入/删除 + 全体排序耗费资源太多）。</p>
+
+<ul>
+  <li>二叉堆的关键应用是<strong><a href="#队列">Pri’orityQueue 优先级队列</a></strong>。如下面的<a href="https://leetcode.cn/problems/merge-k-sorted-lists/">23.合并K个升序链表</a>。</li>
+</ul>
 
 <h5 id="优势">优势</h5>
 
@@ -1104,14 +1163,25 @@ void traverse(TreeNode root) {
       <li>还可转化为 <a href="#链表快慢双指针">两链表的公共节点</a>；</li>
     </ol>
   </li>
-  <li>Huffman 树</li>
 </ul>
+
+<h5 id="huffman-哈夫曼树">Huffman 哈夫曼树</h5>
 
 <h3 id="二叉树">二叉树</h3>
 
 <p>优点：增<strong>删</strong>改查性能都很好；</p>
 
-<p>缺点：斜树，瘸子；因此发展出变体满二叉树、完全二叉树；</p>
+<p>缺点：斜树，瘸子；因此发展出变体满二叉树、完全二叉树。</p>
+
+<h5 id="二叉树核心解题思路">二叉树核心解题思路</h5>
+
+<p>二叉树的习题分为三大部分：</p>
+
+<ol>
+  <li>递归，用「遍历」的思维模式解题，即 DFS 算法、<strong>回溯算法</strong>的原型。</li>
+  <li>递归，用「分解问题」的思维模式解题，即<strong>动态规划</strong>、分治算法的原型。</li>
+  <li>非递归，用「层序遍历」的思维模式解题，即 BFS 算法的原型。</li>
+</ol>
 
 <h5 id="分类">分类</h5>
 
@@ -1125,7 +1195,7 @@ void traverse(TreeNode root) {
     <p><img src="assets/完全二叉树.c4f02f51.png" alt="img" style="zoom: 45%;" /><img src="assets/balance_bst.jpg" alt="数据结构与算法-二叉查找树平衡(DSW) - 知乎" style="zoom: 40%;" /></p>
   </li>
   <li>
-    <p>二叉查找/搜索/排序树、<code class="highlighter-rouge">BST</code> 树（<code class="highlighter-rouge">Binary Search Tree、ordered binary tree、sorted binary tree</code>）：若不为空，任意节点的值均 &gt; 左子树任意结点、均 &lt; 右子树任意节点（所有节点的值都不相等），且左右子树都是二叉查找树（即<strong>中序遍历</strong>为单调递增的二叉树 + 二分查找思想）。</p>
+    <p>二叉查找/搜索/排序树、<code class="highlighter-rouge">BST</code> 树（<code class="highlighter-rouge">Binary Search Tree、ordered binary tree、sorted binary tree</code>）：（<strong>左小右大</strong>）若不为空，任意节点的值均 &gt; 左子树任意结点、均 &lt; 右子树任意节点（所有节点的值都不相等），且左右子树都是二叉查找树（即<strong>中序遍历</strong>为单调递增的二叉树 + 二分查找思想）。</p>
 
     <ul>
       <li>压扁了就是无重复值的有序数组。<del>由二叉树的<strong>层序遍历</strong>扩展而来，常用于求无权图的<strong>最短路径</strong>。维护了一组数据的顺序性，得到一个数据的上下界。</del></li>
@@ -1159,18 +1229,19 @@ void traverse(TreeNode root) {
     </ul>
   </li>
   <li>
-    <p><code class="highlighter-rouge">B</code> 树 / 多路平衡查找树、<code class="highlighter-rouge">B+</code> 树：用于数据库索引的实现。</p>
+    <p><code class="highlighter-rouge">B</code> 树 / 多路平衡查找树、<code class="highlighter-rouge">B+</code> 树：用于<strong>数据库索引</strong>的实现。<code class="highlighter-rouge">B</code> 树 VS <code class="highlighter-rouge">B+</code> 树：</p>
 
     <ol>
-      <li>B 树的所有节点存放键和数据；</li>
-      <li>而 B+树只有叶子节点存放 <code class="highlighter-rouge">key</code> 和 <code class="highlighter-rouge">data</code>，其他内节点只存放 <code class="highlighter-rouge">key</code>。</li>
+      <li>节点：<code class="highlighter-rouge">B</code> 树的所有节点存放键和数据，而 <code class="highlighter-rouge">B+</code> 树只有叶子节点存放<code class="highlighter-rouge">key</code> 和 <code class="highlighter-rouge">data</code>，其他内节点只存放 <code class="highlighter-rouge">key</code>。</li>
+      <li>叶子节点：<code class="highlighter-rouge">B</code> 树的叶子节点是独立的；<code class="highlighter-rouge">B+</code> 树的叶子节点有<strong>引用链</strong>指向相邻的叶子节点。</li>
+      <li>查找：<code class="highlighter-rouge">B</code> 树的检索相当于对节点的关键字做<strong>二分查找</strong>，可能不到叶子节点就找到；而 <code class="highlighter-rouge">B+</code> 树的查找是从根节点到叶子节点。</li>
     </ol>
   </li>
   <li>
     <p><code class="highlighter-rouge">Trie</code> 树、字典树、前缀树、单词查找树：由二叉树衍生出来，主要用于处理字符串前缀相关的操作、保存和统计大量的字符串和相关的信息。</p>
   </li>
   <li>
-    <p>线段树：处理数组区间信息的汇总（求和、最值等）、单点更新、区间更新问题。</p>
+    <p><strong>线段树</strong>：叶子节点是数组中的元素，非叶子节点就是索引区间（线段）的汇总信息。用于高效解决数组的区间查询和区间动态修改问题。如处理数组区间信息的汇总（求和、最值等）、单点更新、区间更新问题。</p>
   </li>
   <li>
     <p>树状数组：处理数组的前缀和、单点更新、区间更新问题。</p>
@@ -1206,7 +1277,25 @@ void traverse(TreeNode root) {
   </li>
 </ul>
 
-<p>​</p>
+<h5 id="定义-1">定义</h5>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+</code></pre></div></div>
+
 <h5 id="bst-二叉查找树">BST 二叉查找树</h5>
 
 <ul>
@@ -1228,11 +1317,9 @@ void traverse(TreeNode root) {
 <p>外部变量 + <strong>迭代遍历</strong>一遍：对应<a href="#回溯算法框架">回溯算法核心框架</a>，简单易懂；</p>
 
 <ul>
-  <li>
-    <p><a href="https://leetcode.cn/problems/binary-tree-level-order-traversal/">102.二叉树的层序遍历</a>：从上到下用 <code class="highlighter-rouge">while</code> 遍历每层、并塞入<strong>队列</strong>，自左向右用 <code class="highlighter-rouge">for</code> 遍历每行、将结果加入 List。可扩展出 <a href="#广度优先搜索常见场景">BFS 算法框架</a>；</p>
-
+  <li><a href="https://leetcode.cn/problems/binary-tree-level-order-traversal/">102.二叉树的层序遍历</a>：从上到下用 <code class="highlighter-rouge">while</code> 遍历每层、并塞入<strong>队列</strong>，自左向右用 <code class="highlighter-rouge">for</code> 遍历每行、将结果加入 List。可扩展出 <a href="#广度优先搜索常见场景">BFS 算法框架</a>；</li>
+  <li><a href="https://leetcode.cn/problems/minimum-depth-of-binary-tree/">111.二叉树的最小深度</a>
     <ul>
-      <li><a href="https://leetcode.cn/problems/minimum-depth-of-binary-tree/">111.二叉树的最小深度</a></li>
       <li><a href="https://leetcode.cn/problems/binary-tree-zigzag-level-order-traversal/">103.二叉树的锯齿形层序遍历</a>：奇偶层 <code class="highlighter-rouge">ArrayList</code> 分别用 <code class="highlighter-rouge">addLast()、addFirst()</code>；【】</li>
       <li><a href="https://leetcode.cn/problems/binary-tree-level-order-traversal-ii/">107.二叉树的自底向上层序遍历 II</a>【】</li>
       <li>从上到下打印每行中的最大值；</li>
@@ -1252,7 +1339,7 @@ void traverse(TreeNode root) {
 
 <p><img src="assets/binary_bfs.jpeg" alt="img" style="zoom: 28%;" /></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 层序遍历：非递归实现
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 层序遍历：1. 非递归用栈实现
 public List&lt;List&lt;Integer&gt; &gt; levelOrderTraverse(TreeNode root) {
     // 一维结果
     // List&lt;Integer&gt; res = new LinkedList&lt;&gt;();
@@ -1297,7 +1384,7 @@ public List&lt;List&lt;Integer&gt; &gt; levelOrderTraverse(TreeNode root) {
     return res;
 }
 
-// 层序遍历：递归实现
+// 层序遍历：2. 递归实现
 List&lt;List&lt;Integer&gt; &gt; res = new ArrayList&lt;&gt;(); // 需用到get()，not LinkedList
 List&lt;List&lt;Integer&gt; &gt; levelOrderTraverse(TreeNode root) {
     if (root == null) {
@@ -1322,13 +1409,47 @@ void traverse(TreeNode root, int depth) {
     traverse(root.left, depth + 1);
     traverse(root.right, depth + 1);
 }
+
+//层序遍历：3. 使用自定义 State 类维护每个节点的信息，复杂一些但最灵活，会在图算法或复杂 BFS 算法中见到
+class State {
+    TreeNode node;
+    int depth;
+
+    State(TreeNode node, int depth) {
+        this.node = node;
+        this.depth = depth;
+    }
+}
+
+void levelOrderTraverse(TreeNode root) {
+    if (root == null) {
+        return;
+    }
+    Queue&lt;State&gt; q = new LinkedList&lt;&gt;();
+    // 根节点的路径权重和是 1
+    q.offer(new State(root, 1));
+
+    while (!q.isEmpty()) {
+        State cur = q.poll();
+        // 访问 cur 节点，同时知道它的路径权重和
+        System.out.println("depth = " + cur.depth + ", val = " + cur.node.val);
+
+        // 把 cur 的左右子节点加入队列
+        if (cur.node.left != null) {
+            q.offer(new State(cur.node.left, cur.depth + 1));
+        }
+        if (cur.node.right != null) {
+            q.offer(new State(cur.node.right, cur.depth + 1));
+        }
+    }
+}
 </code></pre></div></div>
 
 <h5 id="前序中序后序遍历">前序/中序/后序遍历</h5>
 
 <ol>
   <li><a href="https://leetcode.cn/problems/binary-tree-preorder-traversal/">144.二叉树的前序遍历</a>：逻辑上用栈，实际在递归的前序位置用<strong>递归栈</strong>；</li>
-  <li><a href="https://leetcode.cn/problems/binary-tree-inorder-traversal/">94.二叉树的中序遍历</a>：在递归的中序位置用<strong>递归栈</strong>；【】</li>
+  <li><a href="https://leetcode.cn/problems/binary-tree-inorder-traversal/">94.二叉树的中序遍历</a>：在递归的中序位置用<strong>递归栈</strong>、不用递归；【】</li>
   <li><a href="https://leetcode.cn/problems/binary-tree-postorder-traversal/">145.二叉树的后序遍历</a>：在递归的后序位置用<strong>递归栈</strong>；【】
     <ul>
       <li>
@@ -1372,6 +1493,67 @@ void traverse(TreeNode root, int depth) {
     return res;
 }
 </code></pre></div></div>
+
+<h5 id="非递归不用栈中序遍历">非递归不用栈中序遍历</h5>
+
+<p>用循环/迭代、中序遍历。</p>
+
+<p>利用<strong>线索二叉树</strong>的思想，即不再闲置叶子节点的左右指针，比如<strong>中序</strong>利用<strong>叶子节点右指针</strong>指向前序遍历情况时的后继节点。在当前节点没有左子树、或者第二次访问节点时即为中序结果。</p>
+
+<ul>
+  <li>此时past的右孩子指向后继节点，所以是第二次访问；</li>
+  <li>代表当前结点的左子树已经访问完毕，所以访问当前结点；</li>
+  <li>然后把指针移到后继或者右子树，并消除多余链接；</li>
+</ul>
+
+<p>递归和迭代两种方式是等价的，区别在于递归的时候隐式地维护了一个栈，而在迭代时需要显式地将这个栈模拟出来。</p>
+
+<p>参考：<a href="https://blog.csdn.net/qq_43252451/article/details/123056671">二叉树遍历四种必会算法：递归遍历、非递归遍历、既不用递归也不用栈遍历（三种深度优先），层序遍历（广度优先）</a></p>
+
+<p>难理解，直接背。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public List&lt;Integer&gt; inorderTraversal(TreeNode root) {
+    // 中序遍历非栈非递归，中序线索
+    List&lt;Integer&gt; res = new LinkedList&lt;&gt;();
+    TreeNode current = root;
+    while(current != null) {
+        if(current.left == null) {
+            // 当前节点没有左孩子，所以是应该访问的结点
+            res.add(current.val);
+            // 找右孩子、或者在前面建立的右孩子链接
+            current = current.right;
+        } else {
+            TreeNode past = current.left;
+            // past一直到最右下
+            while(past.right != null &amp;&amp; past.right != current) {
+                past = past.right;
+            }
+
+            if(past.right == null) {
+                // 此时current是past的后继结点，建立链接方便下次找到后继节点
+                past.right = current;
+                current = current.left;
+            } else {
+                /*
+                此时past的右孩子指向后继节点，所以是第二次访问；
+                代表当前结点的左子树已经访问完毕，所以访问当前结点；
+                然后把指针移到后继或者右子树，并消除多余链接；
+                */
+                res.add(current.val);
+                past.right = null;
+                current = current.right;
+            }
+        }
+    }
+    return res;
+}
+</code></pre></div></div>
+
+<h5 id="经典题目-1">经典题目</h5>
+
+<ol>
+  <li></li>
+</ol>
 
 <h3 id="图">图</h3>
 
@@ -1512,7 +1694,7 @@ void traverse(int[][] graph, int s, LinkedList&lt;Integer&gt; path) {
 }
 </code></pre></div></div>
 
-<h5 id="最小生成树-kruskal-算法">最小生成树 Kruskal 算法</h5>
+<h5 id="kruskal-最小生成树算法">Kruskal 最小生成树算法</h5>
 
 <blockquote>
   <p>经典算法，学有余力可以掌握一下</p>
@@ -1523,7 +1705,7 @@ void traverse(int[][] graph, int s, LinkedList&lt;Integer&gt; path) {
 <p><a href="https://visualgo.net/zh/mst">最小生成树（MST）</a>：权重和最小的生成树。都用了贪心思想。<a href="https://leetcode.cn/problems/min-cost-to-connect-all-points/">1584.连接所有点的最小费用</a>【】</p>
 
 <ol>
-  <li><code class="highlighter-rouge">Kruskal</code> 克鲁斯卡尔算法：用到了贪心思想，使权重和尽可能小。对所有边按照权重从小到大排序，从权重最小的边开始，选择合适的边加入 <code class="highlighter-rouge">mst</code> 集合；如果边的两端点不属于同一集合，则合并，直到所有的点都属于同一个集合为止。用并查集算法来保证生成树不含环且不是森林：
+  <li><code class="highlighter-rouge">Kruskal</code> 克鲁斯卡尔算法：用到了贪心思想，使权重和尽可能小。对所有边按照权重从小到大排序，从权重最小的边开始，选择合适的边加入 <code class="highlighter-rouge">mst</code> 集合；如果边的两端点不属于同一集合，则合并，直到所有的点都属于同一个集合为止。实就是 <strong>Union Find 算法</strong> + 排序。用并查集算法来保证生成树不含环且不是森林：
     <ol>
       <li>如果一条边的两个节点是连通的，则会出现环；</li>
       <li>如果最后的连通分量总数大于 1，则说明是「森林」。</li>
@@ -1533,7 +1715,7 @@ void traverse(int[][] graph, int s, LinkedList&lt;Integer&gt; path) {
   <li><code class="highlighter-rouge">Prim</code> 普瑞姆算法：核心是切分定理（将图分为两个不重叠且非空的节点集合），每次都把权重最小的「横切边」拿出来，直到把构成最小生成树的所有边都切出来为止。用 BFS 算法思想 和 <code class="highlighter-rouge">visited</code> 布尔数组避免成环。</li>
 </ol>
 
-<h5 id="最短路径-dijkstra-算法">最短路径 Dijkstra 算法</h5>
+<h5 id="dijkstra-最短路径算法">Dijkstra 最短路径算法</h5>
 
 <blockquote>
   <p>经典算法，学有余力可以掌握一下</p>
@@ -1541,7 +1723,7 @@ void traverse(int[][] graph, int s, LinkedList&lt;Integer&gt; path) {
 
 <p>简单图（有向无向皆可）的最短路径 <code class="highlighter-rouge">Dijkstra</code> 迪杰斯特拉算法：注意是长度而不是具体的路径。是 BFS 算法的加强版，都是从二叉树的层序遍历衍生出来。</p>
 
-<h5 id="经典题目-1">经典题目</h5>
+<h5 id="经典题目-2">经典题目</h5>
 
 <ul>
   <li>看到依赖问题 ==&gt; 首先想到的就是把问题转化成「有向图」</li>
@@ -1551,7 +1733,7 @@ void traverse(int[][] graph, int s, LinkedList&lt;Integer&gt; path) {
 
 <ul>
   <li>
-    <p>有向图的环检测、循环依赖判断：<a href="https://leetcode.cn/problems/course-schedule/">207.课程表 选修依赖先修</a>【】、<a href="https://labuladong.github.io/algo/2/20/49/">二分图判定算法</a>，常用邻接表，DFS 算法遍历图的框架 + <code class="highlighter-rouge">visited</code> 数组</p>
+    <p>有向图的<strong>环检测</strong>、循环依赖判断：<a href="https://leetcode.cn/problems/course-schedule/">207.课程表 选修依赖先修</a>【】、<a href="https://labuladong.github.io/algo/2/20/49/">二分图判定算法</a>，常用邻接表，DFS 算法遍历图的框架 + <code class="highlighter-rouge">visited</code> 数组</p>
 
     <ul>
       <li>DFS 实现</li>
@@ -1580,7 +1762,14 @@ void traverse(int[][] graph, int s, LinkedList&lt;Integer&gt; path) {
     </ul>
   </li>
   <li>
-    <p>二分图的判定、图论的双色问题：二分图的顶点集可分割为两个互不相交的子集，图中每条边依附的两个顶点都分属于这两个子集，且两个子集内的顶点不相邻。</p>
+    <p><strong>二分图的判定</strong>、图论的双色问题：二分图的顶点集可分割为两个互不相交的子集，图中每条边依附的两个顶点都分属于这两个子集，且两个子集内的顶点不相邻。</p>
+  </li>
+  <li>
+    <p>Union Find 算法：<code class="highlighter-rouge">Kruskal</code> 克鲁斯卡尔算法，最小生成树。</p>
+
+    <ul>
+      <li>使用并查集操作联通分量。</li>
+    </ul>
   </li>
 </ul>
 
@@ -1653,7 +1842,16 @@ void traverse(int[][] graph, int s, LinkedList&lt;Integer&gt; path) {
 
 <h3 id="时间空间复杂度">时间、空间复杂度</h3>
 
-<p>O(1)、O(n)、O(lgN)</p>
+<blockquote>
+  <p>分析算法复杂度时，分析的是最坏情况的复杂度。</p>
+</blockquote>
+
+<p>O(1)、O(n)、O(lgN)。</p>
+
+<ul>
+  <li>时间复杂度用来衡量一个算法的执行效率，</li>
+  <li>空间复杂度用来衡量算法的内存消耗。</li>
+</ul>
 
 <h3 id="排序">排序</h3>
 
@@ -2494,6 +2692,8 @@ int binarySearch(int[] nums, int target) {
 
 <h5 id="递归">递归</h5>
 
+<p>所有递归算法的本质上都是<a href="#前序/中序/后序遍历">二叉树的遍历</a>。</p>
+
 <p>递归 VS 迭代：都是循环中的一种。</p>
 
 <ul>
@@ -2574,12 +2774,14 @@ int dp(string&amp; ring, int i, string&amp; key, int j) {
 
 <p>核心思想：如何聪明地<strong>穷举求最值</strong>。本质上是穷举「状态」，做「选择」找最优解。</p>
 
+<p>动态规划的暴力穷举解法一般是递归形式，优化方法非常固定，要么是添加备忘录，要么是改写成迭代形式。</p>
+
 <h5 id="动态规划三要素">动态规划三要素</h5>
 
 <ol>
-  <li>重复子问题：在计算的过程中，有一些问题会重复计算，必须记住结果；若没有重复子问题，可用「分治法」求解。</li>
+  <li><strong>重复子问题</strong>：在计算的过程中，有一些问题会重复计算，必须记住结果；若没有重复子问题，可用「分治法」求解。</li>
   <li>最优子结构：子问题间必须互相独立、可同时最优，不能互相影响。如要总分最高，则子问题为语文、数学等分别最高。如果语文、数学成绩互相制约、影响，不能同时达到最高，子问题并不独立，无法同时最优。</li>
-  <li>状态转移方程：
+  <li><strong>状态转移方程</strong>（暴力解）：
     <ol>
       <li>明确 <strong>base case</strong>：直接从<del>最底下、</del>最简单、问题规模最小<del>、已知结果的</del>，开始往上推，直到想要的答案。如 <code class="highlighter-rouge">f(1)</code> 和 <code class="highlighter-rouge">f(2) </code> 推出 <code class="highlighter-rouge">f(20)</code>。</li>
       <li>明确<strong>状态</strong>：记录解决问题到了哪一步，通常是原问题和子问题中随自变量变化的（题目中的）因变量，状态一般作为 <code class="highlighter-rouge">dp</code> 数组的下标/key ；如目标金额 <code class="highlighter-rouge">n</code>。</li>
@@ -2686,7 +2888,7 @@ int dp(string&amp; ring, int i, string&amp; key, int j) {
     <ul>
       <li>先对集合求和，得出 <code class="highlighter-rouge">sum</code>，把问题转化为<strong>背包问题</strong>：背包容量为 <code class="highlighter-rouge">sum / 2</code> 和 <code class="highlighter-rouge">N</code> 个物品，每个物品的重量为 <code class="highlighter-rouge">nums[i]</code>。</li>
       <li><code class="highlighter-rouge">dp</code> 数组的定义：<code class="highlighter-rouge">dp[i][j] = x</code> 表示，对于前 <code class="highlighter-rouge">i</code> 个物品，当前背包的容量为 <code class="highlighter-rouge">j</code> 时，若 <code class="highlighter-rouge">x</code> 为 <code class="highlighter-rouge">true</code>，则说明可恰好将背包装满，若 <code class="highlighter-rouge">x</code> 为 <code class="highlighter-rouge">false</code>，则说明不能恰好将背包装满。</li>
-      <li><a href="https://labuladong.github.io/article/wx.html?wx=RXfnhSpVBmVneQjDSUSAVQ">0-1 背包问题</a>：每个物体只有两种可能的状态（取与不取），对应二进制中的 0 和 1【】</li>
+      <li><a href="https://labuladong.github.io/article/wx.html?wx=RXfnhSpVBmVneQjDSUSAVQ">0-1 背包问题</a>：每个物体只有两种可能的状态（取与不取），对应二进制中的 0 和 1【重要】</li>
       <li>
         <p><a href="https://leetcode.cn/problems/maximum-bags-with-full-capacity-of-rocks/">2279.装满石头的背包的最大数量</a>【】</p>
 
@@ -2789,6 +2991,12 @@ int coinChange(int[] coins, int amount) {
 
 <h3 id="bfs-框架">BFS 框架</h3>
 
+<p>BFS 也是一种暴力穷举算法，必须掌握。本质就是二叉树的层序遍历，适合解决最短路径问题。</p>
+
+<h5 id="为什么常用-bfs-寻找最短路径">为什么常用 BFS 寻找最短路径？</h5>
+
+<h5 id="为什么常用-dfs-寻找所有路径">为什么常用 DFS 寻找所有路径？</h5>
+
 <h5 id="广度优先搜索常见场景">广度优先搜索常见场景</h5>
 
 <ul>
@@ -2856,7 +3064,7 @@ int BFSTree(Node start, Node target) {
 
 <ul>
   <li>
-    <p>回溯算法：实际上就是<strong>多叉决策树</strong>的 DFS 遍历，关键是在前序和后序位置做一些操作。本质是：走不通就回头。</p>
+    <p>回溯算法：实际上就是<strong>多叉决策树</strong>的 DFS 遍历，关键是在前序和后序位置做一些操作。本质是：走不通就回头。回溯算法是一种纯粹的暴力穷举算法，<strong>必须掌握</strong>。</p>
   </li>
   <li>
     <p>DFS 算法：本质上是一种<strong>暴力穷举算法</strong>，为图论中的概念。回溯算法是在遍历树枝，DFS 算法是在遍历节点。</p>
@@ -2872,7 +3080,7 @@ int BFSTree(Node start, Node target) {
       <li>二叉查找树（BST）；</li>
     </ul>
   </li>
-  <li>排列组合；</li>
+  <li>秒杀所有排列/组合/子集问题；</li>
   <li>找出图或树中符合题目要求的全部方案；
     <ul>
       <li>图中（有向无向皆可）的符合某种特征（如最长）的路径及长度；</li>
@@ -2893,6 +3101,14 @@ int BFSTree(Node start, Node target) {
 <p><img src="assets/排列树.jpeg" alt="img" style="zoom: 25%;" /><img src="assets/full_permute.jpg" alt="img" style="zoom: 25%;" /></p>
 
 <ul>
+  <li>
+    <p>元素可重不可复选【】，即 <code class="highlighter-rouge">nums</code> 中的元素可以存在重复，每个元素最多只能被使用一次。</p>
+
+    <p>以组合为例，如果输入 <code class="highlighter-rouge">nums = [2,5,2,1,2]</code>，和为 7 的组合应该有两种 <code class="highlighter-rouge">[2,2,2,1]</code> 和 <code class="highlighter-rouge">[5,2]</code>。</p>
+  </li>
+  <li>
+    <p>元素无重可复选【】，即 <code class="highlighter-rouge">nums</code> 中的元素都是唯一的，每个元素可以被使用若干次。以组合为例，如果输入 nums = [2,3,6,7]，和为 7 的组合应该有两种 [2,2,3] 和 [7]。</p>
+  </li>
   <li>
     <p><a href="https://labuladong.github.io/algo/4/29/105/">组合/子集问题</a></p>
 
@@ -2916,6 +3132,18 @@ int BFSTree(Node start, Node target) {
       <li><a href="https://leetcode.cn/problems/max-area-of-island/">695.岛屿的最大面积</a>【】</li>
     </ul>
   </li>
+</ul>
+
+<h5 id="回溯算法经典例题">回溯算法经典例题</h5>
+
+<ul>
+  <li><a href="https://leetcode.cn/problems/numbers-with-same-consecutive-differences/">967.连续差相同的数字</a>【】</li>
+  <li><a href="https://leetcode.cn/problems/non-decreasing-subsequences/">491.递增子序列</a>【】</li>
+  <li><a href="https://leetcode.cn/problems/unique-paths-iii/">980.不同路径 III</a>【】</li>
+  <li><a href="https://leetcode.cn/problems/palindrome-partitioning/">131.分割回文串</a>【】</li>
+  <li><a href="https://leetcode.cn/problems/restore-ip-addresses/">93.复原 IP 地址</a>【】</li>
+  <li><a href="https://leetcode.cn/problems/letter-combinations-of-a-phone-number/">17.电话号码的字母组合</a>【】</li>
+  <li><a href="https://leetcode.cn/problems/word-search/">79.单词搜索</a>【】</li>
 </ul>
 
 <h5 id="回溯算法框架">回溯算法框架</h5>
@@ -3020,7 +3248,7 @@ private void backtrack(int[] nums, 路径track, 选择列表) {
 
 <h3 id="缓存淘汰算法">缓存淘汰算法</h3>
 
-<h4 id="lru-算法">LRU 算法</h4>
+<h4 id="手撸lru-算法">手撸LRU 算法</h4>
 
 <p>Least Recently Used，按访问顺序、优先删除最久未使用的数据。</p>
 
@@ -3040,7 +3268,7 @@ private void backtrack(int[] nums, 路径track, 选择列表) {
 
 <p><img src="assets/linked_hashmap.jpg" alt="img" style="zoom: 35%;" /><img src="assets/90896.gif" alt="img" style="zoom:43%;" /></p>
 
-<h4 id="lfu-算法">LFU 算法</h4>
+<h4 id="手撸-lfu-算法">手撸 LFU 算法</h4>
 
 <p>按访问频率来淘汰，用一个 <code class="highlighter-rouge">HashMap</code> 存储访问频率。</p>
 

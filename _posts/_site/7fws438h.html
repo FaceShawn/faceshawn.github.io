@@ -8,125 +8,44 @@
 
 <p>[TOC]</p>
 
-<h2 id="uml-类图和时序图">UML 类图和时序图</h2>
+<h2 id="数据库基础">数据库基础</h2>
 
-<h4 id="uml-统一建模语言">UML 统一建模语言</h4>
+<h3 id="什么是数据库-数据库管理系统-数据库系统">什么是数据库, 数据库管理系统, 数据库系统?</h3>
 
-<blockquote>
-  <p>可视化的、面向对象的、软件开发的工业标准。</p>
-</blockquote>
-
-<p>在 UML 系统开发中有三个主要模型：</p>
-
-<ol>
-  <li>功能模型：从用户的角度展示系统的功能，包括用例图。</li>
-  <li>对象模型：采用对象，属性，操作，关联等概念展示系统的结构和基础，包括类别图、对象图。</li>
-  <li>动态模型：展现系统的内部行为。包括序列图，活动图，状态图。</li>
-</ol>
-
-<h4 id="类间关系与-uml-图例">类间关系与 UML 图例</h4>
-
-<p><img src="assets/uml_class_struct.jpg" alt="_images/uml_class_struct.jpg" style="zoom:65%;" /></p>
-
-<ol>
-  <li><code class="highlighter-rouge">&lt;&lt;abstract&gt;&gt;</code>：抽象类</li>
-  <li>继承关系为 <code class="highlighter-rouge">is-a</code>，eg：自行车是车、猫是动物。</li>
-  <li>实现关系：带空心箭头的虚线。eg：车为抽象概念（接口），在现实中无法直接用来定义对象，只有指明具体的子类（汽车or自行车），才可用来定义对象。表现为继承抽象类。</li>
-  <li>泛化关系：带空心箭头的实线。eg：汽车与SUV。表现为继承非抽象类。</li>
-  <li><strong>聚合关系</strong>：带空心菱形箭头的实线。eg：学生与班级。
-    <ol>
-      <li>组合关系：带实心菱形箭头的实线。是一种强依赖的特殊聚合关系，如果整体不存在了，则部分也不存在了。eg：轮胎、发动机组成小汽车。</li>
-    </ol>
-  </li>
-  <li>关联关系：实线。 通常与运行状态无关，用来定义不同类的对象间静态的、天然的、由常识等因素决定的结构；是一种强关联的关系。默认不强调方向，表示对象间相互知道，箭头表示A知道指向的对象B。通常是以<strong>成员变量</strong>的形式实现。eg：乘车人和车票、学生和身份证。</li>
-  <li>依赖关系：带箭头的虚线。描述对象在运行期间会用到另一个对象的关系；是一种临时性的关系，通常在运行期间产生，随运行变化； 双向依赖是一种非常糟糕的结构，应保持单向依赖。eg：学生依赖于指向的自行车。
-    <ul>
-      <li>体现为构造方法及方法的传入参数，箭头指向被调用者；“使用”对方的方法和属性。</li>
-    </ul>
-  </li>
-</ol>
-
-<h4 id="时序图">时序图</h4>
+<p><strong>数据库系统</strong>（Data Base System，简称 <strong>DBS</strong>）：通常由软件、数据库和数据管理员组成。</p>
 
 <ul>
-  <li>在需求分析阶段，如果与系统交互的 User 超过一类并且相关的 UseCase 超过 5 个，使用<strong>用例图</strong>来表达更加清晰的结构化需求。</li>
-  <li>如果某个业务对象的<strong>状态</strong>超过 3 个，使用状态图来表达并且明确状态变化的各个触发条件。
+  <li><strong>数据库</strong>（DataBase 简称 DB）：就是信息的集合、或者说数据库是由数据库管理系统管理的<strong>数据的集合</strong>。</li>
+  <li><strong>数据库管理系统</strong>（Database Management System 简称 <strong>DBMS</strong>）：是一种<strong>操纵和管理</strong>数据库的大型软件，通常用于建立、使用和<strong>维护</strong>数据库。</li>
+  <li><strong>数据库管理员</strong>（Database Administrator, 简称 <strong>DBA</strong>）：负责全面管理和控制数据库系统。</li>
+</ul>
+
+<p>数据库系统基本构成如下图所示：</p>
+
+<p><img src="assets/e21120184e63406526a4e873cacd23f2.png" alt="" style="zoom: 50%;" /></p>
+
+<h3 id="sql-关系型数据库">SQL 关系型数据库</h3>
+
+<h5 id="sql-关系型数据库和nosql-非关系型数据库的区别">SQL 关系型数据库和NoSQL 非关系型数据库的区别</h5>
+
+<ul>
+  <li><strong>SQL 关系型数据库</strong>：建立在<strong>关系模型</strong>的基础上的数据库。
     <ul>
-      <li>说明：状态图的核心是对象状态，首先明确对象有多少种状态，然后明确两两状态之间是否存在直接转换关系，再明确触发状态转换的条件是什么。</li>
-      <li>正例：淘宝订单状态有已下单、待付款、已发货等。比如已下单与已收货这两种状态之间是不可能有直接转换关系的。</li>
+      <li>关系模型表明了数据库中所存储的数据之间的联系（一对一、一对多、多对多）。</li>
+      <li>由多张能互相连接的表组成。数据都被存放在了各种表中（比如用户表），表中的每一行就存放着一条数据（比如一个用户的信息）。</li>
+      <li>主要用于执行<strong>规模小而读写频繁</strong>，或大批量 极少写<del>访问</del>的事务。</li>
+      <li>借助于集合、代数等数学概念和方法处理数据。</li>
     </ul>
   </li>
-  <li>如果系统中某个功能的调用链路上的涉及对象超过 3 个，使用<strong>时序图</strong>来表达并且明确各调用环节的输入与输出。</li>
-  <li>如果系统中模型类超过 5 个，且存在复杂的依赖关系，使用<strong>类图</strong>来表达并且明确类之间的关系。
+  <li><strong>NoSQL 非关系型数据库</strong>：
     <ul>
-      <li>说明：类图像建筑领域的施工图，如果搭平房，可能不需要，但如果建造蚂蚁 Z 空间大楼，肯定需要详细的施工图。</li>
-    </ul>
-  </li>
-  <li>如果系统中超过 2 个对象之间存在协作关系，并需要表示复杂的处理流程，使用<strong>活动图</strong>来表示。
-    <ul>
-      <li>说明：活动图是流程图的扩展，增加了能够体现协作关系的对象泳道，支持表示并发等。</li>
+      <li>关系数据库在一些数据敏感的应用中读写性能较差，如为<strong>海量文档</strong>创建索引、高流量网站的网页服务，及发送流式媒体，故采用 <strong>NoSQL</strong>；</li>
+      <li>优点：<strong>高效读写海量数据</strong>，支持<strong>高并发</strong>；支持 <code class="highlighter-rouge">key-value</code>、文档、图片等形式，可用硬盘或随机存储器作为载体，不支持SQL；</li>
     </ul>
   </li>
 </ul>
 
-<p>时序图：显示对象间交互与协作关系，清晰立体地反映系统的调用纵深链路。按时间顺序排列。</p>
-
-<p>顺序图：显示参与交互的对象及其对象间消息交互的顺序。</p>
-
-<p>包括的建模元素主要有：</p>
-
-<ol>
-  <li>系统角色（Actor）：可是人、其他的系统或子系统。</li>
-  <li>对象（Object）：三种命名方式：对象名和类名、只显示类名表示匿名对象、只显示对象名。</li>
-  <li>生命线（Lifeline）：表示为从对象图标向下延伸的虚线，表示对象存在的时间。</li>
-  <li>控制焦点（Focus of control）：表示时间段的符号，在这个时间段内对象将执行相应的操作。用小矩形表示。</li>
-  <li>消息（Message）：一般分为：
-    <ol>
-      <li>同步消息=调用消息（Synchronous Message）：消息发送者把控制传递给消息的接收者，<strong>然后停止活动</strong>，等待消息的接收者放弃或返回控制。用来表示同步的意义。</li>
-      <li>异步消息（Asynchronous Message）：消息发送者通过消息把信号传递给消息的接收者，<strong>然后继续</strong>自己的活动，不等待接受者返回消息或控制。接收者和发送者是并发工作的。</li>
-      <li>返回消息（Return Message）：表示从过程调用返回。</li>
-      <li>自关联消息（Self-Message）：  表示方法的自身调用及同对象内的方法调用另一个方法。</li>
-    </ol>
-  </li>
-</ol>
-
-<h2 id="数据库入门">数据库入门</h2>
-
-<ul>
-  <li>DBMS：数据库管理系统</li>
-</ul>
-
-<h3 id="分类">分类</h3>
-
-<ul>
-  <li>关系型数据库：建立在关系模型的基础上，借助于集合、代数等数学概念和方法处理数据。由多张能互相连接的表组成。主要用于执行<strong>规模小而读写频繁</strong>，或大批量极少写<del>访问</del>的事务。
-    <ol>
-      <li>商用数据库，如：Oracle，SQL Server，DB2 等；</li>
-      <li>开源数据库，如：
-        <ol>
-          <li><strong>MySQL Community Server</strong> (GPL) 社区版：主要用于业务数据存储；</li>
-          <li>MariaDB 分支：开源社区用来规避 MySQL 闭源的风险，大部分跟 MySQL 5.5 以前的版本使用差不多；</li>
-          <li>PostgreSQL 等；</li>
-        </ol>
-      </li>
-      <li>桌面数据库，如：微软 Access，适合桌面应用程序使用；</li>
-      <li>嵌入式数据库，如：Sqlite，适合手机应用和桌面程序。</li>
-    </ol>
-  </li>
-  <li>
-    <p>NoSQL 非关系型数据库：关系数据库在一些数据敏感的应用中读写性能较差，如为海量文档创建索引、高流量网站的网页服务，及发送流式媒体，故采用 <strong>NoSQL</strong>；优点：高效读写海量数据，支持高并发；支持 <code class="highlighter-rouge">key-value</code>、文档、图片等形式，可用硬盘或随机存储器作为载体，不支持SQL；包括：</p>
-
-    <ol>
-      <li><strong>Redis</strong>：Key-value；RAM 存储；缓存数据存储；</li>
-      <li><strong>MongoDB</strong>：Nodejs 在 Mongoose 包的帮助下 JSON 的数据格式直接插入；用户行为分析数据存储；</li>
-      <li><strong>ElasticSearch</strong>：搜索数据存储；</li>
-      <li>Apache Cassandra（Facebook 使用、高度可扩展）、Dynamo；</li>
-      <li>MemcacheDB 和 HBase 等。</li>
-    </ol>
-  </li>
-</ul>
-
-<h3 id="数据模型">数据模型</h3>
+<h5 id="数据模型">数据模型</h5>
 
 <p>数据库按照数据结构来组织、存储和管理数据，共有三种模型：</p>
 
@@ -136,37 +55,83 @@
   <li><strong>关系模型</strong>：表明数据库中存储数据间一对一、一对多、多对多的联系，如表格。</li>
 </ol>
 
-<h3 id="主键">主键</h3>
+<h5 id="分类">分类</h5>
 
 <ul>
-  <li>元组：表中的一行/一条记录；</li>
-  <li>码：数据表中关系的某个或某几个属性的组合，用于区分每条记录；
+  <li><strong>SQL 关系型数据库</strong>：
+    <ol>
+      <li>商用数据库，如：<code class="highlighter-rouge">Oracle</code>，<code class="highlighter-rouge">SQL Server</code>，DB2 等；</li>
+      <li>开源数据库，如：
+        <ol>
+          <li><strong><code class="highlighter-rouge">MySQL</code> Community Server</strong> (GPL) 社区版：主要用于业务数据存储；</li>
+          <li>MariaDB 分支：开源社区用来规避 MySQL 闭源的风险，大部分跟 MySQL 5.5 以前的版本使用差不多；</li>
+          <li>PostgreSQL 等；</li>
+        </ol>
+      </li>
+      <li>桌面数据库，如：微软 <code class="highlighter-rouge">Access</code>，适合桌面应用程序使用；</li>
+      <li>嵌入式数据库，如：<code class="highlighter-rouge">SQLite</code>（如微信本地的聊天记录的存储），适合手机应用和桌面程序。</li>
+    </ol>
+  </li>
+  <li><strong>NoSQL 非关系型数据库</strong>：
+    <ol>
+      <li><strong>Redis</strong>：Key-value；RAM 存储；缓存数据存储；</li>
+      <li><strong>ElasticSearch</strong>：搜索数据存储；</li>
+      <li><strong>MongoDB</strong>：Nodejs 在 Mongoose 包的帮助下 JSON 的数据格式直接插入；用户行为分析数据存储；</li>
+      <li>Apache Cassandra（Facebook 使用、高度可扩展）、Dynamo；</li>
+      <li>MemcacheDB 和 HBase 等。
+        <h3 id="元组-码-候选码-主码-外码-主属性-非主属性">元组, 码, 候选码, 主码, 外码, 主属性, 非主属性</h3>
+      </li>
+    </ol>
+  </li>
+  <li><strong>元组</strong>：表中的一行/一条记录；</li>
+  <li><strong>码</strong>：码就是能唯一标识实体的某个或<strong>某几个</strong>属性的组合，用于区分每条记录，<del>对应表中的列</del>；
     <ul>
-      <li>候选码：能唯一标识一条记录的最小属性（列）集和；可被选为主码的属性或属性组；</li>
+      <li><strong>候选码</strong>：能唯一标识一条记录的最小属性集和；<del>可被选为主码的属性或属性组；</del></li>
     </ul>
   </li>
-  <li>主属性：候选码属性的并集；
+  <li><strong>主键（主码） <code class="highlighter-rouge">id</code></strong>：用于唯一标识一条记录的<strong>某个</strong>属性，一个表只能有一个主键。不可重复、不可空。主码是从候选码中选出来的。 一个实体集中只能有一个主码，但可以有多个候选码。<code class="highlighter-rouge">unique + not null</code>。</li>
+  <li><strong>外键（外码）</strong>：用来和其他表建立联系，是<strong>另一个表</strong>的主键，一个表可有多个外键。可重复、可为空。</li>
+  <li><strong>主属性</strong>：所有候选码属性的<strong>并集</strong>；
     <ul>
-      <li>非主属性：相对于主属性来说，不包含在候选码中的属性。</li>
+      <li><strong>非主属性</strong>：相对于主属性来说，不包含在任何一个候选码中的属性。</li>
     </ul>
   </li>
-  <li>主键 <code class="highlighter-rouge">id</code>：用于唯一标识一条记录的某个属性，不可重复、不可空，一个表只能有一个主键。<code class="highlighter-rouge">unique + not null</code>；基本原则：选取完全业务无关的字段，不可用身份证号、手机号、邮箱地址等（看上去唯一但可能会更改）。可用作 <code class="highlighter-rouge">id</code> 字段的类型有：
-    <ul>
-      <li>自增整数类型：INT 上限约21亿，BIGINT约922亿亿。</li>
-      <li>全局唯一GUID字符串类型：GUID算法通过网卡MAC地址、时间戳和随机数保证任意计算机在任意时间生成的字符串都是不同的。</li>
-    </ul>
-  </li>
-  <li>外键：用来和其他表建立联系，是另一表的主键，可重复、可为空。一个表可有多个外键。当表越来越多，关系越来越复杂时，一般在<strong>设计数据库</strong>时通过外键来标注表与表间的关系；但在数据库中往往不使用外键，而是通过逻辑来关联。</li>
 </ul>
 
-<p><strong>不用外键与级联更新</strong>，一切外键概念必须在应用层解决：</p>
-
-<p>如：学生表中的 student_id 是主键，那么成绩表中的 student_id 则为外键。如果更新学生表中的 student_id，同时触发成绩表中的 student_id 更新，即为<strong>级联更新</strong>。</p>
+<p><strong>主码 id 选取的基本原则</strong>：选取完全业务无关的字段，不可用身份证号、手机号、邮箱地址等（看上去唯一但可能会更改）。可用作 <code class="highlighter-rouge">id</code> 字段的类型有：</p>
 
 <ol>
-  <li>适用于单机低并发，不适合分布式、高并发集群；对分库分表不友好，分库分表下外键无法生效；</li>
-  <li>级联更新是强阻塞，存在数据库更新风暴的风险；</li>
-  <li>外键影响数据库的插入速度；增加了复杂性： 每次做DELETE 或UPDATE都必须考虑外键约束，需额外维护；</li>
+  <li>自增整数类型：INT 上限约21亿，BIGINT约922亿亿。</li>
+  <li>全局唯一GUID字符串类型：GUID算法通过网卡MAC地址、时间戳和随机数保证任意计算机在任意时间生成的字符串都是不同的。</li>
+</ol>
+
+<h3 id="主键和外键有什么区别">主键和外键有什么区别?</h3>
+
+<h3 id="不用外键与级联更新">不用外键与级联更新</h3>
+
+<p>一切外键概念必须在应用层解决：</p>
+
+<ul>
+  <li>当表越来越多，关系越来越复杂时，一般在<strong>设计数据库</strong>时通过外键来标注表与表间的关系；</li>
+  <li>但在数据库中往往不使用外键，而是通过<strong>逻辑</strong>来关联。</li>
+</ul>
+
+<p><strong>级联更新</strong>：更新当前表的主键时、会触发其它表的对应外键更新。</p>
+
+<ul>
+  <li>如：学生表中的 student_id 是主键，那么成绩表中的 student_id 则为外键。</li>
+  <li>如果更新学生表中的 student_id，同时触发成绩表中的 student_id 更新，即为级联更新。</li>
+</ul>
+
+<p>为什么不要用外键呢？</p>
+
+<ol>
+  <li>增加了<strong>复杂性</strong>： 每次做DELETE 或UPDATE都必须考虑外键约束，需额外维护；<strong>增加了额外工作</strong>： 去检查，来保证数据的的一致性和正确性，消耗资源；</li>
+  <li>外键影响数据库的<strong>插入速度</strong>；</li>
+  <li>外键的<strong>主从关系</strong>是定的，假如那天需求有变化，数据库中的这个字段根本不需要和其他表有关联的话就会增加很多麻烦。</li>
+  <li>级联更新是<strong>强阻塞</strong>，存在数据库<strong>更新风暴</strong>的风险；</li>
+  <li>适用于单机<strong>低并发</strong>，不适合分布式、高并发集群；</li>
+  <li>对<strong>分库分表</strong>不友好，分库分表下外键无法生效；</li>
 </ol>
 
 <h3 id="数据库范式">数据库范式</h3>
@@ -174,15 +139,24 @@
 <h5 id="函数依赖">函数依赖</h5>
 
 <ol>
-  <li><strong>函数依赖</strong> ：若在一张表中，在属性（或属性组）X 的值确定的情况下，必定能确定属性 Y 的值，那么就可说 <code class="highlighter-rouge">Y</code> 函数依赖于 <code class="highlighter-rouge">X</code>，写作 <code class="highlighter-rouge">X → Y</code>。</li>
+  <li><strong>函数依赖</strong> ：若在一张表中，在属性（或属性组）X 的值确定的情况下，必定能确定属性 Y 的值，那么就可说 <code class="highlighter-rouge">Y</code> 函数<strong>依赖于</strong> <code class="highlighter-rouge">X</code>，写作 <code class="highlighter-rouge">X → Y</code>。</li>
   <li><strong>部分函数依赖</strong> ：如果 <code class="highlighter-rouge">X→Y</code>，且存在 X 的一个真子集 X0（部分关键字），使得 <code class="highlighter-rouge">X0→Y</code>，则称 <code class="highlighter-rouge">Y</code> 对 <code class="highlighter-rouge">X</code> 部分函数依赖。
     <ul>
       <li>如学生基本信息表 R关系（学号，身份证号，姓名）中，（学号，身份证号）-&gt;（姓名），（学号）-&gt;（姓名），（身份证号）-&gt;（姓名）；</li>
       <li>姓名部分函数依赖于（学号，身份证号）；</li>
     </ul>
   </li>
-  <li><strong>完全函数依赖</strong>：在一个关系中，某个非主属性数据项依赖于<strong>全部关键字</strong>。不同班级学生编号可能相同，在 R 关系中，（班级，学生编号）-&gt;（姓名），但（学生编号）-&gt;（姓名）不成立，（班级）-&gt;（姓名）不成立，姓名完全函数依赖于（班级，学生编号）；</li>
-  <li><strong>传递函数依赖</strong> ： 某个字段依赖于主键，而有其他字段依赖于该字段。会导致数据冗余和异常。如，在关系 R（学号 , 姓名, 系名，系主任）中，学号 → 系名，系名 → 系主任，非主属性系主任对于学号有传递函数依赖。</li>
+  <li><strong>完全函数依赖</strong>：在一个关系中，某个非主属性数据项依赖于<strong>全部关键字</strong>。
+    <ul>
+      <li>不同班级学生编号可能相同，在 R 关系中，（班级，学生编号）-&gt;（姓名），但（学生编号）-&gt;（姓名）不成立，（班级）-&gt;（姓名）不成立，姓名<strong>完全函数依赖于</strong>（班级，学生编号）；</li>
+    </ul>
+  </li>
+  <li><strong>传递函数依赖</strong> ： 某个字段依赖于主键，而有其他字段依赖于该字段。会导致数据冗余和异常。
+    <ul>
+      <li>在关系模式 R(U)中，设 X，Y，Z 是 U 的不同的属性子集，如果 <strong>X 确定 Y</strong>、Y 确定 Z，且有 X 不包含 Y，Y 不确定 X，（X∪Y）∩Z=空集合</li>
+      <li>如，在关系 R（学号 , 姓名, 系名，系主任）中，学号 → 系名，系名 → 系主任，<strong>非主属性</strong>系主任对于学号有传递函数依赖。</li>
+    </ul>
+  </li>
 </ol>
 
 <h5 id="范式">范式</h5>
@@ -190,9 +164,19 @@
 <p>用于规范建表，划分字段。</p>
 
 <ol>
-  <li><code class="highlighter-rouge">1NF</code>（第一范式）：对属性的原子性约束，要求属性（表中的字段）不可再分（为其他字段）。是所有关系型数据库的最基本要求，即创建的表一定满足第一范式。</li>
-  <li><code class="highlighter-rouge">2NF</code>（第二范式）：对记录的惟一性约束，要求主键可以唯一标识记录。在 <code class="highlighter-rouge">1NF</code> 基础上，消除了非主属性对于<strong>码</strong>的<strong>部分函数依赖</strong>，非主属性都依赖于<strong>主键</strong>。</li>
-  <li><code class="highlighter-rouge">3NF</code>（第三范式）：对字段冗余性的约束，要求字段没有冗余，即任何字段不能由其他字段派生出来。在 <code class="highlighter-rouge">2NF</code> 基础上，消除了非主属性对于<strong>码</strong>的<strong>传递函数依赖</strong>（任何非主属性不依赖于其它非主属性）。基本上解决了数据冗余，插入异常，修改异常，删除异常的问题。</li>
+  <li><code class="highlighter-rouge">1NF</code>（第一范式）：对属性的原子性约束，要求属性（表中的字段）<strong>不可再分</strong>（为其他字段）。是所有关系型数据库的最基本要求，即创建的表一定满足第一范式。</li>
+  <li><code class="highlighter-rouge">2NF</code>（第二范式）：对记录的惟一性约束，要求<strong>主键</strong>可以唯一标识记录。
+    <ul>
+      <li>在 <code class="highlighter-rouge">1NF</code> 基础上，消除了非主属性对于码的<strong>部分函数依赖</strong>，非主属性都依赖于<strong>主键</strong>。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">3NF</code>（第三范式）：对<strong>字段冗余性</strong>的约束，要求字段没有冗余，即任何字段不能由其他字段派生出来。
+    <ul>
+      <li>在 <code class="highlighter-rouge">2NF</code> 基础上，消除了非主属性对于码的<strong>传递函数依赖</strong>（任何非主属性不依赖于其它非主属性）。</li>
+      <li>基本上解决了数据冗余，插入异常，修改异常，删除异常的问题。</li>
+      <li>比如在关系 R(学号 , 姓名, 系名，系主任)中，学号 → 系名，系名 → 系主任，所以存在非主属性系主任对于学号的传递函数依赖，所以该表的设计，不符合 3NF 的要求。</li>
+    </ul>
+  </li>
   <li><code class="highlighter-rouge">BCNF</code>：主属性内部不能有<strong>部分或传递依赖</strong>。</li>
 </ol>
 
@@ -205,84 +189,103 @@
 <h5 id="设计步骤">设计步骤</h5>
 
 <ol>
-  <li>需求分析 : 包括数据、功能和性能需求。根据功能模块划分实体（往往指现实世界中一个完整单位），实体间的关系，各实体的属性、可选唯一标识属性（主键）、数据存储特点/生命周期（是否常用，分库分表，永久存储，定期归档，定期清空等）。</li>
-  <li>概要设计 : 主要用 E-R 模型进行设计，如用 Visio 画 <code class="highlighter-rouge">E-R</code> 图。</li>
-  <li>逻辑设计/详细设计 : 通过将 E-R 图转换成表，实现从 E-R 模型到关系模型的转换，并应用三大范式优化。</li>
-  <li>物理结构设计 : 为设计的数据库选择合适的存储结构和存取路径，做具体的技术选型。</li>
-  <li>数据库实现 : 包括 SQL 编程（创建数据库表）、测试和试运行。</li>
-  <li>数据库的运行和维护 : log 日志，根据新需求进行建表、索引优化、大表拆分。</li>
+  <li><strong>需求分析</strong> : 包括数据、功能和性能需求。根据功能模块划分实体（往往指现实世界中一个完整单位），实体间的关系，各实体的属性、可选唯一标识属性（主键）、数据存储特点/生命周期（是否常用，分库分表，永久存储，定期归档，定期清空等）。</li>
+  <li><strong>概要设计</strong> : 主要用 E-R 模型进行设计，如用 Visio 画 <code class="highlighter-rouge">E-R</code> 图。</li>
+  <li><strong>逻辑设计/详细设计</strong> : 通过将 E-R 图转换成表，实现从 E-R 模型到关系模型的转换，并应用三大范式优化。</li>
+  <li><strong>物理结构设计</strong> : 为设计的数据库选择合适的存储结构和存取路径，做具体的技术选型。</li>
+  <li>数据库<strong>实现</strong> : 包括 SQL 编程（创建数据库表）、测试和试运行。</li>
+  <li>数据库的<strong>运行和维护</strong> : log 日志，根据新需求进行建表、索引优化、大表拆分。</li>
 </ol>
 
 <h5 id="e-r-图">E-R 图</h5>
 
-<p>E-R 图 / 实体-联系图：表示实体类型、属性和联系。</p>
+<p>E-R 图 / 实体-联系图：提供了表示<strong>实体类型、属性和联系</strong>的方法，用来描述现实世界的概念模型。 它是描述现实世界<strong>关系概念模型</strong>的有效方法。 是表示概念关系模型的一种方式。</p>
 
 <ul>
   <li>实体：矩形；</li>
   <li>属性： <u>唯一标识属性（主键）</u>、派生属性、可选属性、联系属性；</li>
-  <li>关系：1:1，1:N，M:N；</li>
+  <li>关系：1:1，1:N，M:N；
+    <ul>
+      <li>每个学生可以选若干门课程，同一门课程也可以被若干人选择，所以它们之间的关系是多对多（M: N）</li>
+    </ul>
+  </li>
   <li>元组、候选码、主码、域；</li>
   <li>多值属性：</li>
 </ul>
 
 <p>E-R 图中的冲突有三种：属性冲突、命名冲突、结构冲突。</p>
 
-<p><img src="assets/E-R图示例.png" style="zoom: 67%;" /></p>
+<p><img src="assets/E-R图示例.png" style="zoom: 80%;" /></p>
 
-<p>数据库实际的关系模型：</p>
+<p>转换为数据库实际的<strong>关系模型</strong>：</p>
 
-<p><img src="assets/数据库实际的关系模型.png" alt="关系模型" style="zoom: 90%;" /></p>
+<p><img src="assets/数据库实际的关系模型.png" alt="关系模型" style="zoom: 100%;" /></p>
 
-<p>UML 类图</p>
+<h5 id="uml-类图">UML 类图</h5>
 
 <blockquote>
-  <p>见设计模式。</p>
+  <p>见面向对象。</p>
 </blockquote>
+
+<h3 id="存储过程">存储过程</h3>
+
+<p>存储过程：是一组为了完成特定功能的 SQL 语句集合，中间加了逻辑控制语句。更偏向于业务逻辑。</p>
+
+<ul>
+  <li>优点：
+    <ul>
+      <li>在业务比较复杂时非常实用，如一个操作需写一大串 SQL 语句，存储过程方便下一次的调用。</li>
+      <li>存储过程一旦调试完成通过后就能稳定运行；</li>
+      <li>比单纯 SQL 语句执行要快，因为存储过程是预编译过的。</li>
+    </ul>
+  </li>
+  <li>缺点：存储过程难以调试和扩展，没有移植性，消耗数据库资源。禁止使用。</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CREATE PROCEDURE &lt;过程名&gt; ( [过程参数[,…] ] ) &lt;过程体&gt;
+[过程参数[,…] ] 格式
+[ IN | OUT | INOUT ] &lt;参数名&gt; &lt;类型&gt;
+</code></pre></div></div>
 
 <h2 id="mysql">MySQL</h2>
 
-<p>是一种关系型数据库：用于持久化存储系统中的数据，建立在关系模型的基础上。</p>
+<p>是一种关系型数据库，主要用于<strong>持久化存储</strong>系统中的数据，建立在<strong>关系模型</strong>的基础上。</p>
+
+<p>MySQL 的默认端口号是 <strong>3306</strong>。</p>
 
 <h3 id="优势">优势</h3>
 
 <ol>
   <li><strong>开源</strong>。</li>
   <li>用 C 和 C++ 编写，并用了多种编译器进行测试，保证源代码的<strong>可移植性</strong>。</li>
-  <li><strong>跨平台</strong>：支持 Windows、Linux、Mac OS、Solaris 等操作系统。SQL Server 只支持 Windows。</li>
-  <li>为多种<strong>编程语言</strong>提供了API，包括 C、C++、C#、Java、PHP、Python、Ruby 等。</li>
-  <li>支持<strong>多语言编码</strong>，如中文的 GB 2312、BIG5、日文的 Shift JIS 等都可用作数据表名和列名。</li>
+  <li><strong>跨平台</strong>：支持 Windows、Linux、Mac OS 等操作系统。SQL Server 只支持 Windows。</li>
+  <li>为多种<strong>编程语言</strong>提供了API，包括 C、C++、C#、<code class="highlighter-rouge">Java</code>、PHP、Python、Ruby 等。</li>
+  <li>支持<strong>多语言编码</strong>，如中文的 <code class="highlighter-rouge">GB2312</code>、BIG5、日文的 Shift JIS 等都可用作数据表名和列名。</li>
   <li>支持<strong>多线程</strong>，充分利用 CPU资源，支持多用户。</li>
-  <li>基于 C/S 模式的 DBMS。既能作为单独的应用程序在 C/S 网络环境中运行，也能作为程序库嵌入其他软件。
+  <li>基于 <strong>C/S 模式</strong>的 DBMS。既能作为单独的应用程序在 C/S 网络环境中运行，也能作为程序库嵌入其他软件。
     <ul>
       <li>另一类是基于共享文件系统的 DBMS，如 Microsoft Access 和 FileMaker，主要用于桌面用途，不适合高端或更关键的应用。</li>
     </ul>
   </li>
   <li>提供 TCP/IP、ODBC 和 JDBC 等多种<strong>数据库连接</strong>途径。</li>
-  <li>提供用于管理、检查、优化<strong>数据库操作的管理工具</strong>。
-    <ol>
-      <li>MyCli，默认；</li>
-      <li>Navicat、MySQL Workbench 图形客户端；</li>
-      <li>phpMyAdmin；</li>
-    </ol>
-  </li>
-  <li>优化的<strong>SQL</strong>查询算法，有效地提高查询速度。</li>
-  <li>可处理拥有上千万条记录的大型数据库。</li>
+  <li>提供用于管理、检查、优化数据库操作的<strong>管理工具</strong>。如默认 MyCli，Navicat、MySQL Workbench 图形客户端；phpMyAdmin。</li>
+  <li>优化的<strong>SQL</strong>查询算法，有效地提高查询速度。可处理拥有上千万条记录的大型数据库。</li>
 </ol>
 
 <h3 id="安装">安装</h3>
 
 <h5 id="版本号">版本号</h5>
 
-<p>MySQL 的命名机制由 3 个数字和 1 个后缀组成，如 <code class="highlighter-rouge">mysql-5.7.20</code>：</p>
+<p>MySQL 的命名机制由 3 个数字和 1 个后缀组成，如 <code class="highlighter-rouge">mysql-5.7.21</code>：</p>
 
 <blockquote>
   <p>源自Github 上面的<a href="http://semver.org/lang/zh-CN/">语义化版本标准</a></p>
 </blockquote>
 
 <ol>
-  <li>第 1 个数字 <code class="highlighter-rouge">5</code> 是主版本号：用于描述文件的格式，所有版本 5 的发行版都有相同的文件夹格式。表示做了不兼容的 API 修改。</li>
-  <li>第 2 个数字 <code class="highlighter-rouge">7</code> 是发行级别：表示做了向下兼容的功能性新增；+ 主版本号组合 = 发行序列号，描述了稳定的特征集。</li>
-  <li>第 3 个数字 <code class="highlighter-rouge">20</code> 是在此发行系列的版本号：随每次新发行的版本递增。表示做了向下兼容的问题修正。通常选择已发行的最新版本。</li>
+  <li>第 1 个数字 <code class="highlighter-rouge">5</code> 是<strong>主版本号</strong>：用于描述文件的格式，所有版本 5 的发行版都有相同的文件夹格式。表示做了不兼容的 API 修改。</li>
+  <li>第 2 个数字 <code class="highlighter-rouge">7</code> 是<strong>发行级别</strong>：表示做了向下兼容的<strong>功能性新增</strong>；+ 主版本号组合 = 发行序列号，描述了稳定的特征集。</li>
+  <li>第 3 个数字 <code class="highlighter-rouge">20</code> 是在此发行系列的版本号：随每次新发行的版本递增。表示做了向下兼容的<strong>问题修正</strong>。通常选择已发行的最新版本。</li>
 </ol>
 
 <h5 id="使用">使用</h5>
@@ -313,23 +316,23 @@ mysqld start/stop/restatr/status
 <p>二者表示的含义不同，在不同编码中，字符和字节的对应关系不同。</p>
 
 <ol>
-  <li><code class="highlighter-rouge">ASCII</code> 字符集和编码：用 7 bits 位表示一个字符，共 128 个字符，包括控制字符、英文大小写字符、阿拉伯数字、英文标点符号等；
+  <li><code class="highlighter-rouge">ASCII</code> 字符集和编码：用 7 bits 位表示一个字符，<strong>共 128 个字符</strong>，包括控制字符、英文大小写字符、阿拉伯数字、英文标点符号等；
     <ol>
       <li><code class="highlighter-rouge">ASCII</code> 扩展字符集用 8 bits 位表示一个字符，共 256 个字符；一个英文字符占 1Byte；</li>
-      <li>缺点：只支持英文和部分西欧语言，不支持其他语言；</li>
+      <li>缺点：只支持英文和部分西欧语言，不支持其他语言。</li>
     </ol>
   </li>
-  <li><code class="highlighter-rouge">GB2312</code> 字符集和编码：一个英文字符占 1Byte，和 <code class="highlighter-rouge">ASCII</code> 码相同；非英字符（如中文）占 2Byte。涵盖了绝大部分常用汉字，不支持部分生僻字和繁体字。
+  <li><code class="highlighter-rouge">GB2312</code> 字符集和编码：一个英文字符占 1Byte，和 <code class="highlighter-rouge">ASCII</code> 码相同；非英字符（如中文）占 <strong>2Byte</strong>。涵盖了绝大部分常用汉字，不支持部分生僻字和繁体字。
     <ol>
       <li><code class="highlighter-rouge">GBK</code>：兼容并扩展 <code class="highlighter-rouge">GB2312</code> 字符集；</li>
-      <li>缺点：各地区的本地编码方案（如 GB2312）互相不兼容，容易出现乱码；</li>
+      <li>缺点：各地区的本地编码方案（如 GB2312）互相不兼容，容易出现乱码。</li>
     </ol>
   </li>
-  <li><code class="highlighter-rouge">BIG5</code> 字符集&amp;编码：支持港澳台繁体中文；</li>
+  <li><code class="highlighter-rouge">BIG5</code> 字符集&amp;编码：支持港澳台<strong>繁体</strong>中文。</li>
   <li><code class="highlighter-rouge">Unicode</code> 字符集和 <code class="highlighter-rouge">UTF</code> 编码：包含了世界上几乎所有已知字符。
     <ol>
-      <li><code class="highlighter-rouge">UTF-8</code> 字符编码方案：是一种针对 <code class="highlighter-rouge">Unicode</code> 的可变长度字符编码（定长码），也是一种前缀码，可用来表示 <code class="highlighter-rouge">Unicode</code> 标准中的任何字符，且其编码中的第一个字节仍与 <code class="highlighter-rouge">ASCII</code> 兼容；用 <code class="highlighter-rouge">1-4 </code>个字节为每个字符编码；目前使用最广，所有互联网协议都支持；</li>
-      <li><code class="highlighter-rouge">UTF-16</code> 字符编码方案：一个英文字母字符或一个汉字字符存储都需 2 个字节（Unicode 扩展区的一些汉字存储需 4 个字节）；</li>
+      <li><code class="highlighter-rouge">UTF-8</code> <strong>字符编码方案</strong>：是一种针对 <code class="highlighter-rouge">Unicode</code> 的<strong>可变长度</strong>字符编码（定长码），也是一种前缀码，可用来表示 <code class="highlighter-rouge">Unicode</code> 标准中的任何字符，且其编码中的<strong>第一个字节</strong>仍与 <code class="highlighter-rouge">ASCII</code> 兼容；用 <code class="highlighter-rouge">1-4 </code>个字节为每个字符编码；目前使用最广，所有互联网协议都支持；</li>
+      <li><code class="highlighter-rouge">UTF-16</code> 字符编码方案：一个英文字母字符或一个汉字字符存储都需 <strong>2 个字节</strong>（Unicode 扩展区的一些汉字存储需 4 个字节）；</li>
       <li><code class="highlighter-rouge">UTF-32</code> 字符编码方案：任何字符的存储都需 4 个字节。</li>
     </ol>
   </li>
@@ -338,39 +341,224 @@ mysqld start/stop/restatr/status
 <p>MySQL 字符集中有两套 <code class="highlighter-rouge">UTF-8</code> 编码的实现：</p>
 
 <ol>
-  <li><strong><code class="highlighter-rouge">utf8</code></strong> ： 只支持<code class="highlighter-rouge">1-3</code>个字节 ；一个英文字符占 1Byte，和 <code class="highlighter-rouge">ASCII</code> 码相同；一个中文字符占 3Byte；</li>
-  <li><strong><code class="highlighter-rouge">utf8mb4</code></strong> ： UTF-8 的完整实现，可存储 <code class="highlighter-rouge">emoji</code> 符号、较复杂的文字、繁体字，占 <code class="highlighter-rouge">4</code> 个字节。</li>
+  <li><strong><code class="highlighter-rouge">utf8</code></strong> ： 只支持<code class="highlighter-rouge">1-3</code>个字节 ；一个英文字符占 <code class="highlighter-rouge">1Byte</code>，和 <code class="highlighter-rouge">ASCII</code> 码相同；一个中文字符占 <strong><code class="highlighter-rouge">3Byte</code></strong>；</li>
+  <li><strong><code class="highlighter-rouge">utf8mb4</code></strong> ： UTF-8 的完整实现，可存储 <code class="highlighter-rouge">emoji</code> 符号、较复杂的文字、繁体字，占 <strong><code class="highlighter-rouge">4</code> 个字节</strong>。</li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT LENGTH("轻松工作"); -- 返回为 12
-SELECT CHARACTER_LENGTH("轻松工作"); -- 返回为 4
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT LENGTH("轻松工作");            -- 返回为 12 位
+SELECT CHARACTER_LENGTH("轻松工作");  -- 返回为 4 字节
 </code></pre></div></div>
 
 <h3 id="数据类型">数据类型</h3>
 
-<p>MySQL 数据类型及对应的 Java 包装类、JDBC 类型。</p>
+<h5 id="mysql-数据类型及对应的-java-包装类jdbc-类型">MySQL 数据类型、及对应的 Java 包装类、JDBC 类型</h5>
 
-<p><img src="assets/java_mysql_jdbc_datatype.png" alt="img" style="zoom:80%;" /></p>
+<blockquote>
+  <p>注意：类型应为大写，暂用小写便于记忆；大于显示宽度也可插入。</p>
+</blockquote>
 
-<p>注意：类型应为大写，暂用小写便于记忆；大于显示宽度也可插入。</p>
+<p><img src="assets/java_mysql_jdbc_datatype.png" alt="img" style="zoom:90%;" /></p>
 
-<p>数据类型及主要用法（字段类型选择原则）：</p>
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th>MySQL数据类型</th>
+      <th>Java包装类</th>
+      <th>JDBC类型</th>
+      <th>占用空间</th>
+      <th>范围</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>整型</td>
+      <td><code class="highlighter-rouge">tinyint</code></td>
+      <td><code class="highlighter-rouge">Byte</code></td>
+      <td>TINYINT</td>
+      <td>1 Byte</td>
+      <td>0 ~ 255</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td><strong><code class="highlighter-rouge">smallint</code></strong></td>
+      <td><code class="highlighter-rouge">Short</code></td>
+      <td>SMALLINT</td>
+      <td>2 Byte</td>
+      <td>0 ~ 65535</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td><strong><code class="highlighter-rouge">mediumint</code></strong></td>
+      <td><code class="highlighter-rouge">Integer</code></td>
+      <td>INTEGER</td>
+      <td>3 Byte</td>
+      <td>0 ~ 1677w</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td><code class="highlighter-rouge">int/integer</code></td>
+      <td><code class="highlighter-rouge">Integer</code></td>
+      <td>INTEGER</td>
+      <td>4 Byte</td>
+      <td>0 ~ 42亿</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td><code class="highlighter-rouge">bigint</code></td>
+      <td><code class="highlighter-rouge">Long</code></td>
+      <td>BIGINT</td>
+      <td>8 Byte</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>浮点型</td>
+      <td><code class="highlighter-rouge">float(M, D)</code></td>
+      <td><code class="highlighter-rouge">Float</code></td>
+      <td><strong>REAL</strong></td>
+      <td>4 Byte</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td><code class="highlighter-rouge">double(M, D)</code></td>
+      <td><code class="highlighter-rouge">Double</code></td>
+      <td>DOUBLE</td>
+      <td>8 Byte</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>定点数</td>
+      <td><code class="highlighter-rouge">decimal(M, D)</code></td>
+      <td><code class="highlighter-rouge">BigDecimal</code></td>
+      <td>DECIMAL</td>
+      <td>由定义的宽度决定</td>
+      <td>每 4 字节可存储 9 位数字</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td><code class="highlighter-rouge">numberic</code></td>
+      <td><code class="highlighter-rouge">BigDecimal</code></td>
+      <td>DECIMAL</td>
+      <td>由定义的宽度决定</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>字符串</td>
+      <td><code class="highlighter-rouge">char(M)</code></td>
+      <td><code class="highlighter-rouge">String</code></td>
+      <td>CHAR</td>
+      <td>固定长度，1 &lt;= M &lt;= 255</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td><code class="highlighter-rouge">varchar(N)</code></td>
+      <td><code class="highlighter-rouge">String</code></td>
+      <td>VARCHAR</td>
+      <td>可变长度</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td><strong><code class="highlighter-rouge">tinytext</code></strong></td>
+      <td><code class="highlighter-rouge">String</code></td>
+      <td><strong>VARCHAR</strong></td>
+      <td>可变长度</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td><code class="highlighter-rouge">text</code></td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td><code class="highlighter-rouge">blob</code></td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td><code class="highlighter-rouge">binary</code></td>
+      <td> </td>
+      <td>BINARY</td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>日期时间</td>
+      <td><code class="highlighter-rouge">date</code></td>
+      <td><code class="highlighter-rouge">Date</code></td>
+      <td>DATE</td>
+      <td> </td>
+      <td>YYYY-MM-DD</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td><code class="highlighter-rouge">year</code></td>
+      <td><code class="highlighter-rouge">Date</code></td>
+      <td><strong>DATE</strong></td>
+      <td> </td>
+      <td>YYYY</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td><code class="highlighter-rouge">time</code></td>
+      <td><code class="highlighter-rouge">Date</code></td>
+      <td>TIME</td>
+      <td> </td>
+      <td>HH:MM:SS</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td><code class="highlighter-rouge">datetime</code></td>
+      <td><code class="highlighter-rouge">Date</code></td>
+      <td><strong>TIMESTAMP</strong></td>
+      <td>8 Byte</td>
+      <td>YYYY-MM-DD HH:MM:SS</td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td><code class="highlighter-rouge">timestamp</code></td>
+      <td><code class="highlighter-rouge">Date</code></td>
+      <td>TIMESTAMP</td>
+      <td>4 Byte</td>
+      <td>YYYY-MM-DD HH:MM:SS？</td>
+    </tr>
+  </tbody>
+</table>
+
+<h5 id="四大类数据类型及主要用法">四大类数据类型及主要用法：</h5>
+
+<blockquote>
+  <p>字段类型选择原则</p>
+</blockquote>
 
 <ol>
   <li>
-    <p>数值类型：可用 <code class="highlighter-rouge">UNSIGNED</code> 修饰；</p>
+    <p><strong>数值类型</strong>：可用 <code class="highlighter-rouge">UNSIGNED</code> 修饰；</p>
 
     <ol>
-      <li>整型
+      <li>整型：
         <ol>
-          <li><code class="highlighter-rouge">tinyint unsigned</code>（1 Byte）：0 ~ 255，可表示 Bool；</li>
-          <li><code class="highlighter-rouge">smallint</code>（2 Byte）：0 ~ 65535；</li>
-          <li><code class="highlighter-rouge">mediumint</code>（3 Byte）：0 ~ 1677w；对应 Java 中的 <code class="highlighter-rouge">Integer</code> 类型；</li>
-          <li><code class="highlighter-rouge">int/integer</code>（4 Byte）/<code class="highlighter-rouge">int(M位数)</code>：0 ~ 42亿；</li>
-          <li><code class="highlighter-rouge">bigint</code>（8 Byte）：对应 Java 中的 <code class="highlighter-rouge">Long</code> 类型，否则可能会 Integer 溢出。如 <code class="highlighter-rouge">id unsigned bigint not null auto_increment, primary key (id)</code>。</li>
+          <li><code class="highlighter-rouge">tinyint unsigned</code>（1 Byte）：0 ~ 255；对应 Java 中的 <code class="highlighter-rouge">Byte</code> 类型；可表示 bool；</li>
+          <li><strong><code class="highlighter-rouge">smallint</code></strong>（2 Byte）：0 ~ 65535；            对应 Java 中的 <code class="highlighter-rouge">Short</code> 类型；</li>
+          <li><code class="highlighter-rouge">mediumint</code>（3 Byte）：0 ~ 1677w；          对应 Java 中的 <code class="highlighter-rouge">Integer</code> 类型；</li>
+          <li><code class="highlighter-rouge">int/integer</code>（4 Byte）/<code class="highlighter-rouge">int(M位数)</code>：0 ~ 42亿；对应 Java 中的 <code class="highlighter-rouge">Integer</code> 类型；</li>
+          <li><code class="highlighter-rouge">bigint</code>（8 Byte）：对应 Java 中的 <code class="highlighter-rouge">Long</code> 类型，否则可能会 Integer 溢出。
+            <ul>
+              <li>如 <code class="highlighter-rouge">id unsigned bigint not null auto_increment, primary key (id)</code>。</li>
+            </ul>
+          </li>
         </ol>
       </li>
-      <li>浮点型：可用<code class="highlighter-rouge">(精度M, 标度D)</code>，分别表示（总位数/显示宽度，小数位数）。注意浮点数相减和比较运算时易出问题。
+      <li>浮点型：可用<code class="highlighter-rouge">(精度M, 标度D)</code>，分别表示（总位数/显示宽度，<strong>小数位数</strong>）。注意浮点数相减和比较运算时易出误差问题。
         <ol>
           <li><code class="highlighter-rouge">float(M, D小数位数)</code>：比较粗略但开销相对较少，常用浮点型；对应 JDBC 中的<code class="highlighter-rouge">real</code>（4 Byte）；</li>
           <li><code class="highlighter-rouge">double(M, D)</code>（8 Byte）</li>
@@ -378,33 +566,35 @@ SELECT CHARACTER_LENGTH("轻松工作"); -- 返回为 4
       </li>
       <li>定点数
         <ul>
-          <li><code class="highlighter-rouge">decimal(M, D小数位数)</code>：优点是不存在<strong>舍入误差</strong>，值和计算都是精确的。不同于浮点数的四舍五入，实际上是以字符串的形式存放；用于对精度要求较高时，如金额、货币、科学数据；占用空间由定义的宽度决定，每 4 个字节可存储 9 位数字，且小数点占用1 Byte。</li>
+          <li><code class="highlighter-rouge">decimal(M, D小数位数)</code>：优点是不存在<strong>舍入误差</strong>，值和计算都是精确的。不同于浮点数的四舍五入，实际上是以<strong>字符串</strong>的形式存放；用于<strong>对精度要求较高</strong>时，如金额、货币、科学数据；占用空间由定义的宽度决定，每 4 个字节可存储 9 位数字，且<strong>小数点</strong>占用1 Byte。</li>
           <li><code class="highlighter-rouge">numeric</code></li>
         </ul>
       </li>
     </ol>
   </li>
-  <li>字符串类型：电话号码、信用卡号含非数字字符（空格和短划线），及避免丢失开头的 <code class="highlighter-rouge">0</code>，不能存为数值类型。对应 Java 中的 String，length() 返回的是 char（占 2Byte ）的数量。
+  <li>
+    <p><strong>字符串类型</strong>：电话号码、信用卡号含非数字字符（空格和短划线），及避免丢失开头的 <code class="highlighter-rouge">0</code>，不能存为数值类型。对应 Java 中的 <code class="highlighter-rouge">String</code>，<code class="highlighter-rouge">length()</code> 返回的是 <code class="highlighter-rouge">char</code>（占 2Byte ）的数量。</p>
+
     <ol>
       <li><code class="highlighter-rouge">CHAR(M)</code>：固定长度，存入的数据均占 M 字节，1 &lt;= M &lt;= 255；会自动删除插入数据尾部的空格；处理速度快，但浪费空间。</li>
-      <li><del><code class="highlighter-rouge">VARCHAR(M)</code></del>：可变长度，MySql 5.0 之前的版本，指最多存储 <strong>M 个字节</strong>，1 &lt;= M &lt;= 255；</li>
-      <li><code class="highlighter-rouge">VARCHAR(N)</code>：可变长度，MySql 5.0 之后的版本，指最多存储 <strong>N 个字符（</strong>数字、字母或汉字）的数据；
+      <li><del><code class="highlighter-rouge">VARCHAR(M)</code></del>：可变长度，按照<strong>实际的长度</strong>存储；MySql 5.0 之前的版本，指最多存储 <strong>M 个字节</strong>，1 &lt;= M &lt;= 255；</li>
+      <li><code class="highlighter-rouge">VARCHAR(N)</code>：可变长度，按照<strong>实际的长度</strong>存储；MySql 5.0 之后的版本，指最多存储 <strong>N 个字符（</strong>数字、字母或汉字）的数据；
         <ol>
-          <li>MySQL 规定：一行数据的最大长度是 65535 字节，是所有列共享（相加）的，所以 VARCHAR 的最大值受此限制；<code class="highlighter-rouge">UTF-8</code> 编码中，一个英文字符占 1 Byte，中文占 3 Byte，故 1 &lt;= 字符数 N &lt;= 65535 / 3；</li>
+          <li>MySQL 规定：一行数据的最大长度是 65535 字节，是所有列共享（相加）的，所以 VARCHAR 的最大值受此限制；<code class="highlighter-rouge">UTF-8</code> 编码中，一个英文字符占 1 Byte，<strong>中文占 3 Byte</strong>，故 1 &lt;= 字符数 N &lt;= 65535 / 3；</li>
           <li>另外需 1-2 个<strong>额外字节</strong>记录/存储长度 N 的值：N &lt;= 255 时需 1 Byte（2^8）；N &gt;255 时则需 2 Byte；<code class="highlighter-rouge">varchar(255)</code> 比 <code class="highlighter-rouge">varchar(256)</code>少占用 1 个（记录 N 的额外）字节；</li>
         </ol>
       </li>
-      <li>其它文本字符串类型：
+      <li>其它文本字符串类型：text、blob、binary等
         <ol>
           <li><code class="highlighter-rouge">tinytext(255), text(65535，64k), mediumtext, longtext(4GB)</code></li>
           <li><code class="highlighter-rouge">tinyblob, blob, mediumblob, longblob</code>：避免使用</li>
-          <li><code class="highlighter-rouge">binary, varbinary</code></li>
         </ol>
       </li>
+      <li><code class="highlighter-rouge">binary, varbinary</code></li>
     </ol>
   </li>
   <li>
-    <p>日期时间类型：统一对应 Java 中的 Date 类；</p>
+    <p><strong>日期时间类型</strong>：统一对应 Java 中的 Date 类；</p>
 
     <ol>
       <li>
@@ -416,19 +606,23 @@ SELECT CHARACTER_LENGTH("轻松工作"); -- 返回为 4
       </li>
       <li><code class="highlighter-rouge">time</code>：HH:MM:SS</li>
       <li><code class="highlighter-rouge">datetime</code>（8Byte）：YYYY-MM-DD HH:MM:SS，create_time；对应 JDBC 中的 <code class="highlighter-rouge">TIMESTAMP</code>；</li>
-      <li><code class="highlighter-rouge">timestamp</code>（4Byte）：YYYY-MM-DD HH:MM:SS；用于需记录时区的 create_time；
+      <li><code class="highlighter-rouge">timestamp</code>（4Byte）：YYYY-MM-DD HH:MM:SS；用于需记录时区的 create_time；</li>
+    </ol>
+
+    <ul>
+      <li>时间？数据： <code class="highlighter-rouge">int(timestamp) &gt; datetime &gt; char &gt; varchar</code>。
         <ul>
-          <li>时间？数据： <code class="highlighter-rouge">int(timestamp) &gt; datetime &gt; char &gt; varchar</code>。用 int 存储时间取值范围为 <code class="highlighter-rouge">1970-01-01 00:00:01 ~ 2038-01-19-03:14:07</code>，超出范围的用 <code class="highlighter-rouge">DATETIME</code>，还需转换为时间，若访存频繁则用 datetime。</li>
+          <li>用 int 存储时间取值范围为 <code class="highlighter-rouge">1970-01-01 00:00:01 ~ 2038-01-19-03:14:07</code>，超出范围的用 <code class="highlighter-rouge">DATETIME</code>，还需转换为时间，若<strong>访存频繁</strong>则用 datetime。</li>
         </ul>
 
-        <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 用于需记录时区的 create_time
-INSERT INTO time_zone_test(date_time, time_stamp) VALUES(NOW(), NOW());
+        <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> # 用于需记录时区的 create_time
+ INSERT INTO time_zone_test(date_time, time_stamp) VALUES(NOW(), NOW());
 </code></pre></div>        </div>
       </li>
-    </ol>
+    </ul>
   </li>
   <li>
-    <p>其它类型</p>
+    <p><strong>其它类型</strong></p>
 
     <ol>
       <li><code class="highlighter-rouge">enum(‘v1’, ...)</code>：最多 65535 个元素；从多个值中取一个时用 ENUM；避免使用；</li>
@@ -443,15 +637,17 @@ INSERT INTO tab VALUES ('man', 'man');
   </li>
 </ol>
 
-<p>char VS varchar：</p>
+<h5 id="char-vs-varchar"><code class="highlighter-rouge">char VS varchar</code></h5>
+
+<p>字符字段类型的选择原则：</p>
 
 <ol>
-  <li>一般 <code class="highlighter-rouge">&lt;</code> 50个字节时用 char （除了个别很少用到的字段，也可用 varchar 来节省空间）；</li>
-  <li>对于 MyISAM 存储引擎，最好用固定长度的数据列（CHAR ）。可使整个表静态化，从而使数据检索更快，用空间换时间；</li>
-  <li>对于 <strong>InnoDB 存储引擎</strong>，最好用可变长度的数据列（VARCHAR）。InnoDB 数据表的存储格式不分固定长度和可变长度，因此用 CHAR 不一定比用 VARCHAR 更好，但由于 VARCHAR 是按照实际的长度存储，更节省空间，对磁盘 I/O 和数据存储总量更好。</li>
+  <li>一般 <code class="highlighter-rouge">&lt;</code> 50个<strong>字节</strong>时用 <code class="highlighter-rouge">char</code> （除个别很少用到的字段，也可用 <code class="highlighter-rouge">varchar</code> 来节省空间）；</li>
+  <li>对于 <code class="highlighter-rouge">MyISAM </code>存储引擎，最好用<strong>固定长度</strong>的数据列（CHAR ）。可使整个表静态化，从而使数据<strong>检索更快</strong>，用空间换时间；</li>
+  <li>对于 <strong><code class="highlighter-rouge">InnoDB</code> 存储引擎</strong>，最好用<strong>可变长度</strong>的数据列（VARCHAR）。<code class="highlighter-rouge">InnoDB </code>数据表的存储格式不分固定长度和可变长度，因此用 CHAR 不一定比用 VARCHAR 更好，但由于 VARCHAR 是按照<strong>实际的长度</strong>存储，更<strong>节省空间</strong>，对磁盘 I/O 和数据存储总量更好。</li>
 </ol>
 
-<h3 id="sql语句">SQL语句</h3>
+<h3 id="sql-语句">SQL 语句</h3>
 
 <p>标准 SQL ：指符合国际标准的 SQL；</p>
 
@@ -460,10 +656,10 @@ INSERT INTO tab VALUES ('man', 'man');
 <h4 id="sql-语言分类">SQL 语言分类</h4>
 
 <ol>
-  <li><strong>DDL</strong>（Data Definition Language）数据库定义语言：<code class="highlighter-rouge">CREATE、ALTER、DROP</code> 等语句；主要用于定义数据库/表结构、视图、索引和触发器等对象。主要由 <code class="highlighter-rouge">DBA</code> 数据库管理员使用。</li>
-  <li><strong>DML</strong>（Data Manipulation Language）数据库操作语言：<code class="highlighter-rouge">INSERT、UPDATE、DELETE</code> 语句；用于插入、更新、删除表记录。</li>
-  <li><strong>DQL</strong>（Data Query Language）数据库查询语言：<code class="highlighter-rouge">SELECT</code> 语句；用于查询表记录，最频繁的数据库操作。</li>
-  <li><strong>DCL</strong>（Data Control Language）：数据库控制语言。主要用于控制用户的访问权限。其中：
+  <li><strong>DDL</strong>（<code class="highlighter-rouge">Data Definition Language</code>）数据库定义语言：主要用于定义数据库/数据表结构、视图、索引和触发器等对象。主要由 <code class="highlighter-rouge">DBA</code> 数据库管理员使用。<code class="highlighter-rouge">CREATE、ALTER、DROP</code> 等语句。</li>
+  <li><strong>DQL</strong>（<code class="highlighter-rouge">Data Query Language</code>）数据库查询语言：用于查询表记录，最频繁的数据库操作。<code class="highlighter-rouge">SELECT</code> 语句。</li>
+  <li><strong>DML</strong>（<code class="highlighter-rouge">Data Manipulation Language</code>）数据库操作语言：用于插入、更新、删除表记录。<code class="highlighter-rouge">INSERT、UPDATE、DELETE</code> 语句。</li>
+  <li><strong>DCL</strong>（<code class="highlighter-rouge">Data Control Language</code>）：数据库控制语言。主要用于控制用户的访问权限。其中：
     <ol>
       <li><code class="highlighter-rouge">GRANT</code>：增加用户权限；</li>
       <li><code class="highlighter-rouge">REVOKE</code>：收回用户权限；</li>
@@ -475,7 +671,7 @@ INSERT INTO tab VALUES ('man', 'man');
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-- 允许远程连接的 IP 地址，“%”表示不限制连接的 IP
 -- 123456 为用户密码
-MySQL&gt; grant all PRIVILEGES on &lt;数据库名.表名&gt; to root@'127.0.0.1/%'  identified by '123456' [WITH GRANT OPTION];
+MySQL&gt; grant all PRIVILEGES on &lt;数据库名.表名&gt; to root@'127.0.0.1/%' identified by '123456' [WITH GRANT OPTION];
 
 -- 开启MySQL的远程帐号，立即生效
 FLUSH PRIVILEGES;
@@ -483,30 +679,40 @@ FLUSH PRIVILEGES;
 
 <h4 id="ddl-数据库表结构操作">DDL 数据库/表结构操作</h4>
 
+<blockquote>
+  <p>反引号<code class="highlighter-rouge"> </code><code class="highlighter-rouge"> </code>用于区分MYSQL的保留字与普通字符、识别符，如用于表名、列名等，如 `status`；</p>
+
+  <p>单引号<code class="highlighter-rouge"> '' </code>、双引号用于字符串。</p>
+</blockquote>
+
 <h5 id="数据库操作">数据库操作</h5>
 
 <ul>
   <li>登录数据库：<code class="highlighter-rouge">mysql -uroot -proot</code></li>
   <li>创建数据库：<code class="highlighter-rouge">create database test</code></li>
   <li>查看所有数据库：<code class="highlighter-rouge">show databases</code></li>
+  <li>删除数据库：<code class="highlighter-rouge">drop database test</code></li>
   <li>使用数据库：<code class="highlighter-rouge">use test</code></li>
   <li>查看所有数据表：<code class="highlighter-rouge">show tables</code></li>
-  <li>删除数据库：<code class="highlighter-rouge">drop database test</code></li>
 </ul>
 
 <h5 id="表操作">表操作</h5>
 
 <ul>
-  <li>创建表：<code class="highlighter-rouge">create table emp(ename varchar(10),hiredate date,sal decimal(10,2),deptno int(2))  
-      create table dept(deptno int(2),deptname varchar(10))</code></li>
+  <li>创建表：<code class="highlighter-rouge">create table dept(deptno int(2),deptname varchar(10))</code></li>
   <li>查看表的定义：<code class="highlighter-rouge">desc emp</code></li>
   <li>查看表定义（详细）：<code class="highlighter-rouge">show create table emp \G</code></li>
   <li>删除表：<code class="highlighter-rouge">drop table emp</code></li>
-  <li>修改表字段：<code class="highlighter-rouge">alter table emp modify ename varchar(20)</code></li>
+  <li>修改表名：<code class="highlighter-rouge">alter table emp rename emp1</code></li>
+</ul>
+
+<p>字段：</p>
+
+<ul>
   <li>添加表字段：<code class="highlighter-rouge">alter table emp add column age int(3)</code></li>
   <li>删除表字段：<code class="highlighter-rouge">alter table emp drop column age</code></li>
+  <li>修改表字段：<code class="highlighter-rouge">alter table emp modify ename varchar(20)</code></li>
   <li>字段改名：<code class="highlighter-rouge">alter table emp change age age1 int(4)</code></li>
-  <li>修改表名：<code class="highlighter-rouge">alter table emp rename emp1</code></li>
 </ul>
 
 <h5 id="常用语句">常用语句</h5>
@@ -521,59 +727,40 @@ FLUSH PRIVILEGES;
   </li>
   <li>删除：<code class="highlighter-rouge">DROP</code> database [ <strong>IF</strong> <strong>EXISTS</strong> ] <数据库名> / table 表名;</数据库名></li>
   <li>选择：<code class="highlighter-rouge">USE</code> <数据库名>;</数据库名></li>
-  <li>修改数据库：比较麻烦，不支持直接修改，需要通过其它方式间接修改。比如先创建新库，再导出导入数据。</li>
-  <li>修改：<code class="highlighter-rouge">ALTER</code> TABLE <表名> [修改选项]：
+  <li>修改数据库：比较麻烦，不支持直接修改，需要通过其它方式<strong>间接修改</strong>。比如先创建新库，再导出导入数据。</li>
+  <li>修改：<code class="highlighter-rouge">ALTER</code> TABLE <表名> [修改选项]，修改选项有：
 </表名>    <ol>
-      <li><code class="highlighter-rouge">ADD COLUMN</code> <新列名> <类型> [约束条件] [FIRST | after <已存在的列名>]</已存在的列名></类型></新列名></li>
-      <li><code class="highlighter-rouge">CHANGE COLUMN</code> <旧列名> <新列名> <新列类型不能为空></新列类型不能为空></新列名></旧列名></li>
-      <li><code class="highlighter-rouge">ALTER COLUMN</code> <列名> { `SET DEFAULT` <默认值> | DROP DEFAULT }</默认值></列名></li>
-      <li>MODIFY COLUMN <列名> &lt;**类型**&gt;</列名></li>
-      <li><code class="highlighter-rouge">DROP COLUMN</code> <列名></列名></li>
       <li><code class="highlighter-rouge">RENAME TO</code> <新表名>，`rename table old_db.tb to new_db.tb`;</新表名></li>
-      <li>CHARACTER SET <字符集名></字符集名></li>
-      <li>COLLATE <校对规则名></校对规则名></li>
+      <li><code class="highlighter-rouge">ADD COLUMN</code> <新列名> <类型> [约束条件] [FIRST | after <已存在的列名>]</已存在的列名></类型></新列名></li>
+      <li><code class="highlighter-rouge">DROP COLUMN</code> <列名></列名></li>
+      <li><code class="highlighter-rouge">CHANGE COLUMN</code> <旧列名> <新列名> <新列类型不能为空>：不仅用于修改现有列的定义，还可以用于**重命名列**；</新列类型不能为空></新列名></旧列名></li>
+      <li><code class="highlighter-rouge">MODIFY COLUMN</code> <列名> &lt;**类型**&gt; { `SET DEFAULT` <默认值>}：修改现有列（字段）的定义，**数据类型**和约束，如默认值、是否允许 NULL 等；
+</默认值></列名>        <ul>
+          <li><code class="highlighter-rouge">ALTER TABLE employees MODIFY COLUMN salary DECIMAL(10, 2) NOT NULL;</code></li>
+        </ul>
+      </li>
+      <li><code class="highlighter-rouge">CHARACTER SET</code> <字符集名></字符集名></li>
+      <li><code class="highlighter-rouge">COLLATE</code> <校对规则名></校对规则名></li>
     </ol>
   </li>
-  <li>修改存储引擎：ALTER TABLE <表名> ENGINE=<存储引擎名>;</存储引擎名></表名></li>
+  <li>修改存储引擎：<code class="highlighter-rouge">ALTER TABLE &lt;表名&gt; ENGINE=&lt;存储引擎名&gt;;</code></li>
 </ol>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-- 如果数据库中存在user_accounts表，就从数据库中删除
-DROP TABLE IF EXISTS `user_accounts`;
-
--- 创建数据库表
-CREATE TABLE `user_accounts` (
-  `id`  int(100) unsigned NOT NULL AUTO_INCREMENT primary key,
-  `password`  varchar(32) NOT NULL DEFAULT '' COMMENT '用户密码',
-  `reset_pwd` tinyint(32) NOT NULL DEFAULT 0 COMMENT '用户类型：0-不需重置密码；1-需重置',
-  `mobile`    varchar(20)  NOT NULL DEFAULT '' COMMENT '手机',
-  `create_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-  `update_at` timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
-  -- 创建唯一索引，不允许重复
-  UNIQUE INDEX idx_user_mobile(`mobile`)
-)
-ENGINE=InnoDB DEFAULT CHARSET=utf8
-COMMENT='用户表信息';
-
-SHOW CREATE TABLE &lt;数据表名&gt;;
-desc/describe `sys_user`;
-</code></pre></div></div>
 
 <h5 id="列属性列约束">列属性/列约束</h5>
 
 <ol>
-  <li><code class="highlighter-rouge">PRIMARY KEY</code>：主键，不可空、不可重复；</li>
-  <li><code class="highlighter-rouge">UNIQUE</code>：唯一索引（唯一约束），<strong>可空</strong>、不可重复，可在多个字段定义；主键和唯一约束的创建需依靠索引，没有已建好的索引，Oracle 会自动建立唯一索引。</li>
-  <li><code class="highlighter-rouge">AUTO_INCREMENT</code>：自动增长约束，必须为索引（主键或 <code class="highlighter-rouge">unique</code>），只能用于一个字段、不可为空（<code class="highlighter-rouge">NOT NULL</code> ）；只能是整数类型，默认从1开始，通过表属性 <code class="highlighter-rouge">auto_increment = x</code> 设置起始值；</li>
-  <li><code class="highlighter-rouge">FOREIGN KEY</code>：外键约束；</li>
-  <li><code class="highlighter-rouge">DEFAULT</code> <默认值>：当前字段的默认值；</默认值></li>
   <li><code class="highlighter-rouge">NULL</code> 约束：表示当前列可为 null；
     <ul>
       <li><code class="highlighter-rouge">NOT NULL</code> 约束：在添加数据时没有指定值会报错；常搭配 <code class="highlighter-rouge">AUTO_INCREMENT</code> 用于 id 字段；</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">CHECK</code>：检查约束；</li>
+  <li><code class="highlighter-rouge">DEFAULT</code> <默认值>：当前字段的默认值；</默认值></li>
+  <li><code class="highlighter-rouge">AUTO_INCREMENT</code>：自动增长约束，必须为索引（主键或 <code class="highlighter-rouge">unique</code>），只能用于一个字段、不可为空（<code class="highlighter-rouge">NOT NULL</code> ）；只能是整数类型，默认从1开始，通过表属性 <code class="highlighter-rouge">auto_increment = x</code> 设置起始值；</li>
+  <li><code class="highlighter-rouge">PRIMARY KEY</code>：主键，不可空、不可重复；</li>
+  <li><code class="highlighter-rouge">FOREIGN KEY</code>：外键约束；</li>
   <li><code class="highlighter-rouge">COMMENT</code>：注释；</li>
-  <li>反引号<code class="highlighter-rouge"> </code><code class="highlighter-rouge"> </code>用于区分MYSQL的保留字与普通字符、识别符，如用于表名、列名等，如 `status`；单引号<code class="highlighter-rouge"> '' </code>、双引号用于字符串。</li>
+  <li><code class="highlighter-rouge">UNIQUE</code>：唯一索引（唯一约束），<strong>可空</strong>、不可重复，可在多个字段定义；主键和唯一约束的创建需依靠索引，没有已建好的索引，Oracle 会自动建立唯一索引。</li>
+  <li><code class="highlighter-rouge">CHECK</code>：检查约束；</li>
 </ol>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-- 在定义完列后直接用关键字指定约束
@@ -581,63 +768,44 @@ desc/describe `sys_user`;
 ALTER TABLE &lt;数据表名&gt; ADD CONSTRAINT &lt;约束名&gt; UNIQUE(&lt;列名&gt;);
 ALTER TABLE &lt;数据表名&gt; CHANGE COLUMN &lt;字段名&gt; &lt;数据类型&gt; DEFAULT &lt;默认值&gt;/NULL;
 ALTER TABLE &lt;表名&gt; DROP INDEX &lt;约束名&gt;;
+
+-- 如果数据库中存在user_accounts表，就从数据库中删除
+DROP TABLE IF EXISTS `user_accounts`;
+
+-- 创建数据库表
+CREATE TABLE `user_accounts` (
+  `id`        int(100) unsigned NOT NULL AUTO_INCREMENT [primary key],
+  `password`  varchar(32) 		NOT NULL DEFAULT '' COMMENT '用户密码',
+  `reset_pwd` tinyint(32) 		NOT NULL DEFAULT 0  COMMENT '用户类型：0-不需重置密码；1-需重置',
+  `mobile`    varchar(20)  		NOT NULL DEFAULT '' COMMENT '手机',
+  `create_at` timestamp(6) 		NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `update_at` timestamp(6) 		NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), -- 
+  PRIMARY KEY (`id`),
+  -- 创建唯一索引，不允许重复
+  UNIQUE INDEX idx_user_mobile(`mobile`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户表信息';
 </code></pre></div></div>
-
-<h4 id="dcl-数据控制语句">DCL 数据控制语句</h4>
-
-<ul>
-  <li>授予操作权限：<code class="highlighter-rouge">grant select,insert on test.* to 'test'@'localhost' identified by '123'</code></li>
-  <li>收回操作权限：<code class="highlighter-rouge">revoke insert on test.* from 'test'@'localhost'</code></li>
-</ul>
-
-<h5 id="字符集相关">字符集相关</h5>
-
-<ul>
-  <li>查看字符集：<code class="highlighter-rouge">show variables like 'character%'</code></li>
-  <li>创建数据库时指定字符集：<code class="highlighter-rouge">create database mall character set utf8</code></li>
-</ul>
-
-<h5 id="修改时区">修改时区</h5>
-
-<ul>
-  <li>修改mysql全局时区为北京时间，即我们所在的东8区：<code class="highlighter-rouge">set global time_zone = '+8:00';</code></li>
-  <li>修改当前会话时区：<code class="highlighter-rouge">set time_zone = '+8:00'</code></li>
-  <li>立即生效：<code class="highlighter-rouge">flush privileges</code></li>
-</ul>
-
-<h5 id="权限相关">权限相关</h5>
-
-<ul>
-  <li>授予所有数据库的所有权限：<code class="highlighter-rouge">grant all privileges on *.* to z1@localhost identified by '123'</code></li>
-  <li>授予所有数据库的所有权限(包括grant)：<code class="highlighter-rouge">grant all privileges on *.* to z1@localhost with grant option</code></li>
-  <li>授予SUPER PROCESS FILE权限：<code class="highlighter-rouge">grant super,process,file on *.* to z3@localhost</code></li>
-  <li>只授予登录权限：<code class="highlighter-rouge">grant usage on *.* to z4@localhost</code></li>
-  <li>查看账号权限：<code class="highlighter-rouge">show grants for z1@localhost</code></li>
-  <li>修改自己的密码：<code class="highlighter-rouge">set password = password('123')</code></li>
-  <li>管理员修改他人密码：<code class="highlighter-rouge">set password for 'z1'@'localhost' = password('123')</code></li>
-  <li>删除账号：<code class="highlighter-rouge">drop user z2@localhost</code></li>
-</ul>
 
 <h4 id="dql-select-和约束">DQL SELECT 和约束</h4>
 
 <p>在表查询中，一律不要使用 <code class="highlighter-rouge">*</code> 作为查询的字段列表，需要哪些字段必须明确写明。</p>
 
 <ol>
-  <li>增加查询分析器解析成本；</li>
-  <li>增减字段容易与 resultMap 配置不一致；</li>
+  <li>增加查询<strong>分析器</strong>解析成本；</li>
+  <li>增减字段容易与 <code class="highlighter-rouge">MyBatis</code> 中的 <code class="highlighter-rouge">resultMap</code> 配置不一致；</li>
   <li>无用字段增加网络消耗，尤其是 text 类型的字段；</li>
 </ol>
 
 <h5 id="投影查询">投影查询</h5>
 
 <p>只返回某些列
-SELECT 列1 别名1, 列2 别名2 FROM …</p>
+<code class="highlighter-rouge">SELECT 列1 别名1, 列2 别名2 FROM ...</code></p>
 
 <h5 id="from-子句">FROM 子句</h5>
 
 <h5 id="多表查询笛卡尔查询">多表查询/笛卡尔查询</h5>
 
-<p>每一行都两两拼在一起，行数为多表的乘积，结果集可能非常巨大</p>
+<p>每一行都两两拼在一起，行数为多表的乘积，结果集可能非常巨大。</p>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT
     s.id sid,
@@ -664,19 +832,19 @@ WHERE s.gender = 'M' AND c.id = 1;
 </code></pre></div></div>
 
 <ol>
-  <li>= 表示比较两个值是否相等，但不能用于比较NULL；
+  <li><code class="highlighter-rouge">=</code> 表示比较两个值是否相等，但不能用于比较<code class="highlighter-rouge">NULL</code>；
     <ul>
-      <li>NULL=NULL 的返回结果是 NULL，而不是 true;</li>
+      <li><code class="highlighter-rouge">NULL=NULL</code> 的返回结果是 <code class="highlighter-rouge">NULL</code>，而不是 <code class="highlighter-rouge">true</code>;</li>
     </ul>
   </li>
-  <li>&lt;=&gt; 表示安全的等于；不同于=，当比较的两个值相等或都为 NULL 时返回 true;
+  <li><code class="highlighter-rouge">&lt;=&gt; </code>表示安全的等于；不同于<code class="highlighter-rouge">=</code>，当比较的两个值相等或都为 <code class="highlighter-rouge">NULL </code>时返回 <code class="highlighter-rouge">true</code>;
     <ul>
-      <li>当一个操作数为 NULL 时，其返回值为 0 而不为 NULL;</li>
-      <li>NULL&lt;=&gt;NULL 的返回结果是 1(true);</li>
+      <li>当一个操作数为 <code class="highlighter-rouge">NULL </code>时，其返回值为 0 而不为 <code class="highlighter-rouge">NULL</code>;</li>
+      <li><code class="highlighter-rouge">NULL&lt;=&gt;NULL</code> 的返回结果是 <code class="highlighter-rouge">1(true)</code>;</li>
     </ul>
   </li>
-  <li>NULL&lt;&gt;NULL 的返回结果是 false;</li>
-  <li>NULL&lt;&gt;1 的返回结果是 true;</li>
+  <li><code class="highlighter-rouge">NULL&lt;&gt;NULL</code> 的返回结果是 <code class="highlighter-rouge">false</code>;</li>
+  <li><code class="highlighter-rouge">NULL&lt;&gt;1</code> 的返回结果是 <code class="highlighter-rouge">true</code>;</li>
 </ol>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>is [not] null，更推荐ISNULL()
@@ -689,16 +857,16 @@ is [not] ture/false/unknown：检验某个值的真假
 
 <h5 id="having-条件子句">HAVING 条件子句</h5>
 
-<p>类似where，过滤分组，对分组后/查询结果再次过滤，可用聚合函数、字段别名。</p>
+<p>类似 <code class="highlighter-rouge">where</code>，<strong>过滤分组</strong>，对分组后/查询结果再次过滤，可用<strong>聚合函数</strong>、字段别名。</p>
 
 <h5 id="排序子句">排序子句</h5>
 
-<p>ORDER BY 首选排序字段/别名 排序方式（默认升序ASC/降序DESC） [二次排序字段/别名 ,排序方式] …</p>
+<p><code class="highlighter-rouge">ORDER BY 首选排序字段/别名 排序方式（默认升序ASC/降序DESC） [二次排序字段/别名 ,排序方式] ...</code></p>
 
 <h5 id="limit-限制结果数量子句">LIMIT 限制结果数量子句</h5>
 
-<p>LIMIT <记录数> OFFSET <初始位置>
-等价于 LIMIT &lt;[初始位置,] 记录数&gt;：初始位置由0开始计数，默认为0</初始位置></记录数></p>
+<p><code class="highlighter-rouge">LIMIT &lt;记录数&gt; OFFSET &lt;初始位置&gt;</code>
+等价于 <code class="highlighter-rouge">LIMIT &lt;[初始位置,] 记录数&gt;</code>：初始位置由0开始计数，默认为0</p>
 
 <h5 id="函数">函数</h5>
 
@@ -738,77 +906,86 @@ is [not] ture/false/unknown：检验某个值的真假
 
 SELECT COUNT(*/id) 聚合列别名 FROM ...
 -- 分组聚合子句，得到N行结果&lt;class_id, num&gt;
-    SELECT COUNT(*) num 
-    FROM students 
-    GROUP BY class_id;
+    SELECT COUNT(*) num  FROM students GROUP BY class_id;
 -- 只支持分组的列，按class_id, gender分组:
-    SELECT class_id, gender, COUNT(*) num 
-    FROM students 
-    GROUP BY class_id, gender;
--- 按性别分组，拼接name，female_Lily？
-    SELECT `sex`, GROUP_CONCAT(name) 
-    FROM tb_students_info 
-    GROUP BY sex;
+    SELECT class_id,gender,COUNT(*) num  FROM students GROUP BY class_id, gender;
+
+-- 将group by产生的同一个分组中的值连接起来，返回一个字符串结果。
+-- group_concat 返回带有来自一个组的连接的非NULL值的字符串结果。组内字符串连接。
+-- 按性别分组，结果拼接name，如&lt;female, Lily,Cat&gt;
+    SELECT `sex`, GROUP_CONCAT(DISTINCT name)  FROM tb_students_info GROUP BY sex;
 
 -- DISTINCT, ALL 选项：去除重复记录
-SELECT DISTINCT name,age FROM student; -- name不同、age相同不统计？
+SELECT DISTINCT name,age FROM student; -- 统计&lt;name, age&gt;不同的结果集
 SELECT COUNT(DISTINCT name,age) FROM student;
 
--- AS 语法 用于为表或列(字段)提供临时名称(别名)。
+-- AS 语法：用于为表或列(字段)提供临时名称(别名)。
 select t1.name from table_1 as t1, table_2 as t2 where t1.id = t2.id;
 -- 为子查询结果集指定别名
 SELECT * FROM (SELECT * FROM result) AS Temp;
-
--- group_concat 返回带有来自一个组的连接的非NULL值的字符串结果。组内字符串连接。
 </code></pre></div></div>
 
 <h5 id="连接查询">连接查询</h5>
 
-<p>对多个表进行 JOIN 运算，先确定一个主表作为结果集，然后选择性地“连接”其他表的行。</p>
+<p>对多个表进行 <strong>JOIN 运算</strong>，先确定一个主表作为结果集，然后选择性地连接其他表的行。</p>
 
 <ol>
-  <li>内连接 <code class="highlighter-rouge">[INNER] JOIN ON</code>：</li>
-  <li>外连接 <code class="highlighter-rouge">OUTER JOIN</code>
+  <li><strong>内连接</strong> <code class="highlighter-rouge">[INNER] JOIN ON</code>：</li>
+  <li><strong>外连接</strong> <code class="highlighter-rouge">OUTER JOIN</code>
     <ol>
       <li><code class="highlighter-rouge">LEFT [OUTER] JOIN</code>：必须<strong>返回左边表</strong>的记录，右表可能返回 <code class="highlighter-rouge">null</code>；</li>
       <li><code class="highlighter-rouge">RIGHT [OUTER] JOIN</code></li>
       <li><code class="highlighter-rouge">FULL [OUTER] JOIN</code>：取<strong>并集</strong>，彼此没有对应的值为 null。</li>
     </ol>
   </li>
-  <li><code class="highlighter-rouge">cross join</code>：结果是笛卡尔积，就是第一个表的行数乘以第二个表的行数。</li>
+  <li><code class="highlighter-rouge">cross join</code>：结果是<strong>笛卡尔积</strong>，就是第一个表的行数乘以第二个表的行数。</li>
 </ol>
 
-<p><code class="highlighter-rouge">on 和 where</code> 条件的区别：<strong>on是 join on 的条件</strong>，先运行生成临时表，再根据 where 筛选；</p>
+<p><code class="highlighter-rouge">on 和 where</code> 条件的区别：<strong>on是 join on 的条件</strong>，先运行生成<strong>临时表</strong>，再根据 where 筛选；</p>
 
-<ol>
-  <li><code class="highlighter-rouge">on</code> 条件在<strong>生成</strong>临时表时使用，条件不为真也会返回左表中的记录。不管 on 中的条件是否为真，都会返回左边表中的记录。</li>
-  <li><code class="highlighter-rouge">where</code> 条件是在临时表<strong>生成好后</strong>，再对临时表进行<strong>过滤</strong>。这时已没有 <code class="highlighter-rouge">left join</code> 的含义（必须返回左边表的记录），条件不为真的就全部过滤掉。</li>
-</ol>
+<ul>
+  <li><code class="highlighter-rouge">on</code> 条件：在<strong>生成临时表时</strong>使用，条件不为真也会返回左表中的记录？。不管 on 中的条件是否为真，都会返回左边表中的记录。</li>
+  <li><code class="highlighter-rouge">where</code> 条件：是在临时表<strong>生成好后</strong>，再对临时表进行<strong>过滤</strong>。这时已没有 <code class="highlighter-rouge">left join</code> 的含义（必须返回左边表的记录），条件不为真的就全部过滤掉。</li>
+</ul>
 
 <p><code class="highlighter-rouge">union VS union all</code>：都用于合并两个或多个 SELECT 语句的结果集。</p>
 
-<ol>
-  <li><code class="highlighter-rouge">union</code>：取唯一值，记录没有重复；进行表连接后会筛选掉重复的记录，Union All 不去除重复记录。</li>
-  <li><code class="highlighter-rouge">union all</code>：直接连接，取到的是所有值，记录可能有重复；</li>
-</ol>
+<ul>
+  <li><code class="highlighter-rouge">union</code>：取唯一值，记录没有重复；进行表连接后会筛选掉重复的记录。</li>
+  <li><code class="highlighter-rouge">union all</code>：直接连接，取到的是所有值，记录可能有重复；Union All 不去除重复记录。</li>
+</ul>
 
 <h4 id="dml-数据操纵语句">DML 数据操纵语句</h4>
 
+<p>返回 <code class="highlighter-rouge">WHERE</code> 条件匹配的行数及操作的行数。</p>
+
 <h5 id="插入记录">插入记录</h5>
 
-<ul>
-  <li>指定名称插入：<code class="highlighter-rouge">insert into emp (ename,hiredate,sal,deptno) values ('zhangsan','2018-01-01','2000',1)</code></li>
-  <li>不指定名称插入：<code class="highlighter-rouge">insert into emp values ('lisi','2018-01-01','2000',1)</code></li>
-  <li>批量插入数据：<code class="highlighter-rouge">insert into dept values(1,'dept1'),(2,'dept2')</code></li>
-</ul>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-- 指定名称插入：
+insert into emp (ename,hiredate,sal,deptno) values ('zhangsan','2018-01-01','2000',1)
+INSERT [INTO] `user_info` name="Tom", age=21;
 
-<h5 id="修改记录">修改记录</h5>
+-- 不指定名称插入：
+insert into emp values ('lisi','2018-01-01','2000',1)
 
-<p><code class="highlighter-rouge">update emp set sal='4000',deptno=2 where ename='zhangsan'</code></p>
+-- 批量插入数据：
+insert into dept values(1,'dept1'),(2,'dept2')
+INSERT [INTO] `user_info` [name, age] VALUES ("Tom", 21), ("Jack", 13);
+
+-- 插入，如果已存在则更新
+INSERT INTO students (id, name, gender, score) VALUES (1, '小明', 'F', 99) ON DUPLICATE KEY UPDATE name='小明', gender='F', score=99;
+</code></pre></div></div>
 
 <h5 id="删除记录">删除记录</h5>
 
-<p><code class="highlighter-rouge">delete from emp where ename='zhangsan'</code></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>delete from emp where 
+DELETE FROM user_info WHERE ename='zhangsan'
+</code></pre></div></div>
+
+<h5 id="修改记录">修改记录</h5>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>UPDATE user_info SET age=22,sal='4000',score=score+10 WHEN name="Tom" and score&lt;80;
+</code></pre></div></div>
 
 <h5 id="查询记录">查询记录</h5>
 
@@ -817,27 +994,53 @@ SELECT * FROM (SELECT * FROM result) AS Temp;
   <li>查询不重复的记录：<code class="highlighter-rouge">select distinct deptno from emp</code></li>
   <li>条件查询：<code class="highlighter-rouge">select * from emp where deptno=1 and sal&lt;3000</code></li>
   <li>排序和限制：<code class="highlighter-rouge">select * from emp order by deptno desc limit 2</code></li>
-  <li>聚合(查询部门人数大于1的部门编号)：<code class="highlighter-rouge">select deptno,count(1) from emp group by deptno having count(1) &gt; 1</code></li>
+  <li><strong>聚合</strong>（查询部门人数大于1的部门编号）：<code class="highlighter-rouge">select deptno,count(1) from emp group by deptno having count(1) &gt; 1</code>？</li>
   <li>连接查询：<code class="highlighter-rouge">select * from emp e left join dept d on e.deptno=d.deptno</code></li>
-  <li>子查询：<code class="highlighter-rouge">select * from emp where deptno in (select deptno from dept)</code></li>
+  <li><strong>子查询</strong>：<code class="highlighter-rouge">select * from emp where deptno in (select deptno from dept)</code></li>
   <li>记录联合：<code class="highlighter-rouge">select deptno from emp union select deptno from dept</code></li>
 </ul>
 
-<h5 id="增删改">增删改</h5>
+<h4 id="dcl-数据控制语句">DCL 数据控制语句</h4>
 
-<p>返回 <code class="highlighter-rouge">WHERE</code> 条件匹配的行数及操作的行数。</p>
+<ul>
+  <li>授予操作权限：<code class="highlighter-rouge">grant select,insert on test.* to 'test'@'localhost' identified by '123'</code></li>
+  <li>收回操作权限：<code class="highlighter-rouge">revoke insert on test.* from 'test'@'localhost'</code></li>
+</ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>INSERT [INTO] `user_info` [name, age] VALUES ("Tom", 21), ("Jack", 13);
-INSERT [INTO] `user_info` name="Tom", age=21;
+<h5 id="字符集相关">字符集相关</h5>
 
--- 插入，如果已存在则更新
-INSERT INTO students (id, name, gender, score) VALUES (1, '小明', 'F', 99) ON DUPLICATE KEY UPDATE name='小明', gender='F', score=99;
+<ul>
+  <li>查看字符集：<code class="highlighter-rouge">show variables like 'character%'</code></li>
+  <li>创建数据库时指定字符集：<code class="highlighter-rouge">create database mall character set utf8</code></li>
+</ul>
 
-DELETE FROM user_info WHERE ...
+<h5 id="修改时区">修改时区</h5>
 
-UPDATE user_info 
-SET age=22, score=score+10 
-WHEN name="Tom" and score&lt;80;
+<ul>
+  <li>修改mysql全局时区为北京时间，即我们所在的东8区：<code class="highlighter-rouge">set global time_zone = '+8:00';</code></li>
+  <li>修改当前会话时区：<code class="highlighter-rouge">set time_zone = '+8:00'</code></li>
+  <li>立即生效：<code class="highlighter-rouge">flush privileges</code></li>
+</ul>
+
+<h5 id="权限相关">权限相关</h5>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-- 授予所有数据库的所有权限：
+grant all privileges on *.* to z1@localhost identified by '123'
+-- 授予所有数据库的所有权限（包括grant）
+grant all privileges on *.* to z1@localhost with grant option
+-- 授予`SUPER PROCESS FILE`权限
+grant super,process,file on *.* to z3@localhost
+-- 只授予登录权限
+grant usage on *.* to z4@localhost
+
+-- 查看账号权限
+show grants for z1@localhost
+-- 修改自己的密码
+set password = password('123')
+-- 管理员修改他人密码
+set password for 'z1'@'localhost' = password('123')
+-- 删除账号
+drop user z2@localhost
 </code></pre></div></div>
 
 <h4 id="dropdelete-与-truncate-区别">drop、delete 与 truncate 区别</h4>
@@ -845,23 +1048,23 @@ WHEN name="Tom" and score&lt;80;
 <ol>
   <li><strong>用处</strong>不同：
     <ol>
-      <li><code class="highlighter-rouge">drop table 表名</code>（删除表结构）： 释放表占用的空间。</li>
-      <li><code class="highlighter-rouge">truncate table 表名</code>（清空表中数据） : 用于删除表内的数据和索引，但不删除表本身。把自增值重置和索引恢复到初始大小等。</li>
-      <li><code class="highlighter-rouge">delete from 表名 where 列名=值</code>（删除某些行的数据） : 不加 where 子句同<code class="highlighter-rouge">truncate table 表名</code>。</li>
+      <li><code class="highlighter-rouge">drop table 表名</code>（删除<strong>表结构</strong>）： 释放表占用的空间。</li>
+      <li><code class="highlighter-rouge">truncate table 表名</code>（<strong>清空</strong>表中数据） : 用于删除表内的数据和索引，但不删除表本身。把自增值重置、索引恢复到初始大小，再插入数据时<strong>自增长 id</strong> 又从 1 开始。</li>
+      <li><code class="highlighter-rouge">delete from 表名 where 列名=值</code>（删除某些行的数据） : 不加 where 子句作用与<code class="highlighter-rouge">truncate table 表名</code> 类似。</li>
     </ol>
   </li>
   <li>属于不同的数据库语言，能否<strong>回滚</strong>：
     <ol>
-      <li><code class="highlighter-rouge">truncate</code> 和 <code class="highlighter-rouge">drop</code> 属于 DDL语句，原数据不放到 <code class="highlighter-rouge">rollback segment</code> 中，操作立即生效，不能回滚，操作不触发 trigger。有可能造成事故，故不建议使用。</li>
-      <li><code class="highlighter-rouge">delete</code> 是 DML 语句，操作会放到 <code class="highlighter-rouge">rollback segement</code> 中，事务提交后才生效。</li>
-      <li><code class="highlighter-rouge">DELETE</code> 删除数据后，配合事件回滚可找回数据；<code class="highlighter-rouge">TRUNCATE</code> 不支持事务的回滚，数据删除后无法找回。</li>
+      <li><code class="highlighter-rouge">drop</code>  和 <code class="highlighter-rouge">truncate</code> 属于 DDL语句，操作<strong>立即生效</strong>。不支持事务回滚，数据删除后无法找回。有可能造成事故，故不建议使用。</li>
+      <li><code class="highlighter-rouge">delete</code> 是 DML 语句，操作会放到 <code class="highlighter-rouge">rollback segement</code> 中，<strong>事务提交后</strong>才生效。配合<strong>事件回滚</strong>可找回数据。</li>
     </ol>
   </li>
-  <li><strong>执行速度</strong>不同：
-    <ul>
-      <li>一般来说：<code class="highlighter-rouge">drop &gt; truncate &gt; delete</code>。</li>
-      <li><code class="highlighter-rouge">delete</code>命令执行时会产生数据库的<code class="highlighter-rouge">binlog</code>日志，逐行一条一条删除记录，因此比<code class="highlighter-rouge">truncate</code>慢，好处是方便数据回滚恢复。</li>
-    </ul>
+  <li><strong>执行速度</strong>不同：一般来说 <code class="highlighter-rouge">drop &gt; truncate &gt; delete</code>。
+    <ol>
+      <li><code class="highlighter-rouge">drop</code>命令：会把表占用的空间<strong>全部释放</strong>掉。</li>
+      <li><code class="highlighter-rouge">truncate</code>命令：执行时不会产生数据库日志，因此比<code class="highlighter-rouge">delete</code>要快。</li>
+      <li><code class="highlighter-rouge">delete</code>命令：执行时会产生数据库的<strong><code class="highlighter-rouge">binlog</code>日志</strong>，<strong>逐行</strong>删除记录，需要消耗时间，因此比<code class="highlighter-rouge">truncate</code>慢，但是好处是方便数据回滚恢复。</li>
+    </ol>
   </li>
 </ol>
 
@@ -871,22 +1074,21 @@ WHEN name="Tom" and score&lt;80;
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-- 查找表中多余的重复记录，重复记录是根据单个字段（peopleId）来判断
 select * from people 
-where peopleId in (select peopleId 
-                   from people 
+where peopleId in (select peopleId from people 
                    group by peopleId 
                    having count(peopleId) &gt; 1)
 
 -- 删除表中多余的重复记录，重复记录是根据单个字段（peopleId）来判断，只留有rowid最小的记录
-delete from people 
-where peopleId in (select peopleId from people group by peopleId having count(peopleId) &gt; 1)
-and rowid not in (select min(rowid) from people group by peopleId having count(peopleId) &gt; 1)
+delete from people where 
+peopleId in (select peopleId from people 
+   			group by peopleId having count(peopleId) &gt; 1)
+and rowid not in (select min(rowid) from people 
+   			group by peopleId having count(peopleId) &gt; 1)
 
 -- 查找表中多余的重复记录（多个字段）
-select * from vitae a
-where (a.peopleId,a.seq) 
-in (select peopleId,seq 
-    from vitae group by peopleId,seq 
-    having count(*) &gt; 1)
+select * from vitae a where (a.peopleId,a.seq) 
+in (select peopleId,seq from vitae 
+	group by peopleId,seq having count(*) &gt; 1)
 
 -- 删除表中多余的重复记录（多个字段），只留有rowid最小的记录
 delete from vitae a
@@ -907,49 +1109,35 @@ where (a.peopleId,a.seq) in (select peopleId,seq from vitae
 
 <h4 id="删除表前1w行数据">删除表前1W行数据</h4>
 
+<p>方式有：</p>
+
 <ol>
-  <li>直接 <code class="highlighter-rouge">delete from T limit 10000</code>；
-    <ul>
-      <li>单条语句执行时间过长，会导致长事务，导致锁的时间变长、主从延迟等问题。</li>
-    </ul>
-  </li>
-  <li>在一个连接中循环执行20次 <code class="highlighter-rouge">delete from T limit 500</code>；
-    <ul>
-      <li>多个短事务串行执行，每次短暂执行就释放锁资源，相对更好一些；可优化为第3种并发执行。</li>
-    </ul>
-  </li>
-  <li><strong>在20个连接中并发（同时）执行</strong> <code class="highlighter-rouge">delete from T limit 500</code>；
-    <ul>
-      <li>20个连接并发delete且条件一样，会人为导致锁冲突；但如果能将1W条数据先查出来，分片后分配给20个连接，通过id=xxx精确删除，各连接就不会相互竞争。</li>
-    </ul>
-  </li>
+  <li>直接 <code class="highlighter-rouge">delete from T limit 10000</code>：单条语句执行时间过长，会导致长事务，导致<strong>锁的时间变长</strong>、主从延迟等问题。</li>
+  <li>在一个连接中<strong>循环执行</strong>20次 <code class="highlighter-rouge">delete from T limit 500</code>：多个短事务串行执行，每次短暂执行就释放锁资源，相对更好一些；可优化为第3种并发执行。</li>
+  <li>在20个连接中<strong>并发</strong>（同时）<strong>执行</strong> <code class="highlighter-rouge">delete from T limit 500</code>：20个连接并发delete且条件一样，会人为导致<strong>锁冲突</strong>。但如果能将1W条数据先查出来，分片后分配给20个连接，通过id=xxx精确删除，各连接就不会相互竞争。</li>
 </ol>
 
 <h3 id="高性能优化">高性能优化</h3>
 
-<h5 id="sql-优化">SQL 优化</h5>
-
-<ol>
-  <li>索引</li>
-  <li>分库分表</li>
-</ol>
-
-<h5 id="基本设计规范">基本设计规范</h5>
-
-<ul>
-  <li><a href="https://yq.aliyun.com/articles/131756">数据库设计的重要性和设计原则</a></li>
-</ul>
-
 <h5 id="数据库表字段设计规范">数据库、表、字段设计规范</h5>
 
+<blockquote>
+  <p><a href="https://yq.aliyun.com/articles/131756">数据库设计的重要性和设计原则</a></p>
+</blockquote>
+
 <ol>
-  <li>可读性原则：用下划线分隔字段等；</li>
-  <li>表意性原则：表名应能体现其存储内容；临时库表必须以 <code class="highlighter-rouge">tmp_</code> 为前缀、以日期为后缀，备份表必须以 <code class="highlighter-rouge">bak_</code> 为前缀、以时间戳为后缀；</li>
-  <li>长名原则：少用缩写；</li>
+  <li>可读性原则：用<strong>下划线</strong>分隔字段等；</li>
+  <li><strong>表意性</strong>原则：表名应能体现其存储内容；临时库表必须以 <code class="highlighter-rouge">tmp_</code> 为前缀、以日期为后缀，备份表必须以 <code class="highlighter-rouge">bak_</code> 为前缀、以时间戳为后缀；</li>
+  <li><strong>长名原则</strong>：少用缩写；</li>
   <li>所有存储相同数据的列名和列类型必须一致；</li>
-  <li>尽量控制单表数据量的大小在 500 万以内。过大会造成修改表结构、备份、恢复问题。可用历史数据归档（应用于日志数据），分库分表（应用于业务数据、单表行数超过 500 万行或单表容量超过 2GB时）等手段；</li>
-  <li>冷热数据分离，减小表的宽度。减少磁盘 IO，保证热数据的内存缓存命中率（表越宽，把表装载进内存缓冲池时所占用的内存也就越大，会消耗更多的 IO）；</li>
-  <li>尽可能把所有列定义为 NOT NULL；</li>
+  <li>尽量控制<strong>单表数据量</strong>的大小在 500 万以内。过大会造成修改表结构、备份、恢复问题。
+    <ol>
+      <li>历史数据归档：应用于日志数据；</li>
+      <li><strong>分库分表</strong>：应用于业务数据、单表行数超过 500 万行或单表容量超过 2GB时；</li>
+    </ol>
+  </li>
+  <li>冷热数据分离，减小表的宽度。减少磁盘 IO，保证热数据的内存<strong>缓存命中率</strong>（表越宽，把表装载进内存缓冲池时所占用的内存也就越大，会消耗更多的 IO）；</li>
+  <li>尽可能把所有列定义为 NOT NULL。</li>
 </ol>
 
 <h5 id="索引设计规范">索引设计规范</h5>
@@ -959,53 +1147,215 @@ where (a.peopleId,a.seq) in (select peopleId,seq from vitae
   <li>选用 <code class="highlighter-rouge">WHERE</code> 从句或 <code class="highlighter-rouge">ORDER BY、GROUP BY、DISTINCT</code> 中的字段；</li>
 </ul>
 
-<h5 id="sql开发规范">SQL开发规范</h5>
+<h5 id="sql-开发规范">SQL 开发规范</h5>
 
-<h5 id="数据库操作行为规范">数据库操作行为规范</h5>
+<ol>
+  <li>索引</li>
+  <li>分库分表</li>
+</ol>
+
+<p>数据库操作行为规范：</p>
 
 <ul>
-  <li>避免使用<strong>子查询</strong>，会产生大量的临时表也没有索引，消耗过多的 CPU 和 IO 资源，对查询性能的影响大。
+  <li>避免使用<strong>子查询</strong>，会产生大量的<strong>临时表</strong>也没有索引，消耗过多的 CPU 和 IO 资源，对查询性能的影响大。
     <ul>
-      <li>子查询在 in 子句中，且为简单 SQL（不包含 union、group by、order by、limit 从句)）时,可优化为 join 关联查询。</li>
+      <li>子查询在 in 子句中，且为简单 SQL（不包含 <code class="highlighter-rouge">union、group by、order by、limit</code> 从句)）时，可优化为 <strong>join 关联查询</strong>。</li>
     </ul>
   </li>
-  <li>WHERE 从句中禁止对列进行函数转换和计算，导致无法用索引；</li>
+  <li>
+    <p>WHERE 从句中禁止对列进行函数转换和计算，导致无法用索引；</p>
+  </li>
+  <li>慢查询优化</li>
 </ul>
+
+<h3 id="mysql-基础架构">MySQL 基础架构</h3>
+
+<p>下图是 MySQL 的一个简要架构图，从下图可以很清晰的看到客户端的一条 SQL 语句在 MySQL 内部是如何执行的。</p>
+
+<p><img src="assets/13526879-3037b144ed09eb88.png" style="zoom: 80%;" /></p>
+
+<p>从上图可以看出， MySQL 主要由下面几部分构成：</p>
+
+<ul>
+  <li>Server 层：
+    <ol>
+      <li><strong>连接器：</strong> 身份认证和<strong>权限验证</strong>(登录 MySQL 的时候)。</li>
+      <li><strong>查询缓存：</strong> 执行查询语句的时候，会先查询缓存（<del>MySQL 8.0 版本后移除，因为这个功能不太实用</del>）。<strong>命中</strong>缓存，则直接返回。</li>
+      <li><strong>分析器：</strong> 没有命中缓存的话，SQL 语句就会经过分析器（<strong>词法分析、语法分析</strong>）。分析器说白了就是要先看你的 SQL 语句要干嘛，再检查你的 SQL 语句语法是否正确。</li>
+      <li><strong>优化器：</strong> 按照 MySQL 认为最优的方案去<strong>执行</strong>。索引选择。</li>
+      <li><strong>执行器：</strong> 执行语句，<strong>操作引擎</strong>，然后从存储引擎<strong>返回数据</strong>。 执行语句之前会先判断是否有权限，如果没有权限的话，就会报错。</li>
+      <li>同时还有一个<strong>日志模块</strong>（<code class="highlighter-rouge">bin log</code>，所有执行引擎都可共用），redo log 只有 <code class="highlighter-rouge">InnoDB</code> 有。</li>
+    </ol>
+  </li>
+  <li>引擎层：
+    <ul>
+      <li><strong>存储引擎</strong> ： 主要负责数据的存储和读取，提供读写接口。采用的是<strong>插件式</strong>架构，支持 <code class="highlighter-rouge">MyISAM、InnoDB、Memory</code> 等多种存储引擎。</li>
+    </ul>
+  </li>
+</ul>
+
+<h5 id="sql语句在mysql中的执行过程">SQL语句在MySQL中的执行过程</h5>
+
+<p>执行流程：</p>
+
+<ul>
+  <li>查询语句：权限校验（如果命中缓存）=&gt; <strong>查询缓存</strong> =&gt; 分析器 =&gt; 优化器 =&gt;权限校验 =&gt; 执行器 =&gt;存储引擎；</li>
+  <li>更新语句：分析器 =&gt; 权限校验 =&gt; 执行器 =&gt; 引擎 =&gt; redo log（prepare 状态） =&gt; bin log =&gt; redo log（commit状态）</li>
+</ul>
+
+<h5 id="查询缓存">查询缓存</h5>
 
 <h3 id="存储引擎">存储引擎</h3>
 
+<blockquote>
+  <p>MySQL 核心在于存储引擎。</p>
+</blockquote>
+
 <p>存储引擎：如何存储数据并建立索引，更新、查询数据等技术的实现方法。</p>
 
-<h5 id="innodb-引擎">InnoDB 引擎</h5>
+<h4 id="mysql-支持哪些存储引擎默认用哪个">MySQL 支持哪些存储引擎？默认用哪个？</h4>
+
+<p>MySQL 支持多种存储引擎，可以通过 <code class="highlighter-rouge">show engines</code> 命令来查看 MySQL 支持的所有存储引擎。包括：</p>
 
 <ol>
-  <li>行级锁：<code class="highlighter-rouge">MyISAM</code> 只有表级锁（对整张表加锁，不利于并发写），而 <code class="highlighter-rouge">InnoDB</code> 支持<strong>行级锁和表级锁</strong>（<strong>高并发</strong>下性能更好），支持<strong>MVCC</strong>（行级锁的一个升级）。</li>
-  <li><code class="highlighter-rouge">InnoDB</code> 支持<strong>事务</strong>：有提交、回滚和崩溃恢复能力；用于计费或财务系统等对数据准确性要求比较高的；</li>
-  <li><code class="highlighter-rouge">InnoDB</code> 支持<strong>外键</strong>；支持集群索引；</li>
+  <li>MyISAM</li>
+  <li>InnoDB，并且只有 InnoDB 支持<strong>事务</strong>；</li>
+  <li>FEDERATED</li>
+  <li>MEMORY</li>
+  <li>CSV</li>
 </ol>
 
-<h5 id="myisam-引擎">MyISAM 引擎</h5>
+<p>MySQL 默认的存储引擎：</p>
 
-<ol>
-  <li>选择密集型的表。最突出的优点是在筛选大量数据时非常迅速。</li>
-  <li>插入密集型的表。批量插入速度快。并发插入特性允许同时选择和插入数据。如：管理邮件数据、日志记录系统（处理用户的登录日志、操作日志、Web服务器日志）等。</li>
-  <li>支持全文索引；数据可压缩；</li>
-</ol>
+<ul>
+  <li>MySQL 5.5.5 之前是 <code class="highlighter-rouge">MyISAM</code> ，5.5.5 版本之后是 <code class="highlighter-rouge">InnoDB </code>。</li>
+</ul>
+
+<p>如：MySQL 版本 8.x 的存储引擎。</p>
+
+<p><img src="assets/image-20220510105408703.png" alt="查看 MySQL 提供的所有存储引擎" /></p>
+
+<h4 id="存储引擎架构">存储引擎架构</h4>
+
+<p>MySQL 存储引擎采用的是<strong>插件式</strong>架构，支持多种存储引擎，甚至可以为不同的数据库表设置不同的存储引擎以适应不同场景的需要。<strong>存储引擎是基于表的，而不是数据库。</strong></p>
+
+<ul>
+  <li><del>还可以根据 MySQL 定义的存储引擎实现标准接口来编写一个属于自己的存储引擎。</del></li>
+  <li><del>这些非官方提供的存储引擎可以称为第三方存储引擎，区别于官方存储引擎。</del></li>
+</ul>
+
+<h4 id="myisam-引擎innodb-引擎的区别">MyISAM 引擎、InnoDB 引擎的区别</h4>
+
+<h5 id="定义">定义</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">MyISAM</code> 引擎设计简单，数据以<strong>紧密格式</strong>存储。</li>
+  <li><code class="highlighter-rouge">InnoDB</code> 引擎是 MySQL 默认的事务型存储引擎。</li>
+</ul>
+
+<h5 id="行级锁">行级锁</h5>
+
+<ul>
+  <li>行级锁：<code class="highlighter-rouge">MyISAM</code> 只支持表级锁（对整张表加锁，不利于并发写）。
+    <ul>
+      <li>只能对整张表加锁，读取时会对需要读到的所有表加<strong>共享锁</strong>，写入时则对表加<strong>排它锁</strong>。但在表有读取操作的同时，也可以往表中插入新的记录，被称为并发插入。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">InnoDB</code> 支持<strong>行级锁</strong>和表级锁（<strong>高并发</strong>下性能更好），默认为行级锁。支持 <strong>MVCC</strong>。</li>
+</ul>
+
+<h5 id="事务mvcc">事务、MVCC</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">MyISAM</code> 引擎不支持事务。</li>
+  <li><code class="highlighter-rouge">InnoDB</code> 引擎支持<strong>事务、MVCC</strong>：有提交（commit）、回滚（rollback）事务、和崩溃恢复能力。
+    <ul>
+      <li>实现了四个标准的<strong>隔离级别</strong>，默认隔离级别是<strong>可重复读</strong>（REPEATABLE-READ），可以解决<strong>幻读</strong>问题发生的（基于 <strong>MVCC</strong> 多版本并发控制和 Next-Key Lock）。</li>
+      <li><strong>MVCC</strong> 可以看作是行级锁的一个升级，可以有效减少加锁操作，提高性能。</li>
+      <li>用于计费或财务系统等对数据准确性要求比较高的。</li>
+    </ul>
+  </li>
+</ul>
+
+<h5 id="外键">外键</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">MyISAM</code> 引擎不支持，而 <code class="highlighter-rouge">InnoDB</code> 引擎支持<strong>外键</strong>。</li>
+</ul>
+
+<blockquote>
+  <p>外键对于维护数据一致性非常有帮助，但是对性能有一定的损耗。因此，通常情况下不建议在实际生产项目中使用外键的，在<strong>业务代码</strong>中进行约束即可！</p>
+</blockquote>
+
+<h5 id="崩溃恢复">崩溃恢复</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">MyISAM</code> 引擎不支持。</li>
+  <li><code class="highlighter-rouge">InnoDB</code> 引擎支持数据库<strong>异常崩溃后的安全恢复</strong>。数据库重新启动时会保证数据库恢复到崩溃前的状态。这个恢复的过程依赖于 <code class="highlighter-rouge">redo log</code> 。</li>
+</ul>
+
+<h5 id="索引实现">索引实现</h5>
+
+<blockquote>
+  <p>二者都是使用 B+Tree 作为索引结构，但是两者的实现方式不太一样。</p>
+
+  <p><a href="#索引的存储方式及类型">索引的存储方式及类型</a></p>
+</blockquote>
+
+<ul>
+  <li><code class="highlighter-rouge">MyISAM</code> 引擎中，索引文件和数据文件是分离的。
+    <ul>
+      <li>支持非聚集索引？（<strong>全文索引</strong>、空间数据索引）。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">InnoDB</code> 引擎中，其数据文件本身就是索引文件，是一起存放的。
+    <ul>
+      <li>其表数据文件本身就是按 <strong>B+ 多路平衡查找树</strong>组织的一个索引结构，树的叶节点 data 域保存了完整的数据记录。</li>
+      <li>支持<strong>聚集索引、集群索引</strong>、<strong>聚簇索引</strong>，在索引中保存了数据，从而避免直接读取磁盘，因此对查询性能有很大的提升。</li>
+    </ul>
+  </li>
+</ul>
+
+<h5 id="备份">备份</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">MyISAM</code> 引擎不支持。要获取一致性视图需要停止对所有表的写入，而在读写混合场景中，停止写入可能也意味着停止读取。</li>
+  <li><code class="highlighter-rouge">InnoDB</code> 引擎支持真正的<strong>在线热备份</strong>。</li>
+</ul>
+
+<h4 id="myisam-和-innodb-如何选择">MyISAM 和 InnoDB 如何选择？</h4>
+
+<ul>
+  <li><code class="highlighter-rouge">InnoDB</code> 引擎是 MySQL 默认的事务型存储引擎。
+    <ul>
+      <li>一般情况下都选择 <code class="highlighter-rouge">InnoDB</code>，支持行级锁、表级锁、MVCC，外键，数据库异常崩溃后的安全恢复，数据文件本身就是索引文件，在线热备份。</li>
+      <li>某些情况下需要特殊特性时，才考虑使用其它存储引擎。</li>
+      <li><del>内部做了很多优化：</del>包括（从磁盘读取数据时采用的）可预测性读、（能够加快读操作并且自动创建的）自适应哈希索引、能够加速插入操作的<strong>插入缓冲区</strong>等。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">MyISAM</code> 引擎设计简单，数据以<strong>紧密格式</strong>存储。对于只读数据，或者表比较小、可以容忍修复操作。
+    <ol>
+      <li><strong>选择密集型</strong>的表。最突出的优点是在<strong>筛选大量数据</strong>时非常迅速。</li>
+      <li><strong>插入密集型</strong>的表。<strong>批量插入</strong>速度快。并发插入特性允许同时选择和插入数据。如：管理邮件数据、日志记录系统（处理用户的登录日志、操作日志、Web服务器日志）等。</li>
+      <li><code class="highlighter-rouge">MyISAM</code> 引擎支持<strong>压缩表</strong>。</li>
+    </ol>
+  </li>
+</ul>
 
 <h3 id="索引">索引</h3>
 
-<p>索引：是一种用于快速查询和检索数据的数据结构，相当于目录的作用。实质上是一张描述索引列的列值与原表中记录（行）间一 一对应关系的有序表。</p>
+<p>索引：是一种用于<strong>快速查询和检索数据</strong>的数据结构，相当于<strong>目录</strong>的作用。实质上是一张描述<strong>索引列</strong>的列值与原表中记录（行）间一 一对应关系的<strong>有序表</strong>。</p>
 
 <ul>
   <li>
     <p>优点：大大加快数据检索速度；</p>
   </li>
   <li>
-    <p>缺点 ：创建和维护索引耗时间和空间。当对表中的数据增删改时，需同时修改索引，降低 SQL 执行效率。</p>
+    <p>缺点 ：创建和<strong>维护</strong>索引耗时间和空间。当对表中的数据增删改时，需同时修改索引，降低 SQL 执行效率。</p>
   </li>
 </ul>
 
-<p>索引的效率取决于索引列的值是否散列，即该列的值如果越互不相同，那么索引效率越高。</p>
+<p>索引的效率取决于索引列的值是否<strong>散列</strong>，即该列的值如果越互不相同，那么索引效率越高。</p>
 
 <p>常见的索引结构有: <code class="highlighter-rouge">B</code> 树， <code class="highlighter-rouge">B+</code> 树和 <code class="highlighter-rouge">Hash</code> 表。</p>
 
@@ -1024,59 +1374,60 @@ where (a.peopleId,a.seq) in (select peopleId,seq from vitae
       <li>JDK1.8 后 <code class="highlighter-rouge">HashMap</code> 用红黑树；</li>
     </ul>
   </li>
-  <li>最大缺点是 Hash 索引不支持顺序和范围查询，hash 表存储的是无序数据，范围查找时需遍历，比较耗费时间。</li>
-  <li>将所有的数据文件添加到内存，比较耗费内存空间。</li>
+  <li>最大缺点是 Hash 索引不支持<strong>顺序</strong>和范围查询，hash 表存储的是无序数据，范围查找时需遍历，比较耗费时间。</li>
+  <li>将所有的数据文件添加到内存，比较耗费<strong>内存</strong>空间。</li>
 </ol>
 
 <h5 id="b-tree多路平衡查找树">B-Tree/多路平衡查找树</h5>
 
-<p>二叉树及其变种的其他树都不能支撑索引的需求，原因是插入数据的性能较低，且树的深度无法控制， 过深造成 IO 次数变多，影响读取数据的效率。</p>
+<p>二叉树及其变种的其他树都不能支撑索引的需求，原因是<strong>插入数据</strong>的性能较低，且树的深度无法控制， 过深造成 IO 次数变多，影响读取数据的效率。</p>
 
 <p><code class="highlighter-rouge">B</code> 树 VS <code class="highlighter-rouge">B+</code> 树：</p>
 
 <ol>
-  <li>节点：<code class="highlighter-rouge">B</code> 树的所有节点存放键和数据，而 <code class="highlighter-rouge">B+</code> 树只有叶子节点存放 key 和 data，其他内节点只存放 key。</li>
-  <li>叶子节点：<code class="highlighter-rouge">B</code> 树的叶子节点是独立的；<code class="highlighter-rouge">B+</code> 树的叶子节点有引用链指向相邻的叶子节点。</li>
-  <li>查找：<code class="highlighter-rouge">B</code> 树的检索相当于对节点的关键字做二分查找，可能不到叶子节点就找到；而 <code class="highlighter-rouge">B+</code> 树的查找是从根节点到叶子节点。</li>
+  <li>节点：<code class="highlighter-rouge">B</code> 树的<strong>所有节点</strong>存放键和数据，而 <code class="highlighter-rouge">B+</code> 树只有<strong>叶子节点</strong>存放 key 和 data，其他内节点只存放 key。</li>
+  <li>叶子节点：<code class="highlighter-rouge">B</code> 树的叶子节点是独立的；<code class="highlighter-rouge">B+</code> 树的叶子节点有<strong>引用链</strong>指向相邻的叶子节点。</li>
+  <li>查找：<code class="highlighter-rouge">B</code> 树的检索相当于对节点的关键字做<strong>二分查找</strong>，可能不到叶子节点就找到；而 <code class="highlighter-rouge">B+</code> 树的查找是从根节点到叶子节点。</li>
 </ol>
 
 <h5 id="索引的存储方式及类型">索引的存储方式及类型</h5>
 
+<blockquote>
+  <p>见 <a href="#索引实现">MyISAM 引擎、InnoDB 引擎的索引实现</a></p>
+</blockquote>
+
 <ol>
-  <li>聚集索引：索引结构和数据一起存放。<code class="highlighter-rouge">MyISAM</code> 中索引文件和数据文件是分离的，对于 <code class="highlighter-rouge">InnoDB</code> 引擎表来说，该表的索引（B+树、表数据文件）的每个非叶子节点存储索引，叶子节点存储索引和索引对应的数据。
+  <li><strong>聚集索引</strong>（集群索引、聚簇索引？）：索引结构和数据<strong>一起存放</strong>。<code class="highlighter-rouge">MyISAM</code> 中索引文件和数据文件是分离的，对于 <code class="highlighter-rouge">InnoDB</code> 引擎的表来说，该表的索引（B+树）的每个<strong>非叶子节点</strong>存储索引，叶子节点存储索引（key）和索引对应的数据。
     <ul>
-      <li>优点：查询速度非常快，多叉平衡树叶子节点都是有序的，定位到索引的节点，就相当于定位到了数据。</li>
+      <li>优点：<strong>查询速度</strong>非常快，<strong>多路平衡查找树</strong>的叶子节点都是有序的，定位到索引的节点，就相当于定位到了数据。</li>
       <li>缺点：依赖于有序的数据；更新代价大。</li>
-      <li>分类：
-        <ul>
-          <li>主键索引：索引的 key 是数据表的主键。</li>
-        </ul>
-      </li>
+      <li><strong>主键索引</strong>（<code class="highlighter-rouge">PRIMARY</code>）：索引的 key 是数据表的主键。</li>
     </ul>
   </li>
-  <li>非聚集索引：索引结构和数据分开存放。叶节点 data 域存储的数据是主键的值而不是地址，用来定位主键的位置。如二级索引/辅助索引：
+  <li><strong>非聚集索引</strong>：索引结构和数据<strong>分开存放</strong>。叶节点 data 域存储的数据是<strong>主键的值</strong>而不是地址，用来定位主键的位置。如二级索引/辅助索引：
     <ul>
       <li>最大缺点：可能会二次查询（<strong>回表</strong>），当查到索引对应的指针或主键后，可能还需再到数据文件或表中查询。</li>
       <li>分类：
         <ol>
-          <li>唯一索引：如身份证号、邮箱等；根据业务要求，不宜作为主键但有唯一性约束；可为 <code class="highlighter-rouge">NULL</code>；</li>
-          <li>普通索引：</li>
+          <li>唯一索引（<code class="highlighter-rouge">UNIQUE</code>）：如身份证号、邮箱等；根据业务要求，不宜作为主键但<strong>有唯一性约束</strong>；可为 <code class="highlighter-rouge">NULL</code>；</li>
+          <li>普通索引（<code class="highlighter-rouge">INDEX</code>）：</li>
           <li>前缀索引：用于字符串类型；</li>
-          <li>全文索引：用于检索大文本数据中关键字的信息，搜索引擎数据库。</li>
+          <li><strong>全文索引</strong>（<code class="highlighter-rouge">FULLTEXT</code>）：用于检索<strong>大文本</strong>数据中关键字的信息，搜索引擎数据库。</li>
+          <li>空间数据索引</li>
         </ol>
       </li>
     </ul>
   </li>
-  <li>覆盖索引：索引包含/覆盖所有需<strong>查询</strong>的字段的值，避免<strong>回表</strong>。相当于目录。</li>
+  <li><strong>覆盖索引</strong>：索引包含/覆盖所有需<strong>查询</strong>的字段的值，避免<strong>回表</strong>。相当于目录。</li>
 </ol>
 
-<h5 id="mysql添加索引">MySQL添加索引</h5>
+<h5 id="mysql-添加索引">MySQL 添加索引</h5>
 
 <blockquote>
   <ol>
-    <li></li>
     <li>除了索引外，有过哪些SQL优化方面的经验？如分库分表，或通过执行计划查看SQL的优化点。最好是能结合做的实际项目来讲。</li>
   </ol>
+
 </blockquote>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CREATE &lt;索引名&gt; ON &lt;表名&gt; (&lt;列名&gt; [&lt;长度&gt;] [ ASC | DESC]);
@@ -1107,136 +1458,14 @@ ALTER TABLE `table_name` ADD INDEX index_name ( `col1`, `col2` )
 
 <h5 id="建立和使用索引的时机">建立和使用索引的时机</h5>
 
-<p>在 <code class="highlighter-rouge">WHERE</code> 和 <code class="highlighter-rouge">JOIN</code> 语句中出现的列需建立索引，但也不完全如此：</p>
+<p>在 <strong><code class="highlighter-rouge">WHERE</code> 和 <code class="highlighter-rouge">JOIN</code> 语句</strong>中出现的列需建立索引，但也不完全如此：</p>
 
 <p>选用 <code class="highlighter-rouge">WHERE</code> 从句或 <code class="highlighter-rouge">ORDER BY、GROUP BY、DISTINCT</code> 中的字段；</p>
 
 <ol>
-  <li>MySQL只对<code class="highlighter-rouge">&lt;</code>，<code class="highlighter-rouge">&lt;=</code>，<code class="highlighter-rouge">=</code>，<code class="highlighter-rouge">&gt;</code>，<code class="highlighter-rouge">&gt;=</code>，<code class="highlighter-rouge">BETWEEN</code>，<code class="highlighter-rouge">IN</code>使用索引；</li>
-  <li>某些时候的<code class="highlighter-rouge">LIKE</code>也会使用索引；但在<code class="highlighter-rouge">LIKE</code>以通配符 <code class="highlighter-rouge">%和_</code> 开头做查询时，不会使用索引。如，<code class="highlighter-rouge">name like '123%'</code>会走索引；</li>
+  <li>MySQL 只对<code class="highlighter-rouge">&lt;</code>，<code class="highlighter-rouge">&lt;=</code>，<code class="highlighter-rouge">=</code>，<code class="highlighter-rouge">&gt;</code>，<code class="highlighter-rouge">&gt;=</code>，<code class="highlighter-rouge">BETWEEN</code>，<code class="highlighter-rouge">IN</code> 使用索引；</li>
+  <li>某些时候的 <code class="highlighter-rouge">LIKE</code> 也会使用索引；但在 <code class="highlighter-rouge">LIKE</code> 以通配符 <code class="highlighter-rouge">% 和 _</code> 开头做查询时，不会使用索引。如，<code class="highlighter-rouge">name like '123%'</code>会走索引。</li>
 </ol>
-
-<h3 id="事务">事务</h3>
-
-<p>事务：用户定义的一个数据库操作序列，是逻辑上的一组操作；要么全都执行，要么全不执行。如 A 转出钱与 B 收到钱。</p>
-
-<p>数据库事务：多条SQL 语句要么全部执行成功，要么全部不执行 。</p>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-- 开始事务，显式事务
-BEGIN; 或 START TRANSACTION;
-
-UPDATE accounts SET balance = balance - 100 WHERE id = 1;
-UPDATE accounts SET balance = balance + 100 WHERE id = 2;
-
-COMMIT;
-
--- 回滚事务
-ROLLBACK;
-</code></pre></div></div>
-
-<h5 id="事务的四大特性acid">事务的四大特性（ACID）</h5>
-
-<ol>
-  <li>原子性（<code class="highlighter-rouge">Atomicity</code>）：事务是最小的原子单位，（事务内的所有 SQL 作为一个原子单元执行），不可再分割。事务中的所有操作要么全部执行成功，要么全部执行失败。
-    <ul>
-      <li>MySQL InnoDB 引擎用 <code class="highlighter-rouge">undo log</code>（回滚日志）保证。</li>
-    </ul>
-  </li>
-  <li>一致性（<code class="highlighter-rouge">Consistency</code>）：事务执行前后，状态一致。如不管 A 、B 间如何转账，事务结束后两账户的总钱数与事务执行前一致，都是 5000。</li>
-  <li>隔离性（<code class="highlighter-rouge">Isolation</code>）：当多个用户并发访问数据库时，多个并发事务间要相互隔离。如，操作同一张表时，数据库为每个用户开启的事务，不能被其他事务的操作所干扰。
-    <ul>
-      <li>即要达到这么一种效果：对于任意两个并发的事务 T1 和 T2，在事务 T1 看来，T2 要么在 T1 开始前就已结束，要么在T1结束后才开始，这样每个事务都感觉不到有其他事务在并发地执行。</li>
-      <li>数据库提供了多种隔离级别。</li>
-      <li>MySQL InnoDB 引擎通过 <a href="#锁机制">锁机制</a>、<code class="highlighter-rouge">MVCC</code> 等。</li>
-    </ul>
-  </li>
-  <li>持久性（<code class="highlighter-rouge">Durability</code>）：一个事务被提交后，对数据库中数据的改变是持久的，即使数据库发生故障也不会丢失提交事务的操作。
-    <ul>
-      <li>MySQL InnoDB 引擎用 <code class="highlighter-rouge">redo log</code>（重做日志）保证。</li>
-    </ul>
-  </li>
-</ol>
-
-<h5 id="事务传播行为">事务传播行为</h5>
-
-<p>见 SSM 框架中 Spring 事务管理。</p>
-
-<h5 id="并发事务带来的问题">并发事务带来的问题</h5>
-
-<blockquote>
-  <p>副作用</p>
-</blockquote>
-
-<ol>
-  <li>丢失更新（/修改）/脏写：当前事务的更新擦除（覆盖）了其它事务之前（未提交的）的更新；事务的任何隔离级别都一定不允许发生，对访问的数据加锁即可。</li>
-  <li>脏读：一个事务读取到其它事务更新后（已修改）但未提交的数据，如果其它事务回滚该更新，则当前事务读的就是脏数据；</li>
-  <li>不可重复读：在一个事务中，多次读同一数据，（在事务还未结束时，其它事务就修改了此数据），两次读取的数据可能不一致。</li>
-  <li>幻读：在一个事务执行过程中，第一次未查询到某条记录，其它事务在此之后插入/删除并提交此条记录，再次按相同条件可查询到；即好像发生幻觉一样。</li>
-</ol>
-
-<h5 id="事务隔离级别">事务隔离级别</h5>
-
-<p>事务隔离机制：并发处理带来的问题中，更新丢失可完全避免，由应用对数据加锁即可。脏读、不可重读度、幻读，其实都是<strong>数据库的一致性问题</strong>，必须由一定的事务隔离机制来解决。</p>
-
-<p><img src="assets/MySQL并发事务的问题及隔离级别.png" style="zoom:33%;" /></p>
-
-<p>数据库的事务隔离越严格，并发副作用越小，但付出的代价也就越大。</p>
-
-<ol>
-  <li><code class="highlighter-rouge">READ_UNCOMMITTED</code>（读取未提交）： 最低，允许读取尚未提交的数据变更；
-    <ul>
-      <li>解决了<strong>丢失更新</strong>，可能导致脏读、不可重复读、幻读。</li>
-    </ul>
-  </li>
-  <li><code class="highlighter-rouge">READ_COMMITTED</code>（读取已提交）： 允许读取并发事务已提交的数据；
-    <ul>
-      <li>解决了丢失更新、<strong>脏读</strong>，可能导致不可重复读、幻读。</li>
-    </ul>
-  </li>
-  <li><code class="highlighter-rouge">REPEATABLE-READ</code>（可重复读）： 对同一字段的多次读取结果都是一致的，除非数据是被事务本身所修改；MySQL InnoDB 存储引擎<strong>默认</strong>支持的隔离级别。
-    <ul>
-      <li>解决了丢失更新、脏读、<strong>不可重复读</strong>，可能导致幻读。</li>
-    </ul>
-  </li>
-  <li><code class="highlighter-rouge">SERIALIZABLE</code>（可序列化）： 最高，完全服从 <code class="highlighter-rouge">ACID</code>。所有的事务依次逐个执行，事务间完全不可能产生干扰；串行执行，效率会大大下降。
-    <ul>
-      <li>解决了丢失更新、脏读、不可重复读、<strong>幻读</strong>。</li>
-    </ul>
-  </li>
-</ol>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
-</code></pre></div></div>
-
-<h3 id="锁机制">锁机制</h3>
-
-<h5 id="表锁行锁页锁">表锁、行锁、页锁</h5>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-- 锁定
-	LOCK TABLES tbl_name [AS alias]
--- 解锁
-    UNLOCK TABLES
-</code></pre></div></div>
-
-<h5 id="innodb-锁算法">InnoDB 锁算法</h5>
-
-<h5 id="innodb的3种行锁定方式">InnoDB的3种行锁定方式</h5>
-
-<h3 id="sql语句在mysql中的执行过程">SQL语句在MySQL中的执行过程</h3>
-
-<p>MySQL 主要分为：</p>
-
-<ul>
-  <li>Server 层：主要包括连接器、查询缓存、分析器、优化器、执行器，同时还有一个日志模块（bin log，所有执行引擎都可共用），redo log 只有 InnoDB 有。</li>
-  <li>引擎层：主要包括 <code class="highlighter-rouge">MyISAM、InnoDB、Memory</code> 等。</li>
-</ul>
-
-<p>执行流程：</p>
-
-<ul>
-  <li>查询语句：权限校验（如果命中缓存）=&gt; <strong>查询缓存</strong> =&gt; 分析器 =&gt; 优化器 =&gt;权限校验 =&gt; 执行器 =&gt;存储引擎；</li>
-  <li>更新语句：分析器 =&gt; 权限校验 =&gt; 执行器 =&gt; 引擎 =&gt; redo log（prepare 状态） =&gt; bin log =&gt; redo log（commit状态）</li>
-</ul>
 
 <h3 id="视图">视图</h3>
 
@@ -1248,24 +1477,6 @@ AS SELECT id,name,dept_id,age FROM tb_stu_info;
 DESCRIBE 视图名;
 </code></pre></div></div>
 
-<h3 id="存储过程">存储过程</h3>
-
-<p>存储过程：是一组为了完成特定功能的 SQL 语句集合，加了逻辑控制语句。更偏向于业务逻辑。</p>
-
-<ul>
-  <li>
-    <p>优点：在业务比较复杂时非常实用，如一个操作需写一大串 SQL 语句。存储过程一旦调试完成通过后就能稳定运行；比单纯 SQL 语句执行要快，因为存储过程是预编译过的。</p>
-  </li>
-  <li>
-    <p>缺点：存储过程难以调试和扩展，没有移植性，消耗数据库资源。禁止使用。</p>
-  </li>
-</ul>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CREATE PROCEDURE &lt;过程名&gt; ( [过程参数[,…] ] ) &lt;过程体&gt;
-[过程参数[,…] ] 格式
-[ IN | OUT | INOUT ] &lt;参数名&gt; &lt;类型&gt;
-</code></pre></div></div>
-
 <h3 id="触发器">触发器</h3>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>create trigger &lt;触发器名称&gt;  
@@ -1274,6 +1485,398 @@ insert | update | delete  -- 指明激活触发程序的语句的类型
 on &lt;表名&gt;                  -- 操作哪张表  
 for each row              -- 触发器的执行间隔，通知触发器每隔一行执行一次动作，而不是对整个表执行一次。  
 &lt;触发器SQL语句&gt;
+</code></pre></div></div>
+
+<h3 id="事务">事务</h3>
+
+<blockquote>
+  <p>事务的概念起源于数据库，目前，已经成为一个比较广泛的概念。</p>
+</blockquote>
+
+<p><strong>事务</strong>：是逻辑上的一组操作，要么全都执行，要么全不执行。</p>
+
+<p><strong>数据库事务</strong>：可以保证多个对数据库的操作（即 SQL 语句）构成一个逻辑上的整体。多条 SQL 语句要么全部执行成功，要么全部不执行 。</p>
+
+<p>例如，A 转出钱与 B 收到钱，这两个操作必须都成功、或者都失败。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 开始事务，显式事务
+BEGIN; 或 START TRANSACTION;
+
+# 多条 SQL 语句
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+
+COMMIT;
+
+# 有一条SQL执行失败、则回滚事务
+ROLLBACK;
+</code></pre></div></div>
+
+<p><img src="assets/数据库事务示意图.png" style="zoom: 80%;" /></p>
+
+<h5 id="事务的四大特性acid">事务的四大特性（ACID）</h5>
+
+<p><img src="assets/AID-_C.png" style="zoom: 80%;" /></p>
+
+<p>关系型数据库（例如：<code class="highlighter-rouge">MySQL</code>、<code class="highlighter-rouge">SQL Server</code>、<code class="highlighter-rouge">Oracle</code> 等）事务都有 <strong>ACID</strong> 特性：</p>
+
+<ol>
+  <li><strong>A 原子性</strong>（<code class="highlighter-rouge">Atomicity</code>）：事务是最小的原子单位，不可再分割。事务中的所有操作要么全部执行成功，要么全部执行失败。
+    <ul>
+      <li>事务内的所有 SQL 作为一个原子单元执行。</li>
+      <li>MySQL InnoDB 引擎用 <code class="highlighter-rouge">undo log</code>（回滚日志）保证。</li>
+    </ul>
+  </li>
+  <li><strong>C 一致性</strong>（<code class="highlighter-rouge">Consistency</code>）：事务执行前后，状态（数据）保持一致。如不管 A 、B 间如何转账，事务结束后两账户的<strong>总额</strong>与事务执行前一致，都是 5000。</li>
+  <li><strong>I 隔离性</strong>（<code class="highlighter-rouge">Isolation</code>）：当（多个用户）<strong>并发</strong>访问数据库时，多个并发事务间要相互隔离。如，操作同一张表时，数据库为每个用户开启的事务，不能被其他事务的操作所<strong>干扰</strong>。
+    <ul>
+      <li>即，要达到这么一种效果：对于任意两个并发的事务 T1 和 T2，在事务 T1 看来，T2 要么在 T1 开始前就已结束，要么在T1结束后才开始，这样每个事务都感觉不到有其他事务在并发地执行。</li>
+      <li>数据库提供了多种隔离级别。</li>
+      <li>MySQL InnoDB 引擎通过 <a href="#锁机制">锁机制</a>、<code class="highlighter-rouge">MVCC</code> 等。</li>
+    </ul>
+  </li>
+  <li><strong>D 持久性</strong>（<code class="highlighter-rouge">Durability</code>）：一个事务<strong>被提交</strong>后，对数据库中数据的改变是持久的，即使数据库发生故障也不会丢失提交事务的操作。
+    <ul>
+      <li>MySQL InnoDB 引擎用 <code class="highlighter-rouge">redo log</code>（重做日志）保证。</li>
+    </ul>
+  </li>
+</ol>
+
+<h5 id="事务传播行为">事务传播行为</h5>
+
+<blockquote>
+  <p>见 SSM 框架中 Spring 事务管理。</p>
+</blockquote>
+
+<h5 id="并发事务的三大一致性问题">并发事务的三大一致性问题</h5>
+
+<blockquote>
+  <p>副作用。</p>
+</blockquote>
+
+<p>在典型的应用程序中，多个事务<strong>并发运行</strong>，经常会操作<strong>相同的数据</strong>来完成各自的任务（多个用户对同一数据进行操作）。并发虽然是必须的，但可能会导致以下的问题。</p>
+
+<p>四种问题按照<strong>严重性</strong>排序：<strong>脏写 &gt; 脏读 &gt; 不可重复读 &gt; 幻读</strong>。</p>
+
+<ol>
+  <li><strong>脏写</strong>、丢失更新（Lost to modify）：当前事务的更新（修改）<strong>覆盖</strong>了其它事务之前（未提交的）的更新。事务的修改结果就被丢失，因此称为丢失修改。
+    <ul>
+      <li>脏写这个问题太严重了，事务的任何隔离级别都一定不允许发生，对访问的数据<strong>加锁</strong>即可。</li>
+    </ul>
+  </li>
+  <li><strong>脏读（Dirty read）</strong>：一个事务读取到其它事务更新后（已修改）但未提交到数据库的数据，如果其它事务回滚该更新，则当前事务读到的（未提交的数据）就是<strong>脏数据</strong>。</li>
+  <li><strong>不可重复读（Unrepeatable read）</strong>：在一个事务中，多次读同一数据，（在事务还未结束时，其它事务就修改了此数据），两次读取的数据可能不一致。</li>
+  <li><strong>幻读（Phantom read）</strong>：在一个事务执行过程中，第一次未查询到某条记录，其它事务在此之后插入/删除、并提交了此条记录，再次按相同条件可查询到。即好像<strong>发生幻觉</strong>一样，与不可重复读类似。</li>
+</ol>
+
+<p><strong>不可重复读和幻读有什么区别呢？</strong></p>
+
+<ul>
+  <li>不可重复读的重点：是<strong>内容修改</strong>或者记录减少，比如多次读取一条记录发现其中某些记录的值被修改；</li>
+  <li>幻读的重点：在于记录<strong>新增</strong>，比如多次执行同一条查询语句（DQL）时，发现查到的记录增加了。</li>
+</ul>
+
+<p>幻读其实可以看作是不可重复读的一种特殊情况，单独把区分幻读的原因主要是解决幻读和不可重复读的方案不一样。</p>
+
+<ul>
+  <li>解决不可重复读：执行 <code class="highlighter-rouge">delete</code> 和 <code class="highlighter-rouge">update</code> 操作的时候，可以直接对记录<strong>加锁</strong>（Record Lock），保证事务安全。</li>
+  <li>解决幻读：而执行 <code class="highlighter-rouge">insert</code> 操作时，由于<strong>记录锁</strong>只能锁住已经存在的记录，为了避免插入新记录，需要依赖<strong>间隙锁</strong>（Gap Lock）。也就是说执行 <code class="highlighter-rouge">insert</code> 操作时需要依赖 <code class="highlighter-rouge">Next-Key Lock</code>（Record Lock+Gap Lock） 进行加锁来保证不出现幻读。</li>
+</ul>
+
+<h5 id="事务隔离级别">事务隔离级别</h5>
+
+<blockquote>
+  <p>MySQL是怎么保证数据不丢的？</p>
+
+  <p>见 SSM 框架中 Spring 事务管理。</p>
+</blockquote>
+
+<p>事务隔离机制：</p>
+
+<ul>
+  <li>并发处理带来的问题中，更新丢失可完全避免，由应用对数据加锁即可。</li>
+  <li>脏读、不可重复读、幻读，其实都是<strong>数据库的一致性问题</strong>，必须由一定的事务隔离机制来解决。</li>
+</ul>
+
+<p><img src="assets/MySQL并发事务的问题及隔离级别.png" style="zoom:40%;" /></p>
+
+<p>数据库的事务隔离<strong>越严格</strong>，并发副作用越小，但付出的代价也就越大。</p>
+
+<ol>
+  <li>
+    <p><code class="highlighter-rouge">READ_UNCOMMITTED</code>（读取未提交）： 最低，允许读取尚<strong>未提交</strong>的数据变更；</p>
+
+    <ul>
+      <li>解决了<strong>丢失更新</strong>，可能导致脏读、不可重复读、幻读。</li>
+    </ul>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">READ_COMMITTED</code>（读取已提交）： 允许读取并发事务<strong>已提交</strong>的数据；</p>
+
+    <ul>
+      <li>解决了丢失更新、<strong>脏读</strong>，可能导致不可重复读、幻读。</li>
+    </ul>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">REPEATABLE-READ</code>（可重复读）： 对同一字段的<strong>多次读取</strong>结果都是一致的，除非数据是被事务本身所修改。</p>
+
+    <ul>
+      <li>
+        <p>MySQL InnoDB 存储引擎<strong>默认</strong>支持的隔离级别。可以通过<code class="highlighter-rouge">SELECT @@tx_isolation;</code>命令来查看，MySQL 8.0 该命令改为<code class="highlighter-rouge">SELECT @@transaction_isolation;</code></p>
+      </li>
+      <li>
+        <p>解决了丢失更新、脏读、<strong>不可重复读</strong>，可能导致幻读。</p>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">SERIALIZABLE</code>（可序列化）： 最高，完全服从 <code class="highlighter-rouge">ACID</code> 四大特性。所有的事务依次逐个执行，事务间完全不可能产生干扰；串行执行，效率会大大下降。</p>
+
+    <ul>
+      <li>解决了丢失更新、脏读、不可重复读、<strong>幻读</strong>。</li>
+    </ul>
+  </li>
+</ol>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
+</code></pre></div></div>
+
+<h5 id="mysql-的隔离级别是基于锁实现的吗">MySQL 的隔离级别是基于锁实现的吗？</h5>
+
+<p>MySQL 的隔离级别基于<strong>锁和 MVCC 机制</strong>共同实现的。</p>
+
+<ul>
+  <li><code class="highlighter-rouge">SERIALIZABLE</code> 隔离级别，是通过<strong>锁</strong>来实现的。</li>
+  <li>除了 <code class="highlighter-rouge">SERIALIZABLE</code> 隔离级别，其他的隔离级别都是基于 <strong>MVCC</strong> 实现。不过，可能也需要用到锁机制，就比如 <code class="highlighter-rouge">REPEATABLE-READ</code> 在<strong>当前读</strong>情况下需要使用加锁读来保证不会出现幻读。</li>
+</ul>
+
+<h3 id="锁机制">锁机制</h3>
+
+<p><img src="assets/d10348ed49fb4c5be79ad30f0804ae4b.png" alt="img" /></p>
+
+<p>关系型数据库中的为悲观锁：</p>
+
+<ul>
+  <li>表锁、行锁</li>
+  <li>S 共享锁（读锁）、X 排它锁（写锁）</li>
+</ul>
+
+<h4 id="表锁行锁页锁">表锁、行锁、页锁</h4>
+
+<p>表级锁和行级锁对比 ：</p>
+
+<ul>
+  <li><strong>表级锁（table-level locking）：</strong> MySQL 中锁定粒度最大的一种锁，是针对<strong>非索引字段</strong>加的锁，对当前操作的整张表加锁。实现简单，资源消耗也比较少，加锁快，不会出现死锁。其锁定粒度最大，触发锁冲突的概率最高，并发度最低，MyISAM 和 InnoDB 引擎都支持表级锁。</li>
+  <li><strong>行级锁（row-level locking）：</strong> MySQL 中<strong>锁定粒度最小</strong>的一种锁，是针对<strong>索引字段</strong>加的锁，只针对当前操作的行记录进行加锁。 行级锁能大大减少数据库操作的冲突。其加锁粒度最小，并发度高，但加锁的开销也最大，加锁慢，会出现<strong>死锁</strong>。InnoDB 不光支持表级锁，还支持行级锁。</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-- 锁定
+LOCK TABLES tbl_name [AS alias]
+-- 解锁
+UNLOCK TABLES
+</code></pre></div></div>
+
+<p>行级锁的使用有什么注意事项？</p>
+
+<ul>
+  <li>InnoDB 的行锁是针对索引字段加的锁，表级锁是针对非索引字段加的锁。</li>
+  <li>当我们执行 <code class="highlighter-rouge">UPDATE</code>、<code class="highlighter-rouge">DELETE</code> 语句时，如果 <code class="highlighter-rouge">WHERE</code>条件中字段没有命中唯一索引或者索引失效的话，就会导致<strong>扫描全表</strong>对表中的所有行记录进行加锁。</li>
+  <li>
+    <p>这个在日常工作开发中经常会遇到，一定要多多注意！！！</p>
+  </li>
+  <li>不过，很多时候即使用了<strong>索引</strong>也有可能会走<strong>全表扫描</strong>，这是因为 MySQL 优化器的原因。</li>
+</ul>
+
+<h4 id="共享锁和排他锁">共享锁和排他锁</h4>
+
+<p>不论是表级锁还是行级锁，都存在共享锁和排他锁这两类：</p>
+
+<ul>
+  <li><strong>读锁、共享锁（Share Lock，S 锁）</strong> ：事务在<strong>读取记录时</strong>获取共享锁，允许多个事务同时获取（<strong>锁兼容</strong>）。</li>
+  <li><strong>写锁、排他锁/独占锁（Exclusive Lock，X 锁）</strong> ：事务在<strong>修改记录时</strong>获取排他锁，不允许多个事务同时获取。如果一个记录已经被加了排他锁，那其他事务不能再对这条事务加任何类型的锁（锁不兼容）。</li>
+</ul>
+
+<p>排他锁与任何的锁都不兼容（有<strong>冲突</strong>），共享锁仅和共享锁兼容。</p>
+
+<p>由于 MVCC 的存在，对于一般的 <code class="highlighter-rouge">SELECT</code> 语句，InnoDB 不会加任何锁。不过， 可以通过以下语句显式加共享锁或排他锁。</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">#</span> <span class="err">共享锁</span>
+<span class="k">SELECT</span> <span class="p">...</span> <span class="k">LOCK</span> <span class="k">IN</span> <span class="k">SHARE</span> <span class="k">MODE</span><span class="p">;</span>
+<span class="o">#</span> <span class="err">排他锁</span>
+<span class="k">SELECT</span> <span class="p">...</span> <span class="k">FOR</span> <span class="k">UPDATE</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h4 id="意向锁">意向锁</h4>
+
+<p>如果需要用到表锁的话，如何判断表中的记录没有行锁呢？一行一行遍历肯定是不行，性能太差。</p>
+
+<p>意向锁：用来快速判断是否可以对某个表使用<strong>表锁</strong>。</p>
+
+<p>意向锁是表级锁，共有两种：</p>
+
+<ul>
+  <li><strong>意向共享锁（Intention Shared Lock，IS 锁）</strong>：事务有意向对表中的某些记录加共享锁（S 锁），加共享锁前必须先取得该表的 IS 锁。</li>
+  <li><strong>意向排他锁（Intention Exclusive Lock，IX 锁）</strong>：事务有意向对表中的某些记录加排他锁（X 锁），加排他锁之前必须先取得该表的 IX 锁。</li>
+</ul>
+
+<p>意向锁是有数据引擎自己维护的，用户无法手动操作意向锁，在为数据行加共享 / 排他锁之前，InooDB 会先获取该数据行所在在数据表的对应意向锁。</p>
+
+<ul>
+  <li>
+    <p>意向锁之间是互相兼容的。</p>
+  </li>
+  <li>
+    <p>意向锁和共享锁和排它锁互斥（这里指的是表级别的共享锁和排他锁，意向锁不会与行级的共享锁和排他锁互斥）。</p>
+  </li>
+</ul>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th>IS 锁</th>
+      <th>IX 锁</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>S 锁</td>
+      <td>兼容</td>
+      <td>互斥</td>
+    </tr>
+    <tr>
+      <td>X 锁</td>
+      <td>互斥</td>
+      <td>互斥</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="innodb的-3-种行锁定方式">InnoDB的 3 种行锁定方式</h4>
+
+<p>MySQL InnoDB 支持三种行锁定方式：</p>
+
+<ul>
+  <li><strong>记录锁（Record Lock）</strong> ：属于单个行记录上的锁。用于解决<strong>不可重复读</strong>。</li>
+  <li><strong>间隙锁（Gap Lock）</strong> ：锁定一个范围，不包括记录本身。用于解决<strong>幻读</strong>。</li>
+  <li><strong>临键锁（Next-key Lock）</strong> ：<code class="highlighter-rouge">Record Lock+Gap Lock</code>，锁定一个范围，包含记录本身。记录锁只能锁住已经存在的记录，为了避免<strong>插入</strong>新记录，需要依赖间隙锁。用于解决<strong>不可重复读</strong> + <strong>幻读</strong>。</li>
+</ul>
+
+<h3 id="mvcc-多版本并发控制">MVCC 多版本并发控制</h3>
+
+<p>多版本并发控制（Multi-Version Concurrency Control，<strong>MVCC</strong>）：是 MySQL 的 InnoDB 存储引擎<strong>实现隔离级别</strong>的一种具体方式，用于实现<strong>读已提交和可重复读</strong>这两种隔离级别。</p>
+
+<ul>
+  <li>而未提交读隔离级别总是读取最新的数据行，要求很低，无需使用 MVCC。</li>
+  <li>可串行化隔离级别需要对所有读取的行都加锁，单纯使用 MVCC 无法实现。</li>
+</ul>
+
+<h5 id="数据库并发场景">数据库并发场景</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">读-读</code>：不存在任何问题，也不需要并发控制；</li>
+  <li><code class="highlighter-rouge">读-写</code>：有线程安全问题，可能会造成事务隔离性问题，可能遇到<strong>脏读、幻读、不可重复读</strong>；</li>
+  <li><code class="highlighter-rouge">写-写</code>：有线程安全问题，可能会存在<strong>更新丢失</strong>问题，比如第一类更新丢失，第二类更新丢失。</li>
+</ul>
+
+<h4 id="mvcc解决并发哪些问题">MVCC解决并发哪些问题？</h4>
+
+<p>MVCC机制具有以下优点：</p>
+
+<ol>
+  <li>提高数据库并发性能：用更好的方式去处理<strong>并发读-写冲突</strong>，做到即使有读写冲突时，也能做到不加锁。可以做到读操作不会阻塞写操作，同时写操作也不会阻塞读操作。</li>
+  <li>降低死锁风险：由于无需使用<strong>显式锁</strong>来进行并发控制，MVCC可以降低<strong>死锁</strong>的风险。</li>
+  <li>解决脏读、不可重复读、幻读等<strong>事务隔离</strong>问题，但不能解决上面的 <strong>写-写 更新丢失</strong>问题。</li>
+</ol>
+
+<h4 id="基本思想">基本思想</h4>
+
+<p>MVCC 用来<strong>解决读-写冲突</strong>的无锁并发控制，即为事务分配单向增长的<strong>时间戳</strong>。为每个数据修改保存一个版本，版本与事务时间戳相关联。</p>
+
+<p>读操作只读取该事务开始前的数据库快照。</p>
+
+<p>因此有了下面提高并发性能的组合拳：</p>
+
+<ul>
+  <li>MVCC + 悲观锁：MVCC 解决读写冲突，悲观锁解决写写冲突；</li>
+  <li>MVCC + 乐观锁：MVCC 解决读写冲突，乐观锁解决写写冲突；</li>
+</ul>
+
+<p>加锁能解决多个事务同时执行时出现的<strong>并发一致性</strong>问题。</p>
+
+<ul>
+  <li>在实际场景中读操作往往多于写操作，因此又引入了<strong>读写锁</strong>来避免不必要的加锁操作，例如读和读没有互斥关系。</li>
+  <li>读写锁中读和写操作仍然是互斥的，而 MVCC 利用了<strong>多版本</strong>的思想，写操作更新最新的版本快照，而读操作去读旧版本快照，没有互斥关系，这一点和 <code class="highlighter-rouge">CopyOnWrite </code>类似。</li>
+</ul>
+
+<p>脏读和不可重复读最根本的原因是：事务读取到其它事务未提交的修改。</p>
+
+<ul>
+  <li>在事务进行读取操作时，为了解决这个，MVCC 规定只能<strong>读取已经提交</strong>的快照。当然一个事务可以读取自身未提交的快照，这不算是脏读。</li>
+</ul>
+
+<h4 id="mvcc的实现原理">MVCC的实现原理</h4>
+
+<p>实现原理主要是<strong>版本链</strong>、<a href="#三大日志">undo日志</a> 、<code class="highlighter-rouge">Read View </code> 来实现的。</p>
+
+<ul>
+  <li><strong>快照</strong>：即记录的历史版本，每行记录可能存在多个历史版本（多版本技术）。在 MVCC 中事务的修改操作（<code class="highlighter-rouge">DELETE、INSERT、UPDATE</code>）会为数据行新增一个版本<strong>快照</strong>。</li>
+  <li>MVCC 的<strong>多版本</strong>：指的是（数据库中<strong>某一条记录</strong>同时存在）多个版本的<strong>快照</strong>，快照存储在 <strong>Undo 日志</strong>中。</li>
+  <li><code class="highlighter-rouge">undo log</code>（回滚日志）：通过<strong>回滚指针</strong> ROLL_PTR 把一个<strong>数据行</strong>的所有快照连接起来。发生异常时，对已执行的操作进行回滚。用于<strong>实现 MVCC</strong>。</li>
+  <li><code class="highlighter-rouge">ReadView</code>：MVCC 维护了一个 ReadView 结构。在数据行快照不可使用的情况下，需要沿着 Undo Log 的回滚指针 ROLL_PTR  找到下一个快照。</li>
+</ul>
+
+<h4 id="当前读和快照读">当前读和快照读</h4>
+
+<p>InnoDB 的默认隔离级别 RR（可重读）是可以解决幻读问题发生的，主要有下面两种情况：</p>
+
+<ul>
+  <li><strong><a href="#快照读">快照读</a></strong>：由 MVCC 机制来保证不出现幻读。</li>
+  <li><strong><a href="#当前读">当前读</a></strong>：使用 Next-Key Lock 进行加锁来保证不出现幻读。</li>
+</ul>
+
+<h5 id="快照读">快照读</h5>
+
+<p>快照读（一致性非锁定读）：MVCC 的 <code class="highlighter-rouge">SELECT</code> 语句操作是快照中的数据，不需要进行加锁操作。</p>
+
+<ul>
+  <li>除<strong>当前读</strong>中的两类强制指定进行加锁的<code class="highlighter-rouge">SELECT</code> 外。</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT * FROM table ...;
+</code></pre></div></div>
+
+<p>快照读的情况下，如果读取的记录正在执行 <code class="highlighter-rouge">UPDATE/DELETE</code> 操作，读取操作不会因此去等待记录上 X 锁的释放，而是会去读取行的一个快照。</p>
+
+<p>只有在事务隔离级别 RC（读取已提交）和 RR（可重复读）下，InnoDB 才会使用<strong>一致性非锁定读</strong>：</p>
+
+<ul>
+  <li>在 RC 级别下，对于快照数据，一致性非锁定读总是读取被锁定行的<strong>最新一份快照</strong>数据。</li>
+  <li>在 RR 级别下，对于快照数据，一致性非锁定读总是读取<strong>本事务开始时</strong>的行数据版本。</li>
+</ul>
+
+<p>快照读比较适合对于数据一致性要求不是特别高且追求极致性能的业务场景。</p>
+
+<h5 id="当前读">当前读</h5>
+
+<p>当前读 （一致性锁定读）：就是给行记录加 <strong>X 锁或 S 锁</strong>。</p>
+
+<ol>
+  <li>在进行 <code class="highlighter-rouge">SELECT</code> 操作时，可以强制指定进行加锁操作。</li>
+  <li>MVCC 其它会对数据库进行修改的操作（<code class="highlighter-rouge">INSERT、UPDATE、DELETE</code>）需要进行加锁操作，从而读取最新的数据。可以看到 MVCC 并不是完全不用加锁，而只是避免了 <code class="highlighter-rouge">SELECT</code> 的加锁操作。</li>
+</ol>
+
+<p>当前读的一些常见 SQL 语句类型如下：</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">#</span> <span class="err">对读的记录加一个</span><span class="n">X</span><span class="err">锁</span>
+<span class="k">SELECT</span><span class="p">...</span><span class="k">FOR</span> <span class="k">UPDATE</span><span class="p">;</span>
+<span class="o">#</span> <span class="err">对读的记录加一个</span><span class="n">S</span><span class="err">锁</span>
+<span class="k">SELECT</span><span class="p">...</span><span class="k">LOCK</span> <span class="k">IN</span> <span class="k">SHARE</span> <span class="k">MODE</span><span class="p">;</span>
+
+<span class="o">#</span> <span class="err">对修改的记录加一个</span><span class="n">X</span><span class="err">锁</span>
+<span class="k">INSERT</span><span class="p">...</span>
+<span class="k">UPDATE</span><span class="p">...</span>
+<span class="k">DELETE</span><span class="p">...</span>
 </code></pre></div></div>
 
 <h3 id="数据备份与还原">数据备份与还原</h3>
@@ -1287,57 +1890,14 @@ for each row              -- 触发器的执行间隔，通知触发器每隔一
 <h3 id="三大日志">三大日志</h3>
 
 <ol>
-  <li>binlog（归档日志）：是物理日志，记录”在某个数据页上做了哪些修改”。用于数据备份；</li>
-  <li>redo log（重做日志）：InnoDB独有；用于MySQL 实例挂了或宕机、崩溃恢复；</li>
-  <li>undo log（回滚日志）：发生异常时，对已执行的操作进行回滚。用于实现MVCC。</li>
+  <li><code class="highlighter-rouge">binlog</code>（归档日志）：是物理日志，记录”在某个数据页上做了哪些修改”。用于数据备份；</li>
+  <li><code class="highlighter-rouge">redo log</code>（重做日志）：InnoDB独有；用于MySQL 实例挂了或宕机、崩溃恢复；</li>
+  <li><code class="highlighter-rouge">undo log</code>（回滚日志）：发生异常时，对已执行的操作进行回滚。用于<strong>实现 MVCC</strong>。</li>
 </ol>
 
-<p>结合事物的四大特性</p>
-
-<ol>
-  <li>MySQL是怎么保证数据不丢的？</li>
-  <li>为什么不直接写数据文件而是写redo log？</li>
-</ol>
-
-<h3 id="sql注入">SQL注入</h3>
-
-<h5 id="sql-注入方式">SQL 注入方式</h5>
-
-<ul>
-  <li>最常见的是：通过网页输入框（<code class="highlighter-rouge">&lt;input&gt; 、&lt;textarea&gt;</code> 标签等）将恶意 SQL 代码提交给服务器。将 userName 参数拼接到 SQL 语句中，从而构建 SELECT 查询，从数据库中获取当前用户的所有信息。</li>
-</ul>
-
-<h5 id="防止-sql-注入">防止 SQL 注入</h5>
-
-<ol>
-  <li>
-    <p><strong>服务端数据验证</strong>是在数据提交到服务器上后再验证。<strong>客户端数据验证</strong>是在数据发送到服务器前，在浏览器上完成验证，包括 HTML5 内置约束验证、JavaScript 自定义表单验证、CSS 伪类选择器。</p>
-
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> &lt;form&gt;
-   &lt;label for="email"&gt;Email:&lt;/label&gt;
-   &lt;input type="email" id="email" name="email" required&gt;
-   &lt;input type="submit" value="Submit"&gt;
- &lt;/form&gt;
- // required 属性确保用户必须输入电子邮件地址，而 type="email" 会自动验证输入是否为有效的电子邮件格式。
- // 使用正则表达式进行验证
-</code></pre></div>    </div>
-  </li>
-  <li>
-    <p>Web 防火墙可检测和阻止最基本的 SQL 注入；</p>
-  </li>
-  <li>
-    <p>传参用参数占位符 <code class="highlighter-rouge">#{}</code>，尽量避免用变量占位符 <code class="highlighter-rouge">${}</code>；</p>
-  </li>
-  <li>
-    <p>检测用户输入的内容。永远不要信任用户提供的数据，仅在校验通过后才将数据提交给数据库。如：</p>
-    <ol>
-      <li>在页面输入参数时进行字符串检测；</li>
-      <li>提交时进行参数检查、用正则表达式过滤参数中的特殊符号等；</li>
-      <li>Spring Boot 整合 <code class="highlighter-rouge">Hibenate-Validator</code> 框架；</li>
-      <li>用户输入的 SQL 参数严格使用参数绑定或 METADATA 字段值限定，禁止字符串拼接 SQL 访问数据库。</li>
-    </ol>
-  </li>
-</ol>
+<blockquote>
+  <p>为什么不直接写数据文件而是写redo log？</p>
+</blockquote>
 
 <h3 id="参考">参考</h3>
 
@@ -1348,167 +1908,351 @@ for each row              -- 触发器的执行间隔，通知触发器每隔一
 
 <h2 id="redis-缓存数据库">Redis 缓存数据库</h2>
 
-<p>Redis：用 C 语言开发的数据库，数据存在内存中（即内存数据库），读写速度非常快。</p>
+<p>Redis：用 <strong>C 语言</strong>开发的数据库，数据存在内存中（即内存数据库），<strong>读写速度</strong>非常快。</p>
 
-<blockquote>
-  <p>QPS（Query Per Second）：服务器每秒可执行的查询次数。</p>
-</blockquote>
+<ul>
+  <li>默认端口号为 <code class="highlighter-rouge">6379</code>。</li>
+</ul>
 
-<h3 id="用途">用途</h3>
+<h3 id="简单介绍基础">简单介绍基础</h3>
+
+<h4 id="为什么要用-redis为什么要用缓存">为什么要用 Redis/为什么要用缓存？</h4>
+
+<ul>
+  <li><strong>高性能</strong>：假如用户第一次访问数据库中的某些数据的话，从硬盘中读取、过程比较慢。但如果是<strong>高频数据</strong>且不会经常改变的话，则放入缓存，下一次再访问时可直接从缓存中获取。操作缓存就是直接操作内存，所以速度相当快。
+    <ul>
+      <li>不过，要保持数据库和缓存中的数据的一致性，如果数据库中的对应数据改变的之后，同步改变缓存中相应的数据即可！</li>
+    </ul>
+  </li>
+  <li><strong>高并发</strong>：直接操作缓存能承受的<strong>数据库请求</strong>数量远大于直接访问数据库的，所以可考虑把数据库中的部分数据转移到缓存中，这样用户的一部分请求会直接到缓存而不用经过数据库。进而，也就提高了系统整体的<strong>并发</strong>。
+    <ul>
+      <li>QPS（Query Per Second）：服务器每秒可执行的查询次数。</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="其它用途">其它用途</h4>
 
 <p>用于：</p>
 
 <ol>
-  <li>数据缓存：处理（大量数据的）高访问负载；目的：提升用户体验、应对更多的用户。
-    <ul>
-      <li>高性能：缓存数据的处理流程。如用户第一次访问数据库中的某些数据，从硬盘中读取比较慢。属于高频数据且不会经常改变的话，则放入缓存，下一次再访问时可直接从缓存中获取。</li>
-      <li>高并发：直接操作缓存能承受的数据库请求数量远远大于直接访问数据库的，所以可考虑把数据库中的部分数据转移到缓存中，这样用户的一部分请求会直接到缓存而不用经过数据库。</li>
-    </ul>
+  <li><strong>数据缓存</strong>：处理（大量数据的）高访问负载；目的：提升用户体验、应对更多的用户。见上。应用场景有：
+    <ol>
+      <li><code class="highlighter-rouge">session、token</code>、序列化后的对象的缓存。</li>
+      <li>计数：比如用户单位时间的请求数（简单限流可以用到）、页面单位时间的访问数。</li>
+    </ol>
   </li>
-  <li>分布式锁：基于 Redisson 实现分布式锁；</li>
-  <li>限流 ：通过 Redis + Lua 脚本的方式来实现限流；</li>
-  <li>消息队列：Redis 自带的 list 数据结构可作为简单的队列使用。
+  <li><strong>分布式锁</strong>：基于 <code class="highlighter-rouge">Redisson </code>实现分布式锁；</li>
+  <li><strong>限流</strong> ：通过<code class="highlighter-rouge"> Redis + Lua</code> 脚本的方式来实现限流；</li>
+  <li><strong>消息队列</strong>：<code class="highlighter-rouge">Redis </code>自带的 list 数据结构可作为简单的队列使用。
     <ul>
-      <li>Redis 5.0 中增加的 Stream 类型的数据结构更适合用来做消息队列，类似于 <code class="highlighter-rouge">Kafka</code>。支持：
-        <ol>
-          <li>发布 / 订阅模式；</li>
-          <li>按照消费者组进行消费、主题；</li>
-          <li>消息持久化（ RDB 和 AOF）；</li>
-          <li>ACK 机制。</li>
-        </ol>
-      </li>
-      <li>推荐较成熟的一些消息队列，如 RocketMQ、Kafka 等。</li>
+      <li>Redis 5.0 中增加的 Stream 类型的数据结构更适合用来做消息队列，类似于 <code class="highlighter-rouge">Kafka</code>。支持：发布 / 订阅模式、按照消费者组进行消费、消息持久化（ RDB 和 AOF）、ACK 机制。</li>
+      <li>不过，和专业的消息队列相比，还是有很多欠缺的地方。比如<strong>消息丢失</strong>和堆积问题不好解决。</li>
+      <li>因此，通常建议是不使用 Redis 来做消息队列，完全可以选择市面上比较成熟的一些消息队列，比如  <code class="highlighter-rouge">RocketMQ、Kafka</code> 等。</li>
     </ul>
   </li>
 </ol>
 
-<h3 id="分布式缓存常见技术选型方案">分布式缓存常见技术选型方案</h3>
+<h4 id="缓存数据的处理流程">缓存数据的处理流程</h4>
 
-<p>分布式缓存：主要解决单机缓存的容量受服务器限制、且无法保存通用信息的问题。因为本地缓存只在当前服务里有效，如果部署了两个相同的服务，两者间的缓存数据无法共享。</p>
+<blockquote>
+  <p>通常为了保证缓存中的数据与数据库中的<strong>数据一致性</strong>，会给 Redis 里的数据设置<strong>过期时间</strong></p>
+</blockquote>
 
-<h5 id="redis-和-memcached">Redis 和 Memcached</h5>
-
-<p><strong>共同点</strong> ：</p>
+<p>简单来说就是:</p>
 
 <ol>
-  <li>都是基于内存的数据库，一般都用来当做缓存使用；</li>
-  <li>都有过期策略；</li>
+  <li>查询用户请求的数据是否在缓存中，如果在缓存中就<strong>直接返回</strong>查询结果；</li>
+  <li>如果不存在缓存中的话（第一次访问数据、或缓存数据过期），就查询数据库中是否存在；</li>
+  <li>数据库中存在的话就<strong>返回</strong>查询结果、并<strong>更新</strong>缓存中的数据；</li>
+  <li>数据库中不存在的话就返回空数据。</li>
+</ol>
+
+<p><img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/90bbc93a4ce24c27bed574ff96e217ba~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?" alt="" style="zoom: 75%;" /></p>
+
+<h4 id="分布式缓存常见技术选型方案">分布式缓存常见技术选型方案</h4>
+
+<blockquote>
+  <p>分布式缓存使用的比较多的主要是 Memcached 和 Redis。</p>
+
+  <p>不过，基本没有用 Memcached 做缓存的，都是直接用 Redis。</p>
+</blockquote>
+
+<p>分布式缓存：主要解决<strong>单机缓存的容量</strong>受服务器限制、且无法保存通用信息的问题。因为本地缓存只在<strong>当前服务里</strong>有效，如果部署了两个相同的服务，两者间的缓存数据无法共享。</p>
+
+<h4 id="redis-和-memcached">Redis 和 Memcached</h4>
+
+<p>共同点 ：</p>
+
+<ol>
+  <li>都是<strong>基于内存</strong>的数据库，一般都用来当做缓存使用；</li>
+  <li>都有<strong>过期策略</strong>；</li>
   <li>两者的性能都非常高；</li>
 </ol>
 
-<p><strong>区别</strong> ：</p>
+<p>区别 ：</p>
 
 <ol>
-  <li>Redis 支持更丰富的<strong>数据类型</strong>（更复杂的应用场景），不仅支持简单的 k/v 类型的数据，同时还提供 list，set，zset，hash 等数据结构的存储。Memcached 只支持最简单的 k/v 数据类型。</li>
-  <li>Redis 支持数据的<strong>持久化</strong>，有灾难恢复机制，可将内存（缓存）中的数据持久化到磁盘中，重启时可再次加载使用。而 Memcached 把数据全部存在内存中。</li>
-  <li><a href="#内存管理">内存管理</a>：Redis 在<strong>服务器内存</strong>用完后，可将不用的数据放到磁盘上。Memcached 直接报异常。</li>
-  <li>Redis 使用<strong><a href="#单线程模型">单线程</a>的多路 IO 复用模型</strong>（Redis 6.0 引入了多线程 IO ）。Memcached 是多线程，非阻塞 IO 复用的网络模型。</li>
-  <li>Redis <strong><a href="#过期数据的删除策略">过期数据的删除策略</a></strong>同时用了惰性删除与定期删除。Memcached 只用了惰性删除。</li>
-  <li>Redis 支持<strong>发布订阅模型、Lua 脚本、事务</strong>等功能、更多编程语言。而 Memcached 不支持。</li>
-  <li>Redis 原生支持 cluster 模式的。Memcached 没有原生的<strong>集群</strong>模式，需依靠客户端来实现往集群中分片写入数据。</li>
+  <li>数据类型：<code class="highlighter-rouge">Redis </code>支持更丰富的<strong>数据类型</strong>（更复杂的应用场景），不仅支持简单的 k/v 类型的数据，同时还提供 <code class="highlighter-rouge">list，set，zset，hash</code> 等数据结构的存储。<code class="highlighter-rouge">Memcached </code>只支持最简单的 k/v 数据类型。</li>
+  <li>线程模型：<code class="highlighter-rouge">Redis</code> 使用<strong><a href="#单线程模型">单线程</a>的多路 IO 复用模型</strong>（Redis 6.0 引入了多线程 IO ）。<code class="highlighter-rouge">Memcached</code> 是多线程，<strong>非阻塞 IO 复用</strong>的网络模型。</li>
+  <li><a href="#内存管理">内存管理</a>：<code class="highlighter-rouge">Redis</code> 在服务器内存用完后，可将不用的数据放到<strong>磁盘</strong>上。<code class="highlighter-rouge">Memcached </code>直接报异常。</li>
+  <li><a href="#过期数据的删除策略">过期数据的删除策略</a>：<code class="highlighter-rouge">Redis </code>同时用了惰性删除与<strong>定期删除</strong>。<code class="highlighter-rouge">Memcached </code>只用了惰性删除。</li>
+  <li>持久化：<code class="highlighter-rouge">Redis </code>支持数据的<strong>持久化</strong>，有<strong>灾难恢复机制</strong>，可将内存（缓存）中的数据持久化到磁盘中，<strong>重启时</strong>可再次加载使用。而 <code class="highlighter-rouge">Memcached </code>把数据全部存在内存中。</li>
+  <li>事务：<code class="highlighter-rouge">Redis</code> 支持<strong>发布订阅模型、Lua 脚本、事务</strong>等功能、更多编程语言。而 <code class="highlighter-rouge">Memcached</code> 不支持。</li>
+  <li>集群：<code class="highlighter-rouge">Redis</code> 原生支持 cluster 模式的。<code class="highlighter-rouge">Memcached </code>没有原生的<strong>集群</strong>模式，需依靠客户端来实现往集群中分片写入数据。</li>
 </ol>
 
-<h3 id="5大基础数据类型">5大基础数据类型</h3>
+<h3 id="数据类型-1">数据类型</h3>
 
-<p>5大基础数据类型及应用场景</p>
+<blockquote>
+  <p>Redis 常用的数据结构有哪些？</p>
+
+  <p>见 <a href="https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/redis/redis-questions-01.md#redis-%E5%B8%B8%E8%A7%81%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84">Redis 常见命令的用法</a></p>
+</blockquote>
+
+<ul>
+  <li><strong>5 种基础数据结构</strong> ：String（字符串）、List（列表）、Hash（散列）、Set（集合）、Zset（有序集合）。</li>
+  <li><strong>3 种特殊数据结构</strong> ：HyperLogLogs（基数统计）、Bitmap（位存储）、Geospatial（地理位置）。</li>
+</ul>
+
+<p>5大基础数据类型及应用场景：</p>
 
 <ol>
   <li>
-    <p><code class="highlighter-rouge">string</code>：简单的 key-value 类型。</p>
+    <p><code class="highlighter-rouge">String</code>：简单的 key-value 类型。</p>
 
     <ul>
       <li>常用命令： <code class="highlighter-rouge">set/get/del, mset, setex, strlen, exists, incr/decr, expire, ttl</code> 等。</li>
-      <li>应用场景： 常用在需计数的场景，如用户的访问次数、热点文章的点赞转发数等。</li>
+      <li>应用场景： 常用在需<strong>计数</strong>的场景，如用户的<strong>访问次数</strong>、热点文章的点赞转发数、<strong>验证码</strong>等。</li>
     </ul>
   </li>
   <li>
-    <p><code class="highlighter-rouge">list</code>：即双向链表。支持反向查找和遍历。</p>
+    <p><code class="highlighter-rouge">List</code>：即<strong>双向链表</strong>。支持反向查找和遍历。</p>
 
     <ul>
       <li>常用命令：<code class="highlighter-rouge">rpush/rpop, lpush/lpop, lrange, llen</code> 等。</li>
       <li>
-        <p>应用场景：实现队列、栈，发布与订阅、消息队列、慢查询。</p>
+        <p>应用场景：实现队列、栈，发布与订阅、<strong>消息队列</strong>、慢查询。</p>
 
         <p><img src="assets/redis-list.png" alt="redis list" style="zoom: 67%;" /></p>
       </li>
     </ul>
   </li>
   <li>
-    <p><code class="highlighter-rouge">hash</code>：类似于 JDK1.8 前的 HashMap，内部实现也差不多（数组 + 链表）。是一个 string 类型的 field 和 value 的映射表。</p>
+    <p><code class="highlighter-rouge">Hash</code>：类似于 JDK1.8 前的 <code class="highlighter-rouge">HashMap</code>，内部实现也差不多（数组 + 链表）。是一个 String 类型的 field 和 value 的<strong>映射表</strong>。</p>
 
     <ul>
       <li>常用命令： <code class="highlighter-rouge">hset/hmset/hget, hgetall, hexists, hkeys, hvals</code> 等。</li>
-      <li>应用场景：特别适合用于存储对象。</li>
+      <li>应用场景：特别适合用于<strong>存储对象</strong>。</li>
     </ul>
   </li>
   <li>
-    <p><code class="highlighter-rouge">set</code>：类似于 HashSet 。提供了判断某个成员是否在 set 集合内的重要接口，轻易实现交、并、差集的操作。如：共同关注就是求交集。</p>
+    <p><code class="highlighter-rouge">Set</code>：类似于 HashSet 。提供了判断某个成员是否在 set 集合内的重要接口，轻易实现交、并、差集的操作。如：<strong>共同关注</strong>就是求交集。</p>
 
     <ul>
       <li>常用命令： <code class="highlighter-rouge">sadd/spop, smembers, sismember, scard（长度）, sinterstore（交集）, sunion</code> 等。</li>
-      <li>应用场景：存放不重复的数据及需获取多个数据源交集和并集等场景。</li>
+      <li>应用场景：存放<strong>不重复</strong>的数据及需获取多个数据源<strong>交集和并集</strong>等场景。</li>
+      <li><strong>抽奖系统</strong>需要用到什么命令？
+        <ul>
+          <li><code class="highlighter-rouge">SPOP key count</code> ： <strong>随机移除</strong>并获取指定集合中一个或多个元素，适合<strong>不允许重复</strong>中奖的场景。</li>
+          <li><code class="highlighter-rouge">SRANDMEMBER key count</code> : 随机获取指定集合中指定数量的元素，适合允许重复中奖的场景。</li>
+        </ul>
+      </li>
     </ul>
   </li>
   <li>
-    <p><code class="highlighter-rouge">sorted set</code>：比 set 增加了一个权重参数 <code class="highlighter-rouge">score</code>，使集合中的元素能按 score 进行有序排列，还可通过 score 的范围来获取元素的列表。有点像 HashMap 和 TreeSet 的结合体。</p>
+    <p><code class="highlighter-rouge">Sorted Set</code>：比 set 增加了一个<strong>权重参数</strong> <code class="highlighter-rouge">score</code>，使集合中的元素能按 score 进行有序排列，还可通过 score 的范围来获取元素的列表。有点像 HashMap 和 TreeSet 的结合体。</p>
 
     <ul>
       <li>常用命令： <code class="highlighter-rouge">zadd, zcard, zscore, zrange, zrevrange, zrem</code> 等。</li>
-      <li>应用场景： 需对数据根据某个权重进行排序的场景。如实时礼物排行等。</li>
+      <li>应用场景： 需对数据<strong>根据某个权重进行排序</strong>的场景、<strong>排行榜</strong>。如直播间实时礼物的排行榜、朋友圈的微信步数排行榜、王者荣耀中的段位排行榜、话题热度排行榜等。</li>
+      <li>相关的一些 Redis 命令： <code class="highlighter-rouge">ZRANGE</code> (从小到大排序) 、 <code class="highlighter-rouge">ZREVRANGE</code> （从大到小排序）、<code class="highlighter-rouge">ZREVRANK</code> (指定元素排名)。</li>
     </ul>
   </li>
-  <li>
-    <p><code class="highlighter-rouge">bitmap</code>：存储连续的二进制数字（0 和 1）。只需一个 <code class="highlighter-rouge">bit</code> 位来表示某个元素对应的值或状态，key 就是对应元素本身。 8  bit 可组成一个 byte，所以会极大的节省储存空间。</p>
+</ol>
 
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>private RedisTemplate&lt;String, Object&gt; redisTemplate;
+
+// String
+redisTemplate.opsForValue().set(RedisConstantKey.MY_REDIS_VALUE.key, "人民");
+Object o = redisTemplate.opsForValue().get(RedisConstantKey.MY_REDIS_VALUE.key);
+if(Objects.nonNull(o)){
+     System.out.println(o.toString());
+}
+
+// List
+List&lt;Object&gt; language = Lists.newArrayList("java","c++","python","js");
+redisTemplate.opsForList().leftPushAll(RedisConstantKey.MY_REDIS_LIST.key, language);
+
+// Hash，通过putAll方法以map集合的形式添加键值对
+public void addHashData(String key, Map&lt;String, Object&gt; hashData) {
+    redisTemplate.opsForHash().putAll(key, hashData);
+    Map newMap = new HashMap();  
+    newMap.put("map3","map3-3");  
+    newMap.put("map5","map5-5");
+    redisTemplate.opsForHash().putAll("hashValue",newMap);
+    map = redisTemplate.opsForHash().entries("hashValue");  
+}
+
+// Set
+redisTemplate.opsForSet().add(RedisConstantKey.MY_REDIS_SET.key,"aa");
+redisTemplate.opsForSet().add(RedisConstantKey.MY_REDIS_SET.key,"bb");
+// 这里加入一个重复的值，set集合自动去重
+redisTemplate.opsForSet().add(RedisConstantKey.MY_REDIS_SET.key,"aa");
+
+Set&lt;Object&gt; members = redisTemplate.opsForSet().members(RedisConstantKey.MY_REDIS_SET.key);
+Iterator&lt;Object&gt; it = members.iterator();
+while (it.hasNext()){
+	System.out.println(it.next());
+}
+
+//Zset
+
+</code></pre></div></div>
+
+<p>3 种特殊数据结构：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">Bitmap</code>（位存储）：存储连续的二进制数字（0 和 1）。只需一个 <code class="highlighter-rouge">bit</code> 位来表示某个元素对应的值或状态，key 就是对应元素本身。 8  bit 可组成一个 byte，所以会极大的<strong>节省储存空间</strong>。
     <ul>
       <li>常用命令： <code class="highlighter-rouge">setbit/getbit, bitcount, bitop</code>等</li>
-      <li>应用场景： 需保存状态信息（如是否签到、是否登录…）并进一步进行分析的场景。
+      <li>应用场景： 需保存<strong>状态信息</strong>（如是否签到、是否登录…）并进一步进行分析的场景。
         <ol>
-          <li>用户行为分析：分析喜好，需研究点赞过的内容；</li>
-          <li>统计活跃用户：用时间作为 key，用户 ID 为 offset，如果当日活跃过就设置为 1；</li>
-          <li>获取或统计用户在线状态：只需要一个 key，用户 ID 为 offset，如果在线就设置为 1，不在线就设置为 0。</li>
+          <li><strong>用户行为分析</strong>：分析喜好，需研究点赞过的内容；</li>
+          <li><strong>统计活跃用户</strong>：用时间作为 key，用户 ID 为 offset，如果当日活跃过就设置为 1；</li>
+          <li>获取或统计用户<strong>在线状态</strong>：只需要一个 key，用户 ID 为 offset，如果在线就设置为 1，不在线就设置为 0。</li>
         </ol>
       </li>
     </ul>
   </li>
+  <li><code class="highlighter-rouge">HyperLogLogs</code>（基数统计）:
+    <ul>
+      <li>应用场景：<strong>统计页面 UV</strong></li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">Geospatial</code>（地理位置）</li>
 </ol>
 
+<h4 id="string-还是-hash-存储对象数据更好呢">String 还是 Hash 存储对象数据更好呢？</h4>
+
+<ul>
+  <li>String 存储的是<strong>序列化后</strong>的对象数据，存放的是整个对象。Hash 是对对象的<strong>每个字段</strong>单独存储，可以获取部分字段的信息，也可以修改或者添加部分字段，节省网络流量。如果对象中某些字段需要<strong>经常变动</strong>或者经常需要单独查询对象中的个别字段信息，Hash 就非常适合。</li>
+  <li>String 存储相对来说更加<strong>节省内存</strong>，缓存相同数量的对象数据，String 消耗的内存约是 Hash 的一半。并且，存储具有多层嵌套的对象时也方便很多。如果系统对性能和资源消耗非常敏感的话，String 就非常适合。</li>
+</ul>
+
+<p>在绝大部分情况，建议使用 String 来存储对象数据即可！</p>
+
 <blockquote>
-  <p>见 <a href="https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/redis/redis-questions-01.md#redis-%E5%B8%B8%E8%A7%81%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84">Redis 常见命令的用法</a></p>
+  <p>那根据你的介绍，购物车信息用 String 还是 Hash 存储更好呢?</p>
 </blockquote>
+
+<p>购物车信息建议使用 Hash 存储：</p>
+
+<ul>
+  <li>用户 id 为 key</li>
+  <li>商品 id 为 field，商品数量为 value</li>
+</ul>
+
+<p>由于购物车中的商品<strong>频繁修改和变动</strong>，这个时候 Hash 就非常适合了！</p>
+
+<h4 id="使用-bitmap-统计活跃用户怎么做">使用 Bitmap 统计活跃用户怎么做？</h4>
+
+<p>使用日期（精确到天）作为 key，然后用户 ID 为 offset，如果当日活跃过就设置为 1。</p>
+
+<p>初始化数据：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;</span> SETBIT 20210308 1 1
+<span class="o">(</span>integer<span class="o">)</span> 0
+<span class="o">&gt;</span> SETBIT 20210308 2 1
+<span class="o">(</span>integer<span class="o">)</span> 0
+<span class="o">&gt;</span> SETBIT 20210309 1 1
+<span class="o">(</span>integer<span class="o">)</span> 0
+</code></pre></div></div>
+
+<p>统计 20210308~20210309 总活跃用户数:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;</span> BITOP and desk1 20210308 20210309
+<span class="o">(</span>integer<span class="o">)</span> 1
+<span class="o">&gt;</span> BITCOUNT desk1
+<span class="o">(</span>integer<span class="o">)</span> 1
+</code></pre></div></div>
+
+<p>统计 20210308~20210309 在线活跃用户数:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;</span> BITOP or desk2 20210308 20210309
+<span class="o">(</span>integer<span class="o">)</span> 1
+<span class="o">&gt;</span> BITCOUNT desk2
+<span class="o">(</span>integer<span class="o">)</span> 2
+</code></pre></div></div>
+
+<h4 id="使用-hyperloglog-统计页面-uv-怎么做">使用 HyperLogLog 统计页面 UV 怎么做？</h4>
+
+<p>1、将访问指定页面的每个用户 ID 添加到 <code class="highlighter-rouge">HyperLogLog</code> 中。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PFADD PAGE_1:UV USER1 USER2 ...... USERn
+</code></pre></div></div>
+
+<p>2、统计指定页面的 UV。</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PFCOUNT PAGE_1:UV
+</code></pre></div></div>
 
 <h3 id="线程模型">线程模型</h3>
 
-<h5 id="单线程模型">单线程模型</h5>
-
-<p>Redis 基于 Reactor 模式的<strong>文件事件处理器</strong>，以单线程方式运行，通过<strong>I/O 多路复用程序</strong> 来监听多个（客户端连接）套接字（Socket），将感兴趣的事件及类型（读、写）注册到内核中并监听每个事件是否发生。</p>
-
-<ul>
-  <li>多个 Socket（客户端连接）；</li>
-  <li>IO 多路复用程序（支持多个客户端连接的关键）：不需额外创建多余的线程来监听客户端的大量连接，降低了资源的消耗；</li>
-  <li>文件事件分派器（将 socket 关联到相应的事件处理器）；</li>
-  <li>事件处理器（命令请求处理器、命令回复处理器、连接应答处理器）；</li>
-</ul>
-
-<p>用 I/O 多路复用机制同时监听多个文件描述符的可读和可写状态，一旦收到网络请求就会在内存中快速处理。由于绝大多数的操作都是纯内存的，所以<strong>处理速度非常快</strong>。</p>
-
-<p><img src="assets/redis事件处理器.png" alt="img" style="zoom:45%;" /></p>
-
-<h5 id="多线程">多线程</h5>
-
-<p>Redis 4.0 之前为什么不用多线程用单线程？</p>
+<p>Redis 线程模型总结：</p>
 
 <ol>
-  <li>更好的可维护性，方便开发和调试；单线程<strong>编程容易</strong>且更易维护；</li>
-  <li>主要原因：Redis 的<strong>性能瓶颈</strong>不在 CPU （资源），主要在内存和网络（I/O操作）；使用多线程模型带来的性能提升并不能抵消开发和维护成本（可维护性低）；</li>
-  <li>单线程模型（用 I/O 多路复用机制）也能并发处理来自客户端的多个连接，同时等待多个连接发送请求；</li>
-  <li>多线程存在死锁、线程上下文切换等问题，甚至会影响性能。</li>
+  <li>对于<strong>读写命令</strong>来说，Redis 一直是<strong>单线程</strong>模型。</li>
+  <li>多线程：
+    <ol>
+      <li>不过，在 Redis 4.0 版本之后引入了<strong>多线程</strong>来执行一些<strong>大键值对</strong>的异步删除操作，</li>
+      <li>Redis 6.0 版本之后引入了<strong>多线程</strong>来处理<strong>网络请求</strong>（提高网络 IO 读写性能）。</li>
+    </ol>
+  </li>
 </ol>
 
-<p>Redis 6.0 之后为什么引入多线程？</p>
+<h4 id="单线程模型">单线程模型</h4>
+
+<p><img src="assets/redis事件处理器.png" alt="img" style="zoom:55%;" /></p>
+
+<p>Redis 基于 Reactor 模式的<strong>文件事件处理器</strong>，以单线程方式运行，通过<strong>I/O 多路复用程序</strong> 来监听多个（客户端连接）<strong>套接字</strong>（<code class="highlighter-rouge">Socket</code>），将感兴趣的事件及类型（读、写）<strong>注册</strong>到内核中并<strong>监听</strong>每个事件是否发生。</p>
+
+<p>文件事件处理器（file event handler）主要包含 4 个部分：</p>
 
 <ol>
-  <li>主要是为了提高网络 IO 读写性能（解决性能瓶颈）。</li>
+  <li>多个 Socket（客户端连接）；</li>
+  <li>IO 多路复用程序（支持多个客户端连接的关键）；</li>
+  <li>文件事件<strong>分派器</strong>（将 socket 关联到相应的事件处理器）；</li>
+  <li>事件处理器（命令请求处理器、命令回复处理器、连接应答处理器）。</li>
+</ol>
+
+<h4 id="既然是单线程那怎么监听大量的客户端连接呢">既然是单线程，那怎么监听大量的客户端连接呢？</h4>
+
+<p>通过<strong>I/O 多路复用程序</strong> 来监听多个（客户端连接）<strong>套接字</strong>（<code class="highlighter-rouge">Socket</code>），将感兴趣的事件及类型（读、写）<strong>注册</strong>到内核中并<strong>监听</strong>每个事件是否发生。</p>
+
+<p>好处：不需额外创建多余的线程来<strong>监听</strong>客户端的大量连接，降低了资源的消耗。由于绝大多数的操作都是纯内存的，所以处理速度<strong>非常快</strong>。</p>
+
+<h4 id="redis-60-之前为什么不用多线程用单线程">Redis 6.0 之前为什么不用多线程用单线程？</h4>
+
+<blockquote>
+  <p>其实，在 Redis 4.0 版本之后就引入了<strong>多线程</strong>来执行一些<strong>大键值对</strong>的异步删除操作。</p>
+</blockquote>
+
+<ol>
+  <li>单线程<strong>编程容易</strong>且更<strong>易维护</strong>，方便开发和调试；</li>
+  <li><strong>主要原因</strong>：Redis 的<strong>性能瓶颈</strong>不在 CPU（资源），主要在<strong>内存和网络</strong>（I/O操作）；
+    <ol>
+      <li>使用多线程模型带来的性能提升并不能抵消开发和维护成本（可维护性低）；</li>
+      <li>单线程模型（用 I/O 多路复用机制）也能并发处理来自客户端的多个连接，同时等待多个连接发送请求；</li>
+    </ol>
+  </li>
+  <li>多线程存在<strong>死锁</strong>、线程上下文切换等问题，甚至会影响性能。</li>
+</ol>
+
+<h4 id="redis-60-之后为什么引入多线程">Redis 6.0 之后为什么引入多线程？</h4>
+
+<ol>
+  <li>主要是为了<strong>提高网络 IO 读写</strong>性能（解决性能瓶颈）。</li>
   <li>充分利用多核。</li>
 </ol>
 
@@ -1521,12 +2265,16 @@ for each row              -- 触发器的执行间隔，通知触发器每隔一
 <h5 id="缓存数据设置过期时间">缓存数据设置过期时间</h5>
 
 <ul>
-  <li>有助于缓解内存消耗：内存是有限的，如果缓存中的所有数据都一直保存，会有OOM。</li>
+  <li>有助于缓解内存消耗：内存是有限的，如果缓存中的所有数据都一直保存，会有<code class="highlighter-rouge">OOM</code>。</li>
 </ul>
+
+<blockquote>
+  <p>注意：Redis 中除了<strong>字符串</strong>类型有自己独有设置过期时间的命令 <code class="highlighter-rouge">setex</code> 外，其他方法都需要依靠 <code class="highlighter-rouge">expire</code> 命令来设置过期时间 。另外， <code class="highlighter-rouge">persist</code> 命令可以移除一个键的过期时间。</p>
+</blockquote>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt; exp key 60 # 数据在 60s 后过期，expire 命令
 (integer) 1
-&gt; setex key 60 value # 数据在 60s 后过期，用于string
+&gt; setex key 60 value # 数据在 60s 后过期，用于String
 OK
 &gt; ttl key # 查看数据还有多久过期
 (integer) 56
@@ -1534,46 +2282,45 @@ OK
 
 <h5 id="redis-判断数据过期">Redis 判断数据过期</h5>
 
-<p>通过 过期字典（可看作是 hash 表）来保存数据过期的时间。键指向 Redis 数据库中的 key，值是一个 long long 类型的整数，保存了 key 所指向的数据库键的过期时间（毫秒精度的 UNIX 时间戳）。</p>
+<p>通过 <strong>过期字典</strong>（可看作是 hash 表）来保存数据过期的时间。键指向 Redis 数据库中的 key，值是一个 long long 类型的整数，保存了 key 所指向的数据库键的过期时间（毫秒精度的 UNIX 时间戳）。</p>
 
 <h5 id="过期数据的删除策略">过期数据的删除策略</h5>
 
-<p>Redis 采用的是 <strong>定期删除+惰性/懒汉式删除</strong> 。</p>
+<p>Redis 采用的是 <strong>定期删除+惰性/懒汉式删除</strong>，定期删除对<strong>内存</strong>更友好，惰性删除对 <strong>CPU</strong> 更友好。</p>
 
 <ol>
   <li>惰性删除 ：只在取出 key 时才对数据进行过期检查；可能造成太多过期 key 没有被删除。</li>
   <li>定期删除 ： 每隔一段时间抽取一批 key 执行删除过期 key 操作。Redis 底层会通过限制删除操作执行的时长和频率来减少删除操作对 CPU 时间的影响。</li>
 </ol>
 
-<p>定期删除对内存更友好，惰性删除对 CPU 更友好。</p>
+<p>但是，仅仅通过给 key 设置过期时间还是有问题的。因为还是可能存在定期删除和惰性删除漏掉了很多过期 key 的情况。这样就导致大量过期 key 堆积在内存里，然后就 Out of memory 了。</p>
+
+<p>怎么解决这个问题呢？答案就是：<strong>Redis 内存淘汰机制。</strong></p>
 
 <h5 id="redis-内存淘汰机制">Redis 内存淘汰机制</h5>
 
 <blockquote>
-  <p>4.0 版本后增加两种 LFU。</p>
+  <p>相关问题：MySQL 里有 2000w 数据，Redis 中只存 20w 的数据，如何保证 Redis 中的数据都是热点数据?</p>
 </blockquote>
 
-<p><code class="highlighter-rouge">volatile</code>：从已设置过期时间的数据集（server.db[i].expires）中，</p>
+<p>Redis 提供 6 种数据淘汰策略：4.0 版本后增加两种 LFU。</p>
 
 <ol>
-  <li><code class="highlighter-rouge">volatile-lru</code>（least recently used）：淘汰<strong>最近最少使用</strong>的数据。</li>
-  <li><code class="highlighter-rouge">volatile-lfu</code>（least frequently used）：淘汰<strong>最不常用</strong>的数据</li>
-  <li><code class="highlighter-rouge">volatile-ttl</code>：淘汰将要过期的数据。</li>
-  <li><code class="highlighter-rouge">volatile-random</code>：任意选择数据淘汰。</li>
-</ol>
-
-<p><code class="highlighter-rouge">allkeys</code>：当内存不足以容纳新写入数据时，在键空间中，</p>
-
-<ol>
-  <li><code class="highlighter-rouge">allkeys-lru</code>：移除最近最少使用的 key；最常用。</li>
-  <li><code class="highlighter-rouge">allkeys-lfu</code>：移除最不常用的 key。</li>
-  <li><code class="highlighter-rouge">allkeys-random</code>：从数据集（server.db[i].dict）中任意选择数据淘汰。</li>
+  <li><code class="highlighter-rouge">volatile-lru</code>（least recently used）：<strong>从已设置过期时间的数据集</strong>（server.db[i].expires）中，淘汰<strong>最近最少使用</strong>的数据。</li>
+  <li><code class="highlighter-rouge">volatile-lfu</code>（least frequently used）：淘汰<strong>最不常用</strong>的数据。4.0 版本后增加。</li>
+  <li><code class="highlighter-rouge">volatile-ttl</code>：淘汰<strong>将要过期</strong>的数据。</li>
+  <li><code class="highlighter-rouge">volatile-random</code>：淘汰<strong>随机选择</strong>的数据。</li>
+  <li><code class="highlighter-rouge">allkeys-lru</code>：<strong>当内存不足以容纳新写入数据时，在键空间中</strong>，移除最近最少使用的 key。最常用。</li>
+  <li><code class="highlighter-rouge">allkeys-lfu</code>：移除最不常用的 key。4.0 版本后增加。</li>
+  <li><code class="highlighter-rouge">allkeys-random</code>：从数据集中任意选择数据淘汰。</li>
   <li><code class="highlighter-rouge">no-eviction</code>：禁止驱逐数据，即新写入操作会报错。没人用。</li>
 </ol>
 
 <h3 id="持久化机制">持久化机制</h3>
 
-<p>Redis 持久化机制（怎么保证 Redis 挂掉之后再重启数据可进行恢复）</p>
+<blockquote>
+  <p>怎么保证 Redis 挂掉之后再重启数据可进行恢复？</p>
+</blockquote>
 
 <p>持久化数据：将内存中的数据写入到硬盘。</p>
 
@@ -1582,27 +2329,103 @@ OK
   <li>或为了防止系统故障而将数据备份到一个远程位置。</li>
 </ol>
 
-<h5 id="持久化方式">持久化方式</h5>
+<h4 id="持久化方式">持久化方式</h4>
 
 <ul>
-  <li>默认，RDB 持久化：通过创建快照来获得（存储在内存里的）数据在某个时间点上的副本。</li>
-  <li>只追加文件（append-only file, AOF）：每执行一条会更改 Redis 中数据的命令，就将该命令写入到内存缓存 <code class="highlighter-rouge">server.aof_buf</code> 中，然后再根据 <code class="highlighter-rouge">appendfsync</code> 配置来决定何时将其同步到硬盘中的 AOF 文件。</li>
+  <li>默认，<strong>RDB 快照持久化</strong>：通过创建<strong>快照</strong>来获得（存储在内存里的）数据在某个时间点上的副本。Redis 创建快照之后，
+    <ol>
+      <li>可以对快照进行备份，</li>
+      <li>可以将快照复制到其他服务器、从而创建具有相同数据的服务器副本（Redis 主从结构，主要用来提高 Redis 性能），</li>
+      <li>还可以将快照留在原地以便重启服务器时使用。</li>
+    </ol>
+  </li>
+  <li><strong>只追加文件</strong>（append-only file, <code class="highlighter-rouge">AOF</code>）：每执行一条会更改 Redis 中数据的命令，就将该命令写入到<strong>内存缓存</strong> <code class="highlighter-rouge">server.aof_buf</code> 中，然后再根据 <code class="highlighter-rouge">appendfsync</code> 配置来决定何时将其同步到硬盘中的 AOF 文件。</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>appendfsync always    # 每次有数据修改发生时都会写入AOF文件,严重降低速度
-appendfsync everysec  # 每秒钟同步一次，显式地将多个写命令同步到硬盘，推荐
-appendfsync no        # 让操作系统决定何时进行同步
+<blockquote>
+  <p>AOF 持久化的实时性更好，因此已成为主流的持久化方案。</p>
+</blockquote>
+
+<h4 id="rdb-创建快照时会阻塞主线程吗">RDB 创建快照时会阻塞主线程吗？</h4>
+
+<p>Redis 提供了两个命令来生成 RDB 快照文件：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">save</code> : 主线程执行，会阻塞主线程；</li>
+  <li><code class="highlighter-rouge">bgsave</code> : 子线程执行，不会阻塞主线程，默认选项。</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># RDB
+#在900秒之后，如果至少有1个key发生变化，Redis就会自动触发bgsave命令创建快照。
+save 900 1  
+save 300 10  #在300秒之后，如果至少有10个key发生变化。
+save 60 10000  #在60秒之后，如果至少有10000个key发生变化。
 </code></pre></div></div>
 
-<h5 id="aof-重写">AOF 重写</h5>
+<h4 id="三种不同的-aof-持久化方式">三种不同的 AOF 持久化方式</h4>
 
-<p>AOF 重写：通过读取数据库中的键值对来实现，程序无须对现有 AOF 文件进行任何读入、分析或写入操作。</p>
+<blockquote>
+  <p>在 Redis 的配置文件中存在三种不同的 AOF 持久化方式：</p>
+</blockquote>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 默认情况下 Redis 没有开启 AOF方式的持久化，可以通过 appendonly 参数开启：
+appendonly yes
+
+appendfsync always    #每次有数据修改发生时都会写入AOF文件,这样会严重降低Redis的速度
+appendfsync everysec  #每秒钟同步一次，显式地将多个写命令同步到硬盘
+appendfsync no        #让操作系统决定何时进行同步
+</code></pre></div></div>
+
+<p>为了兼顾数据和写入性能，用户可以考虑 <code class="highlighter-rouge">appendfsync everysec</code> 选项 ，让 Redis 每秒同步一次 AOF 文件，Redis 性能几乎没受到任何影响。</p>
+
+<p>而且这样即使出现系统崩溃，用户最多只会丢失一秒之内产生的数据。当硬盘忙于执行写入操作的时候，Redis 还会优雅的放慢自己的速度以便适应硬盘的最大写入速度。</p>
+
+<h4 id="aof-日志">AOF 日志</h4>
+
+<blockquote>
+  <p>AOF 日志是如何实现的？</p>
+</blockquote>
+
+<p>关系型数据库（如 MySQL）通常都是<strong>执行命令之前</strong>记录日志（方便故障恢复），而 Redis AOF 持久化机制是在<strong>执行完命令（写内存）之后</strong>再记录日志（到磁盘）。</p>
+
+<blockquote>
+  <p>为什么是在执行完命令之后记录日志呢？</p>
+</blockquote>
+
+<ul>
+  <li>避免<strong>额外</strong>的检查开销，AOF 记录日志不会对命令进行语法检查；</li>
+  <li>在命令执行完之后再记录，不会<strong>阻塞</strong>当前的命令执行。</li>
+</ul>
+
+<p>这样也带来了风险：</p>
 
 <ol>
-  <li>在执行 <code class="highlighter-rouge">BGREWRITEAOF</code> 命令时，Redis 服务器会维护一个 AOF 重写缓冲区，该缓冲区会在子进程创建新 AOF 文件期间，记录服务器执行的所有写命令。</li>
+  <li>如果刚执行完命令 Redis 就<strong>宕机</strong>会导致对应的修改丢失；</li>
+  <li>可能会<strong>阻塞</strong>后续其他命令的执行（AOF 记录日志是在 Redis 主线程中进行的）。</li>
+</ol>
+
+<h4 id="aof-重写">AOF 重写</h4>
+
+<p>AOF 重写可以产生一个新的 AOF 文件，这个新的 AOF 文件和原有的 AOF 文件所保存的数据库<strong>状态</strong>一样，但体积更小。</p>
+
+<p>AOF 重写：通过读取数据库中的<strong>键值对</strong>来实现，程序无须对现有 AOF 文件进行任何读入、分析或写入操作。</p>
+
+<ol>
+  <li>在执行 <code class="highlighter-rouge">BgreWRITEAOF</code> 命令时，Redis 服务器会维护一个 <strong>AOF 重写缓冲区</strong>，该缓冲区会在子进程创建新 AOF 文件期间，记录服务器执行的所有写命令。</li>
   <li>当子进程完成创建新 AOF 文件的工作之后，服务器会将重写缓冲区中的所有内容追加到新 AOF 文件的末尾，使得新的 AOF 文件保存的数据库状态与现有的数据库状态一致。</li>
   <li>最后，服务器用新的 AOF 文件替换旧的 AOF 文件，以此来完成 AOF 文件重写操作。</li>
 </ol>
+
+<h4 id="redis-40-对于持久化机制做了什么优化">Redis 4.0 对于持久化机制做了什么优化？</h4>
+
+<p>Redis 4.0 开始支持 RDB 和 AOF 的混合持久化（默认关闭，可以通过配置项 <code class="highlighter-rouge">aof-use-rdb-preamble</code> 开启）。</p>
+
+<p>如果把混合持久化打开，AOF 重写时就直接把 RDB 的内容写到 AOF 文件开头。</p>
+
+<ul>
+  <li>好处：可以结合 RDB 和 AOF 的优点，快速加载同时避免丢失过多的数据。</li>
+  <li>缺点：AOF 里面的 RDB 部分是压缩格式不再是 AOF 格式，可读性较差。</li>
+</ul>
 
 <h3 id="事务-1">事务</h3>
 
@@ -1610,12 +2433,25 @@ appendfsync no        # 让操作系统决定何时进行同步
   <p>不建议使用</p>
 </blockquote>
 
-<h5 id="事务命令">事务命令</h5>
+<p>可以将 Redis 中的事务就理解为 ：Redis 事务提供了一种将<strong>多个命令请求打包</strong>的功能。然后，再按顺序执行打包的所有命令，并且不会被中途打断。</p>
+
+<h4 id="事务命令">事务命令</h4>
+
+<p>Redis 可以通过 <strong><code class="highlighter-rouge">MULTI</code>，<code class="highlighter-rouge">EXEC</code>，<code class="highlighter-rouge">DISCARD</code> 和 <code class="highlighter-rouge">WATCH</code></strong> 等命令来实现事务（transaction）功能。</p>
 
 <ol>
-  <li><code class="highlighter-rouge">MULTI</code>命令：可输入多个命令，放到队列，当调用了 <code class="highlighter-rouge">EXEC</code> 命令再执行所有命令；</li>
+  <li><code class="highlighter-rouge">MULTI</code>命令：可输入多个命令，Redis 不会立即执行这些命令，而是将它们放到队列，当调用了 <code class="highlighter-rouge">EXEC</code> 命令再执行所有命令；</li>
+  <li><code class="highlighter-rouge">EXEC</code>命令：</li>
   <li><code class="highlighter-rouge">DISCARD</code>命令：取消一个事务，清空事务队列中保存的所有命令；</li>
   <li><code class="highlighter-rouge">WATCH</code>命令：用于监听指定的键；当调用 <code class="highlighter-rouge">EXEC</code> 命令执行事务时，如果一个被 <code class="highlighter-rouge">WATCH</code> 命令监视的键被修改的话，整个事务都不会执行，直接返回失败。</li>
+</ol>
+
+<p>这个过程是这样的：</p>
+
+<ol>
+  <li>开始事务（<code class="highlighter-rouge">MULTI</code>）。</li>
+  <li>命令入队：批量操作 Redis 的命令，先进先出（FIFO）的顺序执行。</li>
+  <li>执行事务（<code class="highlighter-rouge">EXEC</code>）。</li>
 </ol>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt; MULTI #开始事务
@@ -1629,9 +2465,23 @@ QUEUED
 2) "Guide哥"
 </code></pre></div></div>
 
-<p><strong>不满足原子性（和持久性）</strong></p>
+<h4 id="redis-支持原子性吗">Redis 支持原子性吗？</h4>
 
-<p>Redis 事务在运行错误的情况下，除了执行过程中出现错误的命令外，其他命令都能正常执行。且不支持回滚操作。不满足“要么全部完成，要么完全不起作用”。</p>
+<p>Redis 的事务和我们平时理解的<strong>关系型数据库</strong>的<a href="#事务">事务</a>不同。我们知道事务具有四大特性（ACID）： 1. A 原子性，2. C一致性，3. I 隔离性，4. D 持久性。</p>
+
+<p>Redis 事务在运行错误的情况下，除了执行过程中出现错误的命令外，其他命令都能正常执行。</p>
+
+<p>并且，Redis不支持<strong>回滚</strong>操作。不满足“要么全部完成，要么完全不起作用”。</p>
+
+<p>因此，Redis 事务其实是不满足<strong>原子性</strong>的（而且不满足<strong>持久性</strong>）。</p>
+
+<h4 id="如何解决-redis-事务的缺陷">如何解决 Redis 事务的缺陷？</h4>
+
+<p>Redis 从 2.6 版本开始支持执行 <strong>Lua 脚本</strong>，它的功能和事务非常类似。可以利用 Lua 脚本来<strong>批量执行</strong>多条 Redis 命令，这些 Redis 命令会被提交到 Redis 服务器一次性执行完成，大幅减小了网络开销。</p>
+
+<p>一段 Lua 脚本可以视作一条命令执行，一段 Lua 脚本执行过程中不会有其他脚本或 Redis 命令同时执行，保证了操作不会被其他指令插入或打扰。</p>
+
+<p>如果 Lua 脚本运行时出错并中途结束，出错之后的命令是不会被执行的。并且，出错之前执行的命令是无法被撤销的。因此，严格来说，通过 Lua 脚本来批量执行 Redis 命令也是不满足原子性的。</p>
 
 <h3 id="管道">管道</h3>
 
@@ -1641,9 +2491,11 @@ QUEUED
 
 <h3 id="集群">集群</h3>
 
-<blockquote>
+<h4 id="负载均衡算法">负载均衡算法</h4>
 
-</blockquote>
+<h4 id="负载均衡转发实现">负载均衡转发实现</h4>
+
+<h4 id="集群下的-session-管理">集群下的 Session 管理</h4>
 
 <h3 id="性能优化">性能优化</h3>
 
@@ -1651,45 +2503,195 @@ QUEUED
 
 <p><code class="highlighter-rouge">bigkey</code>：key 对应的 value 所占用的内存较大。如 string 类型的 value 超过 10 kb，复合类型的 value 包含的元素超过 5000 个（对于复合类型的 value，不一定包含的元素越多，占用的内存就越多）。</p>
 
-<h3 id="生产问题">生产问题</h3>
+<p>危害：除了会消耗更多的内存空间，bigkey 对<strong>性能</strong>也会有比较大的影响。因此，应该尽量避免写入 bigkey！</p>
 
-<h5 id="缓存穿透">缓存穿透</h5>
+<h4 id="如何发现-bigkey">如何发现 bigkey？</h4>
 
-<p>缓存穿透、击穿：大量请求的 key 根本不存在于缓存中，导致请求（没有经过缓存）直接到数据库上。</p>
-
-<p>解决方法：</p>
-
-<ul>
-  <li>参数校验：不合法的参数请求直接抛出异常信息返回给客户端。如查询的数据库 id 不能小于 0、传入的邮箱格式错误等；</li>
-  <li>缓存无效 key：如果缓存和数据库都查不到某个 key 的数据就写入 Redis 并设置过期时间，可解决请求的 key 变化不频繁的情况；</li>
-  <li>布隆过滤器：可非常方便地判断一个给定数据不存在于海量数据中（哈希函数）；
+<ol>
+  <li>使用 Redis 自带的 <code class="highlighter-rouge">--bigkeys</code> 参数来查找。这个命令会扫描 Redis 中的所有 key ，会对 Redis 的性能有一点影响。并且，这种方式只能找出每种数据结构 top 1 bigkey（占用内存最大的 string 数据类型，包含元素最多的复合数据类型）。</li>
+  <li>通过分析 RDB 文件来找出 big key。这种方案的前提是 Redis 采用的是 RDB 持久化。网上有现成的代码/工具可以直接拿来使用：
     <ul>
-      <li>把所有可能存在的请求的值都存放在布隆过滤器中，先判断用户发来的请求的值是否存在于布隆过滤器中。不存在的话，直接返回请求参数错误信息给客户端，存在的话才会走下面的流程。</li>
-      <li>用于Redis、海量数据处理、缓存穿透的场景。</li>
+      <li><a href="https://github.com/sripathikrishnan/redis-rdb-tools">redis-rdb-tools</a> ：Python 语言写的用来分析 Redis 的 RDB 快照文件用的工具；</li>
+      <li><a href="https://github.com/weiyanwei412/rdb_bigkeys">rdb_bigkeys</a> : Go 语言写的用来分析 Redis 的 RDB 快照文件用的工具，性能更好。</li>
     </ul>
   </li>
+</ol>
+
+<h4 id="大量-key-集中过期问题">大量 key 集中过期问题</h4>
+
+<p>在内存管理中，对于过期 key，Redis 采用的是 <strong>定期删除+惰性/懒汉式删除</strong> 策略。</p>
+
+<ul>
+  <li>定期删除执行过程中，如果<strong>突然遇到</strong>大量过期 key 的话，客户端请求必须<strong>等待</strong>定期清理过期 key 任务线程执行完成，因为这个这个定期任务线程是在 <strong>Redis 主线程</strong>中执行的。</li>
+  <li>这就导致客户端请求没办法被及时处理，响应速度会比较慢。</li>
 </ul>
+
+<p>如何解决呢？下面是两种常见的方法：</p>
+
+<ol>
+  <li>给 key 设置<strong>随机</strong>过期时间。</li>
+  <li>开启 <code class="highlighter-rouge">lazy-free</code>（惰性删除/延迟释放） 。<code class="highlighter-rouge">lazy-free</code> 特性：是 Redis 4.0 开始引入的，指的是让 Redis 采用异步方式延迟释放 key 使用的内存，将该操作交给单独的<strong>子线程</strong>处理，避免阻塞主线程。</li>
+</ol>
+
+<h3 id="缓存">缓存</h3>
+
+<h4 id="缓存特征">缓存特征</h4>
+
+<p>命中率：当某个请求能够通过访问缓存而得到响应时，称为缓存命中。</p>
+
+<ul>
+  <li>缓存命中率越高，缓存的利用率也就越高。</li>
+</ul>
+
+<p>最大空间：缓存通常位于内存中，内存的空间通常比磁盘空间小的多，因此缓存的最大空间不可能非常大。</p>
+
+<ul>
+  <li>当缓存存放的数据量超过最大空间时，就需要淘汰部分数据来存放新到达的数据。</li>
+</ul>
+
+<p>淘汰策略：</p>
+
+<ul>
+  <li>FIFO（First In First Out）：先进先出策略，在实时性的场景下，需要经常访问最新的数据，那么就可以使用 FIFO，使得最先进入的数据（最晚的数据）被淘汰。</li>
+  <li>LRU（Least Recently Used）：最近最久未使用策略，优先淘汰最久未使用的数据，也就是上次被访问时间距离现在最久的数据。该策略可以保证内存中的数据都是热点数据，也就是经常被访问的数据，从而保证缓存命中率。基于 双向链表 + HashMap 的 LRU 算法实现 LRU。
+    <ol>
+      <li>访问某个节点时，将其从原来的位置删除，并重新插入到链表头部。这样就能保证链表尾部存储的就是最近最久未使用的节点，当节点数量大于缓存最大空间时就淘汰链表尾部的节点。</li>
+      <li>为了使删除操作时间复杂度为 O(1)，就不能采用遍历的方式找到某个节点。HashMap 存储着 Key 到节点的映射，通过 Key 就能以 O(1) 的时间得到节点，然后再以 O(1) 的时间将其从双向队列中删除。</li>
+    </ol>
+  </li>
+  <li>LFU（Least Frequently Used）：最不经常使用策略，优先淘汰一段时间内使用次数最少的数据。</li>
+</ul>
+
+<h4 id="缓存位置">缓存位置</h4>
+
+<ol>
+  <li><strong>浏览器</strong>：当 HTTP 响应允许进行缓存时，浏览器会将 HTML、CSS、JavaScript、图片等静态资源进行缓存。</li>
+  <li><strong>网络服务提供商</strong>（ISP）：是网络访问的第一跳，通过将数据缓存在 ISP 中能够大大提高用户的访问速度。</li>
+  <li><strong>反向代理</strong>：位于服务器之前，请求与响应都需要经过反向代理。通过将数据缓存在反向代理，在用户请求反向代理时就可以直接使用缓存进行响应。</li>
+  <li>本地缓存：使用 <code class="highlighter-rouge">Guava Cache</code> 将数据缓存在服务器本地内存中，服务器代码可以直接读取本地内存中的缓存，速度非常快。</li>
+  <li><strong>分布式缓存</strong>：使用 Redis、Memcache 等分布式缓存将数据缓存在分布式缓存系统中。
+    <ul>
+      <li>相对于本地缓存来说，分布式缓存单独部署，可以根据需求分配硬件资源。不仅如此，服务器集群都可以访问分布式缓存，而本地缓存需要在服务器<strong>集群</strong>之间进行同步，实现难度和性能开销上都非常大。</li>
+    </ul>
+  </li>
+  <li><strong>数据库缓存</strong>：MySQL 等数据库管理系统具有自己的查询缓存机制来提高查询效率。</li>
+  <li><strong>Java 内部的缓存</strong>：Java 为了优化空间，提高字符串、基本数据类型包装类的创建效率，设计了字符串常量池及 Byte、Short、Character、Integer、Long、Boolean 这六种<strong>包装类缓冲池（常量池）</strong>。</li>
+  <li><strong>CPU 多级缓存</strong>：CPU 为了解决运算速度与主存 IO 速度不匹配的问题，引入了<strong>多级缓存</strong>结构，同时使用 MESI 等<strong>缓存一致性</strong>协议来解决多核 CPU 缓存数据一致性的问题。</li>
+</ol>
+
+<h3 id="缓存雪崩击穿穿透">缓存雪崩、击穿、穿透</h3>
+
+<blockquote>
+  <p>Redis 生产问题，缓存异常</p>
+</blockquote>
+
+<p><img src="assets/redis_cache_snow_crash.webp" alt="" style="zoom: 67%;" /></p>
 
 <h5 id="缓存雪崩">缓存雪崩</h5>
 
+<p>缓存雪崩：缓存在<strong>同一时刻大面积失效</strong>、或充当缓存的Redis宕机，请求都<strong>直接落到数据库</strong>上，造成数据库短时间内承受大量请求而宕机。</p>
+
 <ul>
-  <li>Redis 服务不可用：缓存在同一时间大面积失效，请求都直接落到数据库上，造成数据库短时间内承受大量请求。
-    <ol>
-      <li>采用 Redis 集群，避免单机出现问题整个缓存服务都无法使用；</li>
-      <li>限流，避免同时处理大量的请求。</li>
-    </ol>
-  </li>
-  <li>热点缓存失效：被大量访问的数据在某一时刻大面积失效，请求都直接落到数据库上。
-    <ol>
-      <li>设置不同的缓存失效时间，如随机设置；</li>
-      <li>缓存永不失效。</li>
-    </ol>
-  </li>
+  <li><del>如果在高并发的情况下，可能瞬间就会导致数据库宕机。这时候如果运维马上又重启数据库，马上又会有新的流量把数据库打死。</del></li>
 </ul>
 
-<h3 id="缓存读写策略">缓存读写策略</h3>
+<p>解决方法：</p>
 
-<h5 id="cache-aside-pattern旁路缓存模式">Cache Aside Pattern（旁路缓存模式）</h5>
+<ol>
+  <li>针对大量数据同时过期的情况：
+    <ol>
+      <li>错开<strong>设置不同的缓存失效时间</strong>，如<strong>随机设置</strong>，可以避免因为采用<strong>相同的过期时间</strong>导致的缓存雪崩。让他们尽量不同时过期。尤其是在缓存预热的时候，更需要这样做。</li>
+      <li>加<strong>互斥锁</strong>（<code class="highlighter-rouge">setnx</code>命令），保证同一个时间内只有一个请求来构建缓存，构建完后释放锁，未能获取到锁的请求，要么等锁释放后重新读取缓存，要么返回空或默认值。
+        <ul>
+          <li>如果缓存失效的情况，只有拿到锁才可以查询数据库，降低了在同一时刻打在数据库上的请求，防止数据库打死。当然这样会导致系统的性能变差。</li>
+        </ul>
+      </li>
+      <li>后台定时更新缓存：业务线程不再负责更新缓存，对于热点的key可以设置<strong>永不过期</strong>的key，让缓存“永久有效”，让<strong>后台线程定时更新缓存</strong>。适合用于对于<strong>缓存一致性</strong>要求不特别严格的场景。</li>
+      <li>双 <code class="highlighter-rouge">key</code> 策略：备用 key 永久不过期，主 key 过期时返回备用 key 的内容。</li>
+    </ol>
+  </li>
+  <li>Redis 服务不可用、宕机导致的：
+    <ol>
+      <li>采用 Redis 集群、构建Redis主从和哨兵来保证<strong>可靠性</strong>，避免单机出现问题整个缓存服务都无法使用；</li>
+      <li>服务熔断或进行请求限流，避免同时处理大量的请求。
+        <ol>
+          <li><strong>熔断机制</strong>：当流量到达一定的<strong>阈值</strong>时，就暂停业务，直接返回“系统拥挤”之类的错误提示，防止过多的请求打在数据库上。等Redis恢复正常后，再允许业务进行。至少能保证一部分用户是可以正常使用，其他用户多刷新几次也能得到结果。</li>
+          <li><strong>启用限流</strong>：只允许少部分请求访问数据库，大于能承受的压力的请求直接拒绝服务。等到Redis正常且预热完毕，再解除限流。</li>
+        </ol>
+      </li>
+      <li>提高数据库的容灾能力，可以使用分库分表、读写分离的策略。</li>
+    </ol>
+  </li>
+</ol>
+
+<p>例如：</p>
+
+<ul>
+  <li>当多个商品缓存同时失效时会雪崩，导致大量查询数据库。还有就是秒杀刚开始的时候缓存里没有数据。</li>
+  <li><strong>解决方案</strong>：缓存预热，错开缓存失效时间</li>
+</ul>
+
+<h5 id="缓存击穿">缓存击穿</h5>
+
+<p>缓存击穿：是一个<strong>热点的Key</strong>（比如秒杀活动），有<strong>大并发</strong>集中对其进行访问，突然间这个Key失效了，导致大量<strong>并发请求</strong>全部落在数据库上，导致数据库很容易被击穿。</p>
+
+<p>实际上缓存击穿与缓存雪崩都是<strong>key失效</strong>的问题，也可以认为<strong>缓存击穿</strong>是<strong>缓存雪崩</strong>的子集。</p>
+
+<p>二者的区别在于：雪崩针对很多 key 失效，而击穿只针对于某一个<strong>热点 key</strong> 失效。</p>
+
+<p><strong>解决方法</strong>：与缓存雪崩类似</p>
+
+<ol>
+  <li>使用<strong>互斥锁</strong>。</li>
+  <li>后台更新缓存。</li>
+</ol>
+
+<h5 id="缓存穿透">缓存穿透</h5>
+
+<p>缓存穿透：是当用户访问的数据，<strong>既不在缓存中，也不在数据库中</strong>，导致请求在访问缓存时，发现缓存缺失，再去访问数据库时，发现数据库中也没有要访问的数据，没办法构建缓存数据，来服务后续的请求。那么当有大量这样的请求到来时，数据库的压力骤增。</p>
+
+<p>发生的原因有：</p>
+
+<ol>
+  <li>非法请求的限制、参数校验：不合法的参数请求直接抛出异常信息返回给客户端。如查询的数据库 id 不能小于 0、传入的邮箱格式错误等；</li>
+  <li>业务操作错误，缓存的数据或数据库的数据被删除，或者意外被用户访问到不存在的数据。
+    <ul>
+      <li><strong>解决方法</strong>：<strong>缓存无效 key</strong>，缓存空值、或默认值，如果缓存和数据库都查不到某个 key 的数据就写入 Redis 并设置过期时间，可解决请求的 key 变化不频繁的情况；</li>
+    </ul>
+  </li>
+  <li>使用<strong>布隆过滤器</strong>：快速判断数据是否存在，避免通过查询数据库来判断数据是否存在；加入布隆过滤器之后的<strong>缓存处理流程</strong>：
+    <ol>
+      <li>把所有可能存在的请求的值都存放在布隆过滤器中，先判断用户发来的请求的值<strong>是否存在于</strong>布隆过滤器中。不存在的话，直接返回请求参数错误信息给客（无效请求）户端；</li>
+      <li>存在的话判断<strong>缓存中</strong>是否存在对应的数据，存在的话直接返回；</li>
+      <li>不存在的话判断<strong>数据库中</strong>是否存在对应的数据，存在的话返回数据、并更新缓存的数据，不存在的话返回空数据。</li>
+    </ol>
+  </li>
+  <li>黑客恶意攻击：</li>
+</ol>
+
+<h5 id="保证缓存和数据库数据的一致性">保证缓存和数据库数据的一致性</h5>
+
+<p>缓存一致性要求数据更新的同时缓存数据也能够实时更新。</p>
+
+<p>解决方案：</p>
+
+<ul>
+  <li>在数据更新的同时立即去更新缓存；</li>
+  <li>在读缓存之前先判断缓存是否是最新的，如果不是最新的先进行更新。</li>
+</ul>
+
+<p>如果更新数据库成功，而删除缓存这一步失败的情况的话，简单说两个解决方案：</p>
+
+<ol>
+  <li>让缓存数据失效时间变短（不推荐，治标不治本） ：缓存会从数据库中加载数据。不适用先操作缓存后操作数据库的场景。</li>
+  <li>增加 cache 更新重试机制（常用）： 如果 cache 服务当前不可用导致缓存删除失败，就<strong>隔一段时间重试</strong>。如果多次重试还是失败，可把当前更新失败的 key 存入<strong>队列</strong>中，等缓存服务可用后，再将缓存中对应的 key 删除即可。</li>
+</ol>
+
+<p><a href="https://mp.weixin.qq.com/s?__biz=MzIyOTYxNDI5OA==&amp;mid=2247487312&amp;idx=1&amp;sn=fa19566f5729d6598155b5c676eee62d&amp;chksm=e8beb8e5dfc931f3e35655da9da0b61c79f2843101c130cf38996446975014f958a6481aacf1&amp;scene=178&amp;cur_album_id=1699766580538032128#rd">缓存和数据库一致性问题，看这篇就够了 - 水滴与银弹</a></p>
+
+<h4 id="缓存读写策略">缓存读写策略</h4>
+
+<h5 id="cache-aside-pattern旁路缓存模式"><del>Cache Aside Pattern（旁路缓存模式）</del></h5>
 
 <p>适合读请求较多的场景。</p>
 
@@ -1697,12 +2699,10 @@ QUEUED
 
 <ol>
   <li>先更新 DB；</li>
-  <li>然后直接删除 cache 。
-    <ul>
-      <li>先删除 cache ，后更新 DB，可能会造成数据库和缓存数据不一致的问题。</li>
-    </ul>
-  </li>
+  <li>然后直接删除 cache 。</li>
 </ol>
+
+<p>先删除 cache ，后更新 DB，可能会造成数据库和缓存数据不一致的问题。</p>
 
 <p>读请求 :</p>
 
@@ -1729,18 +2729,7 @@ QUEUED
   <li>可短暂地允许数据库和缓存数据不一致的场景 ：更新DB时同样更新cache，但给缓存加一个较短的过期时间，可保证即使数据不一致影响也比较小。</li>
 </ul>
 
-<h5 id="保证缓存和数据库数据的一致性">保证缓存和数据库数据的一致性</h5>
-
-<p>如果更新数据库成功，而删除缓存这一步失败的情况的话，简单说两个解决方案：</p>
-
-<ol>
-  <li>让缓存数据失效时间变短（不推荐，治标不治本） ：缓存会从数据库中加载数据。不适用先操作缓存后操作数据库的场景。</li>
-  <li>增加 cache 更新重试机制（常用）： 如果 cache 服务当前不可用导致缓存删除失败，就隔一段时间重试。如果多次重试还是失败，可把当前更新失败的 key 存入队列中，等缓存服务可用后，再将缓存中对应的 key 删除即可。</li>
-</ol>
-
-<p><a href="https://mp.weixin.qq.com/s?__biz=MzIyOTYxNDI5OA==&amp;mid=2247487312&amp;idx=1&amp;sn=fa19566f5729d6598155b5c676eee62d&amp;chksm=e8beb8e5dfc931f3e35655da9da0b61c79f2843101c130cf38996446975014f958a6481aacf1&amp;scene=178&amp;cur_album_id=1699766580538032128#rd">缓存和数据库一致性问题，看这篇就够了 - 水滴与银弹</a></p>
-
-<h5 id="readwrite-through-pattern读写穿透">Read/Write Through Pattern（读写穿透）</h5>
+<h5 id="readwrite-through-pattern读写穿透"><del>Read/Write Through Pattern（读写穿透）</del></h5>
 
 <p>服务端把 cache 视为主要数据存储，从中读写数据。cache 服务负责将此数据读取和写入 DB，从而减轻应用程序的职责。少见。</p>
 
@@ -1758,8 +2747,275 @@ QUEUED
   <li>读取不到的话，先从 DB 加载，写入到 cache 后返回响应。</li>
 </ol>
 
-<h5 id="write-behind-pattern异步缓存写入">Write Behind Pattern（异步缓存写入）</h5>
+<h5 id="write-behind-pattern异步缓存写入"><del>Write Behind Pattern（异步缓存写入）</del></h5>
 
 <p>和 Read/Write Through Pattern 很相似，两者都是由 cache 服务来负责 cache 和 DB 的读写。</p>
 
 <p>但又有很大不同：Read/Write Through 是同步更新 cache 和 DB，而 Write Behind Caching 则是只更新缓存，不直接更新 DB，改为异步批量的方式来更新 DB。少见。</p>
+
+<h2 id="elasticsearch-全文搜索引擎">Elasticsearch 全文搜索引擎</h2>
+
+<h3 id="简介">简介</h3>
+
+<p><code class="highlighter-rouge">Elasticsearch</code> 是一个基于Lucene的搜索服务器。</p>
+
+<ul>
+  <li>一个开源的<strong>分布式</strong>全文搜索引擎，基于<strong>restful web接口</strong>。</li>
+  <li>可以用来实现<strong>搜索</strong>、<strong>日志</strong>统计、分析、系统监控等功能。</li>
+  <li>广泛运用于云计算中，能够达到实时搜索，具有稳定、可靠、快速的特点。</li>
+  <li>端口：默认端口号为 <code class="highlighter-rouge">9200/9300</code>，<code class="highlighter-rouge">Kibana</code> 默认端口为 <code class="highlighter-rouge">5601</code>。</li>
+</ul>
+
+<blockquote>
+  <p>参考：<a href="https://www.cnblogs.com/buchizicai/p/17093719.html">ES分布式搜索引擎(ES从入门到精通一篇就够了) </a></p>
+</blockquote>
+
+<h4 id="mysqlelasticsearch">MySQL、Elasticsearch</h4>
+
+<ul>
+  <li>MySQL：擅长<strong>事务类型</strong>操作，可以确保数据的安全和一致性；对安全性要求较高的写操作。使用正向索引。</li>
+  <li>Elasticsearch：擅长<strong>海量数据</strong>的搜索、分析、计算；对<strong>查询性能</strong>要求较高的搜索需求。使用<strong>倒排索引</strong>。</li>
+</ul>
+
+<h4 id="sql-和-es-dsl-对应关系">SQL 和 ES DSL 对应关系</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>MySQL</th>
+      <th>Elasticsearch Query DSL</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>SQL</td>
+      <td>DSL</td>
+      <td>是elasticsearch提供的JSON风格的请求语句，用来操作elasticsearch，实现CRUD。</td>
+    </tr>
+    <tr>
+      <td>数据库</td>
+      <td>Index（索引）</td>
+      <td>就是文档的集合。</td>
+    </tr>
+    <tr>
+      <td>Table</td>
+      <td><code class="highlighter-rouge">Type</code>（类型）</td>
+      <td>是索引的<strong>逻辑类别分区</strong>，通常为具有一组<strong>公共字段</strong>的文档类型</td>
+    </tr>
+    <tr>
+      <td>Row</td>
+      <td>Document（文档）</td>
+      <td>就是一条条的数据，文档都是JSON格式。</td>
+    </tr>
+    <tr>
+      <td>Column</td>
+      <td>Field（字段）</td>
+      <td>就是JSON文档中的字段。</td>
+    </tr>
+    <tr>
+      <td>id？</td>
+      <td>Term（词条）</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>Schema（s给ma，表结构）</td>
+      <td>Mapping（映射）</td>
+      <td>是索引中文档的约束，例如字段类型约束。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="倒排索引">倒排索引</h4>
+
+<p>MySQL <strong>正向索引</strong>：如给<strong>表中的id</strong>创建索引，基于 <code class="highlighter-rouge">title </code> 做<strong>模糊查询</strong>时，只能<strong>全表扫描</strong>/逐行扫描，随着数据量增加，查询效率也会越来越低。当数据量达到数百万时，就是一场灾难。</p>
+
+<p>倒排索引中两个非常重要的概念：</p>
+
+<ul>
+  <li>文档（<code class="highlighter-rouge">Document</code>）</li>
+  <li>词条（<code class="highlighter-rouge">Term</code>）：对文档数据或用户搜索数据，利用某种<strong>算法分词</strong>，得到的具备含义的词语。如：我是中国人，就可以分为：我、是、中国人、中国、国人这样的几个词条。</li>
+</ul>
+
+<p><strong>创建倒排索引</strong>是对正向索引的一种特殊处理，流程如下：</p>
+
+<ol>
+  <li>将每一个<strong>文档</strong>的数据利用<strong>算法分词</strong>，得到一个个<strong>词条</strong>；</li>
+  <li>创建<strong>词条列表</strong>：每行数据包括<strong>词条</strong>、词条所在<strong>文档id</strong>、位置等信息；</li>
+  <li>因为词条唯一性，可以给词条创建<strong>倒排索引</strong>（相当于 SQL 中的表），例如hash表结构索引。</li>
+  <li>查询时，先<strong>分词</strong>得到词条，再根据词条去<strong>词条列表</strong>（倒排索引）中查询对应的文档id，根据文档id去<strong>正向索引</strong>中查询文档存入结果集。</li>
+</ol>
+
+<p><img src="assets/2729274-20230205171803916-704919285.png" alt="img" style="zoom:60%;" /></p>
+
+<h4 id="相关概念">相关概念</h4>
+
+<ul>
+  <li><code class="highlighter-rouge">Near Realtime</code>（<strong>近实时</strong>）：Elasticsearch是一个近乎实时的搜索平台，这意味着从<strong>索引文档</strong>到<strong>可搜索文档</strong>之间只有一个轻微的延迟（通常是一秒钟）。</li>
+  <li><code class="highlighter-rouge">Cluster</code>（集群）：群集是一个或多个<strong>节点的集合</strong>，它们一起保存整个数据，并提供跨所有节点的<strong>联合索引</strong>和搜索功能。每个群集都有自己的唯一群集名称，节点通过名称加入群集。</li>
+  <li><code class="highlighter-rouge">Node</code>（节点）：节点是指属于集群的<strong>单个Elasticsearch实例</strong>，存储数据并参与集群的索引和搜索功能。可以将节点配置为按集群名称加入特定集群，默认情况下，每个节点都设置为加入一个名为<code class="highlighter-rouge">elasticsearch</code>的群集。</li>
+  <li><code class="highlighter-rouge">Index</code>（<strong>索引</strong>）：索引是一些具有相似特征的<strong>文档集合</strong>，类似于MySql中<strong>数据库</strong>的概念。
+    <ul>
+      <li><code class="highlighter-rouge">Type</code>（类型）：类型是索引的<strong>逻辑类别分区</strong>，通常为具有一组<strong>公共字段</strong>的文档类型，类似MySql中表的概念。<code class="highlighter-rouge">注意</code>：在6.0.0及更高的版本中，一个索引只能包含一个类型。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">Document</code>（<strong>文档</strong>）：文档是可被索引的基本信息单位，指（<code class="highlighter-rouge">Row</code>），以<code class="highlighter-rouge">JSON</code>形式表示，类似于MySQL中<strong>行记录</strong>（<code class="highlighter-rouge">Row</code>）的概念。
+    <ul>
+      <li>文档中往往包含很多的<strong>字段（Field）</strong>，类似于MySQL数据库中的列。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">Shards</code>（分片）：当索引存储大量数据时，可能会超出单个节点的硬件限制，为了解决这个问题，Elasticsearch提供了将<strong>索引细分</strong>为分片的概念。分片机制赋予了索引<strong>水平扩容</strong>的能力、并允许跨分片分发和并行化操作，从而提高性能和吞吐量。</li>
+  <li><code class="highlighter-rouge">Replicas</code>（副本）：在可能出现故障的网络环境中，需要有一个<strong>故障切换机制</strong>，Elasticsearch提供了将索引的分片复制为一个或多个副本的功能，副本在某些节点失效的情况下提供高可用性。</li>
+  <li><strong>IK分词器</strong>有几种模式？
+    <ul>
+      <li><code class="highlighter-rouge">ik_smart</code>：智能切分，粗粒度</li>
+      <li><code class="highlighter-rouge">ik_max_word</code>：最细切分，细粒度</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="dsl-命令--restapi">DSL 命令 / RestAPI</h3>
+
+<p>Elasticsearch 提供了基于JSON的<strong>DSL（Domain Specific Language）</strong>来<strong>定义查询</strong>。常见的查询类型包括：</p>
+
+<ul>
+  <li><strong>查询所有</strong>：查询出所有数据，一般测试用。例如：<code class="highlighter-rouge">match_all</code></li>
+  <li><strong>全文检索（full text）查询</strong>：利用分词器对用户输入内容分词，然后去<strong>倒排索引库</strong>中匹配。例如：
+    <ul>
+      <li><code class="highlighter-rouge">match_query</code></li>
+      <li><code class="highlighter-rouge">multi_match_query</code></li>
+    </ul>
+  </li>
+  <li><strong>精确查询</strong>：根据精确词条值查找数据，一般是查找keyword、数值、日期、boolean等类型字段。例如：
+    <ul>
+      <li><code class="highlighter-rouge">ids</code></li>
+      <li><code class="highlighter-rouge">range</code></li>
+      <li><code class="highlighter-rouge">term</code>（分词）：</li>
+    </ul>
+  </li>
+  <li><strong>地理查询</strong>：根据经纬度查询。例如：
+    <ul>
+      <li><code class="highlighter-rouge">geo_distance</code></li>
+      <li><code class="highlighter-rouge">geo_bounding_box</code></li>
+    </ul>
+  </li>
+  <li><strong>复合（compound）查询</strong>：复合查询可以将上述各种查询条件组合起来，合并查询条件。例如：
+    <ul>
+      <li><code class="highlighter-rouge">bool</code></li>
+      <li><code class="highlighter-rouge">function_score</code></li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="索引库的crud">索引库的CRUD</h4>
+
+<ul>
+  <li>创建索引库：PUT /索引库名</li>
+  <li>查询索引库：GET /索引库名</li>
+  <li>删除索引库：DELETE /索引库名</li>
+  <li>修改索引库（添加字段）：PUT /索引库名/_mapping</li>
+</ul>
+
+<h4 id="文档操作">文档操作</h4>
+
+<ul>
+  <li>创建文档：POST /{索引库名}/_doc/文档id</li>
+  <li>查询文档：GET /{索引库名}/_doc/文档id</li>
+  <li>删除文档：DELETE /{索引库名}/_doc/文档id</li>
+  <li>修改文档：
+    <ul>
+      <li>全量修改：PUT /{索引库名}/_doc/文档id，直接覆盖原来的文档</li>
+      <li><strong>增量修改</strong>：POST /{索引库名}/_update/文档id { “doc”: {字段}}，修改文档中的部分字段</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 查看所有节点
+GET _cat/nodes
+
+# 查看book索引数据
+GET book/_search
+{
+    "query": {
+    "match": {
+      "content": "chenqionghe"
+    }
+  }
+}
+
+# 添加一条数据
+POST book/_doc 
+{
+  "page":8,
+  "content": "chenqionghe喜欢运动，绳命是如此的精彩，绳命是多么的辉煌"
+}
+
+# 更新数据
+PUT book/_doc/iSAz4XABrERdg9Ao0QZI
+{
+  "page":8,
+  "content":"chenqionghe喜欢运动，绳命是剁么的回晃；绳命是入刺的井猜"
+}
+
+# 删除数据
+POST book/_delete_by_query
+{
+  "query": {
+    "match": {
+      "page": 8
+    }
+  }
+}
+
+# 批量插入数据
+POST book/_bulk
+{ "index":{} }
+{ "page":22 , "content": "Adversity, steeling will strengthen body.逆境磨练意志，锻炼增强体魄。"}
+{ "index":{} }
+{ "page":23 , "content": "Reading is to the mind, such as exercise is to the body.读书之于头脑，好比运动之于身体。"}
+{ "index":{} }
+{ "page":24 , "content": "Years make you old, anti-aging.岁月催人老，运动抗衰老。"}
+{ "index":{} }
+</code></pre></div></div>
+
+<h3 id="sql-查询">SQL 查询</h3>
+
+<p>在<code class="highlighter-rouge">Kibana</code>的Console中输入如下命令：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>POST /_sql?format=txt
+{
+  "query": "SELECT account_number,address,age,balance FROM account LIMIT 10"
+}
+</code></pre></div></div>
+
+<h5 id="将sql转化为dsl">将SQL转化为DSL</h5>
+
+<p>当需要使用Query DSL时，也可以先使用SQL来查询，然后通过<code class="highlighter-rouge">Translate API</code>转换即可。</p>
+
+<p>例如翻译以下查询语句：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>POST /_sql/translate
+{
+  "query": "SELECT account_number,address,age,balance FROM account WHERE age&gt;32 LIMIT 10"
+}
+</code></pre></div></div>
+
+<h3 id="es-与-mysql-数据同步">ES 与 MySQL 数据同步</h3>
+
+<p>同步调用：</p>
+
+<ol>
+  <li>hotel-demo对外提供接口，用来修改elasticsearch中的数据；</li>
+  <li>酒店管理服务在完成数据库操作后，直接调用hotel-demo提供的接口。</li>
+</ol>
+
+<p><img src="assets/2729274-20230205174204697-1782713458.png" alt="img" style="zoom:60%;" /></p>
+
+<p>异步通知：</p>
+
+<ul>
+  <li>hotel-admin对mysql数据库数据完成增、删、改后，发送MQ消息；</li>
+  <li>hotel-demo<strong>监听MQ</strong>，接收到消息后完成elasticsearch数据修改。</li>
+</ul>
+
+<p><img src="assets/2729274-20230205174208679-699617903.png" alt="img" style="zoom:60%;" /></p>

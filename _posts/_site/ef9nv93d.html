@@ -1,5 +1,5 @@
 <blockquote>
-  <p>摘要：分布式、Spring Cloud 微服务、高并发高性能、高可用。</p>
+  <p>摘要：分布式、高并发/高性能、高可用、Spring Cloud 微服务等。</p>
 </blockquote>
 
 <!-- more -->
@@ -17,6 +17,55 @@
 <ul>
   <li>如电商系统可简单地拆分成订单系统、商品系统、登录系统等，如果某个服务的访问量较大的话、也可同时部署在多台机器上。</li>
 </ul>
+
+<h3 id="中间件">中间件</h3>
+
+<p><strong>中间件</strong>：是一类提供系统软件和应用软件之间<strong>连接</strong>、便于软件各部件之间的<strong>沟通</strong>的软件，应用软件可以借助中间件在<strong>不同的技术架构</strong>之间共享信息与资源。中间件位于客户机服务器的操作系统之上，管理着计算资源和网络通信。</p>
+
+<ul>
+  <li>中间件是应用软件与系统软件之间的“中介件”“介中软件”，起到支撑与连接作用；</li>
+  <li>中间件不是开发工具，但它具有开发、管理和部署的功能；</li>
+  <li>中间件是为应用软件服务的，应用软件是为最终用户服务的，最终用户并不直接使用中间件；</li>
+</ul>
+
+<p>是一种应用于<strong>分布式系统</strong>的基础软件，位于应用与操作系统、数据库之间，主要用于解决分布式环境下数据传输、数据访问、应用调度、系统构建和系统集成、流程管理等问题，是分布式环境下支撑应用开发、运行和集成的平台。</p>
+
+<p>中间件是指介于两个不同系统之间的软件组件，它可以在两个系统之间传递、处理、转换数据，以达到协同工作的目的。</p>
+
+<p>它们的关系是什么样的？</p>
+
+<ul>
+  <li>分布式和中间件的关系可以简单理解为父与子的关系，分布式是父，中间件是子。</li>
+  <li>微服务和分布式的关系是一种演变关系，以先有鸡还是先有蛋的比喻来说，是先有微服务，再有分布式，很简单，因为分布式用到了微服务这种架构模式。</li>
+</ul>
+
+<p>Java 常用中间件：</p>
+
+<ol>
+  <li>网关：Nginx、Kong、Zuul、Gateway</li>
+  <li><strong>缓存</strong>：Redis、MemCached、OsCache、EhCache</li>
+  <li><strong>搜索</strong>：ElasticSearch、Solr</li>
+  <li>熔断：Hystrix、resilience4j</li>
+  <li>负载均衡：DNS、F5、LVS、Nginx、OpenResty、HAproxy</li>
+  <li>注册中心：Nacos、Eureka、Zookeeper、Redis、Etcd、Consul</li>
+  <li><strong>认证鉴权</strong>：JWT、SpringSecurity</li>
+  <li><strong>消费队列</strong>：RabbitMQ、Kafka、RocketMQ、ActiveMQ、Redis</li>
+  <li>系统监控：Grafana、Prometheus、Influxdb、Telegraf、Lepus</li>
+  <li>文件系统：OSS、NFS、FastDFS、MogileFS</li>
+  <li>RPC框架：Dubbo、Motan、Thrift、grpc</li>
+  <li><strong>构建工具</strong>：Maven、Gradle</li>
+  <li><strong>集成部署</strong>：Docker、Jenkins、Git、Maven</li>
+  <li>分布式配置：Disconf、Apollo、Nacos 、Spring Cloud Config、Diamond</li>
+  <li>压测：LoadRunner、JMeter、AB、webbench</li>
+  <li><strong>数据库</strong>：MySQL、Redis、MongoDB、PostgreSQL、Memcache、HBase</li>
+  <li>网络：专用网络VPC、弹性公网IP、CDN</li>
+  <li>数据库中间件：DRDS、Mycat、360 Atlas、Cobar</li>
+  <li><strong>分布式框架</strong>：Dubbo、Motan、Spring-Could</li>
+  <li>分布式任务：XXL-JOB、Elastic-Job、Saturn、Quartz,Hangfire</li>
+  <li>分布式追踪：Pinpoint、CAT、zipkin</li>
+  <li><strong>分布式日志</strong>：elasticsearch、logstash、Kibana 、redis、kafka</li>
+  <li>版本发布：蓝绿部署、A/B测试、灰度发布/金丝雀发布</li>
+</ol>
 
 <h3 id="cap-定理和-base-理论">CAP 定理和 BASE 理论</h3>
 
@@ -124,15 +173,32 @@
   </li>
 </ul>
 
+<h3 id="分布式中间件">分布式中间件</h3>
+
+<p>分布式中间件是在分布式系统中用于解决通信、数据传输、负载均衡、数据存储和处理等问题的软件组件。它们能够帮助构建可靠、高效、可扩展的分布式系统。以下是一些常见的分布式中间件以及它们的应用场景和作用：</p>
+
+<ol>
+  <li>消息队列系统：Kafka、RabbitMQ、ActiveMQ： 用于异步通信、解耦系统、实现事件驱动架构，适用于日志收集、消息传递、异步任务处理等场景。</li>
+  <li>分布式缓存系统： Redis、Memcached： 提供高速缓存服务，用于加速数据访问、存储频繁访问的数据、缓解数据库压力。</li>
+  <li>分布式存储系统：HDFS、Ceph、GlusterFS： 提供分布式文件系统支持，用于大规模数据存储、容错、可扩展性和高可用性。</li>
+  <li>分布式数据库系统：MySQL Cluster、CockroachDB、TiDB： 提供分布式数据库服务，支持高并发、水平扩展和数据一致性。</li>
+  <li>分布式计算系统：Hadoop、Spark、Flink： 用于大数据处理和分析，支持并行计算、批处理和实时流处理。</li>
+  <li>服务注册与发现：Consul、ZooKeeper、etcd：提供服务注册、发现和配置管理，用于构建微服务架构、服务发现和负载均衡。</li>
+  <li>分布式事务管理：Atomikos、Seata：解决分布式系统中的事务问题，确保跨多个数据库、服务之间的事务一致性。</li>
+  <li>分布式任务调度：Distributed Cron、Airflow：用于任务的调度和管理，支持定时任务、依赖任务等场景。</li>
+</ol>
+
+<p>这些分布式中间件在不同的场景下发挥着重要的作用，能够解决分布式系统中的各种挑战，包括但不限于数据一致性、容错性、可扩展性、性能和可靠性等问题。选择适合自己场景的分布式中间件需要考虑到业务需求、数据量、系统复杂性和性能要求等因素。</p>
+
 <h3 id="api-网关">API 网关</h3>
 
 <p>是随着微服务（Microservice）概念兴起的一种架构模式。微服务背景下，一个系统被<strong>拆分为多个服务</strong>，但每个服务都需要一些重复功能，且没有一个全局的视图来统一管理。</p>
 
 <p><strong>网关</strong>：主要用于请求转发、安全认证（身份/权限认证）、协议转换、流量控制、负载均衡、容灾、日志、监控等功能。实际上，主要做了一件事：<strong>请求过滤</strong> 。同一入口，统一校验，统一分发。</p>
 
-<p>常见网关系统：</p>
+<p>有哪些<strong>常见的网关系统</strong>？</p>
 
-<ul>
+<ol>
   <li>
     <p>Netflix Zuul：主要通过过滤器（类似于 AOP）来过滤请求，实现网关的各种功能。</p>
   </li>
@@ -141,7 +207,7 @@
   <li>APISIX：基于 Nginx 和 etcd 的高性能、云原生、可扩展的网关系统。与传统 API 网关相比，有动态路由和插件热加载，特别适合微服务系统下的 API 管理。并且与 SkyWalking（分布式链路追踪系统）、Zipkin（分布式链路追踪系统）、Prometheus（监控系统） 等 DevOps 生态工具对接都十分方便。</li>
   <li>Shenyu：基于 WebFlux 的可扩展、高性能、响应式网关，Apache 顶级开源项目。</li>
   <li><a href="https://tech.meituan.com/2021/05/20/shepherd-api-gateway.html">百亿规模API网关服务Shepherd的设计与实现</a></li>
-</ul>
+</ol>
 
 <h3 id="配置中心">配置中心</h3>
 
@@ -150,8 +216,6 @@
 <p>Apollo</p>
 
 <p>Nacos</p>
-
-<h3 id="分布式中间件">分布式中间件</h3>
 
 <h3 id="rpc-框架">RPC 框架</h3>
 
@@ -220,6 +284,28 @@
   <li>Tinyid(滴滴)</li>
   <li>ZooKeeper 这类中间件也可生成唯一 ID</li>
 </ul>
+
+<h3 id="分布式锁">分布式锁</h3>
+
+<p>锁：</p>
+
+<ul>
+  <li>对于单机多线程，在 Java 中，通常使用 <code class="highlighter-rouge">ReetrantLock</code> 这类 JDK 自带的 <strong>本地锁</strong> 来控制本地多个线程对本地共享资源的访问。</li>
+  <li>对于分布式系统，通常使用 <strong>分布式锁</strong> 来控制多个服务对共享资源的访问。</li>
+</ul>
+
+<p>一个最基本的<strong>分布式锁</strong>需要满足：</p>
+
+<ol>
+  <li><strong>互斥</strong> ：任意一个时刻，锁只能被一个线程持有；</li>
+  <li><strong>高可用</strong> ：锁服务是高可用的。并且，即使客户端的释放锁的代码逻辑出现问题，锁最终一定还是会被释放，不会影响其他线程对共享资源的访问。</li>
+</ol>
+
+<p>通常情况下，一般会选择基于 Redis 或者 ZooKeeper 实现分布式锁，Redis 用的要更多一点。</p>
+
+<h5 id="基于-redis-实现分布式锁">基于 Redis 实现分布式锁</h5>
+
+<p>这里也以 Redis 为例介绍分布式锁的实现：</p>
 
 <h3 id="分布式事务">分布式事务</h3>
 
@@ -632,6 +718,103 @@
 <p>Ribbon
 Feign</p>
 
+<h4 id="nginx-如何做负载均衡">NginX 如何做负载均衡</h4>
+
+<h4 id="常见的负载均衡算法">常见的负载均衡算法</h4>
+
+<h4 id="哈希的一致性">哈希的一致性</h4>
+
+<p>一致性哈希是如何做哈希的</p>
+
+<h3 id="cdn">CDN</h3>
+
+<p><strong>CDN</strong> 全称是 Content Delivery Network/Content Distribution Network，即<strong>内容分发网络</strong> 。</p>
+
+<p>可以拆开来看：</p>
+
+<ul>
+  <li>内容 ：指的是静态资源比如图片、视频、文档、JS、CSS、HTML。</li>
+  <li>分发网络 ：指的是将这些静态资源分发到位于多个不同的地理位置机房中的服务器上，这样，就可以实现静态资源的就近访问比如北京的用户直接访问北京机房的数据。</li>
+</ul>
+
+<p>所以，简单来说，CDN 就是将<strong>静态资源</strong>分发到多个不同的地方以实现<strong>就近访问</strong>，进而加快静态资源的访问速度，减轻服务器以及带宽的负担。</p>
+
+<h4 id="cdn-工作原理是什么">CDN 工作原理是什么？</h4>
+
+<p>搞懂下面 3 个问题也就搞懂了 CDN 的工作原理：</p>
+
+<ol>
+  <li>静态资源是如何被缓存到 CDN 节点中的？</li>
+  <li>如何找到最合适的 CDN 节点？</li>
+  <li>如何防止静态资源被盗用？</li>
+</ol>
+
+<h4 id="静态资源是如何被缓存到-cdn-节点中的">静态资源是如何被缓存到 CDN 节点中的？</h4>
+
+<ul>
+  <li>
+    <p>通过预热的方式将源站的资源同步到 CDN 的节点中。这样的话，用户首次请求资源可以直接从 CDN 节点中取，无需回源。</p>
+  </li>
+  <li>如果不预热的话，你访问的资源可能不再 CDN 节点中，CDN 节点将请求源站获取资源，即 <strong>回源</strong>。</li>
+  <li>如果资源有更新的话，可以对其 <strong>刷新</strong> ，删除 CDN 节点上缓存的资源，当用户访问对应的资源时直接回源获取最新的资源，并重新缓存。</li>
+</ul>
+
+<p><strong>命中率</strong> 和 <strong>回源率</strong> 是衡量 CDN 服务质量两个重要指标。命中率越高越好，回源率越低越好。</p>
+
+<h4 id="如何找到最合适的-cdn-节点">如何找到最合适的 CDN 节点？</h4>
+
+<p>GSLB （Global Server Load Balance，全局负载均衡）是 CDN 的大脑，负责多个 CDN 节点之间<strong>相互协作</strong>，最常用的是<strong>基于 DNS</strong> 的 GSLB。</p>
+
+<p>CDN 会通过 GSLB 找到最合适的 CDN 节点，更具体点来说是下面这样的：</p>
+
+<ol>
+  <li>浏览器向 <strong>DNS 服务器</strong>发送域名请求；</li>
+  <li>DNS 服务器向根据 CNAME( Canonical Name ) 别名记录向 GSLB 发送请求；</li>
+  <li>GSLB 返回性能最好（通常距离请求地址最近）的 CDN 节点（边缘服务器，真正缓存内容的地方）的地址给浏览器；</li>
+  <li>浏览器直接访问指定的 CDN 节点。</li>
+</ol>
+
+<p><img src="assets/cdn-overview.png" alt="img" style="zoom:70%;" /></p>
+
+<p>GSLB 内部可以看作是 CDN 专用 DNS 服务器和负载均衡系统组合。CDN 专用 DNS 服务器会返回负载均衡系统 IP 地址给浏览器，浏览器使用 IP 地址请求负载均衡系统进而找到对应的 CDN 节点。</p>
+
+<p><strong>GSLB 是如何选择出最合适的 CDN 节点呢？</strong> GSLB 会根据请求的 IP 地址、CDN 节点状态（比如负载情况、性能、响应时间、带宽）等指标来综合判断具体返回哪一个 CDN 节点的地址。</p>
+
+<h4 id="如何防止资源被盗刷">如何防止资源被盗刷？</h4>
+
+<p>为了防止静态资源被盗用，我们可以利用 <strong>Referer 防盗链</strong> + <strong>时间戳防盗链</strong> 。</p>
+
+<ol>
+  <li>
+    <p>设置 <strong>Referer 防盗链</strong>，即根据 HTTP 请求的头信息里面的 Referer 字段对请求进行限制。可以通过 Referer 字段获取到当前请求页面的来源页面的网站地址，确定请求是否来自合法的网站。</p>
+
+    <ul>
+      <li>不过，如果站点的防盗链配置允许 Referer 为空的话，通过隐藏 Referer，可以直接绕开防盗链</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>时间戳防盗链</strong> 的安全性更强一些。加密的 URL 具有时效性，过期之后就无法再被允许访问。通常有两个参数：</p>
+
+    <ol>
+      <li>
+        <p><code class="highlighter-rouge">wsSecret</code> 签名字符串：一般是通过对用户设定的加密字符串、请求路径、过期时间通过 MD5 哈希算法取哈希的方式获得。</p>
+      </li>
+      <li>
+        <p><code class="highlighter-rouge">wsTime</code> 过期时间</p>
+
+        <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> // 时间戳防盗链 URL 示例
+ http://cdn.wangsu.com/4/123.mp3? wsSecret=79aead3bd7b5db4adeffb93a010298b5&amp;wsTime=1601026312
+</code></pre></div>        </div>
+      </li>
+    </ol>
+  </li>
+  <li>
+    <p>其它：IP 黑白名单配置、IP 访问限频配置等机制来防盗刷。</p>
+  </li>
+</ol>
+
+<h3 id="池化技术">池化技术</h3>
+
 <h2 id="高可用">高可用</h2>
 
 <p>高可用：系统在大部分时间（即使发生硬件故障、或系统升级时）都是可用的、可提供服务的。</p>
@@ -642,7 +825,7 @@ Feign</p>
   <li>熔断</li>
 </ul>
 
-<h4 id="导致系统不可用的情况">导致系统不可用的情况：</h4>
+<h3 id="导致系统不可用的情况">导致系统不可用的情况</h3>
 
 <ol>
   <li>黑客攻击；</li>
@@ -653,44 +836,78 @@ Feign</p>
   <li>自然灾害或人为破坏。</li>
 </ol>
 
-<h4 id="提高系统可用性的方法">提高系统可用性的方法：</h4>
+<p>以下为提高系统可用性的方法：</p>
 
 <ol>
   <li>注重代码质量，测试严格把关：code review 解决内存泄漏、循环依赖。</li>
-  <li>使用集群：相同的服务部署多份，减少单点故障。
-    <ul>
-      <li>灾备设计
-        <ul>
-          <li>容灾： 在异地建立两个完全相同的系统。当某个地方的系统突然挂掉，整个应用系统可切换到另一个，系统就可正常提供服务。</li>
-          <li>备份： 所有重要数据多备份几份。</li>
-        </ul>
-      </li>
-      <li>异地多活：将服务部署在异地、且同时对外提供服务。和传统灾备设计最主要区别在于“多活”，即所有站点都是同时在对外提供服务的。为了应对突发状况如火灾、地震等自然或人为灾害。</li>
-    </ul>
-  </li>
-  <li><strong>限流</strong>：流量控制（flow control），限制对服务端接口<strong>接受请求的频率</strong>，防止服务挂掉。对超过限制的请求放弃处理或放到队列中（排队）等待处理。可有效应对<strong>突发</strong>请求过多。常见限流算法：
-    <ol>
-      <li>固定窗口计数器算法</li>
-      <li>滑动窗口计数器算法</li>
-      <li>漏桶算法</li>
-      <li>令牌桶算法</li>
-    </ol>
-  </li>
-  <li><strong>降级</strong>：当服务器<strong>压力剧增</strong>的情况下，根据当前业务情况及流量对一些服务和页面有策略的降级，以此释放服务器资源以<strong>保证核心任务</strong>的正常运行。目的在于应对系统自身的故障。</li>
-  <li><strong>熔断</strong>机制：系统自动收集所依赖服务的资源使用情况和性能指标，当恶化或调用失败次数达到某个阈值时就迅速失败，立即<strong>切换依赖</strong>其他备用服务。目的在于应对依赖的外部系统或第三方系统的故障。
-    <ul>
-      <li>常用的流量控制和熔断降级框架是 <strong>Netflix 的 Hystrix</strong> 和 alibaba 的 Sentinel。</li>
-    </ul>
-  </li>
-  <li>超时和重试机制：一旦用户的请求超过某个时间得不到响应、就结束此次请求并抛出异常。尤其适合读取第三方服务时，如 RPC 框架自带。</li>
-  <li>异步调用：在程序中实现异步，还可使用 <a href="#消息队列">消息队列</a>。</li>
-  <li>使用缓存：缓存热点数据，存储在内存中，所以速度相当快。</li>
-  <li>灰度发布： 将服务器集群分成若干部分，每天只发布一部分机器，观察运行稳定没有故障，第二天继续发布一部分机器，持续几天才把整个集群全部发布完毕。期间如果发现问题，只需要回滚已发布的一部分服务器即可。</li>
 </ol>
+
+<h3 id="冗余思想">冗余思想</h3>
+
+<p><strong>冗余</strong>的思想：相同的服务<strong>部署多</strong>份、相同的数据备份多份，减少单点故障。</p>
+
+<ul>
+  <li>高可用集群：同一份服务部署两份或者多份，当正在使用的服务突然挂掉的话，可以切换到另外一台服务，从而保证服务的高可用。</li>
+  <li><strong>灾备</strong>设计
+    <ul>
+      <li>容灾： 在异地建立两个完全相同的系统。当某个地方的系统突然挂掉，整个应用系统可切换到另一个，系统就可正常提供服务。</li>
+      <li>备份： 所有重要数据多备份几份。</li>
+    </ul>
+  </li>
+  <li><strong>异地多活</strong>：将服务部署在异地、且同时对外提供服务。和传统灾备设计最主要区别在于“多活”，即所有站点都是同时在对外提供服务的。为了应对突发状况如火灾、地震等自然或人为灾害。</li>
+  <li>例如：哨兵模式的 Redis 集群中，如果 Sentinel（哨兵） 检测到 master 节点出现故障的话， 它就会帮助我们实现故障转移，自动将某一台 slave 升级为 master，确保整个 Redis 系统的可用性。整个过程完全自动，不需要人工介入。</li>
+  <li>例如：Nginx 可以结合 Keepalived 来实现高可用。如果 Nginx 主服务器宕机的话，Keepalived 可以自动进行故障转移，备用 Nginx 主服务器升级为主服务。并且，这个切换对外是透明的，因为使用的虚拟 IP，虚拟 IP 不会改变。</li>
+</ul>
+
+<h3 id="限流">限流</h3>
+
+<p>限流：流量控制（flow control），限制对服务端接口<strong>接受请求的频率</strong>，防止服务挂掉。对超过限制的请求放弃处理或放到队列中（排队）等待处理。可有效应对<strong>突发</strong>请求过多。常见限流算法：</p>
+
+<ol>
+  <li>固定窗口计数器算法</li>
+  <li>滑动窗口计数器算法</li>
+  <li>漏桶算法</li>
+  <li>令牌桶算法</li>
+</ol>
+
+<h3 id="降级">降级</h3>
+
+<p>降级：当服务器<strong>压力剧增</strong>的情况下，根据当前业务情况及流量对一些服务和页面有策略的降级，以此释放服务器资源以<strong>保证核心任务</strong>的正常运行。目的在于应对系统自身的故障。</p>
+
+<h3 id="熔断">熔断</h3>
+
+<p>熔断机制：系统自动收集所依赖服务的资源使用情况和性能指标，当恶化或调用失败次数达到某个阈值时就迅速失败，立即<strong>切换依赖</strong>其他备用服务。目的在于应对依赖的外部系统或第三方系统的故障。</p>
+
+<ul>
+  <li>常用的流量控制和熔断降级框架是 <strong>Netflix 的 Hystrix</strong> 和 alibaba 的 Sentinel。</li>
+  <li>降级和熔断的区别：</li>
+</ul>
+
+<h3 id="超时和重试机制">超时和重试机制</h3>
+
+<p>超时和重试机制：一旦用户的请求超过某个时间得不到响应、就结束此次请求并抛出异常。尤其适合读取第三方服务时，如 RPC 框架自带。</p>
+
+<h3 id="异步调用">异步调用</h3>
+
+<p>异步调用：在程序中实现异步，还可使用 <a href="#消息队列">消息队列</a>。</p>
+
+<h3 id="使用缓存">使用缓存</h3>
+
+<p>使用缓存：缓存热点数据，存储在内存中，所以速度相当快。</p>
+
+<h3 id="灰度发布">灰度发布</h3>
+
+<p>灰度发布： 将服务器集群分成若干部分，每天只发布一部分机器，观察运行稳定没有故障，第二天继续发布一部分机器，持续几天才把整个集群全部发布完毕。期间如果发现问题，只需要回滚已发布的一部分服务器即可。</p>
+
+<ul>
+  <li>灰度发布和回滚的关系：</li>
+</ul>
 
 <h3 id="netflix">Netflix</h3>
 
 <h2 id="微服务">微服务</h2>
+
+<p>微服务：一种软件开发技术- 面向服务的体系结构（SOA）架构样式的一种变体，它提倡将单一应用程序划分成一组小的服务，服务之间互相协调、互相配合，为用户提供最终价值。每个服务运行在其独立的进程中，服务与服务间采用轻量级的通信机制互相沟通（通常是基于HTTP的RESTful API）。每个服务都围绕着具体业务进行构建，并且能够独立地部署到生产环境、类生产环境等。另外，应尽量避免统一的、集中式的服务管理机制，对具体的一个服务务而言，应根据上下文，选择合适的语言、工具对其进行构建。</p>
 
 <h3 id="springcloud">SpringCloud</h3>
 

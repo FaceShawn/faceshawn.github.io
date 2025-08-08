@@ -975,7 +975,7 @@ public final void lazySet(int newValue) // 最终设置为newValue,使用 lazySe
       <li><code class="highlighter-rouge">synchronized/ReentrantLock</code>（相当于构造器参数最大并发数/计数器n=1）都是一次只允许一个线程访问某个资源。</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">CountDownLatch</code>（倒计时器）：是一个同步工具类，用来协调多个线程间的同步。用来控制当前线程等待直到倒计时结束（其它线程都执行完毕），再开始执行。
+  <li><code class="highlighter-rouge">CountDownLatch</code>（<strong>倒计时器</strong>）：是一个同步工具类，用来协调多个线程间的同步。用来控制当前线程等待直到倒计时结束（其它线程都执行完毕），再开始执行。
     <ul>
       <li>通过计数器实现，初始值是线程数量，每执行完一个线程-1。只能一次性使用。</li>
     </ul>
@@ -985,7 +985,11 @@ public final void lazySet(int newValue) // 最终设置为newValue,使用 lazySe
       <li>如：用多线程读取多个文件处理的场景。</li>
     </ul>
   </li>
-  <li><strong><code class="highlighter-rouge">ReentrantLock</code>（可重入锁）</strong>：能对共享/临界资源重复加锁，即当前线程再次获取该锁不会阻塞。基于AQS，唯一实现了Lock接口的类。</li>
+  <li><strong><code class="highlighter-rouge">ReentrantLock</code>（可重入锁）</strong>：能对共享/临界资源重复加锁，即当前线程再次获取该锁不会阻塞。基于AQS，唯一实现了Lock接口的类。
+    <ul>
+      <li><strong>实现原理</strong>：</li>
+    </ul>
+  </li>
   <li><code class="highlighter-rouge">ReentrantReadWriteLock</code>（读-写锁）：可看作组合式，允许一个资源可被多个读/写操作访问，但读-写不能同时进行。允许多个线程同时对某一资源进行读。</li>
   <li><code class="highlighter-rouge">SynchronousQueue</code>（同步队列）</li>
   <li><code class="highlighter-rouge">FutureTask</code></li>

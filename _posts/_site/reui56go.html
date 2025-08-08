@@ -171,10 +171,17 @@ alert(/xss/);
 
 <h4 id="1-使用参数化查询">1. 使用参数化查询</h4>
 
+<p><strong>SQL注入</strong>发生在编译过程中，因为注入了某些特殊字符，最后被编译成了恶意的执行操作；</p>
+
 <p>Java 中的 <code class="highlighter-rouge">PreparedStatement</code> 是预先编译的 SQL 语句，可以传入适当参数并且多次执行。由于<strong>没有拼接的过程</strong>，因此可以防止 SQL 注入的发生。</p>
 
 <ul>
-  <li>传参用参数占位符 <code class="highlighter-rouge">#{}</code>，尽量避免用变量占位符 <code class="highlighter-rouge">${}</code>；</li>
+  <li>
+    <p>预编译完成后，SQL 的结构已经固定，即便用户输入非法参数，也不会对 SQL 的结构产生影响，从而避免了潜在的安全风险。</p>
+  </li>
+  <li>
+    <p>传参用参数占位符 <code class="highlighter-rouge">#{}</code>，尽量避免用变量占位符 <code class="highlighter-rouge">${}</code>；</p>
+  </li>
 </ul>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">PreparedStatement</span> <span class="n">stmt</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="na">prepareStatement</span><span class="o">(</span><span class="s">"SELECT * FROM users WHERE userid=? AND password=?"</span><span class="o">);</span>
