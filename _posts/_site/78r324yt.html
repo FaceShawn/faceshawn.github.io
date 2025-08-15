@@ -4,11 +4,13 @@
 
 <!-- more -->
 
-<h2 id="目录">目录</h2>
+<h3 id="目录">目录</h3>
 
 <p>[TOC]</p>
 
-<h2 id="集合框架容器类">集合框架（容器类）</h2>
+<blockquote>
+  <p>集合框架（容器类）</p>
+</blockquote>
 
 <p>所有集合类都位于 <code class="highlighter-rouge">java.util</code> 包下，用于表示和操作对象集合，包含大量集合接口及其实现类和操作算法。</p>
 
@@ -21,13 +23,11 @@
 
 <h3 id="集合框架继承关系图">集合框架继承关系图</h3>
 
-<p><img src="assets/1362965-20190118094735724-2129767713.png" alt="img" style="zoom: 80%;" /></p>
+<p><img src="assets/1362965-20190118094735724-2129767713.png" alt="img" style="zoom: 88%;" /></p>
 
 <p><img src="assets/1362965-20190118095106326-273814633.png" alt="img" style="zoom:80%;" /></p>
 
-<p><img src="assets/collection-impl.gif" alt="collection-impl" style="zoom: 80%;" /></p>
-
-<h3 id="listqueueset-vs-map">List、Queue、Set VS Map</h3>
+<h3 id="listqueueset-vs-map-接口">List、Queue、Set VS Map 接口</h3>
 
 <p>List、Queue、Set 接口继承自 Collection 接口：</p>
 
@@ -36,10 +36,12 @@
 
 <ol>
   <li><code class="highlighter-rouge">List</code>：有序、可重复，允许多个 <code class="highlighter-rouge">null</code> 元素；可用 <code class="highlighter-rouge">iterator</code> 遍历或 <code class="highlighter-rouge">get(index)</code> 随机访问特定元素；</li>
-  <li><code class="highlighter-rouge">Queue</code>：有序、可重复，允许多个 <code class="highlighter-rouge">null</code> 元素；先进先出，用于排队；</li>
+  <li><code class="highlighter-rouge">Queue</code>：有序、可重复，允许多个 <code class="highlighter-rouge">null</code> 元素；<strong>先进先出</strong>，用于排队；</li>
   <li><code class="highlighter-rouge">Set</code>：无序、不可重复，最多只能有一个 <code class="highlighter-rouge">null</code> 元素；只可用 <code class="highlighter-rouge">iterator</code> 遍历；</li>
   <li><code class="highlighter-rouge">Map</code>：无序、<code class="highlighter-rouge">key</code> 不可重复 <code class="highlighter-rouge">value</code> 可重复，允许一个 <code class="highlighter-rouge">key</code> 和多个 <code class="highlighter-rouge">value</code> 为 <code class="highlighter-rouge">null</code>。</li>
 </ol>
+
+<p><img src="assets/collection-impl.gif" alt="collection-impl" style="zoom: 88%;" /></p>
 
 <h3 id="collection-接口及分类">Collection 接口及分类</h3>
 
@@ -73,14 +75,14 @@
 <h4 id="二queue-接口">二、Queue 接口</h4>
 
 <ol>
-  <li><code class="highlighter-rouge">Deque</code> 双端队列接口：同时实现了栈和队列的功能；
+  <li><code class="highlighter-rouge">Deque</code> <strong>双端队列</strong>接口：同时实现了栈和队列的功能；
     <ul>
       <li><code class="highlighter-rouge">LinkedList</code> 类</li>
       <li><code class="highlighter-rouge">ArrayQueue</code> 类：Object[] 数组 + 双指针；</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">PriorityQueue</code> 类，优先级队列、非阻塞式：用 Object[] 数组实现二叉堆；</li>
-  <li><code class="highlighter-rouge">BlockingQueue</code> 阻塞队列：非常适合用于作为数据共享的通道；
+  <li><code class="highlighter-rouge">Pri'orityQueue</code> 类，<strong>优先级队列</strong>、非阻塞式：用 Object[] 数组实现<strong>二叉堆</strong>；</li>
+  <li><code class="highlighter-rouge">BlockingQueue</code> <strong>阻塞队列</strong>：非常适合用于作为数据共享的通道；
     <ol>
       <li>广泛用在生产者-消费者模式：提供了可阻塞的插入和移除方法。当队列容器已满，生产者线程会被阻塞，直到队列未满；当队列容器为空时，消费者线程会被阻塞，直至队列非空时为止。</li>
       <li>作为 <code class="highlighter-rouge">workqueue</code> 参数传入构造器 <code class="highlighter-rouge">ThreadPoolExecutor()</code> 创建线程池；</li>
@@ -98,7 +100,7 @@
 <h4 id="三set-接口">三、Set 接口</h4>
 
 <ol>
-  <li><code class="highlighter-rouge">HashSet</code> 类：实现了 <code class="highlighter-rouge">Set</code> 接口，存储对象；底层基于 HashMap、但有键无值；元素不可重复，最多只能有一个null元素；用 <code class="highlighter-rouge">add()</code> 添加元素、<code class="highlighter-rouge">contains()</code>；
+  <li><code class="highlighter-rouge">HashSet</code> 类：实现了 <code class="highlighter-rouge">Set</code> 接口，存储对象；底层基于 <strong>HashMap</strong>、但有键无值；元素不可重复，最多只能有一个null元素；用 <code class="highlighter-rouge">add()</code> 添加元素、<code class="highlighter-rouge">contains()</code>；
     <ul>
       <li><code class="highlighter-rouge">LinkedHashSet</code> 类：（基于LinkHashMap、但有键无值，）有序（能按元素的添加顺序遍历）；</li>
     </ul>
@@ -109,7 +111,7 @@
 <h4 id="四map-接口">四、Map 接口</h4>
 
 <ol>
-  <li><code class="highlighter-rouge">HashMap</code> 类：实现了Map接口，存储键值对；底层是 数组和链表（链表散列/链表数组，用于解决哈希冲突）；键不可重复、值可重复，允许一个 key 和多个 value 为null；用 <code class="highlighter-rouge">put()</code> 添加元素、<code class="highlighter-rouge">containsKey()</code>；比 HashSet 快（因为是使用唯一的键来获取对象）；非线程安全；
+  <li><code class="highlighter-rouge">HashMap</code> 类：实现了Map接口，存储键值对；底层是 <strong>数组和链表</strong>（链表散列/<strong>链表数组</strong>，用于解决哈希冲突）；键不可重复、值可重复，允许一个 key 和多个 value 为null；用 <code class="highlighter-rouge">put()</code> 添加元素、<code class="highlighter-rouge">containsKey()</code>；比 HashSet 快（因为是使用唯一的键来获取对象）；非线程安全；
     <ol>
       <li><code class="highlighter-rouge">LinkedHashMap</code> 类：JDK1.8 后在解决哈希冲突时先进行数组扩容；</li>
       <li><code class="highlighter-rouge">ConcurrentHashMap</code> 类：<strong>线程安全</strong>的 HashMap，唯一区别是其中的核心数据如 value 及链表都是 volatile（窝le滔）修饰的，保证了获取时的可见性；key 和 value 都<strong>不允许为 null</strong>。</li>
@@ -162,14 +164,6 @@
   </tbody>
 </table>
 
-<p>注意，以下都是<strong>线程不安全</strong>的：</p>
-
-<ul>
-  <li>ArrayList, LinkedList,</li>
-  <li>HashSet, TreeSet,</li>
-  <li>HashMap, TreeMap.</li>
-</ul>
-
 <p>List中没有而ArrayList中独有的方法不能被List对象使用，即<strong>多态</strong>。</p>
 
 <p>用多态方式调用方法时：先检查父类中是否有该方法，</p>
@@ -179,6 +173,16 @@
   <li>如果有，再去调用子类的同名方法。</li>
 </ul>
 
+<h4 id="线程不安全的集合">线程不安全的集合</h4>
+
+<p>注意，以下都是<strong>线程不安全</strong>的：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">ArrayList, LinkedList</code></li>
+  <li><code class="highlighter-rouge">HashSet, TreeSet</code></li>
+  <li><code class="highlighter-rouge">HashMap, TreeMap</code></li>
+</ol>
+
 <h3 id="list">List</h3>
 
 <h5 id="arraylist-vs-linkedlist">ArrayList VS LinkedList</h5>
@@ -186,11 +190,11 @@
 <p>二者都不是线程安全的</p>
 
 <ol>
-  <li>底层实现方式：ArrayList 基于<strong>动态</strong>数组；LinkedList 基于双向链表（通过 <code class="highlighter-rouge">getLast()</code> 源码可见为双向）。</li>
-  <li>按位查找：ArrayList 用 <code class="highlighter-rouge">get(index)</code> 随机访问，快；LinkedList 指定位置 index 查找，效率为O(n)，顺序访问。</li>
-  <li>插入和删除：ArrayList 效率受元素位置影响，对尾部增删O(1)，指定位置 i 增删为O(n) ；LinkedList先查再增删，增删效率不受元素位置影响，均O(1)。</li>
-  <li>扩容机制：ArrayList 为新建数组并<strong>拷贝</strong>原数组；LinkedList 基于双向链表，不需要扩容。</li>
-  <li>内存空间：从单个元素说，LinkedList 空间开销大，保存前后节点的指针。</li>
+  <li><strong>底层实现方式</strong>：ArrayList 基于<strong>动态</strong>数组；LinkedList 基于<strong>双向链表</strong>（通过 <code class="highlighter-rouge">getLast()</code> 源码可见为双向）。</li>
+  <li><strong>按位查找</strong>：ArrayList 用 <code class="highlighter-rouge">get(index)</code> 随机访问，快；LinkedList 指定位置 index 查找，效率为O(n)，顺序访问。</li>
+  <li><strong>插入和删除</strong>：ArrayList 效率受元素位置影响，对尾部增删O(1)，指定位置 i 增删为O(n) ；LinkedList先查再增删，增删效率不受元素位置影响，均O(1)。</li>
+  <li><strong>扩容机制</strong>：ArrayList 为新建数组并<strong>拷贝</strong>原数组；LinkedList 基于双向链表，不需要扩容。</li>
+  <li><strong>内存空间</strong>：从单个元素说，LinkedList 空间开销大，需要保存前后节点的指针。</li>
 </ol>
 
 <h5 id="arraylist-常用方法">ArrayList 常用方法</h5>
@@ -375,24 +379,6 @@ public interface Deque&lt;E&gt; extends Queue&lt;E&gt; {
 
 <p>两元素相等：判断标准和HashMap相同，两个元素的hashCode相等并且通过equals()方法返回true。</p>
 
-<p>Set 如何去重：Set 通过重写 hashCode 和 equals 实现去重。</p>
-
-<p>调用 <code class="highlighter-rouge">add()</code> 添加元素时（用 HashMap 的 <code class="highlighter-rouge">put()</code> 实现，判断返回值为 true 以确保不重复），判断是否已有此对象：</p>
-
-<ul>
-  <li>Set 用元素（HashMap 用 key）的内存地址计算 hashcode 值，判断 hashCode 是否已存在：
-    <ul>
-      <li>如不存在，则没有重复元素、直接插入；</li>
-      <li>若已存在，则用 equals() 判断两对象是否相等，比较地址（是否为同一对象）：
-        <ul>
-          <li>若二者不等则通过<strong>拉链法</strong>（附到<strong>链表数组</strong>的对应链表中）解决<strong>哈希冲突</strong>，插入成功，返回 true；</li>
-          <li>若相等则 Set 加入失败，返回 false（HashMap 直接覆盖，返回旧的 value 值）。</li>
-        </ul>
-      </li>
-    </ul>
-  </li>
-</ul>
-
 <p>Set为何无序：基于哈希表存储，数组 + 链表 + <strong>红黑树</strong> + 哈希算法（链址法：CRUD性能都很好）</p>
 
 <p>TreeSet 引用类型排序：</p>
@@ -401,6 +387,28 @@ public interface Deque&lt;E&gt; extends Queue&lt;E&gt; {
   <li>类重写比较器规则接口 Comparable；重写 compareTo() 或 compare()；</li>
   <li>直接为集合设置比较器 Comparable 对象，重写比较方法，二者都有时用集合。</li>
 </ol>
+
+<h5 id="set-如何去重">Set 如何去重：</h5>
+
+<blockquote>
+  <p>Set 通过重写 hashCode 和 equals 实现去重。</p>
+</blockquote>
+
+<p>调用 <code class="highlighter-rouge">add()</code> 添加元素时（用 HashMap 的 <code class="highlighter-rouge">put()</code> 实现，判断返回值为 true 以确保不重复），判断是否已有此对象？</p>
+
+<ul>
+  <li>Set 用元素（HashMap 用 key）的内存地址计算 hashcode 值，判断 hashCode 是否已存在？
+    <ul>
+      <li>如不存在，则没有重复元素、直接插入；</li>
+      <li>若已存在，则用 equals() 判断两对象是否相等，比较地址（是否为同一对象？）：
+        <ul>
+          <li>若二者不等则通过<strong>拉链法</strong>（附到<strong>链表数组</strong>的对应链表中）解决<strong>哈希冲突</strong>，插入成功，返回 true；</li>
+          <li>若相等则 Set 加入失败，返回 false（HashMap 直接覆盖，返回旧的 value 值）。</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
 
 <h5 id="hashmap-vs-hashset">HashMap VS HashSet</h5>
 

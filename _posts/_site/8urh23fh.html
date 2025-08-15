@@ -13,32 +13,33 @@
 <h2 id="java-vs-c">Java VS C++</h2>
 
 <ol>
-  <li>纯面向对象的语言（封装、继承、多态）-&gt; 低耦合的系统，易维护、复用、扩展；C++ 兼容 C，效率高但有面向过程。</li>
-  <li>JVM：跨平台/平台无关，一次编译到处运行（很好的可移植性），字节码运行机制，既有编译又有解释；C++为编译型语言，C++11 Windows 下无法<a href="#数组">静态初始化数组</a>。</li>
-  <li>
-    <p>JVM：自动内存管理，没有指针（除 <code class="highlighter-rouge">Unsafe</code> 类），内存更安全；C++ 要手动释放内存，虽然可自由管理内存，但指针易导致：</p>
-
+  <li><strong>纯面向对象</strong>的语言（封装、继承、多态）-&gt; <strong>低耦合</strong>的系统，易维护、复用、扩展；C++ <strong>兼容</strong> C，效率高但有面向过程。
     <ol>
-      <li>野指针（指向垃圾内存的指针）：没有初始化直接使用导致野指针；free 或 delete 后没有置为 NULL，当做合法指针使用导致野指针；</li>
-      <li>空指针 NPE；</li>
-      <li>内存泄漏。</li>
+      <li><strong>继承</strong>：Java类与类<a href="#继承">单继承</a>，接口与接口多继承，类可实现多个<a href="#接口">接口</a>；C++ 类支持多重继承；</li>
+      <li><strong>重载</strong>：Java 只支持方法重载；C++ 还支持操作符（++）重载。</li>
     </ol>
   </li>
-  <li>多线程：支持多线程；C++ 没有内置的多线程机制，必须调用 OS 的多线程功能。</li>
-  <li>继承：Java类与类<a href="#继承">单继承</a>，接口与接口多继承，类可实现多个<a href="#接口">接口</a>；C++ 类支持多重继承；</li>
-  <li>重载：Java 只支持方法重载；C++ 同时支持方法重载和操作符（++）重载。</li>
-  <li>支持网络通信编程且很方便，支持 Web 应用开发。</li>
+  <li><strong>JVM</strong>：<strong>跨平台</strong>/平台无关，一次编译到处运行（很好的<strong>可移植性</strong>），<strong>字节码运行机制</strong>，既有编译又有解释；C++为编译型语言，C++11 Windows 下无法<a href="#数组">静态初始化数组</a>。</li>
+  <li><strong>JVM</strong>：<strong>自动内存管理</strong>，没有指针（除 <code class="highlighter-rouge">Unsafe</code> 类），更安全、方便；C++ 要<strong>手动</strong>释放内存，虽然可自由管理内存，但指针易导致：
+    <ol>
+      <li><strong>野指针</strong>（指向垃圾内存的指针）：没有初始化直接使用而导致野指针；free 或 delete 后没有置为 NULL，当做合法指针使用导致野指针；</li>
+      <li><strong>空指针 NPE</strong>；</li>
+      <li><strong>内存泄漏</strong>。</li>
+    </ol>
+  </li>
+  <li><strong>多线程</strong>：支持多线程；C++ 没有内置的多线程机制，必须调用 OS 的多线程功能。</li>
+  <li>支持<strong>网络通信编程</strong>且很方便，支持 Web 应用开发。</li>
 </ol>
 
 <h2 id="jdkjrejvm-对比">JDK、JRE、JVM 对比</h2>
 
-<p><code class="highlighter-rouge">JDK（Java Development Kit）</code>，是一种功能齐全的 Java SDK，用于程序开发者创建、编译程序。</p>
+<p><code class="highlighter-rouge">JDK (Java Development Kit)</code>，是一种功能齐全的 Java SDK，用于<strong>程序开发者</strong>创建、编译程序。</p>
 
 <ol>
-  <li>Java 开发组件：<code class="highlighter-rouge">javac</code> 编译器、<code class="highlighter-rouge">jar</code> 打包工具、<code class="highlighter-rouge">javadoc</code> 文档生成器、<code class="highlighter-rouge">java-debuger（jdb）</code>调试工具、<code class="highlighter-rouge">javap -c</code> 反汇编；</li>
-  <li><code class="highlighter-rouge">JRE（JAVA Runtime Environment）</code>：包含普通用户运行 Java 程序所需的全部内容。
+  <li><strong>Java 开发组件</strong>：<code class="highlighter-rouge">javac</code> 编译器、<code class="highlighter-rouge">jar</code> 打包工具、<code class="highlighter-rouge">javadoc</code> 文档生成器、<code class="highlighter-rouge">java-debuger（jdb）</code>调试工具、<code class="highlighter-rouge">javap -c</code> 反汇编；</li>
+  <li><code class="highlighter-rouge">JRE (JAVA Runtime Environment)</code>：包含<strong>普通用户</strong>运行 Java 程序所需的全部内容。
     <ol>
-      <li><code class="highlighter-rouge">JVM（JAVA Virtual Machine）</code>：是一个用于执行<strong>Java 字节码</strong>的虚拟机进程，针对不同系统有特定的实现；实现<strong>一次编译，到处运行</strong>；如 <code class="highlighter-rouge">HopSpot、JRockit、J9Vm</code>；</li>
+      <li><code class="highlighter-rouge">JVM (JAVA Virtual Machine)</code>：是一个用于执行<strong>Java 字节码</strong>的虚拟机进程，针对不同系统有特定的实现；实现<strong>一次编译，到处运行</strong>；如 <code class="highlighter-rouge">HopSpot、JRockit、J9Vm</code>；</li>
       <li>用于产品环境的 Java 类库。</li>
     </ol>
   </li>
@@ -50,35 +51,36 @@
 
 <h3 id="关键字">关键字</h3>
 
-<p>注意：虽然 <code class="highlighter-rouge">true</code>, <code class="highlighter-rouge">false</code>, 和 <code class="highlighter-rouge">null</code> 看起来像关键字，但实际上是字面值/量，同样也不可作为标识符。</p>
+<p>注意：</p>
+
+<ul>
+  <li>虽然 <code class="highlighter-rouge">true</code>, <code class="highlighter-rouge">false</code>, 和 <code class="highlighter-rouge">null</code> 看起来像关键字，但实际上是字面值/量，同样也不可作为标识符。</li>
+  <li>标识符 <code class="highlighter-rouge">var</code>、<code class="highlighter-rouge">yield</code> 和 <code class="highlighter-rouge">record</code> 是受限标识符，因为在某些上下文中是不允许的。</li>
+  <li><code class="highlighter-rouge">instanceof</code> 关键字：若对象为类（或接口、抽象类、父类）的<strong>实例</strong>，则返回 true。</li>
+</ul>
 
 <p><img src="assets/Java-key-words.png" alt="image-20220817125334449" style="zoom: 65%;" /></p>
 
-<ul>
-  <li>标识符 <code class="highlighter-rouge">var</code>、<code class="highlighter-rouge">yield</code> 和 <code class="highlighter-rouge">record</code> 是受限标识符，因为在某些上下文中是不允许的；</li>
-  <li><code class="highlighter-rouge">instanceof</code> 关键字：若对象为类（或接口、抽象类、父类）的实例，则返回 true；</li>
-</ul>
-
 <h2 id="常量和变量">常量和变量</h2>
 
-<h3 id="非-static成员变量-vs-局部变量">（非 static）成员变量 VS 局部变量</h3>
+<h3 id="成员变量-vs-局部变量">成员变量 VS 局部变量</h3>
+
+<blockquote>
+  <p>静态成员变量、非静态（实例）成员变量，局部变量（本地变量）</p>
+</blockquote>
 
 <ol>
-  <li>定义（本质）：static 成员变量属于类，用类名调用，<strong>由类的所有对象共享</strong>，持久驻内存，下次调用保留原值；非 static 成员变量属于对象，用对象名调用；局部变量是在代码块/方法中定义的变量/方法参数。
-    <ul>
-      <li>成员变量和局部变量所属的代码块/方法是同一级的。</li>
-    </ul>
-  </li>
-  <li>修饰符：成员变量都可以；局部变量不能被<strong>访问控制修饰符</strong>及 static 修饰，只能被 final 修饰。</li>
-  <li>存储位置：static 成员变量属于类（即静态变量/类变量)，存于方法区，（非 static ）成员变量属于对象，存于堆内存；局部变量属于方法，存于 VM 栈中的局部变量表，基本类型变量直接存值，<strong>对象存放引用</strong>，指向堆内存中的对象本身。</li>
-  <li>默认值/初始化时机：成员变量有默认值，在 JVM <strong>类加载</strong>时自动初始化（如未赋初值则取默认值）（例外：被 final 修饰的成员变量必须显式地赋值）；而局部变量（不自动初始化）必须显式地初始化，在字节码执行时才会运行方法中的（局部变量）代码。</li>
-  <li>生命周期：成员变量与类/对象一致；局部变量与方法一致。</li>
+  <li><strong>定义</strong>（本质）：<strong>static 成员变量</strong>属于类，用类名调用，<strong>由类的所有对象共享</strong>，持久驻内存（方法区），下次调用保留原值；<strong>非 static 成员变量</strong>属于对象，用对象名调用；局部变量是在代码块/方法中定义的变量/方法参数。</li>
+  <li><strong>修饰符</strong>：成员变量都可以；局部变量不能被<strong>访问控制修饰符</strong>及 static 修饰，只能被 final 修饰。</li>
+  <li><strong>存储位置</strong>：static 成员变量属于类（即静态变量/类变量)，存于<strong>方法区</strong>，（非 static ）成员变量属于对象，存于堆内存；局部变量属于方法，存于 VM 栈中的局部变量表，基本类型变量直接存值，<strong>对象存放引用</strong>，指向堆内存中的对象本身。</li>
+  <li><strong>默认值</strong>/初始化时机：成员变量有默认值，在 JVM <strong>类加载</strong>时自动初始化（如未赋初值则取默认值）（例外：被 final 修饰的成员变量必须显式地赋值）；而局部变量（不自动初始化）必须显式地初始化，在字节码执行时才会运行方法中的（局部变量）代码。</li>
+  <li><strong>生命周期</strong>：成员变量与类/对象一致；局部变量与方法一致。</li>
 </ol>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public  class DataClass {
     int age; // 成员变量/全局成员变量/实例变量
     static String URL = "hello"; // 静态成员变量
-    static final String website = "C"; // 静态常量
+    static final String USER = "admin"; // 静态常量
 }
 </code></pre></div></div>
 
@@ -90,7 +92,7 @@
 
 <ol>
   <li>final 修饰的类，所有成员方法被隐式指定为 final，（但成员变量不变）；</li>
-  <li>所有<strong>包装类和 String 类</strong>都是用 final 修饰；</li>
+  <li>所有<strong>包装类和 String 类</strong>都是用 final 修饰的；</li>
   <li>final 不能修饰 abstract，二者互斥、冲突、不能同时存在；</li>
 </ol>
 
@@ -99,15 +101,17 @@
 <p>作用：</p>
 
 <ol>
-  <li>用于防止子类覆盖父类方法的实现，安全；如：POJO 类的 setter 方法，不允许被覆写。</li>
-  <li>方法被转为内嵌，提高执行效率。</li>
+  <li>用于防止子类<strong>覆盖</strong>父类方法的实现，安全；如：POJO 类的 setter 方法，不允许被覆写。</li>
+  <li>方法被转为<strong>内嵌</strong>，提高执行效率。</li>
 </ol>
 
-<p>private 方法都被隐式指定为 private [final] ；final 也可修饰 private，但无意义。</p>
+<p>private 方法都被隐式指定为 <code class="highlighter-rouge">private [final] </code>；final 也可修饰 private，但无意义。</p>
 
 <h5 id="三修饰变量值不可变">三、修饰变量：值不可变</h5>
 
-<p>实质上是常量。</p>
+<blockquote>
+  <p>实质上是常量。JDK1.8 后改为存放在<strong>堆</strong>内存中。</p>
+</blockquote>
 
 <p>从<strong>变量类型</strong>分类：</p>
 
@@ -115,7 +119,7 @@
   <li>修饰基本类型或 String 类型的变量：使用前必须有且仅有一次初始化，初始化后值不可变；
     <ul>
       <li>第二次赋值将抛出编译时错误（<code class="highlighter-rouge">Compiler Error: cannot assign a value to final variable</code>）。</li>
-      <li>若编译阶段已知其确切值，则会当做<strong>编译期常量</strong>（直接宏替换），存入调用类的常量池中。</li>
+      <li>若编译阶段已知其确切值，则会当做<strong>编译期常量</strong>（直接宏替换），存入调用（方法区）类的运行时常量池中。</li>
     </ul>
   </li>
   <li>修饰引用类型变量：初始化后<strong>引用</strong>不可变（即不能指向另一个对象），但<strong>引用指向的对象的内容</strong>可变。即 <a href="#常用类">final 数组/String 类</a> / 集合可添加、删除元素。</li>
@@ -125,7 +129,7 @@
 
 <ol>
   <li>修饰静态成员变量（类变量）=&gt; 即静态常量：只可在静态初始化块中/声明时赋初值；作用域是全局，不用创建对象，用类名直接访问；</li>
-  <li>修饰（实例）成员变量 =&gt; 即成员常量：只可在非静态初始化块中/声明时/<strong>每个构造器中</strong>赋初始值；</li>
+  <li>修饰（实例）成员变量 =&gt; 即成员常量：只可在<strong>非静态</strong>初始化块中/声明时/<strong>每个构造器中</strong>赋初始值；</li>
   <li>修饰局部变量 =&gt; 即局部常量：使用前赋值，不允许二次赋值。</li>
 </ol>
 
@@ -155,7 +159,9 @@ public class HelloWorld {
 
 <h3 id="static-关键字">static 关键字</h3>
 
-<p>static 修饰的成员属于类，可被类的所有对象共享，加 static 不影响作用域。只保存一份拷贝，可用类名调用。</p>
+<p>static 修饰的成员属于类，可被类的所有对象共享，加 static 不影响作用域。</p>
+
+<p><strong>只保存一份拷贝</strong>，可用类名调用。</p>
 
 <h5 id="一修饰成员方法-即静态方法类方法">一、修饰成员方法（=&gt; 即静态方法、类方法）</h5>
 
@@ -163,7 +169,7 @@ public class HelloWorld {
 
 <ol>
   <li>只能访问类的静态成员（变量或方法）：<strong>因为</strong>非 static 成员在对象实例化前不存在，不能被 static 方法调用；</li>
-  <li>方法中不能以任何方式引用 this 和 super；但反之在非静态方法中可通过 this 访问静态成员；</li>
+  <li>方法中不能以任何方式<strong>引用 this 和 super</strong>；但反之在非静态方法中可通过 this 访问静态成员；</li>
 </ol>
 
 <p>方便在<strong>没有创建对象</strong>的情况下调用方法/变量，如：</p>
@@ -171,7 +177,7 @@ public class HelloWorld {
 <ol>
   <li>Collections 类中的一些方法，如 <code class="highlighter-rouge">Objects.equals()</code>；</li>
   <li>util 工具类中的方法，如 <a href="#常用类">Math 工具类</a>、<a href="#常用类">Arrays 工具类</a>的静态方法；</li>
-  <li>单例模式的 <code class="highlighter-rouge">getInstance()</code>、工厂模式的 <code class="highlighter-rouge">create/build()</code>、<code class="highlighter-rouge">Logger LOGGER = LoggerFactory.getLogger(Users.class)</code> 等。</li>
+  <li>单例模式的 <code class="highlighter-rouge">getInstance()</code>、工厂模式的 <code class="highlighter-rouge">create/build()</code>、日志 <code class="highlighter-rouge">Logger LOGGER = LoggerFactory.getLogger(Users.class)</code> 等。</li>
 </ol>
 
 <p><strong>构造器</strong>不是静态方法：</p>
@@ -191,17 +197,23 @@ public class HelloWorld {
 <p>目的：作为<strong>共享变量</strong>使用；减少对象的创建；保留<strong>唯一副本</strong>。</p>
 
 <ol>
-  <li>内存分配：<strong>由类的所有对象共享</strong>，持久驻内存，下次调用保留原值；</li>
-  <li>存储位置：static 成员变量属于类，存于方法区，（非 static ）成员变量属于对象，存于堆内存；局部变量属于方法，存于 VM 栈中的局部变量表，基本类型变量直接存值，<strong>对象存放引用</strong>，指向堆内存中的对象本身。</li>
+  <li>使用方式：<strong>由类的所有对象共享</strong>，持久驻内存，下次调用保留原值；</li>
   <li>调用方式：可用类名调用；</li>
-  <li>生命周期：从类被加载开始，到类被 GC 彻底回收时。</li>
+  <li>存储位置/内存分配：static 成员变量属于类，存于方法区，（非 static ）成员变量属于对象，存于堆内存；</li>
+  <li>生命周期：从<strong>类被加载</strong>开始，到类被 GC 彻底回收时。</li>
 </ol>
 
 <h5 id="三静态代码块">三、静态代码块</h5>
 
-<p>执行顺序：静态代码块 –&gt; 非静态代码块 –&gt; 构造器。</p>
+<blockquote>
+  <p>执行顺序：静态代码块 –&gt; 非静态代码块 –&gt; 构造器。</p>
+</blockquote>
 
-<p>定义在类中方法外，用于初始化静态变量：不管创建多少对象，静态代码块都只执行一次；对于定义在它之后的静态变量，可赋值，但不能访问。如单例模式、定义枚举类。</p>
+<p>定义在类中方法外，用于<strong>初始化</strong>静态变量：不管创建多少对象，静态代码块都只执行一次；</p>
+
+<ul>
+  <li>对于定义在它之后的静态变量，可赋值，但不能访问。如单例模式、定义枚举类。</li>
+</ul>
 
 <p>非静态代码块与构造函数的区别：非静态代码块是对<strong>所有对象</strong>进行统一初始化，而构造函数是给<strong>当前对象</strong>初始化。</p>
 
@@ -211,10 +223,10 @@ public class HelloWorld {
   <p>static 只能修饰内部类。</p>
 </blockquote>
 
-<p>非静态内部类在编译完成后会隐含地保存一个引用，指向创建它的外部类，但静态内部类没有。意味着：</p>
+<p>非静态内部类在编译完成后会隐含地保存一个引用，<strong>指向</strong>创建它的外部类，但静态内部类没有。意味着：</p>
 
 <ol>
-  <li>创建对象不依赖外部类创建的对象，可直接通过外部类？；</li>
+  <li>创建对象不依赖外部类创建的对象，可直接通过外部类创建；</li>
   <li>不能使用任何外部类的非 static 成员变量/方法。</li>
 </ol>
 
@@ -222,7 +234,9 @@ public class HelloWorld {
 
 <h5 id="五静态导入包">五、静态导入包</h5>
 
-<p>1.5 后的新特性， 格式为：import static；</p>
+<blockquote>
+  <p>1.5 后的新特性， 格式为：<code class="highlighter-rouge">import static</code>；</p>
+</blockquote>
 
 <p>可导入某个类中的指定静态资源，不需用类名即可直接调用（类中的）静态成员变量/方法等。</p>
 
@@ -230,24 +244,17 @@ public class HelloWorld {
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class MyClass {
 	// 所有实例共享
-    public final double i = Math.random(); 
-    public static double j = Math.random();
+    public final double i = Math.random();  // 只有第一次赋值起作用
+    public static double j = Math.random(); // 赋值后全局起作用
 }
 
 MyClass cls1 = new MyClass();
 MyClass cls2 = new MyClass();
 
 cls1.i == cls2.i; // false，两个i值不同
-cls1.j == cls2.j; // true，两个j值相同
+cls1.j == cls2.j; // true， 两个j值相同
 
-/**
- * 后台用户管理Service实现类
- * Created by macro on 2018/4/26.
- */
-@Service
-public class UmsAdminServiceImpl implements UmsAdminService {
-	private static final Logger LOGGER = LoggerFactory.getLogger(UmsAdminServiceImpl.class);
-}
+private static final Logger LOGGER = LoggerFactory.getLogger(UmsAdmin.class);
 </code></pre></div></div>
 
 <h2 id="数据类型">数据类型</h2>
@@ -258,21 +265,21 @@ public class UmsAdminServiceImpl implements UmsAdminService {
   <p>primitive type，所占空间大小，默认值，取值范围。</p>
 </blockquote>
 
-<p>基本数据类型都是直接存储在内存中的内存栈上的。</p>
+<p>基本数据类型都是直接存储在内存中的 Java 虚拟机栈上的。</p>
 
 <p>基本数据类型对应的<a href="#包装类型和常量池缓存机制">包装类型</a>。</p>
 
 <ol>
   <li><strong>布尔型</strong> <code class="highlighter-rouge">boolean</code> 占用大小根据实现 JVM 不同有所差异，官方手册没有明确说明，<strong>逻辑上占1Byte</strong>：
     <ul>
-      <li>根据《Java虚拟机规范》里的结论，如果<strong>boolean单独使用</strong>、最终被编译为 int 类型，则占<strong>4字节</strong>；如果以boolean数组使用、最终会被编码为 <strong>byte 数组</strong>，则占<strong>1字节</strong>；</li>
+      <li>根据《Java虚拟机规范》里的结论，如果<strong>boolean单独使用</strong>、最终被编译为 int 类型，则占<strong>4字节</strong>；如果以<strong>boolean数组</strong>使用、最终会被编码为 <strong>byte 数组</strong>，则占<strong>1字节</strong>；</li>
       <li>默认值 false：不能转换成任何数据类型，true != 1；</li>
     </ul>
   </li>
   <li><strong>字符型</strong> <code class="highlighter-rouge">char</code> 2Byte ‘u0000’：0 ~ 65535.</li>
   <li>4种<strong>整型</strong>：
     <ol>
-      <li><code class="highlighter-rouge">byte</code> 1Byte 默认值0：取值范围 <code class="highlighter-rouge">-128~127</code>；</li>
+      <li><code class="highlighter-rouge">byte</code> 即字节，1Byte 默认值0：取值范围 <code class="highlighter-rouge">-128~127</code>；</li>
       <li><code class="highlighter-rouge">short</code> 2Byte 0：2^15-1 = 32,767；</li>
       <li><code class="highlighter-rouge">int</code> 4Byte 0：2^31-1 = 2,147,483,647（21亿）；</li>
       <li><code class="highlighter-rouge">long</code> 8Byte 0L：<a href="#常用类">BigInteger类</a>。</li>
@@ -305,22 +312,21 @@ double price = 12.254(D);
   <li>接口</li>
 </ol>
 
-<p>基本数据类型和引用类型的区别主要在于：基本数据类型是分配在栈上的，而引用类型是分配在堆上的。</p>
+<p>基本数据类型和引用类型的区别主要在于：基本数据类型是分配在<strong>栈</strong>上的，而引用类型是分配在<strong>堆</strong>上的。</p>
 
-<p>引用类型继承于Object类（也是引用类型），都是按照Java里面存储对象的内存模型来进行数据存储的：“引用”（存放对象在内存堆上的地址）是存储在VM栈上的，而对象本身的值存储在内存堆上的。</p>
+<p>引用类型继承于<code class="highlighter-rouge">Object</code>类（也是引用类型），都是按照Java里面存储<strong>对象</strong>的内存模型来进行数据存储的：</p>
+
+<ul>
+  <li>“引用”（存放对象在内存堆上的地址）是存储在VM栈上的，而对象本身的值存储在内存堆上的。</li>
+</ul>
 
 <h3 id="包装类">包装类</h3>
 
 <p>包装类（<code class="highlighter-rouge">wrapper class</code>），箱子；为了方便基本数据类型能和<strong>其它对象</strong>结合在一起使用，如一些常用的集合 <code class="highlighter-rouge">List</code> 和 <code class="highlighter-rouge">Set</code> 等要求存放的值必须为对象。</p>
 
-<p>都是用 final 修饰，无法继承。</p>
-
-<p>从 JAVA SE5 开始引入自动装箱/拆箱机制 -&gt; 将基本数据类型当成（对应包装类的）<strong>对象</strong>操作，使二者可方便的相互转换（一种<a href="#面向对象">面向对象</a>的体现）：</p>
-
-<ul>
-  <li><strong>装箱</strong>：将基本数据类型 ==&gt; 转换为对应的包装类型；</li>
-  <li><strong>拆箱</strong>：将包装类型 ==&gt; 转换为对应的基本数据类型；</li>
-</ul>
+<blockquote>
+  <p>都是用 final 修饰，无法继承。</p>
+</blockquote>
 
 <h5 id="基本数据类型-vs-包装类型">基本数据类型 VS 包装类型</h5>
 
@@ -328,21 +334,26 @@ double price = 12.254(D);
 
 <ol>
   <li><strong>根本</strong>：一种数据类型；一种引用数据类型（面向对象的<strong>类</strong>），有类的特性（封装、继承、多态等）。</li>
-  <li><strong>存储位置</strong>：基本数据类型定义的变量，用作<strong>局部变量</strong>（直接存放在 VM 栈的局部变量表中，占用空间小），用作 <strong><code class="highlighter-rouge">static</code> 成员变量</strong>（存放在方法区），用作<strong>非 <code class="highlighter-rouge">static</code> 成员变量</strong>（存放在堆中）；而用包装类实例化的对象，一律存放在堆中。</li>
+  <li><strong>存储位置</strong>：
+    <ol>
+      <li>基本数据类型定义的变量，用作<strong>局部变量</strong>（直接存放在 VM 栈的局部变量表中，占用空间小），用作 <strong><code class="highlighter-rouge">static</code> 成员变量</strong>（存放在方法区），用作<strong>非 <code class="highlighter-rouge">static</code> 成员变量</strong>（存放在堆中）；</li>
+      <li>而用包装类实例化的对象，一律存放在堆中。</li>
+    </ol>
+  </li>
   <li><strong>默认值</strong>：基本数据类型有默认值（int = 0）且不是 <code class="highlighter-rouge">null</code>；包装类型若不赋值则为 <code class="highlighter-rouge">null</code>。</li>
   <li>泛型：基本类型不可用于泛型；包装类型可以。</li>
 </ol>
 
 <h5 id="包装类型和常量池缓存机制">包装类型和常量池缓存机制</h5>
 
-<p><a href="#四大类八小类基本数据类型">基本数据类型</a>对应的包装类型，及其放入常量池的取值：</p>
+<p><a href="#四大类八小类基本数据类型">基本数据类型</a>对应的包装类型，及其放入（方法区中运行时常量池）常量池的取值：</p>
 
 <ol>
   <li><code class="highlighter-rouge">Boolean</code>：<code class="highlighter-rouge">TRUE/FALSE</code> 两个常量，用于表示布尔值 <code class="highlighter-rouge">true 和 false</code>；</li>
   <li><strong><code class="highlighter-rouge">Character</code></strong>：[0, 127]，即7位ASCII码、最大7F Del；</li>
   <li><code class="highlighter-rouge">Byte Short **Integer** Long</code>：[-128, 127]；</li>
   <li><code class="highlighter-rouge">Float、Double</code>：不会进入常量池；</li>
-  <li><code class="highlighter-rouge">String</code> 类型：所有字面量都会进入<a href="#数组">常量池</a>；</li>
+  <li><code class="highlighter-rouge">String</code> 类型：所有<strong>字面量</strong>都会进入<a href="#数组">常量池</a>；</li>
 </ol>
 
 <p>包装类在常量池的值会<strong>复用</strong>已有对象的缓存数据，可直接用 <code class="highlighter-rouge">==</code> 判断；其它范围的值，必须全部用 <code class="highlighter-rouge">equals()</code> 比较。如：</p>
@@ -354,7 +365,12 @@ double price = 12.254(D);
 
 <h5 id="自动装箱拆箱机制">自动装箱/拆箱机制</h5>
 
-<p>方便二者的相互转换。</p>
+<p>从 JAVA SE5 开始引入自动装箱/拆箱机制 -&gt; 将基本数据类型当成（对应包装类的）<strong>对象</strong>操作，使二者可方便的相互转换（一种<a href="#面向对象">面向对象</a>的体现）：</p>
+
+<ul>
+  <li><strong>装箱</strong>：将基本数据类型 ==&gt; 转换为对应的包装类型；</li>
+  <li><strong>拆箱</strong>：将包装类型 ==&gt; 转换为对应的基本数据类型；</li>
+</ul>
 
 <p>自动拆箱的时机：</p>
 
@@ -410,8 +426,8 @@ int i4 = Integer.parserInt(str); // 字符串 =&gt; 基本数据类型
 <p><strong>自动类型转换</strong>：系统把某种基本类型的值直接赋给另一种基本类型的变量。</p>
 
 <ol>
-  <li><code class="highlighter-rouge">        	char =&gt; int -&gt; long -&gt; float -&gt; double</code></li>
-  <li><code class="highlighter-rouge">byte -&gt; short =&gt; int -&gt; long -&gt; float -&gt; double</code></li>
+  <li>​                   <code class="highlighter-rouge">char =&gt; int -&gt; long -&gt; float -&gt; double</code>；</li>
+  <li><code class="highlighter-rouge">byte -&gt; short =&gt; int -&gt; long -&gt; float -&gt; double</code>；</li>
 </ol>
 
 <p><strong>强制类型转换</strong>：把一个范围大的数值或变量赋给另一个范围小的变量。如将 float 类型的变量赋值给 int 变量。</p>
@@ -422,11 +438,8 @@ int i4 = Integer.parserInt(str); // 字符串 =&gt; 基本数据类型
     <p>条件表达式（三目运算符）<code class="highlighter-rouge">condition ? 表达式1 : 表达式2 </code>中，表达式1 和 2 在<strong>类型对齐</strong>时，可能抛出因自动拆箱（和强制类型转换）导致 NPE 异常。如表达式 1 或 表达式 2 的值：</p>
 
     <ol>
-      <li>任一个是基本数据类型；
-        <ol>
-          <li>类型不一致，会强制拆箱升级成表示范围更大的那个类型。</li>
-        </ol>
-      </li>
+      <li>任一个是基本数据类型；</li>
+      <li>类型不一致，会强制拆箱升级成表示范围更大的那个类型。</li>
     </ol>
   </li>
 </ol>
@@ -464,7 +477,7 @@ Integer result = flag ? a * b : c;
       <li>比较对象：<code class="highlighter-rouge">==</code> 和 <code class="highlighter-rouge">equals()</code> 比较的都是内存地址，没有重写 <code class="highlighter-rouge">equals()</code> 方法的类都是调用的 Object 的 <code class="highlighter-rouge">equals()</code> 方法。</li>
     </ol>
   </li>
-  <li>表达式（包含算术运算）== 包装类（<a href="#数据类型转换">触发自动拆箱</a> =&gt; 基本数据类型）：比较的是数值；</li>
+  <li>表达式（包含算术运算）== 包装类（<a href="#数据类型转换">触发自动拆箱</a> =&gt; 基本数据类型）：比较的是数值。</li>
 </ol>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>42 == 42.0? // 42.0下转型（窄化）为 int 42，返回true
@@ -474,7 +487,7 @@ Integer result = flag ? a * b : c;
 
 <ol>
   <li>基本类型的变量、值 == 引用类型（包装类）的变量、值；不能触发自动拆箱；</li>
-  <li>包装类之间；如果用，则比较的是变量指向的引用/内存地址是否相同，应该用equals() 比较两个对象的内容是否相同；</li>
+  <li>包装类之间；如果用，则比较的是变量指向的<strong>引用</strong>/内存地址是否相同，应该用equals() 比较两个对象的内容是否相同；</li>
   <li>boolean 类型的变量、值 == 其他任意类型的变量、值；</li>
   <li>浮点数 == 浮点数：若浮点数之间用 <code class="highlighter-rouge">==</code> 比较，会有浮点数精度陷阱，不精确；可以设置误差范围，或见 <a href="#常用类">BigDecimal 类</a>。</li>
   <li>没有继承关系的两个引用类型之间；同上第2条。</li>
@@ -499,19 +512,20 @@ Integer result = flag ? a * b : c;
 
 <h5 id="重写-equals">重写 equals()</h5>
 
-<p>重写 <code class="highlighter-rouge">equals()</code> 必须重写 <code class="highlighter-rouge">hashCode()</code>：保证 <code class="highlighter-rouge">equals()</code> 相同的对象哈希码也相同。</p>
+<blockquote>
+  <p>见 Java 集合框架文档中的 hashCode() VS equals() 部分。</p>
+</blockquote>
+
+<p>重写 <code class="highlighter-rouge">equals()</code> 必须重写 <code class="highlighter-rouge">hashCode()</code>：保证 <code class="highlighter-rouge">equals()</code> <strong>相同的对象</strong>哈希码也相同。</p>
 
 <p><code class="highlighter-rouge">equals()</code> 和 <code class="highlighter-rouge">hashCode()</code> 同时存在的意义：</p>
 
 <ol>
-  <li><code class="highlighter-rouge">equals()</code> 保证可靠：比较对象（地址或内容）是绝对相等的；</li>
-  <li><code class="highlighter-rouge">hashCode()</code> 保证性能：用于获取哈希码（确定该对象在哈希表中的索引位置），通常用来将对象的内存地址转换为整数后返回；
+  <li><code class="highlighter-rouge">equals()</code> 保证<strong>可靠</strong>：比较对象（地址或内容）是绝对相等的；</li>
+  <li><code class="highlighter-rouge">hashCode()</code> 保证<strong>性能</strong>：用于获取哈希码（确定该对象在哈希表中的索引位置），通常用来将对象的内存地址转换为整数后返回；
     <ol>
-      <li>保证在最快的时间内判断两个对象是否相等，可能有误差值；
-        <ol>
-          <li>同一对象的 hashcode 一定相等，不同对象的也可能相等。</li>
-        </ol>
-      </li>
+      <li>保证在<strong>最快的时间内</strong>判断两个对象是否相等，可能有误差值；</li>
+      <li>同一对象的 hashcode 一定相等，不同对象的也可能相等。</li>
     </ol>
   </li>
 </ol>
@@ -572,7 +586,11 @@ int n = list.size(); // 3. 泛型集合的方法，vector、List等
 
 <p>当指定的下标值超出数组的总长度时，会拋出 <code class="highlighter-rouge">ArrayIndexOutOfBoundsException</code>（数组越界异常）。</p>
 
-<p>因为 Java 类与类间支持继承，可能产生一个数组里可存放多种数据类型的假象。如一个水果数组，元素可是苹果或香蕉（都继承了水果），但元素类型还是水果。</p>
+<p>因为 Java <strong>类与类间</strong>支持继承，可能产生一个数组里可存放多种数据类型的假象。</p>
+
+<ul>
+  <li>如一个水果数组，元素可是苹果或香蕉（都继承了水果），但元素类型还是水果。</li>
+</ul>
 
 <h5 id="数组list-接口arraylist-类">数组、List 接口、ArrayList 类</h5>
 
@@ -587,7 +605,7 @@ int n = list.size(); // 3. 泛型集合的方法，vector、List等
 <p>Array 类：提供静态方法，动态创建和访问数组。</p>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>int[] data = new int[10]; // 没有进行初始化，默认值为0
-Array.set(data, 7, 6); // 设置data[7]=6
+Array.set(data, 7, 6);    // 设置data[7]=6
 </code></pre></div></div>
 
 <p>Arrays 类：提供静态方法，对数组进行操作。定义在 <code class="highlighter-rouge">java.util</code> 包中，主要实现数组元素的查找，内容填充、排序等。<a href="#常用类">常用类</a>。</p>
@@ -599,7 +617,7 @@ List list = Arrays.asList(a); // 用法示例
 boolean equals(int[] a, int[] a2) // 判断两个数组是否相等
 String toString(int[] a) // 输出数组信息
 
-void fill(int[] a, int val) // 将指定内容填充到数组中
+void fill(int[] a, int val)  // 将指定内容填充到数组中
 int[] copyOf(int[] a, int n) // 拷贝，不改变参数内容，也可用于扩容
 int[] copyOfRange(int[] a, int fromIndex, int toIndex) // 拷贝区间
 
@@ -636,6 +654,10 @@ new Person("张三", 30).tell();
 
 <h3 id="面向对象思想">面向对象思想</h3>
 
+<blockquote>
+  <p>见面向对象思想文档。</p>
+</blockquote>
+
 <p>主要包括：</p>
 
 <ol>
@@ -665,16 +687,81 @@ new Person("张三", 30).tell();
 
 <h3 id="封装继承多态">封装、继承、多态</h3>
 
-<blockquote>
-  <p>见面向对象思想。</p>
-</blockquote>
+<h4 id="封装">封装</h4>
 
-<h3 id="thissuper-关键字">this、super 关键字</h3>
+<p>定义：利用抽象数据类型将<strong>数据和基于数据的操作</strong>封装在一起，使其构成一个不可分割的独立实体。数据被保护在抽象数据类型的内部，尽可能地<strong>隐藏</strong>内部的细节，只保留一些对外的接口使其与外部发生联系。用户无需关心对象内部的细节，但可以通过对象对外提供的接口来访问该对象。</p>
+
+<p>定义：指把对象的成员变量/属性隐藏在内部，不允许外部对象直接访问，通过（可被外界访问的）public 方法来操作属性。控制对外隐藏和暴露哪些数据。基本单位是类。如 <strong>POJO 类</strong>的 getter/setter 方法。</p>
+
+<p>优点：</p>
+
+<ul>
+  <li>减少<strong>耦合</strong>：可以独立地开发、测试、优化、使用、理解和修改</li>
+  <li>减轻维护的负担：可以更容易被理解，并且在调试的时候可以不影响其他模块</li>
+  <li>有效地调节性能：可以通过剖析来确定哪些模块影响了系统的性能</li>
+  <li>提高软件的<strong>可重用性</strong></li>
+  <li>降低了构建大型系统的风险：即使整个系统不可用，但是这些独立的模块却有可能是可用的</li>
+</ul>
+
+<h4 id="继承">继承</h4>
+
+<p>继承：指子类可<strong>使用</strong>父类的所有属性和方法。子类 is a 父类。</p>
+
+<p>继承的特点：</p>
+
+<ol>
+  <li>
+    <p>子类<strong>拥有</strong>父类所有的属性和方法（包括私有属性和私有方法），但无法访问父类中的<strong>私有属性和方法</strong>，仅拥有。</p>
+
+    <ol>
+      <li>子类不能继承父类的构造器；</li>
+      <li>子类可重写父类的方法；继承应该遵循里氏替换原则，子类对象必须能够替换掉所有父类对象。</li>
+      <li>继承后变量和方法的访问顺序：就近原则。</li>
+    </ol>
+  </li>
+  <li>
+    <p><strong>单继承</strong>（不支持多重继承）：程序结构更清晰、便于维护。多重继承会使类型转换、构造方法的调用顺序变复杂，影响性能。</p>
+
+    <ol>
+      <li>若支持多重继承：类 C 继承自类 A 和类 B，如果类 A 和 B 都有自定义的成员方法 f()，则调用类 C.f() 会产生二义性；</li>
+      <li>通过实现多个接口、间接支持多重继承：接口由于只包含方法定义，不能有方法的实现，类 C 不能直接调用方法，需实现具体的 f() 才能调用，不会产生二义性。</li>
+    </ol>
+  </li>
+  <li>
+    <p>对于父类的包访问权限、成员变量/方法，如果子类和父类在<strong>同一个包</strong>下，则子类能继承，否则子类不能继承；</p>
+  </li>
+</ol>
+
+<h5 id="方法重载-vs-重写">方法重载 VS 重写</h5>
+
+<ul>
+  <li>重载（overload）：同一个类中，多个同名方法根据不同的传参来执行不同的逻辑处理；</li>
+  <li>重写/覆盖、覆写（override）：子类<strong>继承</strong>父类已有的方法，并重新实现其内部逻辑、功能。遵循两同两小一大。</li>
+</ul>
+
+<p>区别：</p>
+
+<ol>
+  <li>方法名都<strong>相同</strong>。</li>
+  <li>发生范围：重载在同一个类；重写在子类中。</li>
+  <li>参数列表（类型、个数、顺序） ：重载至少一个不同；重写一定<strong>相同</strong>。</li>
+  <li>返回值类型、异常：重载可不同（只有返回值不同不算重载）；<strong>两小</strong>：重写子类的返回值类型、异常范围（<code class="highlighter-rouge">RunTimeException</code>）&lt;= 父类（<code class="highlighter-rouge">Exception</code>）。</li>
+  <li>访问修饰符：重载可不同；<strong>一大</strong>：重写，子类访问权限（只能是 <code class="highlighter-rouge">public，而非private</code>）&gt;= 父类（<code class="highlighter-rouge">protected</code>），即子类修饰符不能做更严格的限制；
+    <ul>
+      <li>另外父类方法修饰符为 <code class="highlighter-rouge">private/final/static</code>或构造器时（都不能被继承），子类不能重写，但被 static 修饰的方法能被再次声明。</li>
+      <li><a href="#反射机制">反射机制</a>。</li>
+    </ul>
+  </li>
+  <li>发生阶段：重载实现的是<strong>编译时</strong>的多态性（即前绑定）；重写实现的是<strong>运行时</strong>的多态性（即后绑定）。</li>
+</ol>
+
+<h5 id="thissuper-关键字">this、super 关键字</h5>
 
 <p>this 代表当前（类的）对象的引用，指向本对象；super 代表对父类对象的引用，指向父类对象。</p>
 
 <ol>
-  <li>在构造器中，this用于区分（同名）成员变量与局部变量；this 调用本类中的其他构造方法、super() 调用父类中的其他构造方法时，必须处于构造器的首行，否则编译器会报错。</li>
+  <li>在构造器中，this用于区分（同名）成员变量与局部变量；</li>
+  <li>this 调用本类中的其他构造方法、super() 调用父类中的其他构造方法时，必须处于构造器的首行，否则编译器会报错。</li>
   <li>在 static 方法中，this、super 不可用。</li>
 </ol>
 
@@ -682,12 +769,74 @@ new Person("张三", 30).tell();
 
 <ol>
   <li><code class="highlighter-rouge">super.成员变量/方法</code>：用于在子类中，调用父类的同名成员变量或方法；</li>
-  <li><code class="highlighter-rouge">super(param1, ...)</code>：用于在子类构造器（的第一行），显式地调用父类构造器；
+  <li><code class="highlighter-rouge">super(param1, ...)</code>：用于在子类构造器（的第一行），<strong>显式地</strong>调用父类构造器；
     <ol>
       <li>若父类有无参构造器，系统会自动调用 <code class="highlighter-rouge">super()</code>；</li>
       <li>若父类的构造器都带参，则必须用 <code class="highlighter-rouge">super(param1, ...)</code> 显式调用一次。</li>
     </ol>
   </li>
+</ol>
+
+<h4 id="多态">多态</h4>
+
+<p>多态：即<strong>一个接口，多个方法</strong>。指多个子类继承并重写父类的同一属性或方法，或多个子类实现接口并覆盖接口中的同一方法，并将父类引用指向子类对象。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 引用的自动类型转换，指存在继承关系的对象类型转换
+Animal animal = new Dog(); // 向上转型，把Dog类型转换为Animal类型
+animal.run();
+
+// 引用的强制类型转换，编译正常，运行可能报错ClassCastException类型转换异常，建议在强转前判断对象的真实类型
+Dog dog = (Dog) animal; // 向下转型，把Animal类型转换为Dog类型
+animal.run();
+
+Animal animal = new Cat();
+if (animal instanceof Cat) {
+    Cat cat = (Cat) animal; // 向下转型
+}
+</code></pre></div></div>
+
+<p>实现多态有 3 个必要条件：</p>
+
+<ol>
+  <li>子类继承父类/实现接口；</li>
+  <li>方法重写；</li>
+  <li>父类引用指向子类对象（<strong>向上转型</strong>）或接口的引用变量指向其实现类的实例对象。</li>
+</ol>
+
+<p>分类：</p>
+
+<ol>
+  <li>编译时多态：是静态的，主要指<strong>方法重载</strong>。编译后变成不同的方法；</li>
+  <li>运行时多态：是动态的，即通常所说的多态性。指程序中定义的<strong>对象引用</strong>所指向的<strong>具体类型</strong>在运行期间才确定。
+    <ul>
+      <li>指继承父类和实现接口时，可用父类引用指向子类对象。<strong>引用类型变量</strong>发出的方法调用的到底是哪个类中的方法，必须在程序运行期间才能确定。</li>
+    </ul>
+  </li>
+</ol>
+
+<p>特征：</p>
+
+<ol>
+  <li>对于方法的调用：编译看左边，运行看右边？
+    <ol>
+      <li>如果子类重写了父类方法，真正执行的是子类覆盖的方法；</li>
+      <li>如果子类没有覆盖父类的方法，执行的是父类的方法。</li>
+    </ol>
+  </li>
+  <li>对于变量：编译、运行都看左边。</li>
+</ol>
+
+<p>优势：</p>
+
+<ol>
+  <li>父类作为方法的形参（入参）用来传递对象；</li>
+  <li>便于类与类间解耦，右边对象可组件化切换，改换业务。</li>
+</ol>
+
+<p>劣势：</p>
+
+<ol>
+  <li>编译看左边，不能调用子类独有的方法。</li>
 </ol>
 
 <h3 id="值传递-vs-引用传递">值传递 VS 引用传递</h3>
@@ -832,9 +981,9 @@ protected Son clone() throws CloneNotSupportedException {
 <p><code class="highlighter-rouge">JDK1.8</code> 后新增三个方法：</p>
 
 <ol>
-  <li>默认方法：用 default 修饰，即实例方法；</li>
-  <li>静态方法：只能用接口名本身调用，不能用子接口/实现类调用；</li>
-  <li>私有方法：被私有方法/默认方法调用，只能在本接口中访问。</li>
+  <li><strong>默认方法</strong>：用 default 修饰，即实例方法；</li>
+  <li><strong>静态方法</strong>：只能用接口名本身调用，不能用子接口/实现类调用；</li>
+  <li><strong>私有方法</strong>：被私有方法/默认方法调用，只能在本接口中访问。</li>
 </ol>
 
 <h5 id="抽象类">抽象类</h5>
@@ -868,7 +1017,7 @@ protected Son clone() throws CloneNotSupportedException {
 <p>异：</p>
 
 <ol>
-  <li>一个类只能<strong>继承（extends）</strong>一个抽象<strong>类</strong>；但可<strong>实现（implements）</strong>多个接口。抽象类被设计用来被继承的（用于代码复用），接口被设计用来实现的。</li>
+  <li>一个类只能<strong>继承（extends）</strong>一个抽象<strong>类</strong>；但可<strong>实现（implements）</strong>多个接口。抽象类被设计<strong>用来被继承的</strong>（用于代码复用），接口被设计<strong>用来实现的</strong>。</li>
   <li>接口比抽象类更抽象：抽象类可有静态方法、静态代码块、<strong>构造器</strong>；接口中 JDK1.8后可有静态方法，没有构造器。</li>
   <li>抽象类可定义<strong>成员变量</strong>，默认 default，可在子类中被重新定义，也可被重新赋值；接口中的成员变量只能用 <code class="highlighter-rouge">public static finial</code> 修饰（JDK1.8 后默认为default），实际是常量，不能被修改且必须有初始值。</li>
   <li>抽象类可有（普通成员）<strong>方法的具体实现</strong>；接口（只有public abstract方法定义，）不能有方法的具体实现。</li>
@@ -929,7 +1078,9 @@ protected Son clone() throws CloneNotSupportedException {
 
 <h5 id="checked-exception">Checked Exception</h5>
 
-<p><code class="highlighter-rouge">checked exception</code>（（编译时）受检查异常）：代码还没运行，编译器就会检查，并要求必须处理的异常；如果不处理，程序就不能编译通过。除了<code class="highlighter-rouge">RuntimeException</code>及其子类以外都是 <code class="highlighter-rouge">checked exception</code>。必须要对这段代码 <code class="highlighter-rouge">try...catch</code>，或 <code class="highlighter-rouge">throws exception</code>。</p>
+<p><code class="highlighter-rouge">checked exception</code>（编译时、受检查异常）：代码还没运行，编译器就会检查，并要求必须处理的异常；如果不处理，程序就<strong>不能编译通过</strong>。</p>
+
+<p>除了<code class="highlighter-rouge">RuntimeException</code>及其子类以外都是 <code class="highlighter-rouge">checked exception</code>。必须要对这段代码 <code class="highlighter-rouge">try...catch</code>，或 <code class="highlighter-rouge">throws exception</code>。</p>
 
 <ol>
   <li><code class="highlighter-rouge">IOException</code></li>
@@ -958,7 +1109,7 @@ protected Son clone() throws CloneNotSupportedException {
       <li>集合里的元素即使 isNotEmpty，取出的数据元素也可能为 null；Map 集合类（<code class="highlighter-rouge">HashMap、CurrentHashMap、HashTable、TreeMap</code>）的 Key/Value是否允许存储 null 值；</li>
       <li>远程调用返回对象时，一律要进行空指针判断；</li>
       <li>对于 Session 中获取的数据；</li>
-      <li>级联（链式）调用 <code class="highlighter-rouge">obj.getA().getB().getC()</code>，一连串调用；</li>
+      <li><strong>级联（链式）调用</strong> <code class="highlighter-rouge">obj.getA().getB().getC()</code>，一连串调用；</li>
     </ol>
   </li>
   <li><code class="highlighter-rouge">ArrayIndexOutOfBoundsException</code>：数组下标越界；</li>
@@ -1241,14 +1392,18 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
 
 <ul>
   <li>反射是线程安全的；</li>
-  <li>反射用软引用 relectionData 缓存 class 信息，避免每次都重新从 JVM 获取带来的开销；</li>
+  <li>反射用<strong>软引用</strong> relectionData 缓存 class 信息，避免每次都重新从 JVM 获取带来的开销；</li>
   <li>当找到需要的方法，会copy一份，而不是用原来的实例，从而保证数据隔离；</li>
   <li>调度反射方法，最终是由 JVM 执行 <code class="highlighter-rouge">invoke0()</code> 执行；</li>
 </ul>
 
 <h2 id="注解">注解</h2>
 
-<p><code class="highlighter-rouge">Annotation</code> （注解）：是 Java5 开始引入的新特性，可看作是一种特殊的注释，本质是继承了 <code class="highlighter-rouge">Annotation</code> 特殊接口；主要用于修饰类、方法、变量，提供某些信息供程序在编译或运行时使用。</p>
+<p><code class="highlighter-rouge">Annotation</code> （注解）：是 Java5 开始引入的新特性，可看作是一种特殊的注释，本质是继承了 <code class="highlighter-rouge">Annotation</code> 特殊接口。</p>
+
+<ul>
+  <li>主要用于修饰类、方法、变量，提供某些信息供程序在编译或运行时使用。</li>
+</ul>
 
 <h5 id="注解解析方法">注解解析方法</h5>
 
@@ -1340,68 +1495,15 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
 <p>定义</p>
 
 <ul>
-  <li>序列化： 将对象（包括对象的类型信息、存储在对象中的数据及其类型）转换成二进制字节流的过程；</li>
+  <li>序列化： 将对象（包括对象的类型信息、存储在对象中的数据及其类型）转换成<strong>二进制字节流</strong>的过程；</li>
   <li>反序列化：在内存中新建对象。如果 JVM 在反序列化时找不到该类，则抛出一个 <code class="highlighter-rouge">ClassNotFoundException</code> <a href="#异常">异常</a>。</li>
 </ul>
 
-<p>目的：持久化 Java 对象，将对象存储到文件系统、数据库、内存中，或通过网络传输对象；</p>
+<p>目的：<strong>持久化 Java 对象</strong>，将对象存储到文件系统、数据库、内存中，或<strong>通过网络</strong>传输对象；</p>
 
-<p>整个过程都是 JVM 独立的，即，在一个平台上序列化的对象可在另一个完全不同的平台上反序列化该对象。</p>
+<p>整个过程都是 <strong>JVM 独立</strong>的，即，在一个平台上序列化的对象可在另一个（完全不同的）平台上反序列化该对象。</p>
 
-<p>序列化和反序列化对应 OSI 七层协议模型中的表示层：主要就是对应用层的用户数据进行处理转换为二进制流。属于 TCP/IP 四层模型中应用层的一部分。</p>
-
-<h5 id="具体实现">具体实现</h5>
-
-<p>常见序列化协议：</p>
-
-<ul>
-  <li>文本类序列化：可读性较好，但性能较差，一般不会选择；
-    <ul>
-      <li>JSON</li>
-      <li>XML</li>
-    </ul>
-  </li>
-  <li>基于二进制的序列化协议：
-    <ol>
-      <li>JDK 自带的序列化，只需实现 <code class="highlighter-rouge">java.io.Serializable</code>接口即可。几乎不直接用此方式，主要原因有两个：
-        <ol>
-          <li>不支持跨语言调用；</li>
-          <li>相比于其他序列化框架性能更差，序列化后的字节数组体积较大，导致传输成本加大。</li>
-        </ol>
-      </li>
-      <li>Kryo：推荐；</li>
-      <li>Protobuf</li>
-      <li>hessian</li>
-    </ol>
-  </li>
-</ul>
-
-<p>JDK 自带序列化的实现：</p>
-
-<ul>
-  <li>
-    <p>用于序列化和反序列化的类必须实现 <code class="highlighter-rouge">Serializable</code> 接口：用于实现 Java 类的序列化操作而提供的一个<strong>语义级别</strong>的接口。没有任何方法或字段，只是用于标识可序列化的语义。</p>
-
-    <ul>
-      <li>
-        <p>对象中如果有属性不想被序列化，使用 <code class="highlighter-rouge">transient</code> 修饰。</p>
-      </li>
-      <li>
-        <p>实现了 Serializable 接口的类可被 ObjectOutputStream 转换为字节流，也可通过 ObjectInputStream 再将其解析为对象。</p>
-      </li>
-    </ul>
-  </li>
-  <li>
-    <p>显式地定义 <code class="highlighter-rouge">serialVersionUID</code>：在反序列化时，JVM 会把传来的字节流中的 serialVersionUID 与本地相应实体（类）的（serialVersionUID）进行比较，如果相同就认为是同一个类。</p>
-
-    <ul>
-      <li>序列化类新增属性时，不要修改 serialVersionUID 字段，避免反序列失败；如果完全不兼容升级，避免反序列化混乱，需修改。</li>
-    </ul>
-
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>private static final long serialVersionUID = 1L; 
-</code></pre></div>    </div>
-  </li>
-</ul>
+<p>序列化和反序列化对应 OSI 七层协议模型中的<strong>表示层</strong>：主要就是对应用层的用户数据进行处理转换为二进制流。属于 TCP/IP 四层模型中<strong>应用层</strong>的一部分。</p>
 
 <h5 id="常见应用场景">常见应用场景</h5>
 
@@ -1411,19 +1513,63 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
   <li>对象在进行<strong>网络传输</strong>（如远程方法调用 RPC ）之前需先被序列化，接收到序列化的对象之后进行反序列化；用 <strong>Socket 套接字</strong>在网络中传送对象时，如用 RPC 协议进行网络通信时；</li>
 </ol>
 
-<h5 id="trasient-关键字">trasient 关键字</h5>
+<h5 id="具体实现">具体实现</h5>
 
-<p>作用：阻止实例中（用 <code class="highlighter-rouge">trasient</code> 修饰的）变量序列化；当对象被反序列化时，被 <code class="highlighter-rouge">transient</code> 修饰的变量值不会被持久化和恢复。</p>
+<p>常见序列化协议：</p>
 
 <ol>
-  <li>只能修饰变量，不能修饰类和方法；</li>
-  <li>修饰的成员变量不能被序列化（修饰的对象需实现 Serializable 接口），在反序列化后变量值将会被置成默认值；</li>
-  <li>静态变量不管是否被 transient 修饰，均不能被序列化（如果反序列化后类中 static 变量还有值，则为当前 JVM 中对应 static 变量的值）。
-    <ul>
-      <li>序列化保存的是对象状态，静态变量保存的是类状态，不属于任何对象，因此静态变量不能被序列化。</li>
-    </ul>
+  <li>
+    <p>文本类序列化：可读性较好，但性能较差，一般不会选择；JSON、XML</p>
+  </li>
+  <li>基于二进制的序列化协议：</li>
+  <li>JDK 自带的序列化；</li>
+  <li>Kryo：推荐；</li>
+  <li>Protobuf</li>
+  <li>hessian</li>
+</ol>
+
+<p>JDK 自带序列化的实现：</p>
+
+<blockquote>
+  <p>几乎不直接用此方式，主要原因有：不支持<strong>跨语言</strong>调用；相比于其他序列化框架性能更差，序列化后的字节数组体积较大，导致传输成本加大。</p>
+</blockquote>
+
+<ul>
+  <li>
+    <p>用于序列化和反序列化的类必须实现 <code class="highlighter-rouge">java.io.Serializable</code> 接口：用于实现 Java 类的序列化操作而提供的一个<strong>语义级别</strong>的接口。没有任何方法或字段，只是用于标识可序列化的语义。</p>
+  </li>
+  <li>
+    <p>实现了 Serializable 接口的类可被 ObjectOutputStream 转换为字节流，也可通过 ObjectInputStream 再将其解析为对象。</p>
+  </li>
+</ul>
+
+<h5 id="trasient-关键字transient">trasient 关键字、<code class="highlighter-rouge">@transient</code></h5>
+
+<p>作用：阻止实例中（用 <code class="highlighter-rouge">trasient</code> 修饰的）属性序列化；当对象被反序列化时，被 <code class="highlighter-rouge">transient</code> 修饰的变量值不会被持久化和恢复。</p>
+
+<p>对象中如果有属性<strong>不想被序列化</strong>，可以属性前添加关键字 <code class="highlighter-rouge">transient</code>、或使用 <code class="highlighter-rouge">@transient</code> 修饰。</p>
+
+<ol>
+  <li>一旦变量被transient修饰，变量将不再是对象持久化的一部分，该变量内容在序列化后无法获得访问。</li>
+  <li>只能修饰<strong>变量</strong>，而不能修饰方法和类、<strong>局部变量</strong>。</li>
+  <li>被transient关键字修饰的<strong>成员变量</strong>不能被序列化，（修饰的对象需实现 Serializable 接口，在反序列化后变量值将会被置成默认值）；</li>
+  <li><strong>静态变量</strong>不管是否被transient修饰，均不能被序列化。
+    <ol>
+      <li>序列化保存的是对象状态，静态变量保存的是类状态，不属于任何对象，因此静态变量不<strong>能被序列化</strong>。</li>
+      <li>如果反序列化后类中 static 变量还有值，则为当前 JVM 中对应 static 变量的值。</li>
+    </ol>
   </li>
 </ol>
+
+<h5 id="serialversionuid">serialVersionUID</h5>
+
+<ul>
+  <li>显式地定义 <code class="highlighter-rouge">serialVersionUID</code>：在<strong>反序列化</strong>时，JVM 会把传来的字节流中的 <code class="highlighter-rouge">serialVersionUID</code> 与本地相应实体（类）的（<code class="highlighter-rouge">serialVersionUID</code>）进行比较，如果相同就认为是同一个类。</li>
+  <li>序列化类新增属性时，不要修改 <code class="highlighter-rouge">serialVersionUID</code> 字段，避免反序列失败；如果完全不兼容升级，避免反序列化混乱，需修改。</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>private static final long serialVersionUID = 1L; 
+</code></pre></div></div>
 
 <h3 id="java-io-流">Java I/O 流</h3>
 
@@ -1515,7 +1661,7 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
   <li>同步非阻塞 I/O</li>
   <li>I/O 多路复用
     <ul>
-      <li>NIO (Non-blocking/New I/O)：支持面向缓冲，基于通道的 I/O 操作方法。 用于高负载、高并发的（网络）应用；</li>
+      <li><strong>NIO</strong> (<code class="highlighter-rouge">Non-blocking/New I/O</code>)：支持面向缓冲，基于通道的 I/O 操作方法。 用于高负载、高并发的（网络）应用；</li>
     </ul>
   </li>
   <li>信号驱动 I/O</li>
@@ -1529,7 +1675,7 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
 <h2 id="socket-网络编程">Socket 网络编程</h2>
 
 <blockquote>
-  <p>暂无</p>
+
 </blockquote>
 
 <h2 id="jdk18-新特性">JDK1.8 新特性</h2>
@@ -1782,7 +1928,7 @@ System.out.println("平均数 : " + stats.getAverage());
 
 <p><a href="#数组">Arrays 数组</a></p>
 
-<p>详细方法见 Java 集合框架中。</p>
+<p>详细方法见 <strong>Java 集合框架</strong>中。</p>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import java.util.Collections;
 
@@ -1864,7 +2010,9 @@ if (!Character.isLetterOrDigit(s.charAt(left))) {
   left++;
 }
 // 判断二者是否相等，忽略大小写
-Character.toLowerCase(s.charAt(left))；
+Character.toLowerCase(s.charAt(left));
+
+str = Character.toString(‘c’);
 </code></pre></div></div>
 
 <h3 id="string-类">String 类</h3>
@@ -1873,64 +2021,81 @@ Character.toLowerCase(s.charAt(left))；
 
 <h5 id="string-类定义">String 类定义</h5>
 
-<p>String 是用 <a href="#常量和变量">private final</a> 修饰的字符数组保存，每次都创建新对象（多了会导致性能降低）。一旦创建，其值不可改变，适用于<strong>不常改变长度</strong>的字符串，<code class="highlighter-rouge">str.length()</code>。</p>
+<p>String 是用 <a href="#常量和变量">private final</a> 修饰的<strong>字符数组</strong>保存，<strong>每次都</strong>创建新对象（多了会导致性能降低）。String 类是不可变类，一旦创建，其值不可改变，适用于<strong>不常改变长度</strong>的字符串，<code class="highlighter-rouge">str.length()</code>。</p>
 
-<ul>
-  <li><code class="highlighter-rouge">final</code>：表示 char 数组的<strong>引用地址</strong>不可变；</li>
-  <li><code class="highlighter-rouge">private</code>修饰符：表示值不会被外部修改。其实可通过<a href="#反射机制">反射机制</a>改变值。</li>
-</ul>
+<ol>
+  <li><code class="highlighter-rouge">private</code> 修饰符：表示值不会被<strong>外部</strong>修改。其实可通过<a href="#反射机制">反射机制</a>改变值。</li>
+  <li><code class="highlighter-rouge">final</code>：表示 char 数组的<strong>引用地址</strong>不可变。</li>
+</ol>
 
 <p>二者配合可以保证用 String 类声明的对象的值不可变。</p>
-
-<ul>
-  <li><a href="https://xmmarlowe.github.io/2021/09/10/Java/Java-String%E7%B1%BB%E4%B8%BA%E4%BB%80%E4%B9%88%E7%94%A8final%E4%BF%AE%E9%A5%B0%EF%BC%9F/">String 是 final 类，不可变</a>。</li>
-</ul>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>private [final] char value[];
 
 // 通过反射修改String中的字符
-String s = “Hello World”; 
+String str = “Hello World”; 
 // 获取String类中的value字段
 Field val = String.class.getDeclaredField(“value”);
 // 改变value属性的访问权限
 val.setAccessible(true);
 // 获取s对象上的属性value数组
-char[] value = (char[]) val.get(s);
+char[] value = (char[]) val.get(str);
 // 改变value所引用的数组中的第5个字符
 value[5] = ‘_’; // 变为 Hello_World
 
 String t = value.toString(); //?
 </code></pre></div></div>
 
-<p><strong>一、好处</strong>：</p>
+<p><strong>运算符重载</strong>：Java 语言本身并不支持<a href="#多态">运算符重载</a>，<code class="highlighter-rouge">+</code> 和 <code class="highlighter-rouge">+=</code> 是专门为 String 类重载过的运算符，也是 Java 中仅有的两个重载过的运算符。</p>
 
-<ol>
-  <li>
-    <p>使 JVM 可实现<strong>字符串常量池</strong>：复制 String 变量、new 同一字面量、不同的（字符串）变量指向相同的字面量，都是指向字符串常量池中（同一内存地址的）同一对象。字符串常量池的好处：</p>
-
-    <ul>
-      <li>可重复使用字符串常量，避免每次都重新创建相同对象，节省内存。</li>
-      <li>不影响引用该对象的其他变量；如果字符串是可变的，当某个变量改变值时，其他指向该内存地址的变量的值也会改变，不符合常量池设计的初衷。</li>
-    </ul>
-  </li>
-  <li>
-    <p>保证了字符串对象在<strong>多线程</strong>环境下是<strong>线程安全</strong>的。常用字符串来传递数据，如数据库的用户名密码、网络编程中的 IP 和端口。因为字符串是不可变的，故其值不能被修改；如果可变，则可通过改变引用地址指向的值去修改字符串的值，从而导致安全漏洞。</p>
-  </li>
-  <li>
-    <p>内存地址不变，因为 <strong>hashcode</strong> 由内存地址间接得到，因此保证了 String 对象的 <code class="highlighter-rouge">hashcode</code> 的唯一性：创建 String 时 <code class="highlighter-rouge">hashcode</code> 就被缓存了，不必每次重新计算，处理速度快，很适合作为 Map 的键。</p>
-  </li>
-</ol>
-
-<p><strong>二、缺点</strong>：每次修改 String 对象都会产生新对象，占用内存。如 String 对象的 <code class="highlighter-rouge">+</code> 操作直接生成新常量，并把 String 对象引用指向新常量。</p>
-
-<p>运算符重载：Java 语言本身并不支持<a href="#多态">运算符重载</a>，<code class="highlighter-rouge">+</code> 和 <code class="highlighter-rouge">+=</code> 是专门为 String 类重载过的运算符，也是 Java 中仅有的两个重载过的运算符。</p>
-
-<p><code class="highlighter-rouge">String.intern()</code> 是一个 native（本地）方法，作用是将指定的字符串对象的引用保存在字符串常量池中，可简单分为两种情况：如果字符串常量池中</p>
+<p><code class="highlighter-rouge">String.intern()</code> 是一个 native（本地）方法，作用是将指定的字符串对象的<strong>引用</strong>保存在<strong>字符串常量池</strong>中，可简单分为两种情况：如果字符串常量池中</p>
 
 <ol>
   <li>保存了对应的字符串对象的引用，直接返回该引用。</li>
   <li>没有保存的话，在常量池中创建一个指向该字符串对象的引用并返回。</li>
 </ol>
+
+<h5 id="创建字符串对象的方式">创建字符串对象的方式</h5>
+
+<p>见 <a href="#数组">字符串常量池与  equals()</a></p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>String s1 = "ab"; // 将字面量"ab"放到常量池中，并将引用变量 s1 指向常量池中字面量的地址；推荐
+String str1 = new String("ab"); // 在堆内存创建一个新对象，a 引用指向新对象
+
+s1 != str1 // s1是常量池中的对象的引用，str1 是堆内存中的对象的引用，二者地址不同
+s1.equals(str1) // true，二者内容相同，重写 hashCode()
+
+// 字符数组
+char value[] = { ’H‘, ’e‘, ’l‘, ’l‘, ’o‘ };
+char[] value = ; // 均可
+
+String str = new String(value); // 用字符数组构造字符串对象
+String str = String.valueOf(value);
+</code></pre></div></div>
+
+<h5 id="string-类不可变的优缺点">String 类不可变的优缺点</h5>
+
+<p><strong>一、好处</strong>：</p>
+
+<ol>
+  <li>
+    <p>使 JVM 可实现<strong>字符串常量池</strong>：<strong>复制</strong> String 变量、<strong>new</strong> 同一字面量、不同的（字符串）变量<strong>指向</strong>相同的字面量，都是指向字符串常量池中（同一内存地址的）同一对象。字符串常量池的好处：</p>
+
+    <ul>
+      <li>可<strong>重复使用</strong>字符串常量，避免每次都重新创建相同对象，节省内存。</li>
+      <li>不影响<strong>引用该对象的其他变量</strong>；如果字符串是可变的，当某个变量改变值时，其他指向<strong>该内存地址</strong>的变量的值也会改变，不符合常量池设计的初衷。</li>
+    </ul>
+  </li>
+  <li>保证了字符串对象在<strong>多线程</strong>环境下是<strong>线程安全</strong>的。常用字符串来传递数据，如数据库的用户名密码、网络编程中的 IP 和端口。
+    <ul>
+      <li>因为字符串是不可变的，故其值不能被修改；</li>
+      <li>如果可变，则可通过改变<strong>引用地址指向的值</strong>去修改字符串的值，从而导致安全漏洞。</li>
+    </ul>
+  </li>
+  <li>内存地址不变，而 <strong>hashcode</strong> 由内存地址间接得到，因此保证了 String 对象的 <strong><code class="highlighter-rouge">hashcode</code> 的唯一性</strong>：创建 String 时 <code class="highlighter-rouge">hashcode</code> 就被缓存了，不必每次重新计算，处理速度快，很适合作为 <strong>Map 的键</strong>。</li>
+</ol>
+
+<p><strong>二、缺点</strong>：每次修改 String 对象都会产生新对象，占用内存。如 String 对象的 <code class="highlighter-rouge">+</code> <strong>拼接操作</strong>直接生成新常量，并把 String 对象引用指向新常量。</p>
 
 <h5 id="final-string">final String</h5>
 
@@ -1938,7 +2103,7 @@ String t = value.toString(); //?
 
 <ol>
   <li>
-    <p>形式: 字符常量是<strong>单引号</strong>引起的一个字符，属于基本类型变量；字符串常量是<strong>双引号</strong>引起的 0 或若干个字符，属于对象。二者可相互转换。</p>
+    <p>形式：字符常量 char 是<strong>单引号</strong>引起的一个字符，属于基本类型变量；字符串常量 final String 是<strong>双引号</strong>引起的 0 或若干个字符，属于对象。二者可相互转换。</p>
 
     <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> // char 在 Java 中占两个字节
  char ch = ‘a’;
@@ -1952,7 +2117,7 @@ String t = value.toString(); //?
 </code></pre></div>    </div>
   </li>
   <li>
-    <p>含义: 字符常量相当于一个整型值（ASCII 值），可进行表达式运算；字符串常量代表（该字符串在内存中存放位置的）<strong>地址值</strong>。</p>
+    <p>含义：字符常量相当于一个整型值（ASCII 值），可进行表达式运算；字符串常量代表（该字符串在内存中存放位置的）<strong>地址值</strong>。</p>
   </li>
   <li>
     <p>占内存大小：<a href="#数据类型">字符常量</a>只占 2 个字节；字符串常量取决于长度。</p>
@@ -1978,51 +2143,51 @@ String c = "hello";
 
 // true，b是常量，在编译期间就计算出了b+2=”hello2”，在常量池中找到已有地址，与a相同
 a == b + 2;
-// false，c是变量，在编译期间不能确定其值，在堆中新建对象”hello”，+运算得到新变量 “hello2”，二者地址不同
+// false，c是变量，在编译期间不能确定其值，在堆中新建对象”hello”？，+运算得到新变量 “hello2”，二者地址不同
 a == c + 2;
 </code></pre></div></div>
 
-<h5 id="字符数组stringbuilderstringbuffer">字符数组、StringBuilder、StringBuffer</h5>
+<h5 id="可变字符串类-stringbuilderstringbuffer">可变字符串类 StringBuilder、StringBuffer</h5>
 
-<p>StringBuilder、StringBuffer 都是对<strong>原对象</strong>操作，都用<strong>无 final 修饰</strong>的字符数组保存。对象创建后，仍可修改值。</p>
+<p>Java 提供了两个可变字符串类 <code class="highlighter-rouge">StringBuilder</code> 和 <code class="highlighter-rouge">StringBuffer</code>。　　</p>
+
+<ul>
+  <li>实际上，二者功能基本相似，方法也差不多。都是对<strong>原对象</strong>操作，都用<strong>无 final 修饰</strong>的字符数组保存。对象创建后，<strong>仍可修改值</strong>。</li>
+  <li>不同的是，<code class="highlighter-rouge">StringBuffer</code> 是<strong>线程安全</strong>的，方法都是 <code class="highlighter-rouge">synchronized</code> 修饰的，适用于<strong>多线程</strong>在字符串缓冲区中操作大量数据。<del>用于多线程使用共享变量的情景</del>。</li>
+  <li>而 <code class="highlighter-rouge">StringBuilder</code> 则没有实现线程安全功能、非线程安全的，所以<strong>性能略高</strong>。适用于<strong>单线程</strong>在字符串缓冲区中操作大量数据。</li>
+</ul>
+
+<p>因此在通常情况下，如果需要创建一个内容可变的字符串对象，则应该优先考虑使用 <code class="highlighter-rouge">StringBuilder</code> 类。</p>
+
+<p><strong>拼接字符串</strong>：</p>
+
+<p><code class="highlighter-rouge">StringBuffer</code> 就是为了解决<strong>大量拼接字符串时</strong>产生很多<strong>临时对象</strong>问题而提供的一个类。它提供了 <code class="highlighter-rouge">append</code> 和 <code class="highlighter-rouge">add</code> 方法，可以将字符串添加到已有序列的末尾或指定位置。<del>本质是一个线程安全的可修改的字符序列。</del></p>
+
+<p>在很多情况下字符串拼接操作不需要线程安全，所以可以选择 <code class="highlighter-rouge">StringBuilder</code>。</p>
 
 <ol>
-  <li>
-    <p>字符数组；</p>
-
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> char value[] = { ’H‘, ’e‘, ’l‘, ’l‘, ’o‘ };
- char[] value = ; // 均可
-      
- String str = new String(value); // 用字符数组构造字符串对象
- String str = String.valueOf(value);
-</code></pre></div>    </div>
-  </li>
-  <li>
-    <p><code class="highlighter-rouge">StringBuilder</code>：性能最好，非线程安全，适用于<strong>单线程</strong>在字符串缓冲区中操作大量数据。重载了 <code class="highlighter-rouge">toString()</code> ，在调用该类对象时自动返回一个字符串，用 <code class="highlighter-rouge">System.out.println(对象名)</code> 可打印出来。</p>
-
-    <ul>
-      <li><code class="highlighter-rouge">String</code> 对象通过 <code class="highlighter-rouge">“+”</code> 拼接，实际上是通过创建 <code class="highlighter-rouge">StringBuilder</code> 调用 <code class="highlighter-rouge">append()</code> 方法实现的，最后调用 <code class="highlighter-rouge">toString()</code> 得到一个 <code class="highlighter-rouge">String</code> 对象 。</li>
-      <li>在循环内用 <code class="highlighter-rouge">“+”</code> 拼接 <code class="highlighter-rouge">String</code> 对象，会导致创建过多的 <code class="highlighter-rouge">StringBuilder</code> <strong>临时对象</strong>，造成内存资源浪费。可直接使用<code class="highlighter-rouge">StringBuilder</code> 调用 <code class="highlighter-rouge">append()</code> 方法代替。</li>
-    </ul>
-
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> // 转为StringBuilder对象
- String str = ”num is:“;
- // 1.[X] 通过强制类型转换
- StringBuilder strBuilder = (StringBuilder)str;
- // 2. 通过构造函数
- StringBuilder strBuilder = new StringBuilder(str);
-      
- for (int i = 0; i &lt; 1000; i++) {
-    strBuilder.append(','); // 用`+`会产生大量临时StringBuilder对象
-    strBuilder.append(i);
- }
- return strBuilder.toString();
-</code></pre></div>    </div>
-  </li>
-  <li>
-    <p><code class="highlighter-rouge">StringBuffer</code>：是<code class="highlighter-rouge">StringBuilder</code>的<strong>线程安全版本</strong>，很少用，适用于<strong>多线程</strong>在字符串缓冲区中操作大量数据。方法都是 <code class="highlighter-rouge">synchronized</code> 修饰的，用于多线程使用共享变量的情景。</p>
-  </li>
+  <li>通过 <code class="highlighter-rouge">+</code> 拼接 <code class="highlighter-rouge">String</code> 对象，实际上是通过创建 <code class="highlighter-rouge">StringBuilder</code> 调用 <code class="highlighter-rouge">append()</code> 方法实现的，最后调用 <code class="highlighter-rouge">toString()</code> 得到一个新 <code class="highlighter-rouge">String</code> 对象 。</li>
+  <li><code class="highlighter-rouge">StringBuilder</code> 重载了 <code class="highlighter-rouge">toString()</code> ，在调用该类对象时自动返回一个字符串，用 <code class="highlighter-rouge">System.out.println(对象名)</code> 可打印出来。</li>
+  <li>在循环内用 <code class="highlighter-rouge">+</code> 拼接 <code class="highlighter-rouge">String</code> 对象，会导致创建过多的 <code class="highlighter-rouge">StringBuilder</code> <strong>临时对象</strong>，造成内存资源浪费。可直接使用 <code class="highlighter-rouge">StringBuilder</code> 调用 <code class="highlighter-rouge">append()</code> 方法代替。</li>
 </ol>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 转为StringBuilder对象
+String str = "num is:";
+// 1.[X] 通过强制类型转换
+StringBuilder strBuilder = (StringBuilder)str;
+// 2. 通过构造函数
+StringBuilder strBuilder = new StringBuilder(str);
+  
+for (int i = 0; i &lt; 1000; i++) {
+   strBuilder.append(','); // 用`+`会产生大量临时StringBuilder对象
+   strBuilder.append(i);
+}
+
+// 替换指定下标位置的单个字符；
+strBuilder.setCharAt(1, 'X');
+
+return strBuilder.toString();
+</code></pre></div></div>
 
 <p>参考：</p>
 
@@ -2033,27 +2198,37 @@ a == c + 2;
 
 <h4 id="常用方法">常用方法</h4>
 
+<blockquote>
+  <p>获判转替合，货盘转提盒</p>
+</blockquote>
+
 <h5 id="获取">获取</h5>
 
 <ol>
   <li><code class="highlighter-rouge">int length() </code>：字符数；</li>
-  <li><code class="highlighter-rouge">char charAt(int index)</code>：返回指定索引处的 <code class="highlighter-rouge">char</code>；
+  <li>
+    <p><code class="highlighter-rouge">char charAt(int index)</code>：返回指定索引处的 <code class="highlighter-rouge">char</code>；</p>
+
     <ul>
       <li>当访问不存在的下标时会发生 <code class="highlighter-rouge">StringIndexOutOfBoundsException</code>（下标越界异常）；</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">int indexOf(**int** ch, [int fromIndex])</code>：从指定位置开始，获取 ch 第一次出现的索引；
+  <li>
+    <p><code class="highlighter-rouge">int indexOf(**int** ch, [int fromIndex])</code>：从指定位置开始，获取 ch 第一次出现的索引；未找到 ch 则返回 -1；</p>
+
     <ul>
-      <li>未找到 ch 则返回 -1；</li>
-    </ul>
-  </li>
-  <li><code class="highlighter-rouge">int indexOf(**String** str, [int fromIndex])</code>
-    <ul>
-      <li><code class="highlighter-rouge">lastIndexOf()</code>：同 indexOf；</li>
+      <li>
+        <p><code class="highlighter-rouge">int indexOf(**String** str, [int fromIndex])</code></p>
+      </li>
+      <li>
+        <p><code class="highlighter-rouge">lastIndexOf()</code>：同 indexOf；</p>
+      </li>
     </ul>
   </li>
   <li><code class="highlighter-rouge">String substring(begin, [end])</code>：<strong>切片</strong>，截取指定位置 <code class="highlighter-rouge">[begin,end)</code> 的新<strong>子串</strong>。</li>
-  <li><code class="highlighter-rouge">String[] split(String regex, [int limit])</code>：根据正则匹配<strong>切割/拆分</strong>，需检查最后一个分隔符后有无内容，否则会有抛出 <code class="highlighter-rouge">IndexOutOfBoundsException</code> 的风险。
+  <li>
+    <p><code class="highlighter-rouge">String[] split(String regex, [int limit])</code>：根据正则匹配<strong>切割/拆分</strong>，需检查最后一个分隔符后有无内容，否则长度不及预期、会有抛出 <code class="highlighter-rouge">IndexOutOfBoundsException</code> 的风险。</p>
+
     <ol>
       <li>regex：正则表达式分隔符。</li>
       <li>limit：分割份数。</li>
@@ -2070,8 +2245,8 @@ a == c + 2;
 <h5 id="判断">判断</h5>
 
 <ol>
-  <li><code class="highlighter-rouge">boolean isEmpty()</code>: 是否有内容。原理是判断字符串长度是否为0；</li>
-  <li><code class="highlighter-rouge">boolean equals(str)</code>：判断字符串内容是否相同。重写了 <code class="highlighter-rouge">Object</code> 类中的 <code class="highlighter-rouge">equals()</code>，只判断字符串内容是否相同；需对当前字符串判空；
+  <li><code class="highlighter-rouge">boolean isEmpty()</code>: 是否有内容。原理是判断<strong>字符串长度</strong>是否为0；</li>
+  <li><code class="highlighter-rouge">boolean equals(str)</code>：判断字符串<strong>内容</strong>是否相同。重写了 <code class="highlighter-rouge">Object</code> 类中的 <code class="highlighter-rouge">equals()</code>，只判断字符串内容是否相同；需对当前字符串判空；
     <ul>
       <li><code class="highlighter-rouge">boolean equalsIgnoreCase()</code>：忽略大小写，判断内容是否相同；</li>
     </ul>
@@ -2081,12 +2256,29 @@ a == c + 2;
       <li>同：<code class="highlighter-rouge">if (str.indexOf(str) != -1)</code>，区别：后者可获取子串出现的位置。</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">boolean startsWith(String prefix)</code>：是否以指定前缀开头；
+  <li><code class="highlighter-rouge">boolean startsWith(String prefix)</code>：是否以<strong>指定前缀</strong>开头；
     <ul>
       <li><code class="highlighter-rouge">boolean endsWith(String suffix)</code>；</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">int compareTo(str)</code>：比较两字符串的字典顺序，基于字符的 Unicode 值。相等返回 0；小于str参数，返回负数。</li>
+  <li><code class="highlighter-rouge">int compareTo(str)</code>：比较两字符串的<strong>字典顺序</strong>，基于字符的 Unicode 值。相等返回 0；小于str参数，返回负数。</li>
+</ol>
+
+<h5 id="转换">转换</h5>
+
+<ol>
+  <li><code class="highlighter-rouge">char[] toCharArray()</code>：将字符串转成<strong>字符数组</strong>，常用于遍历 <code class="highlighter-rouge">for(char ch : str.toCharArray()){}</code></li>
+  <li><code class="highlighter-rouge">byte[] getBytes()</code>：将字符串转成<strong>字节数组</strong>；
+    <ul>
+      <li><code class="highlighter-rouge">String(byte[])</code>：将字节数组转成字符串；</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">String toUpperCase()</code>：将字符串全部转成大写；
+    <ul>
+      <li><code class="highlighter-rouge">String toLowerCase()</code></li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">static String String.valueOf(int/double)</code>： 将基本数据类型 int/double 转成字符串；<a href="#与字符串间的转换">自动装箱</a>。</li>
 </ol>
 
 <h5 id="替换和合并">替换和合并</h5>
@@ -2100,41 +2292,17 @@ a == c + 2;
       <li><code class="highlighter-rouge">String trim()</code>：删除字符串的头尾空白符；</li>
     </ol>
   </li>
-  <li><code class="highlighter-rouge">String replaceAll(String regex, String replaceStr)</code>：用 <code class="highlighter-rouge">replaceStr</code> 替换所有正则匹配到的<strong>子串</strong>。
+  <li><code class="highlighter-rouge">String replaceAll(String regex, String replaceStr)</code>：用 <code class="highlighter-rouge">replaceStr</code> 替换所有<strong>正则匹配</strong>到的<strong>子串</strong>。
     <ul>
       <li><code class="highlighter-rouge">String replaceFirst(String regex, String replaceStr)</code>：只替换匹配的第一个子串。</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">String concat(String str)</code>: 将 str 拼接到结尾，不能拼接其他类型，二者都不能为 null，否则运行时会报空指针异常 NPE（编译时不报错）。
+  <li><code class="highlighter-rouge">String concat(String str)</code>: 将 str 拼接到结尾，不能拼接其他类型，二者都不能为 <strong>null</strong>，否则运行时会报空指针异常 NPE（编译时不报错）。
     <ul>
       <li><code class="highlighter-rouge">+</code>：可拼接字符、数字、字符串等数据类型；</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">String.join(String " ", List&lt;String&gt; wordList)</code>：合并 List，并插入 “ ”；</li>
-  <li><code class="highlighter-rouge">StringBuilder.setCharAt(index, char)</code>：替换单个字符；</li>
-</ol>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>String str = "Test string";
-StringBuilder strBuilder = new StringBuilder(str);
-strBuilder.setCharAt(1, 'X');
-str = strBuilder.toString();
-</code></pre></div></div>
-
-<h5 id="转换">转换</h5>
-
-<ol>
-  <li><code class="highlighter-rouge">char[] toCharArray()</code>：将字符串转成字符数组，常用于 <code class="highlighter-rouge">for(char ch : str.toCharArray()){}</code></li>
-  <li><code class="highlighter-rouge">byte[] getBytes()</code>：将字符串转成字节数组；
-    <ul>
-      <li><code class="highlighter-rouge">String(byte[])</code>：将字节数组转成字符串；</li>
-    </ul>
-  </li>
-  <li><code class="highlighter-rouge">static String String.valueOf(int/double)</code>： 将基本数据类型 int/double 转成字符串；<a href="#包装类">自动装箱</a>。</li>
-  <li><code class="highlighter-rouge">String toUpperCase()</code>：将字符串全部转成大写；
-    <ul>
-      <li><code class="highlighter-rouge">String toLowerCase()</code></li>
-    </ul>
-  </li>
+  <li><code class="highlighter-rouge">String.join(String ",", List&lt;String&gt; wordList)</code>：<strong>合并 List</strong>，并插入逗号；</li>
 </ol>
 
 <h3 id="math-类">Math 类</h3>

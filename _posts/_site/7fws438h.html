@@ -1,5 +1,5 @@
 <blockquote>
-  <p>摘要：计算机基础之数据库，包括SQL语句书写，数据类型，索引/锁，MySQL等。</p>
+  <p>摘要：计算机基础之数据库，数据库基础包括主键、范式等，MySQL 包括数据类型、 SQL语句书写、数据库性能优化、InnoDB 存储引擎、索引、事务、锁、MVCC、三大日志等，Redis，Elasticsearch。</p>
 </blockquote>
 
 <!-- more -->
@@ -75,7 +75,7 @@
   <li><strong>NoSQL 非关系型数据库</strong>：
     <ol>
       <li><strong>Redis</strong>：Key-value；RAM 存储；缓存数据存储；</li>
-      <li><strong>ElasticSearch</strong>：搜索数据存储；</li>
+      <li><del><strong>ElasticSearch</strong></del>：搜索数据存储；</li>
       <li><strong>MongoDB</strong>：Nodejs 在 Mongoose 包的帮助下 JSON 的数据格式直接插入；用户行为分析数据存储；</li>
       <li>Apache Cassandra（Facebook 使用、高度可扩展）、Dynamo；</li>
       <li>MemcacheDB 和 HBase 等。
@@ -86,7 +86,7 @@
   <li><strong>元组</strong>：表中的一行/一条记录；</li>
   <li><strong>码</strong>：码就是能唯一标识实体的某个或<strong>某几个</strong>属性的组合，用于区分每条记录，<del>对应表中的列</del>；
     <ul>
-      <li><strong>候选码</strong>：能唯一标识一条记录的最小属性集和；<del>可被选为主码的属性或属性组；</del></li>
+      <li><strong>候选码</strong>：能唯一标识一条记录的<strong>最小属性集和？</strong>；<del>可被选为主码的属性或属性组；</del></li>
     </ul>
   </li>
   <li><strong>主键（主码） <code class="highlighter-rouge">id</code></strong>：用于唯一标识一条记录的<strong>某个</strong>属性，一个表只能有一个主键。不可重复、不可空。主码是从候选码中选出来的。 一个实体集中只能有一个主码，但可以有多个候选码。<code class="highlighter-rouge">unique + not null</code>。</li>
@@ -105,18 +105,26 @@
   <li>全局唯一GUID字符串类型：GUID算法通过网卡MAC地址、时间戳和随机数保证任意计算机在任意时间生成的字符串都是不同的。</li>
 </ol>
 
-<h3 id="主键和外键有什么区别">主键和外键有什么区别?</h3>
+<h4 id="主键和外键有什么区别">主键和外键有什么区别?</h4>
 
-<h3 id="不用外键与级联更新">不用外键与级联更新</h3>
+<blockquote>
+  <p>见上。</p>
+</blockquote>
+
+<h4 id="不用外键与级联更新">不用外键与级联更新</h4>
+
+<blockquote>
+  <p>使用 <code class="highlighter-rouge">SET FOREIGN_KEY_CHECKS=0;</code> <strong>禁用外键约束</strong></p>
+</blockquote>
 
 <p>一切外键概念必须在应用层解决：</p>
 
 <ul>
-  <li>当表越来越多，关系越来越复杂时，一般在<strong>设计数据库</strong>时通过外键来标注表与表间的关系；</li>
+  <li>当表越来越多，关系越来越复杂时，一般在<strong>设计</strong>数据库时通过<strong>外键</strong>来标注表与表间的关系；</li>
   <li>但在数据库中往往不使用外键，而是通过<strong>逻辑</strong>来关联。</li>
 </ul>
 
-<p><strong>级联更新</strong>：更新当前表的主键时、会触发其它表的对应外键更新。</p>
+<p><strong>级联更新</strong>：更新当前表的主键时、会触发其它表的<strong>对应关联外键更新。</strong></p>
 
 <ul>
   <li>如：学生表中的 student_id 是主键，那么成绩表中的 student_id 则为外键。</li>
@@ -126,12 +134,53 @@
 <p>为什么不要用外键呢？</p>
 
 <ol>
-  <li>增加了<strong>复杂性</strong>： 每次做DELETE 或UPDATE都必须考虑外键约束，需额外维护；<strong>增加了额外工作</strong>： 去检查，来保证数据的的一致性和正确性，消耗资源；</li>
-  <li>外键影响数据库的<strong>插入速度</strong>；</li>
-  <li>外键的<strong>主从关系</strong>是定的，假如那天需求有变化，数据库中的这个字段根本不需要和其他表有关联的话就会增加很多麻烦。</li>
+  <li>性能问题：
+    <ol>
+      <li>增加了<strong>复杂性、维护负担</strong>： 每次做插入、更新或删除数据时都必须<strong>考虑外键约束</strong>，数据库都需要检查外键约束的完整性。数据库需都要维护这两个主键索引、外键索引，这可能会导致性能开销。</li>
+      <li>外键影响数据库的<strong>插入速度</strong>；其次，在插入新的订单项之前，数据库需要执行数据一致性检查以确保引用的订单号在 Orders 表中存在。这额外的检查可能增加插入订单项的执行时间。</li>
+    </ol>
+  </li>
+  <li>锁竞争问题：多个事务同时对同一数据进行修改时，可能会引起<strong>锁竞争和死锁</strong>，导致数据库出现阻塞和无法继续处理请求的情况。</li>
+  <li>对<strong>分库分表</strong>不友好：相关数据可能分布在不同的数据库中，<strong>外键</strong>通常难以跨越不同数据库来建立关系。更重要的是，分库分表环境中，数据的<strong>一致性</strong>可能更难维护。<strong>跨库事务</strong>搞不定。</li>
   <li>级联更新是<strong>强阻塞</strong>，存在数据库<strong>更新风暴</strong>的风险；</li>
+  <li>外键的<strong>主从关系</strong>是定的，假如那天需求有变化，数据库中的这个字段根本不需要和其他表有关联的话就会增加很多麻烦。</li>
   <li>适用于单机<strong>低并发</strong>，不适合分布式、高并发集群；</li>
-  <li>对<strong>分库分表</strong>不友好，分库分表下外键无法生效；</li>
+</ol>
+
+<h4 id="数据库更新风暴">数据库更新风暴</h4>
+
+<p>数据库更新风暴（Database Update Storm）：通常指的是在<strong>高并发</strong>环境下，多个客户端同时对数据库进行大量的<strong>更新操作</strong>（如插入、更新或删除记录），导致数据库性能急剧下降或完全崩溃的情况。</p>
+
+<p>数据库系统可能无法<strong>及时处理</strong>所有的请求，导致<strong>请求堆积和阻塞</strong>。这可能会导致以下问题：</p>
+
+<ol>
+  <li>响应时间延长：由于请求堆积，数据库无法及时响应客户端的请求，导致延迟增加，响应时间变长。</li>
+  <li><strong>锁竞争与死锁</strong>：多个客户端同时对同一数据进行修改时，可能会引起锁竞争和死锁，导致数据库出现阻塞和无法继续处理请求的情况。</li>
+  <li>性能下降与系统崩溃：数据库系统可能无法承受来自大量并发更新的压力，导致系统性能急剧下降甚至崩溃。</li>
+</ol>
+
+<p>原因：</p>
+
+<ol>
+  <li>高并发写入：当多个用户同时向数据库中大量写入数据时，会导致数据库服务器需要处理大量的写入操作。如果这些写入操作集中在一个短时间内发生，就会造成数据库更新风暴。</li>
+  <li>批量处理操作：某些应用程序可能会定期进行批量处理，例如批量插入、更新或删除数据。如果这些批量处理操作没有合理地进行流量控制，就可能在某个时间点上集中发生，引发数据库更新风暴。</li>
+  <li>锁竞争：当多个用户同时对同一数据进行修改时，数据库会使用锁机制来确保数据的一致性。如果多个用户同时请求对同一数据进行更新，就会导致锁冲突，从而降低数据库的并发处理能力。</li>
+  <li>索引维护：数据库中的索引是用来提高查询性能的重要组成部分。当大量的更新操作同时发生时，索引的维护成本会急剧增加，从而影响系统性能。</li>
+  <li>数据库配置不合理：数据库服务器的配置参数对性能有着重要的影响。如果数据库配置不合理，例如缓冲区大小设置过小、日志文件过小或过大，都可能导致数据库更新风暴的发生。</li>
+</ol>
+
+<p>优化和解决：为了避免数据库更新风暴，可以考虑以下策略：</p>
+
+<ol>
+  <li>优化数据库设计：合理设计数据库结构、分表分库、优化查询语句、合理设计和管理索引，以提高数据库的写入性能。</li>
+  <li><strong>批量提交</strong>与<strong>事务</strong>管理：将多个小的更新操作合并成一个批量更新操作，减少数据库的事务提交次数，提高系统性能。</li>
+  <li><strong>负载均衡</strong>与<strong>缓存</strong>：通过负载均衡将请求分散到多个数据库实例上。使用缓存技术，将热点数据放入缓存中，减轻数据库的压力。</li>
+  <li>引入分布式数据库：采用分布式数据库架构，将数据分散存储在多个节点上，提高系统的并发处理能力和容错能力。</li>
+  <li><strong>异步处理</strong>与<strong>消息队列</strong>：将写入操作异步化，并使用消息队列来缓冲和调度写入请求，降低数据库的负荷。</li>
+  <li>流量控制：对于批量处理操作或高并发写入场景，可以采用流量控制的方式，将请求分散在一个时间段内进行处理，避免在某个时间点上集中发生，从而减轻数据库的负载压力。</li>
+  <li>定期维护和优化：定期对数据库进行维护和优化，包括清理无用数据、重新组织索引、优化数据库配置参数等，可以提高数据库的性能和稳定性。</li>
+  <li>监控和预警：建立数据库监控系统，实时监测数据库的性能指标，例如CPU利用率、内存利用率、磁盘IO等，及时发现并解决潜在的问题。同时，设置预警机制，当数据库发生更新风暴时，及时采取相应的应对措施。</li>
+  <li>提升硬件性能：增加数据库服务器的硬件配置，如增加CPU核心数、内存容量等，提高系统处理能力。</li>
 </ol>
 
 <h3 id="数据库范式">数据库范式</h3>
@@ -140,13 +189,13 @@
 
 <ol>
   <li><strong>函数依赖</strong> ：若在一张表中，在属性（或属性组）X 的值确定的情况下，必定能确定属性 Y 的值，那么就可说 <code class="highlighter-rouge">Y</code> 函数<strong>依赖于</strong> <code class="highlighter-rouge">X</code>，写作 <code class="highlighter-rouge">X → Y</code>。</li>
-  <li><strong>部分函数依赖</strong> ：如果 <code class="highlighter-rouge">X→Y</code>，且存在 X 的一个真子集 X0（部分关键字），使得 <code class="highlighter-rouge">X0→Y</code>，则称 <code class="highlighter-rouge">Y</code> 对 <code class="highlighter-rouge">X</code> 部分函数依赖。
+  <li><strong>部分函数依赖</strong> ：如果 <code class="highlighter-rouge">X→Y</code>，且存在 X 的一个<strong>真子集</strong> X0（X 中的<strong>部分属性</strong>就可以确定 Y），使得 <code class="highlighter-rouge">X0→Y</code>，则称 <code class="highlighter-rouge">Y</code> 对 <code class="highlighter-rouge">X</code> 部分函数依赖。
     <ul>
       <li>如学生基本信息表 R关系（学号，身份证号，姓名）中，（学号，身份证号）-&gt;（姓名），（学号）-&gt;（姓名），（身份证号）-&gt;（姓名）；</li>
       <li>姓名部分函数依赖于（学号，身份证号）；</li>
     </ul>
   </li>
-  <li><strong>完全函数依赖</strong>：在一个关系中，某个非主属性数据项依赖于<strong>全部关键字</strong>。
+  <li><strong>完全函数依赖</strong>：在一个关系中，某个<strong>非主属性</strong>数据项依赖于<strong>全部关键字、属性、主键？</strong>。
     <ul>
       <li>不同班级学生编号可能相同，在 R 关系中，（班级，学生编号）-&gt;（姓名），但（学生编号）-&gt;（姓名）不成立，（班级）-&gt;（姓名）不成立，姓名<strong>完全函数依赖于</strong>（班级，学生编号）；</li>
     </ul>
@@ -164,20 +213,20 @@
 <p>用于规范建表，划分字段。</p>
 
 <ol>
-  <li><code class="highlighter-rouge">1NF</code>（第一范式）：对属性的原子性约束，要求属性（表中的字段）<strong>不可再分</strong>（为其他字段）。是所有关系型数据库的最基本要求，即创建的表一定满足第一范式。</li>
-  <li><code class="highlighter-rouge">2NF</code>（第二范式）：对记录的惟一性约束，要求<strong>主键</strong>可以唯一标识记录。
+  <li><code class="highlighter-rouge">1NF</code>（第一范式）：对属性的原子性约束，要求属性（表中的字段）<strong>不可再分</strong>（为其他字段）。是所有关系型数据库的<strong>最基本要求</strong>，即创建的表一定满足第一范式。</li>
+  <li><code class="highlighter-rouge">2NF</code>（第二范式）：对记录的<strong>惟一性约束</strong>，要求<strong>主键</strong>可以唯一标识记录。
     <ul>
       <li>在 <code class="highlighter-rouge">1NF</code> 基础上，消除了非主属性对于码的<strong>部分函数依赖</strong>，非主属性都依赖于<strong>主键</strong>。</li>
     </ul>
   </li>
   <li><code class="highlighter-rouge">3NF</code>（第三范式）：对<strong>字段冗余性</strong>的约束，要求字段没有冗余，即任何字段不能由其他字段派生出来。
     <ul>
-      <li>在 <code class="highlighter-rouge">2NF</code> 基础上，消除了非主属性对于码的<strong>传递函数依赖</strong>（任何非主属性不依赖于其它非主属性）。</li>
-      <li>基本上解决了数据冗余，插入异常，修改异常，删除异常的问题。</li>
+      <li>在 <code class="highlighter-rouge">2NF</code> 基础上，消除了非主属性对于码的<strong>传递函数依赖</strong>（任何非主属性<strong>不依赖于</strong>其它非主属性）。</li>
+      <li>基本上解决了<strong>数据冗余</strong>，插入异常，修改异常，删除异常的问题。</li>
       <li>比如在关系 R(学号 , 姓名, 系名，系主任)中，学号 → 系名，系名 → 系主任，所以存在非主属性系主任对于学号的传递函数依赖，所以该表的设计，不符合 3NF 的要求。</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">BCNF</code>：主属性内部不能有<strong>部分或传递依赖</strong>。</li>
+  <li><code class="highlighter-rouge">BCNF</code>：<strong>主属性内部</strong>不能有<strong>部分或传递依赖</strong>。</li>
 </ol>
 
 <h3 id="数据库设计">数据库设计</h3>
@@ -199,7 +248,7 @@
 
 <h5 id="e-r-图">E-R 图</h5>
 
-<p>E-R 图 / 实体-联系图：提供了表示<strong>实体类型、属性和联系</strong>的方法，用来描述现实世界的概念模型。 它是描述现实世界<strong>关系概念模型</strong>的有效方法。 是表示概念关系模型的一种方式。</p>
+<p>E-R 图 / 实体-联系图：提供了表示<strong>实体类型、属性和联系</strong>的方法，用来描述现实世界的概念模型。 是描述现实世界<strong>关系概念模型</strong>的有效方法。</p>
 
 <ul>
   <li>实体：矩形；</li>
@@ -229,14 +278,14 @@
 
 <h3 id="存储过程">存储过程</h3>
 
-<p>存储过程：是一组为了完成特定功能的 SQL 语句集合，中间加了逻辑控制语句。更偏向于业务逻辑。</p>
+<p>存储过程：是一组为了完成特定功能的 <strong>SQL 语句集合</strong>，中间加了逻辑控制语句。更偏向于业务逻辑。</p>
 
 <ul>
   <li>优点：
     <ul>
       <li>在业务比较复杂时非常实用，如一个操作需写一大串 SQL 语句，存储过程方便下一次的调用。</li>
       <li>存储过程一旦调试完成通过后就能稳定运行；</li>
-      <li>比单纯 SQL 语句执行要快，因为存储过程是预编译过的。</li>
+      <li>比单纯 SQL 语句<strong>执行要快</strong>，因为存储过程是预编译过的。</li>
     </ul>
   </li>
   <li>缺点：存储过程难以调试和扩展，没有移植性，消耗数据库资源。禁止使用。</li>
@@ -248,6 +297,10 @@
 </code></pre></div></div>
 
 <h2 id="mysql">MySQL</h2>
+
+<blockquote>
+  <p>关键字用大写，表名、字段名用小写。</p>
+</blockquote>
 
 <p>是一种关系型数据库，主要用于<strong>持久化存储</strong>系统中的数据，建立在<strong>关系模型</strong>的基础上。</p>
 
@@ -534,7 +587,7 @@ SELECT CHARACTER_LENGTH("轻松工作");  -- 返回为 4 字节
   </tbody>
 </table>
 
-<h5 id="四大类数据类型及主要用法">四大类数据类型及主要用法：</h5>
+<h5 id="四大类数据类型">四大类数据类型</h5>
 
 <blockquote>
   <p>字段类型选择原则</p>
@@ -649,6 +702,10 @@ INSERT INTO tab VALUES ('man', 'man');
 
 <h3 id="sql-语句">SQL 语句</h3>
 
+<blockquote>
+  <p>关键字用大写，表名、字段名用小写。</p>
+</blockquote>
+
 <p>标准 SQL ：指符合国际标准的 SQL；</p>
 
 <p>方言：各数据库支持的各自扩展功能。</p>
@@ -680,7 +737,7 @@ FLUSH PRIVILEGES;
 <h4 id="ddl-数据库表结构操作">DDL 数据库/表结构操作</h4>
 
 <blockquote>
-  <p>反引号<code class="highlighter-rouge"> </code><code class="highlighter-rouge"> </code>用于区分MYSQL的保留字与普通字符、识别符，如用于表名、列名等，如 `status`；</p>
+  <p>反引号<code class="highlighter-rouge"> </code><code class="highlighter-rouge"> </code>用于区分MYSQL的保留字与普通字符、识别符，如用于表名、列名等，如 `status` ；</p>
 
   <p>单引号<code class="highlighter-rouge"> '' </code>、双引号用于字符串。</p>
 </blockquote>
@@ -699,10 +756,10 @@ FLUSH PRIVILEGES;
 <h5 id="表操作">表操作</h5>
 
 <ul>
-  <li>创建表：<code class="highlighter-rouge">create table dept(deptno int(2),deptname varchar(10))</code></li>
+  <li>创建表：<code class="highlighter-rouge">create table \dept\(deptno int(2), deptname varchar(10));</code></li>
   <li>查看表的定义：<code class="highlighter-rouge">desc emp</code></li>
   <li>查看表定义（详细）：<code class="highlighter-rouge">show create table emp \G</code></li>
-  <li>删除表：<code class="highlighter-rouge">drop table emp</code></li>
+  <li><strong>删除表</strong>：<code class="highlighter-rouge">drop table emp</code></li>
   <li>修改表名：<code class="highlighter-rouge">alter table emp rename emp1</code></li>
 </ul>
 
@@ -725,7 +782,7 @@ FLUSH PRIVILEGES;
  [[DEFAULT] COLLATE &lt;校对规则名 utf8_chinese_ci&gt;];
 </code></pre></div>    </div>
   </li>
-  <li>删除：<code class="highlighter-rouge">DROP</code> database [ <strong>IF</strong> <strong>EXISTS</strong> ] <数据库名> / table 表名;</数据库名></li>
+  <li><strong>删除</strong>：<code class="highlighter-rouge">DROP</code> database [ <strong>IF</strong> <strong>EXISTS</strong> ] <数据库名> / table 表名;</数据库名></li>
   <li>选择：<code class="highlighter-rouge">USE</code> <数据库名>;</数据库名></li>
   <li>修改数据库：比较麻烦，不支持直接修改，需要通过其它方式<strong>间接修改</strong>。比如先创建新库，再导出导入数据。</li>
   <li>修改：<code class="highlighter-rouge">ALTER</code> TABLE <表名> [修改选项]，修改选项有：
@@ -746,18 +803,35 @@ FLUSH PRIVILEGES;
   <li>修改存储引擎：<code class="highlighter-rouge">ALTER TABLE &lt;表名&gt; ENGINE=&lt;存储引擎名&gt;;</code></li>
 </ol>
 
-<h5 id="列属性列约束">列属性/列约束</h5>
+<h5 id="nullnot-nulldefault-约束">NULL、NOT NULL、DEFAULT 约束</h5>
 
 <ol>
-  <li><code class="highlighter-rouge">NULL</code> 约束：表示当前列可为 null；
+  <li><code class="highlighter-rouge">NULL</code> 约束：表示当前列可设置为空 null；MySQL默认情况下指定字段为NULL修饰符。
     <ul>
-      <li><code class="highlighter-rouge">NOT NULL</code> 约束：在添加数据时没有指定值会报错；常搭配 <code class="highlighter-rouge">AUTO_INCREMENT</code> 用于 id 字段；</li>
+      <li>MySQL中的NULL其实是占用空间的；</li>
+      <li><code class="highlighter-rouge">""</code> 空字符串不等同于NULL，表示长度为0的字符或字符串，是可以计算的，比如 <code class="highlighter-rouge">SELECT length(””); SELECT “”+1;</code> 都有结果输出。</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">DEFAULT</code> <默认值>：当前字段的默认值；</默认值></li>
-  <li><code class="highlighter-rouge">AUTO_INCREMENT</code>：自动增长约束，必须为索引（主键或 <code class="highlighter-rouge">unique</code>），只能用于一个字段、不可为空（<code class="highlighter-rouge">NOT NULL</code> ）；只能是整数类型，默认从1开始，通过表属性 <code class="highlighter-rouge">auto_increment = x</code> 设置起始值；</li>
+  <li><code class="highlighter-rouge">NOT NULL</code> <strong>非空约束</strong>：表示当前字段不能设置为空值（即<strong>不传值或传null</strong>），设置为空值就会<strong>报错</strong>；常搭配 <code class="highlighter-rouge">AUTO_INCREMENT</code> 用于 id 字段；</li>
+  <li><code class="highlighter-rouge">DEFAULT</code> <默认值>：当前字段的默认值。不给字段传值时使用默认值、也**不会报错**，如果传了的话（包括传null）按照**传递值**处理。
+</默认值>    <ol>
+      <li>传递值还可以受<code class="highlighter-rouge">NOTNULL</code>、<code class="highlighter-rouge">NULL</code>约束，NOT NULL和DEFAULT是两个<strong>独立</strong>的约束条件，可以用在一个字段上，但不会交互使用。<strong>传递<code class="highlighter-rouge">NULL</code>值</strong>时：
+        <ol>
+          <li>如果设置为<code class="highlighter-rouge">NOTNULL</code>约束，则会报错。</li>
+          <li>如果未设置<code class="highlighter-rouge">NOTNULL</code>约束，会使用DEFAULT值；</li>
+        </ol>
+      </li>
+      <li>姓名字段上不给值可以，用默认值。但是要给的话，一定不能给NULL值。<code class="highlighter-rouge">NOT NULL DEFAULT ‘张三’</code></li>
+    </ol>
+  </li>
+</ol>
+
+<h5 id="其它列属性列约束">其它列属性/列约束</h5>
+
+<ol>
+  <li><code class="highlighter-rouge">AUTO_INCREMENT</code>：<strong>自动增长</strong>约束，必须为索引（主键或 <code class="highlighter-rouge">unique</code>），只能用于一个字段、不可为空（<code class="highlighter-rouge">NOT NULL</code> ）；只能是整数类型，默认从1开始，通过表属性 <code class="highlighter-rouge">auto_increment = x</code> 设置起始值；</li>
   <li><code class="highlighter-rouge">PRIMARY KEY</code>：主键，不可空、不可重复；</li>
-  <li><code class="highlighter-rouge">FOREIGN KEY</code>：外键约束；</li>
+  <li><code class="highlighter-rouge">FOREIGN KEY</code>：外键约束；使用 <code class="highlighter-rouge">SET FOREIGN_KEY_CHECKS=0;</code> 来<strong>禁用外键约束</strong>。</li>
   <li><code class="highlighter-rouge">COMMENT</code>：注释；</li>
   <li><code class="highlighter-rouge">UNIQUE</code>：唯一索引（唯一约束），<strong>可空</strong>、不可重复，可在多个字段定义；主键和唯一约束的创建需依靠索引，没有已建好的索引，Oracle 会自动建立唯一索引。</li>
   <li><code class="highlighter-rouge">CHECK</code>：检查约束；</li>
@@ -768,22 +842,30 @@ FLUSH PRIVILEGES;
 ALTER TABLE &lt;数据表名&gt; ADD CONSTRAINT &lt;约束名&gt; UNIQUE(&lt;列名&gt;);
 ALTER TABLE &lt;数据表名&gt; CHANGE COLUMN &lt;字段名&gt; &lt;数据类型&gt; DEFAULT &lt;默认值&gt;/NULL;
 ALTER TABLE &lt;表名&gt; DROP INDEX &lt;约束名&gt;;
+</code></pre></div></div>
 
--- 如果数据库中存在user_accounts表，就从数据库中删除
+<h5 id="创建数据库表定义表结构">创建数据库表、定义表结构</h5>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-- 如果数据库中存在user_accounts表，就从数据库中删除
 DROP TABLE IF EXISTS `user_accounts`;
 
 -- 创建数据库表
 CREATE TABLE `user_accounts` (
-  `id`        int(100) unsigned NOT NULL AUTO_INCREMENT [primary key],
+--`id`        int(100) unsigned NOT NULL AUTO_INCREMENT [primary key],
+  `id` 		  bigint(20) 		NOT NULL AUTO_INCREMENT,
   `password`  varchar(32) 		NOT NULL DEFAULT '' COMMENT '用户密码',
   `reset_pwd` tinyint(32) 		NOT NULL DEFAULT 0  COMMENT '用户类型：0-不需重置密码；1-需重置',
+  `status` 	  int(1) 					 DEFAULT '1' COMMENT '帐号启用状态：0-&gt;禁用；1-&gt;启用'
   `mobile`    varchar(20)  		NOT NULL DEFAULT '' COMMENT '手机',
   `create_at` timestamp(6) 		NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   `update_at` timestamp(6) 		NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), -- 
+  `login_time` datetime 		NULL	 DEFAULT COMMENT '最后登录时间',
   PRIMARY KEY (`id`),
   -- 创建唯一索引，不允许重复
   UNIQUE INDEX idx_user_mobile(`mobile`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户表信息';
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8 COMMENT='用户表信息';
+
+INSERT INTO `ums_admin` VALUES ('1', 'test', 'pwd', 'timg.jpg', 'test@qq.com', '测试账号', null, '2018-09-29 13:55:30', '2018-09-29 13:55:39', '1');
 </code></pre></div></div>
 
 <h4 id="dql-select-和约束">DQL SELECT 和约束</h4>
@@ -892,7 +974,7 @@ is [not] ture/false/unknown：检验某个值的真假
   <li>加密函数、格式化函数和锁函数等。</li>
 </ol>
 
-<h5 id="聚合函数聚合查询">聚合函数、聚合查询</h5>
+<h5 id="count-聚合函数聚合查询">COUNT 聚合函数、聚合查询</h5>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-- count 计数、统计，返回不同的非NULL值数目：
 	count(*)：统计值不为 NULL 的行数；
@@ -925,7 +1007,7 @@ select t1.name from table_1 as t1, table_2 as t2 where t1.id = t2.id;
 SELECT * FROM (SELECT * FROM result) AS Temp;
 </code></pre></div></div>
 
-<h5 id="连接查询">连接查询</h5>
+<h5 id="join-连接查询">JOIN 连接查询</h5>
 
 <p>对多个表进行 <strong>JOIN 运算</strong>，先确定一个主表作为结果集，然后选择性地连接其他表的行。</p>
 
@@ -951,7 +1033,7 @@ SELECT * FROM (SELECT * FROM result) AS Temp;
 <p><code class="highlighter-rouge">union VS union all</code>：都用于合并两个或多个 SELECT 语句的结果集。</p>
 
 <ul>
-  <li><code class="highlighter-rouge">union</code>：取唯一值，记录没有重复；进行表连接后会筛选掉重复的记录。</li>
+  <li><code class="highlighter-rouge">union</code>：取唯一值，记录没有重复；进行<strong>表连接后</strong>会筛选掉重复的记录。</li>
   <li><code class="highlighter-rouge">union all</code>：直接连接，取到的是所有值，记录可能有重复；Union All 不去除重复记录。</li>
 </ul>
 
@@ -961,16 +1043,19 @@ SELECT * FROM (SELECT * FROM result) AS Temp;
 
 <h5 id="插入记录">插入记录</h5>
 
+<p>INSERT INTO `ums_admin` VALUES (‘张三’, 18, NULL);</p>
+
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-- 指定名称插入：
-insert into emp (ename,hiredate,sal,deptno) values ('zhangsan','2018-01-01','2000',1)
+insert into emp(ename, hiredate, sal, deptno) values ('zhangsan', '2018-01-01', '2000', 1);
 INSERT [INTO] `user_info` name="Tom", age=21;
 
 -- 不指定名称插入：
-insert into emp values ('lisi','2018-01-01','2000',1)
+insert into emp values ('lisi', '2018-01-01', '2000', 1);
+INSERT INTO `ums_admin` VALUES ('1', 'test', 'pwd', 'timg.jpg', 'test@qq.com', '测试账号', null, '2018-09-29 13:55:30', '2018-09-29 13:55:39', '1');
 
 -- 批量插入数据：
-insert into dept values(1,'dept1'),(2,'dept2')
-INSERT [INTO] `user_info` [name, age] VALUES ("Tom", 21), ("Jack", 13);
+insert into dept values(1,'dept1'),(2,'dept2');
+INSERT [INTO] `user_info` ([name, age]) VALUES ("Tom", 21), ("Jack", 13);
 
 -- 插入，如果已存在则更新
 INSERT INTO students (id, name, gender, score) VALUES (1, '小明', 'F', 99) ON DUPLICATE KEY UPDATE name='小明', gender='F', score=99;
@@ -1117,71 +1202,305 @@ where (a.peopleId,a.seq) in (select peopleId,seq from vitae
   <li>在20个连接中<strong>并发</strong>（同时）<strong>执行</strong> <code class="highlighter-rouge">delete from T limit 500</code>：20个连接并发delete且条件一样，会人为导致<strong>锁冲突</strong>。但如果能将1W条数据先查出来，分片后分配给20个连接，通过id=xxx精确删除，各连接就不会相互竞争。</li>
 </ol>
 
-<h3 id="高性能优化">高性能优化</h3>
+<h3 id="数据库性能优化">数据库性能优化</h3>
 
-<h5 id="数据库表字段设计规范">数据库、表、字段设计规范</h5>
-
-<blockquote>
-  <p><a href="https://yq.aliyun.com/articles/131756">数据库设计的重要性和设计原则</a></p>
-</blockquote>
+<h4 id="优化目标">优化目标</h4>
 
 <ol>
-  <li>可读性原则：用<strong>下划线</strong>分隔字段等；</li>
-  <li><strong>表意性</strong>原则：表名应能体现其存储内容；临时库表必须以 <code class="highlighter-rouge">tmp_</code> 为前缀、以日期为后缀，备份表必须以 <code class="highlighter-rouge">bak_</code> 为前缀、以时间戳为后缀；</li>
-  <li><strong>长名原则</strong>：少用缩写；</li>
-  <li>所有存储相同数据的列名和列类型必须一致；</li>
-  <li>尽量控制<strong>单表数据量</strong>的大小在 500 万以内。过大会造成修改表结构、备份、恢复问题。
-    <ol>
-      <li>历史数据归档：应用于日志数据；</li>
-      <li><strong>分库分表</strong>：应用于业务数据、单表行数超过 500 万行或单表容量超过 2GB时；</li>
-    </ol>
-  </li>
-  <li>冷热数据分离，减小表的宽度。减少磁盘 IO，保证热数据的内存<strong>缓存命中率</strong>（表越宽，把表装载进内存缓冲池时所占用的内存也就越大，会消耗更多的 IO）；</li>
-  <li>尽可能把所有列定义为 NOT NULL。</li>
-</ol>
-
-<h5 id="索引设计规范">索引设计规范</h5>
-
-<ul>
-  <li>建议单张表索引不超过 5 个；</li>
-  <li>选用 <code class="highlighter-rouge">WHERE</code> 从句或 <code class="highlighter-rouge">ORDER BY、GROUP BY、DISTINCT</code> 中的字段；</li>
-</ul>
-
-<h5 id="sql-开发规范">SQL 开发规范</h5>
-
-<ol>
-  <li>索引</li>
-  <li>分库分表</li>
-</ol>
-
-<p>数据库操作行为规范：</p>
-
-<ul>
-  <li>避免使用<strong>子查询</strong>，会产生大量的<strong>临时表</strong>也没有索引，消耗过多的 CPU 和 IO 资源，对查询性能的影响大。
-    <ul>
-      <li>子查询在 in 子句中，且为简单 SQL（不包含 <code class="highlighter-rouge">union、group by、order by、limit</code> 从句)）时，可优化为 <strong>join 关联查询</strong>。</li>
-    </ul>
+  <li>
+    <p>减少 IO 次数：IO永远是数据库最容易瓶颈的地方，是 SQL 优化中需要第一优先考虑，也是收效最明显的优化手段。</p>
   </li>
   <li>
-    <p>WHERE 从句中禁止对列进行函数转换和计算，导致无法用索引；</p>
+    <p>降低 CPU 计算：CPU 运算量的优化。 CPU 处理内存中的数据<strong>比较运算</strong>（如 order by,group by,distinct … 都是消耗 CPU 的大户）。</p>
   </li>
-  <li>慢查询优化</li>
+</ol>
+
+<h4 id="为什么数据库性能会慢">为什么数据库性能会慢？</h4>
+
+<p>应该站在哪个层面思考优化？</p>
+
+<blockquote>
+  <p>考虑成本、性价比。</p>
+
+  <p>每一层的上层是该层的载体，因此越往顶层越能决定性能的上限，同时<strong>优化的成本</strong>也相对会比较高，性价比也随之越低。</p>
+</blockquote>
+
+<p>无论是关系型数据库还是 NoSQL，任何存储系统的<strong>查询性能</strong>的决定因素主要有三种：</p>
+
+<ol>
+  <li><strong>查找的时间复杂度</strong>，主要有两个决定因素：
+    <ol>
+      <li><strong>查找算法</strong>，复杂查询，具体实现（<strong>使用索引</strong>、优化 <strong>SQL 语句</strong>）</li>
+      <li>选择合适的<strong>存储系统</strong>（RDBMS、NoSQL）</li>
+    </ol>
+  </li>
+  <li><strong>数据总量</strong>：数据量越多，资源的消耗（CPU、磁盘读写繁忙）、耗时也会越来越高。
+    <ul>
+      <li><del>存储结构</del>：从关系型数据库角度出发，索引结构基本固定是 B+Tree，时间复杂度是 O(log n)，存储结构是行式存储。因此对于关系数据库能优化的一般只有数据量。</li>
+      <li>思考能否从物理表设计的层面优化：数据拆分（读写分离、<strong>分库分表</strong>），来减少数据量。</li>
+      <li><strong>合理设计表结构</strong></li>
+    </ul>
+  </li>
+  <li><strong>高负载、高并发请求</strong>：导致 CPU、磁盘繁忙，而服务器资源不足则会导致<strong>慢查询</strong>等问题。
+    <ol>
+      <li><strong>数据库架构优化</strong>、用空间换性能：选择负载均衡、<strong>集群</strong>、数据冗余、分布式缓存、、序列化、数据库连接池的方式分担压力。<strong>主从分离</strong>、一主多从</li>
+      <li>硬件：升级磁盘、CPU。</li>
+    </ol>
+  </li>
+</ol>
+
+<h4 id="首先使用索引">首先使用索引</h4>
+
+<p>索引是提高数据库查询效率的关键。通过在<strong>经常查询的列上</strong>创建索引，可以加速数据的检索速度，从而提高读取查询的性能。</p>
+<ol>
+  <li>比如说，在 <code class="highlighter-rouge">WHERE、ORDER BY 和 GROUP BY</code> 子句中<strong>使用的列上</strong>创建索引。</li>
+  <li>选择合适的列：只在需要高效检索、重复值较低的列上创建索引。避免在大字段或低选择性的列上创建索引，因为这可能导致索引维护开销变大。</li>
+  <li>不要让字段的<strong>默认值为NULL</strong>：只要列中<strong>包含有NULL值</strong>都将不会被包含在索引中，复合索引中只要有一列含有NULL值，那么这一列对于此复合索引就是无效的。</li>
+  <li><strong>使用短索引</strong>：对串列进行索引，如果可能应该<strong>指定一个前缀长度</strong>。例如，如果有一个CHAR(255)的 列，如果在前10 个或20 个字符内，多数值是惟一的，那么就不要对整个列进行索引。不仅可以提高查询速度而且可以节省磁盘空间和I/O操作。</li>
+  <li>考虑索引顺序：在多列索引中，列的顺序会影响查询性能。将选择性高、经常用于查询条件的列放在索引的前面。</li>
+  <li>如果排序字段没有用到索引，就尽量<strong>少用排序</strong>。排序操作会消耗较多的 CPU 资源，减少排序可以在缓存命中率高等 IO 能力足够的场景下会较大影响 SQL的响应时间。可以在程序中排序。</li>
+  <li>mysql查询只使用一个索引，因此如果where子句中已经使用了索引的话，那么order by中的列是不会使用索引的。因此尽量不要<strong>包含多个列的排序</strong>，如果需要最好给这些列<strong>创建复合索引</strong>。</li>
+  <li>控制索引数量：<strong>过度使用索引</strong>、过多的索引会增加数据插入、更新和删除的开销，同时也会占用更多的存储空间。因此，只创建必要的索引。建议单张表索引不超过 5 个。</li>
+</ol>
+
+<h4 id="优化-sql-语句">优化 SQL 语句</h4>
+
+<p>编写高效的查询语句可以显著提升性能。</p>
+
+<ol>
+  <li>避免使用<strong>子查询</strong>，会产生大量的<strong>临时表</strong>也没有索引，消耗过多的 CPU 和 IO 资源，对查询性能的影响大。
+    <ul>
+      <li>用 <strong>JOIN 连接查询</strong>代替子查询、join 简单表不易超过3个、小表驱动大表、链接字段建索引。
+        <ul>
+          <li>子查询在 in 子句中，且为简单 SQL（不包含 <code class="highlighter-rouge">union、group by、order by、limit</code> 从句）时，可优化为 <strong>join 关联查询</strong>。</li>
+        </ul>
+      </li>
+      <li>使用合适的<strong>连接方式</strong>（如 INNER JOIN、LEFT JOIN）可以避免产生大量冗余数据。</li>
+    </ul>
+  </li>
+  <li>避免使用<strong>通配符</strong>查询，避免 <strong>select *</strong>，尽量使用精确的条件。</li>
+  <li>用Where子句替换HAVING子句：因为HAVING只会在检索出所有记录之后才对结果集进行过滤；</li>
+  <li>在 where 子句中不要使用：否则将<strong>导致索引失效</strong>（存储引擎将放弃使用索引）进而进行<strong>全表扫描</strong>。
+    <ol>
+      <li>避免使用 <strong>not in</strong>，可以用 <strong>not exists</strong> 代替；</li>
+      <li>避免使用 <strong>!=或&lt;&gt; **两种逻辑比较操作符，可以用 **&gt; or &lt;</strong> 代替；</li>
+      <li>避免使用 <strong>is null /is not null</strong> 对字段进行null值判断；</li>
+      <li>避免使用 <strong>or</strong> 关键字来连接条件，如果一个字段有索引，另一个字段没有索引，将导致索引失效进而进行全表扫描。可以用 <strong>union all</strong> 代替；</li>
+      <li>不要对字段进行<strong>函数操作</strong>，比如 COUNT 等聚合函数；
+        <ol>
+          <li><code class="highlighter-rouge">select * from users where YEAR(adddate)&lt;2007;</code> 改为:</li>
+          <li><code class="highlighter-rouge">select * from users where adddate&lt;‘2007-01-01′;</code></li>
+        </ol>
+      </li>
+      <li>尽量避免在 “=” 的左边进行函数等<strong>表达式运算</strong>；</li>
+      <li><strong>like 模糊查询</strong>使用前置匹配会导致全表扫面。不鼓励使用like操作，如果非使用不可，l<code class="highlighter-rouge">ike “%aaa%”</code> 不会使用索引而<code class="highlighter-rouge">like “aaa%”</code>可以使用索引。</li>
+      <li>使用索引字段为条件时，若为<strong>复合索引</strong>，那么必须使用到该索引中的第一个字段作为条件，这样才能保证索引被正确使用。</li>
+      <li>使用<strong>参数</strong>也会导致全表扫面。</li>
+    </ol>
+  </li>
+  <li>尽量<strong>用 union all 代替 union</strong>：差异主要是 union 需要将结果集合并后再进行<strong>唯一性过滤</strong>操作，这就会涉及到<strong>排序</strong>，增加大量的 CPU 运算，加大资源消耗及延迟。当然，union all 的前提条件是两个结果集没有重复数据。</li>
+  <li>避免类型转换</li>
+  <li>能用DISTINCT的就不用<strong>GROUP BY</strong></li>
+  <li>update语句尽量只更新必须的字段，减少性能消耗。</li>
+</ol>
+
+<h4 id="合理设计表结构">合理设计表结构</h4>
+
+<p>良好的表设计可以提高查询性能。</p>
+
+<ol>
+  <li><strong>遵循范式设计</strong>：表的设计合理化（符合3NF），比如消除冗余字段（节省空间）；</li>
+  <li>反范式优化：比如适当加冗余等（减少join）；</li>
+  <li><strong>拆分表</strong>：
+    <ol>
+      <li>分区将数据在物理上分隔开，不同分区的数据可以指定保存在处于不同磁盘上的数据文件里。这样，当对这个表进行查询时，只需要在表分区中进行扫描，而不必进行全表扫描，明显缩短了查询时间；</li>
+      <li>另外处于不同磁盘的分区也将对这个表的数据传输分散在不同的磁盘I/O，一个精心设置的分区可以将数据传输对磁盘I/O竞争均匀地分散开。</li>
+      <li>对数据量大时表可采取此方法，可按月自动建表分区。</li>
+    </ol>
+  </li>
+</ol>
+
+<p>具体如：</p>
+
+<ol>
+  <li>始终定义<strong>主键</strong>，最好是使用自动递增的整数值主键：为表定义主键可按<strong>物理方式</strong>组织数据，以便更快地<strong>查找、检索和排序</strong>记录，从而提升性能。主键缺失也是导致基于行的复制延迟的主要原因之一。</li>
+  <li>
+    <p>外键规范：禁止使用外键；外键约束问题必须在应用层解决；禁止使用级联查询；</p>
+
+    <ol>
+      <li>针对于互联网大数据量高并发量的数据存储场景来说，外键与级联查询对性能的潜在影响较大；</li>
+      <li>外键与级联查询存在<strong>更新风暴</strong>的风险；</li>
+      <li><strong>级联查询</strong>：是指一个查询的结果依赖于另一个查询的结果，通常是通过子查询或者嵌套查询实现的。</li>
+      <li><strong>更新风暴</strong>问题：是指由于某些约束，例如外键约束或者触发器约束，当一条记录被更新时，相关约束的记录也会被更新，引发一系列连锁反应，导致短时间大量更新操作引发数据库性能下降甚至死锁的问题。因此，分布式场景一般禁止使用外键约束，或者触发器约束。</li>
+    </ol>
+  </li>
+  <li>尽量把所有列定义为 <strong>NOT NULL</strong>：NULL 类型比较特殊，SQL 难优化。</li>
+  <li>数据类型选择原则是：<strong>字段的长度</strong>在最大限度的满足可能的需要的前提下，应该尽可能的设得短一些，这样可以提高查询的效率，而且在建立索引的时候也可以减少资源的消耗。
+    <ol>
+      <li>数字类型：
+        <ol>
+          <li>非万不得已<strong>不要使用 DOUBLE</strong>，不仅仅只是存储长度的问题，同时还会存在精确性的问题。</li>
+          <li>同样，固定精度的小数，也<strong>不建议使用 DECIMAL</strong>，建议乘以固定倍数转换成整数存储，可以大大节省存储空间。</li>
+          <li>只含有数字的字段尽量不要设计为字符串，这会降低查询和连接的性能。</li>
+        </ol>
+      </li>
+      <li>字符类型：尽可能使用<code class="highlighter-rouge">varchar/nvachar</code> 代替 <code class="highlighter-rouge">char/nchar</code> 因为变长字段存储空间小，可以节省存储空间。
+        <ol>
+          <li><strong>定长字段</strong>：建议使用 CHAR 类型（char查询快，但是耗存储空间，可用于用户名、密码等长度变化不大的字段)，</li>
+          <li>不定长字段：尽量使用VARCHAR（varchar查询相对慢一些但是节省存储空间，可用于评论等长度变化大的字段）。</li>
+        </ol>
+      </li>
+      <li>时间类型：<strong>尽量使用TIMESTAMP</strong>类型，因为其存储空间只需要DATETIME 类型的一半。
+        <ol>
+          <li>对于只需要精确到某一天的数据类型，建议使用DATE类型，因为他的存储空间只需要3个字节，比TIMESTAMP还少。</li>
+          <li>不建议通过INT类型类存储一个unix timestamp 的值，因为这太不直观，会给维护带来不必要的麻烦，同时还不会带来任何好处。</li>
+        </ol>
+      </li>
+      <li>ENUM &amp;SET：对于状态字段，可以尝试使用 ENUM 来存放，因为可以极大的降低存储空间，而且即使需要增加新的类型，只要增加于末尾，修改结构也不需要重建表数据。</li>
+    </ol>
+  </li>
+  <li>选择合适的<strong>字符编码、字符集</strong>：字符集直接决定了数据在MySQL中的存储编码方式，由于同样的内容使用<strong>不同字符集</strong>表示所占用的空间大小会有较大的差异，可以帮助我们尽可能减少数据量，进而减少IO操作次数。</li>
+</ol>
+
+<h4 id="数据库架构优化">数据库架构优化</h4>
+
+<p>分布式和集群化：</p>
+
+<ul>
+  <li><strong>负载均衡</strong>：负载均衡集群是由一组相互独立的计算机系统构成，通过常规网络或专用网络进行连接，由路由器衔接在一起，各节点相互协作、共同负载、均衡压力，对客户端来说，整个群集可以视为一台具有超高性能的独立服务器。MySQL一般部署的是高可用性负载均衡集群，具备读写分离，一般只对读进行负载均衡。解决高负载。</li>
+  <li>集群、数据冗余的方式分担压力</li>
+  <li>使用<strong>分布式缓存</strong>数据库。</li>
+  <li>读写分离。读写分离简单的说是把对数据库读和写的操作分开对应不同的数据库服务器，这样能有效地减轻数据库压力，也能减轻io压力。主数据库提供写操作，从数据库提供读操作，其实在很多系统中，主要是读的操作。当主数据库进行写操作时，数据要同步到从的数据库，这样才能有效保证数据库完整性。</li>
+  <li>数据拆分：通过某种特定的条件，将存放在同一个数据库中的数据分散存放到多个数据库上，实现分布存储，通过路由规则路由访问特定的数据库，这样一来每次访问面对的就不是单台服务器了，而是N台服务器，这样就可以降低单台机器的负载压力。
+    <ol>
+      <li>将读取工作负载分发到读取<strong>副本</strong>：读取副本（多个副本，跨可用区）可用于从主实例中分流读取工作负载。这将减少主实例的开销或负载，进而提高主实例的性能。此外，更多资源可用于读取副本上的读取查询。ProxySQL 是一种高性能的开源 MySQL 代理，能够路由数据库查询，</li>
+      <li><strong>分库分表</strong>：尽量控制<strong>单表数据量</strong>的大小在 500 万、单表容量 2GB 以内。过大会造成修改表结构、备份、恢复问题。</li>
+      <li>MySQL <strong>主从分离</strong>、一主多从、主备切换：</li>
+      <li><strong>缓存？</strong>：冷热数据分离，减小表的宽度。减少磁盘 IO，保证热数据的内存<strong>缓存命中率</strong>（表越宽，把表装载进内存缓冲池时所占用的内存也就越大，会消耗更多的 IO）；</li>
+    </ol>
+  </li>
+  <li>使用数据库连接池：是一种创建和管理连接池的技术，可供任何需要它们的进程使用。连接池可显著提高应用的性能，同时减少总体资源用量。</li>
 </ul>
+
+<h4 id="其他优化">其他优化</h4>
+
+<h5 id="选择合适的存储系统">选择合适的存储系统</h5>
+
+<p>RDBMS、NoSQL</p>
+
+<ol>
+  <li>如果在存储结构这层的优化没效果，继续再往上一层进行考虑。</li>
+  <li>是否关系型数据库不适合用在现在的业务场景？如果要换存储，那么得换怎样的 NoSQL?</li>
+</ol>
+
+<h5 id="服务器硬件升级磁盘cpu">服务器硬件升级磁盘、CPU</h5>
+
+<blockquote>
+  <p>加钱上大内存。</p>
+</blockquote>
+
+<h5 id="启用慢查询日志定位低效率的sql语句并优化">启用慢查询日志定位低效率的SQL语句并优化</h5>
+
+<blockquote>
+  <p>启用慢查询标志，识别、分析和调整执行时间超过阈值的 SQL 查询语句以提高性能。</p>
+</blockquote>
+
+<p>慢查询：SQL语句响应时间超过阀值、查询的 SQL语句耗费较长的时间（超过阈值）。</p>
+
+<p>慢查询日志：是MySQL提供的一种日志记录，用来记录在MySQL中<strong>响应时间超过阀值</strong>的语句。</p>
+
+<ul>
+  <li><code class="highlighter-rouge">long_query_time</code> 阈值的默认值为 10秒。正常情况下，MySQL 不会自动开启慢查询。</li>
+</ul>
+
+<p>慢查询的危害：</p>
+
+<ol>
+  <li>用户体验差；</li>
+  <li>占用MySQL内存，影响性能、性能变差；</li>
+  <li>造成DDL操作阻塞：InnoDB引擎默认加的是行锁，但锁其实都是加在索引上的，如果筛选条件没有建立索引，会降级到表锁。而慢查询有一大部分原因都是因为没加索引导致的，所以慢查询时间过长，就会导致表锁的时间也很长，如果这时候执行DDL就会造成阻塞。</li>
+</ol>
+
+<p>原因、常见场景：</p>
+
+<ol>
+  <li><strong>没加索引</strong>会造成<strong>全表扫描</strong>，又或者没利用好索引、没走到索引、走的不是<strong>最优索引</strong>，这两种情况都会导致<strong>扫描行数</strong>增多，从而查询时间变慢。</li>
+  <li>单表数据量太大：可能超千万，或者达到亿级别，可能加了索引之后，个别查询还是存在慢查询的情况，这种貌似没啥好办法，要么就看索引设置得到底对不对，要么就只能<strong>分表</strong>了。</li>
+  <li><strong>Limit 深分页</strong>：即从比较后面的位置开始进行分页，比如每页有10条，然后我要看第十万页的数据，这时候的分页就会比较“深”。在这种情况下，即使字段加了索引，查询速度可能还是很慢（和不加差不多），因为二级索引树存的是主键ID，查到数据还需要进行<strong>回表</strong>才能决定是否丢弃。
+    <ul>
+      <li>解决思路：都是先查出主键字段（id），避免<strong>回表</strong>，再根据主键查出所有字段。</li>
+    </ul>
+  </li>
+  <li>排序字段没加索引。</li>
+  <li>再加上各种筛选就变慢了。</li>
+</ol>
+
+<h5 id="适当使用视图加速查询">适当使用<strong>视图</strong>加速查询</h5>
+
+<p>经常被查询的列数据，并且这些数据不被经常的修改，删除。它有助于避免<strong>多重排序</strong>操作。</p>
+
+<h5 id="封装存储过程">封装存储过程</h5>
+
+<p>存储过程：是SQL语句和控制语句的预编译集合，经编译和优化后保存在数据库中，可由应用程序调用执行。</p>
+
+<ul>
+  <li>而且允许用户声明变量、逻辑控制语句及其他强大的编程功能。</li>
+  <li>包含逻辑控制语句和数据操作语句，可以接收参数、输出参数、返回单个或多个结果值及返回值。</li>
+</ul>
+
+<p>优点：</p>
+
+<ol>
+  <li>模块化程序设计，只需创建一次，以后即可调用该存储过程任意次；</li>
+  <li>执行速度快，运行效率高；</li>
+  <li>减少网络流量，降低客户机和服务器之间的通信量；</li>
+  <li>具有良好的安全性。</li>
+  <li>有利于集中控制，易于维护。</li>
+</ol>
+
+<h5 id="避免大型事务">避免大型事务</h5>
+
+<p>在单个事务中对记录进行过多（更新、删除、插入）将占用过多记录的资源（锁、缓冲区）。</p>
+
+<ul>
+  <li>可能会溢出日志缓冲区，从而导致磁盘 IO。</li>
+  <li>剩余查询将必须等待资源或锁被释放。</li>
+  <li>会导致<strong>缓冲区池</strong>中的数据过多，从而阻止进一步使用缓冲区池。</li>
+  <li>此类大型事务的回滚也会降低数据库的性能。</li>
+  <li>为克服此问题，建议将大型事务拆分为多个小型且运行速度更快的事务。</li>
+</ul>
+
+<h5 id="定期备份和优化">定期备份和优化</h5>
+
+<ul>
+  <li>定期优化可以清理无用数据和重建索引；</li>
+  <li>定时的去清除不需要的数据、定时进行碎片整理；</li>
+  <li>日志历史数据归档</li>
+</ul>
+
+<h5 id="mysql-配置">MySQL 配置</h5>
+
+<ol>
+  <li>InnoDB 缓冲区池大小</li>
+  <li>重做日志/InnoDB 日志文件大小：InnoDB 日志文件或重做日志会记录表数据的数据更改。InnoDB 日志文件大小定义了单个重做日志文件的大小。对于具有较高重做日志大小的写入繁重的工作负载，可以为写入提供更多空间，而无需执行频繁的检查点刷新活动并节省磁盘 I/O，从而提高写入性能。</li>
+</ol>
+
+<h4 id="优化工具">优化工具</h4>
 
 <h3 id="mysql-基础架构">MySQL 基础架构</h3>
 
 <p>下图是 MySQL 的一个简要架构图，从下图可以很清晰的看到客户端的一条 SQL 语句在 MySQL 内部是如何执行的。</p>
 
-<p><img src="assets/13526879-3037b144ed09eb88.png" style="zoom: 80%;" /></p>
+<p><img src="assets/13526879-3037b144ed09eb88.png" style="zoom: 80%;" /><img src="assets/590a51057027273ca28210baa508f236daeaab.png" style="zoom: 70%;" /></p>
 
 <p>从上图可以看出， MySQL 主要由下面几部分构成：</p>
 
 <ul>
   <li>Server 层：
     <ol>
-      <li><strong>连接器：</strong> 身份认证和<strong>权限验证</strong>(登录 MySQL 的时候)。</li>
+      <li><strong>连接器：</strong> 身份认证和<strong>权限验证</strong>（登录 MySQL 的时候）。</li>
       <li><strong>查询缓存：</strong> 执行查询语句的时候，会先查询缓存（<del>MySQL 8.0 版本后移除，因为这个功能不太实用</del>）。<strong>命中</strong>缓存，则直接返回。</li>
-      <li><strong>分析器：</strong> 没有命中缓存的话，SQL 语句就会经过分析器（<strong>词法分析、语法分析</strong>）。分析器说白了就是要先看你的 SQL 语句要干嘛，再检查你的 SQL 语句语法是否正确。</li>
+      <li><strong>分析器（解析器）：</strong> 没有命中缓存的话，SQL 语句就会经过分析器（<strong>词法分析、语法分析</strong>）。分析器说白了就是要先看你的 SQL 语句要干嘛，再检查你的 SQL 语句语法是否正确。</li>
       <li><strong>优化器：</strong> 按照 MySQL 认为最优的方案去<strong>执行</strong>。索引选择。</li>
       <li><strong>执行器：</strong> 执行语句，<strong>操作引擎</strong>，然后从存储引擎<strong>返回数据</strong>。 执行语句之前会先判断是否有权限，如果没有权限的话，就会报错。</li>
       <li>同时还有一个<strong>日志模块</strong>（<code class="highlighter-rouge">bin log</code>，所有执行引擎都可共用），redo log 只有 <code class="highlighter-rouge">InnoDB</code> 有。</li>
@@ -1495,7 +1814,7 @@ for each row              -- 触发器的执行间隔，通知触发器每隔一
 
 <p><strong>事务</strong>：是逻辑上的一组操作，要么全都执行，要么全不执行。</p>
 
-<p><strong>数据库事务</strong>：可以保证多个对数据库的操作（即 SQL 语句）构成一个逻辑上的整体。多条 SQL 语句要么全部执行成功，要么全部不执行 。</p>
+<p><strong>数据库事务</strong>：可以保证<strong>多个对数据库的操作</strong>（即 SQL 语句）构成一个逻辑上的整体。多条 SQL 语句要么全部执行成功，要么全部不执行 。</p>
 
 <p>例如，A 转出钱与 B 收到钱，这两个操作必须都成功、或者都失败。</p>
 
@@ -1521,18 +1840,18 @@ ROLLBACK;
 <p>关系型数据库（例如：<code class="highlighter-rouge">MySQL</code>、<code class="highlighter-rouge">SQL Server</code>、<code class="highlighter-rouge">Oracle</code> 等）事务都有 <strong>ACID</strong> 特性：</p>
 
 <ol>
-  <li><strong>A 原子性</strong>（<code class="highlighter-rouge">Atomicity</code>）：事务是最小的原子单位，不可再分割。事务中的所有操作要么全部执行成功，要么全部执行失败。
+  <li><strong>A 原子性</strong>（<code class="highlighter-rouge">Atomicity</code>）：事务是<strong>最小</strong>的原子单位，不可再分割。事务中的所有操作要么全部执行成功，要么全部执行失败。
     <ul>
       <li>事务内的所有 SQL 作为一个原子单元执行。</li>
       <li>MySQL InnoDB 引擎用 <code class="highlighter-rouge">undo log</code>（回滚日志）保证。</li>
     </ul>
   </li>
-  <li><strong>C 一致性</strong>（<code class="highlighter-rouge">Consistency</code>）：事务执行前后，状态（数据）保持一致。如不管 A 、B 间如何转账，事务结束后两账户的<strong>总额</strong>与事务执行前一致，都是 5000。</li>
-  <li><strong>I 隔离性</strong>（<code class="highlighter-rouge">Isolation</code>）：当（多个用户）<strong>并发</strong>访问数据库时，多个并发事务间要相互隔离。如，操作同一张表时，数据库为每个用户开启的事务，不能被其他事务的操作所<strong>干扰</strong>。
+  <li><strong>C 一致性</strong>（<code class="highlighter-rouge">Consistency</code>）：事务执行前后，<strong>状态（数据）</strong>保持一致。如不管 A 、B 间如何转账，事务结束后两账户的<strong>总额</strong>与事务执行前一致，都是 5000。</li>
+  <li><strong>I 隔离性</strong>（<code class="highlighter-rouge">Isolation</code>）：当（多个用户）<strong>并发</strong>访问数据库时，<strong>多个并发事务间</strong>要相互隔离。如，操作同一张表时，数据库为每个用户开启的事务，不能被其他事务的操作所<strong>干扰</strong>。
     <ul>
       <li>即，要达到这么一种效果：对于任意两个并发的事务 T1 和 T2，在事务 T1 看来，T2 要么在 T1 开始前就已结束，要么在T1结束后才开始，这样每个事务都感觉不到有其他事务在并发地执行。</li>
-      <li>数据库提供了多种隔离级别。</li>
-      <li>MySQL InnoDB 引擎通过 <a href="#锁机制">锁机制</a>、<code class="highlighter-rouge">MVCC</code> 等。</li>
+      <li>数据库提供了多种<strong>隔离级别</strong>。</li>
+      <li>MySQL InnoDB 引擎通过 <a href="#锁机制">锁机制</a>、<code class="highlighter-rouge">MVCC</code> 等保证。</li>
     </ul>
   </li>
   <li><strong>D 持久性</strong>（<code class="highlighter-rouge">Durability</code>）：一个事务<strong>被提交</strong>后，对数据库中数据的改变是持久的，即使数据库发生故障也不会丢失提交事务的操作。
@@ -1551,7 +1870,7 @@ ROLLBACK;
 <h5 id="并发事务的三大一致性问题">并发事务的三大一致性问题</h5>
 
 <blockquote>
-  <p>副作用。</p>
+  <p>副作用。对应隔离性。</p>
 </blockquote>
 
 <p>在典型的应用程序中，多个事务<strong>并发运行</strong>，经常会操作<strong>相同的数据</strong>来完成各自的任务（多个用户对同一数据进行操作）。并发虽然是必须的，但可能会导致以下的问题。</p>
@@ -1564,9 +1883,9 @@ ROLLBACK;
       <li>脏写这个问题太严重了，事务的任何隔离级别都一定不允许发生，对访问的数据<strong>加锁</strong>即可。</li>
     </ul>
   </li>
-  <li><strong>脏读（Dirty read）</strong>：一个事务读取到其它事务更新后（已修改）但未提交到数据库的数据，如果其它事务回滚该更新，则当前事务读到的（未提交的数据）就是<strong>脏数据</strong>。</li>
-  <li><strong>不可重复读（Unrepeatable read）</strong>：在一个事务中，多次读同一数据，（在事务还未结束时，其它事务就修改了此数据），两次读取的数据可能不一致。</li>
-  <li><strong>幻读（Phantom read）</strong>：在一个事务执行过程中，第一次未查询到某条记录，其它事务在此之后插入/删除、并提交了此条记录，再次按相同条件可查询到。即好像<strong>发生幻觉</strong>一样，与不可重复读类似。</li>
+  <li><strong>脏读（Dirty read）</strong>：一个事务读取到其它事务更新后（已修改）但未提交到数据库的数据。如果其它事务回滚该更新，则当前事务读到的（未提交的数据）就是<strong>脏数据</strong>。</li>
+  <li><strong>不可重复读（Unrepeatable read）</strong>：在一个事务中，多次读同一数据，两次读取的数据<del>可能</del>不一致。在事务还未结束时，其它事务就修改了此数据</li>
+  <li><strong>幻读（Phantom read）</strong>：在一个事务执行过程中，<strong>第一次未查询到</strong>某条记录，在此之后，其它事务插入/删除、并提交了此条记录，再次按相同条件可查询到。即好像<strong>发生幻觉</strong>一样，与不可重复读类似。</li>
 </ol>
 
 <p><strong>不可重复读和幻读有什么区别呢？</strong></p>
@@ -1579,8 +1898,8 @@ ROLLBACK;
 <p>幻读其实可以看作是不可重复读的一种特殊情况，单独把区分幻读的原因主要是解决幻读和不可重复读的方案不一样。</p>
 
 <ul>
-  <li>解决不可重复读：执行 <code class="highlighter-rouge">delete</code> 和 <code class="highlighter-rouge">update</code> 操作的时候，可以直接对记录<strong>加锁</strong>（Record Lock），保证事务安全。</li>
-  <li>解决幻读：而执行 <code class="highlighter-rouge">insert</code> 操作时，由于<strong>记录锁</strong>只能锁住已经存在的记录，为了避免插入新记录，需要依赖<strong>间隙锁</strong>（Gap Lock）。也就是说执行 <code class="highlighter-rouge">insert</code> 操作时需要依赖 <code class="highlighter-rouge">Next-Key Lock</code>（Record Lock+Gap Lock） 进行加锁来保证不出现幻读。</li>
+  <li>解决不可重复读：执行 <code class="highlighter-rouge">delete</code> 和 <code class="highlighter-rouge">update</code> 操作的时候，可以直接<strong>对记录加锁</strong>（Record Lock），保证事务安全。</li>
+  <li>解决幻读：而执行 <code class="highlighter-rouge">insert</code> 操作时，由于<strong>记录锁</strong>只能锁住已经存在的记录，为了避免插入新记录，需要依赖<strong>间隙锁</strong>（Gap Lock）。也就是说执行 <code class="highlighter-rouge">insert</code> 操作时需要依赖 <strong><code class="highlighter-rouge">Next-Key Lock</code></strong>（Record Lock+Gap Lock） 进行加锁来保证不出现幻读。</li>
 </ul>
 
 <h5 id="事务隔离级别">事务隔离级别</h5>
@@ -1589,6 +1908,8 @@ ROLLBACK;
   <p>MySQL是怎么保证数据不丢的？</p>
 
   <p>见 SSM 框架中 Spring 事务管理。</p>
+
+  <p>对应隔离性。</p>
 </blockquote>
 
 <p>事务隔离机制：</p>
@@ -1603,9 +1924,7 @@ ROLLBACK;
 <p>数据库的事务隔离<strong>越严格</strong>，并发副作用越小，但付出的代价也就越大。</p>
 
 <ol>
-  <li>
-    <p><code class="highlighter-rouge">READ_UNCOMMITTED</code>（读取未提交）： 最低，允许读取尚<strong>未提交</strong>的数据变更；</p>
-
+  <li><code class="highlighter-rouge">READ_UNCOMMITTED</code>（读取未提交）： 最低，允许读取尚<strong>未提交</strong>的数据变更；
     <ul>
       <li>解决了<strong>丢失更新</strong>，可能导致脏读、不可重复读、幻读。</li>
     </ul>
@@ -1617,9 +1936,7 @@ ROLLBACK;
       <li>解决了丢失更新、<strong>脏读</strong>，可能导致不可重复读、幻读。</li>
     </ul>
   </li>
-  <li>
-    <p><code class="highlighter-rouge">REPEATABLE-READ</code>（可重复读）： 对同一字段的<strong>多次读取</strong>结果都是一致的，除非数据是被事务本身所修改。</p>
-
+  <li><code class="highlighter-rouge">REPEATABLE_READ</code>（可重复读）： 对同一字段的<strong>多次读取</strong>结果都是一致的，除非数据是被事务本身所修改。
     <ul>
       <li>
         <p>MySQL InnoDB 存储引擎<strong>默认</strong>支持的隔离级别。可以通过<code class="highlighter-rouge">SELECT @@tx_isolation;</code>命令来查看，MySQL 8.0 该命令改为<code class="highlighter-rouge">SELECT @@transaction_isolation;</code></p>
@@ -1629,9 +1946,7 @@ ROLLBACK;
       </li>
     </ul>
   </li>
-  <li>
-    <p><code class="highlighter-rouge">SERIALIZABLE</code>（可序列化）： 最高，完全服从 <code class="highlighter-rouge">ACID</code> 四大特性。所有的事务依次逐个执行，事务间完全不可能产生干扰；串行执行，效率会大大下降。</p>
-
+  <li><code class="highlighter-rouge">SERIALIZABLE</code>（可序列化）： 最高，完全服从 <code class="highlighter-rouge">ACID</code> 四大特性。所有的事务依次逐个执行，事务间完全不可能产生干扰；串行执行，效率会大大下降。
     <ul>
       <li>解决了丢失更新、脏读、不可重复读、<strong>幻读</strong>。</li>
     </ul>
@@ -1652,7 +1967,7 @@ ROLLBACK;
 
 <h3 id="锁机制">锁机制</h3>
 
-<p><img src="assets/d10348ed49fb4c5be79ad30f0804ae4b.png" alt="img" /></p>
+<p><img src="assets/d10348ed49fb4c5be79ad30f0804ae4b.png" alt="img" style="zoom:80%;" /></p>
 
 <p>关系型数据库中的为悲观锁：</p>
 
@@ -2012,14 +2327,14 @@ UNLOCK TABLES
 
 <ul>
   <li><strong>5 种基础数据结构</strong> ：String（字符串）、List（列表）、Hash（散列）、Set（集合）、Zset（有序集合）。</li>
-  <li><strong>3 种特殊数据结构</strong> ：HyperLogLogs（基数统计）、Bitmap（位存储）、Geospatial（地理位置）。</li>
+  <li><strong>3 种特殊数据结构</strong> ：HyperLogLogs（基数统计）、Bitmap（位存储）、<strong>Geospatial</strong>（地理位置）。</li>
 </ul>
 
 <p>5大基础数据类型及应用场景：</p>
 
 <ol>
   <li>
-    <p><code class="highlighter-rouge">String</code>：简单的 key-value 类型。</p>
+    <p><code class="highlighter-rouge">String</code>：简单的 key-value 类型。因为 <code class="highlighter-rouge">Redis</code> 的 <code class="highlighter-rouge">key</code> 和 <code class="highlighter-rouge">value</code> 是<strong>天然支持幂等</strong>的；</p>
 
     <ul>
       <li>常用命令： <code class="highlighter-rouge">set/get/del, mset, setex, strlen, exists, incr/decr, expire, ttl</code> 等。</li>
@@ -2039,7 +2354,7 @@ UNLOCK TABLES
     </ul>
   </li>
   <li>
-    <p><code class="highlighter-rouge">Hash</code>：类似于 JDK1.8 前的 <code class="highlighter-rouge">HashMap</code>，内部实现也差不多（数组 + 链表）。是一个 String 类型的 field 和 value 的<strong>映射表</strong>。</p>
+    <p><code class="highlighter-rouge">Hash</code>：类似于 JDK1.8 前的 <code class="highlighter-rouge">HashMap</code>，内部实现也差不多（<strong>数组 + 链表</strong>）。是一个 String 类型的 field 和 value 的<strong>映射表</strong>。</p>
 
     <ul>
       <li>常用命令： <code class="highlighter-rouge">hset/hmset/hget, hgetall, hexists, hkeys, hvals</code> 等。</li>
@@ -2061,7 +2376,7 @@ UNLOCK TABLES
     </ul>
   </li>
   <li>
-    <p><code class="highlighter-rouge">Sorted Set</code>：比 set 增加了一个<strong>权重参数</strong> <code class="highlighter-rouge">score</code>，使集合中的元素能按 score 进行有序排列，还可通过 score 的范围来获取元素的列表。有点像 HashMap 和 TreeSet 的结合体。</p>
+    <p><code class="highlighter-rouge">Sorted Set</code>：比 set 增加了一个<strong>权重参数</strong> <code class="highlighter-rouge">score</code>，使集合中的元素能按 score 进行<strong>有序排列</strong>，还可通过 score 的范围来获取元素的列表。有点像 HashMap 和 TreeSet 的结合体。</p>
 
     <ul>
       <li>常用命令： <code class="highlighter-rouge">zadd, zcard, zscore, zrange, zrevrange, zrem</code> 等。</li>
@@ -2616,7 +2931,7 @@ QUEUED
       <li>服务熔断或进行请求限流，避免同时处理大量的请求。
         <ol>
           <li><strong>熔断机制</strong>：当流量到达一定的<strong>阈值</strong>时，就暂停业务，直接返回“系统拥挤”之类的错误提示，防止过多的请求打在数据库上。等Redis恢复正常后，再允许业务进行。至少能保证一部分用户是可以正常使用，其他用户多刷新几次也能得到结果。</li>
-          <li><strong>启用限流</strong>：只允许少部分请求访问数据库，大于能承受的压力的请求直接拒绝服务。等到Redis正常且预热完毕，再解除限流。</li>
+          <li><strong>启用限流</strong>：<strong>只允许少部分请求</strong>访问数据库，大于能承受的压力的请求直接拒绝服务。等到Redis正常且预热完毕，再解除限流。</li>
         </ol>
       </li>
       <li>提高数据库的容灾能力，可以使用分库分表、读写分离的策略。</li>
@@ -2648,7 +2963,7 @@ QUEUED
 
 <h5 id="缓存穿透">缓存穿透</h5>
 
-<p>缓存穿透：是当用户访问的数据，<strong>既不在缓存中，也不在数据库中</strong>，导致请求在访问缓存时，发现缓存缺失，再去访问数据库时，发现数据库中也没有要访问的数据，没办法构建缓存数据，来服务后续的请求。那么当有大量这样的请求到来时，数据库的压力骤增。</p>
+<p>缓存穿透：是当用户访问的数据，<strong>既不在缓存中，也不在数据库中</strong>，导致请求在访问缓存时，发现缓存缺失，再去访问数据库时，发现数据库中也没有要访问的数据，没办法构建缓存数据、来服务后续的请求。那么当有大量这样的请求到来时，数据库的压力骤增。</p>
 
 <p>发生的原因有：</p>
 
@@ -2753,7 +3068,7 @@ QUEUED
 
 <p>但又有很大不同：Read/Write Through 是同步更新 cache 和 DB，而 Write Behind Caching 则是只更新缓存，不直接更新 DB，改为异步批量的方式来更新 DB。少见。</p>
 
-<h2 id="elasticsearch-全文搜索引擎">Elasticsearch 全文搜索引擎</h2>
+<h2 id="elasticsearch-分布式全文搜索引擎">Elasticsearch 分布式全文搜索引擎</h2>
 
 <h3 id="简介">简介</h3>
 

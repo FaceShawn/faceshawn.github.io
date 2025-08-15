@@ -28,7 +28,14 @@
   <li>系统设计：系统<strong>架构</strong>示意图：普通用户、管理员，前端（输入输出），后台，MyBatis 数据持久化，微服务，配置等；
     <ol>
       <li>系统概要设计：系统功能模块（划分）图：系统-子系统-功能模块，各自的描述、输入输出接口设计（格式、入参和出参/返回值）。接口文档现在都是 <a href="#接口文档">Swagger-UI</a>，注解标注在 Controller；</li>
-      <li>数据库表结构设计：E-R 模型（转为 POJOs 及 DAO 接口）；</li>
+      <li>数据库表结构设计：
+        <ol>
+          <li><strong>逻辑设计/详细设计</strong> : 通过将 E-R 图转换成表，实现从 E-R 模型到关系模型的转换（转为 POJOs 及 DAO 接口），并应用三大范式优化；</li>
+          <li><strong>物理结构设计</strong> : 为设计的数据库选择合适的存储结构和存取路径，做具体的技术选型。</li>
+          <li>数据库<strong>实现</strong> : 包括 SQL 编程（创建数据库表）、测试和试运行。</li>
+          <li>数据库的<strong>运行和维护</strong> : log 日志，根据新需求进行建表、索引优化、大表拆分。</li>
+        </ol>
+      </li>
       <li>功能模块详细设计：模块流程图（Controller 调用 Sercive 实现业务逻辑）。</li>
     </ol>
   </li>
@@ -38,19 +45,13 @@
 
 <h5 id="系统业务架构示意图">系统业务架构示意图</h5>
 
-<p>项目架构图：</p>
-
-<p>技术架构图：</p>
+<p>项目技术架构图：</p>
 
 <p>业务架构图：</p>
 
 <p>应用架构图：</p>
 
 <p><img src="assets/mall系统架构示意图.jpg" alt="系统架构图" style="zoom: 37%;" /></p>
-
-<p>业务架构示意图：</p>
-
-<p><img src="assets/mall业务架构示意图.jpg" alt="系统架构图" style="zoom: 80%;" /></p>
 
 <h5 id="系统功能模块图">系统功能模块图</h5>
 
@@ -78,7 +79,11 @@
       <li><code class="highlighter-rouge">MallAdminApplication.java</code>：程序主入口；</li>
       <li><code class="highlighter-rouge">common/</code>：存放通用类
         <ol>
-          <li><code class="highlighter-rouge">api/</code>：<del>参数定义</del>、<code class="highlighter-rouge">CommonResult</code> 通用返回结果、IErrorCode、ResultCode；</li>
+          <li><code class="highlighter-rouge">api/</code>：<del>参数定义</del>、<code class="highlighter-rouge">CommonResult</code> 通用返回结果、IErrorCode、ResultCode；
+            <ol>
+              <li><code class="highlighter-rouge">BaseController/CommonResult</code> 类：用于<strong>统一封装返回对象</strong>，供所有的 controller 继承，主要提供了返回成功或失败对象的几种方法。</li>
+            </ol>
+          </li>
           <li><code class="highlighter-rouge">baseconfig/</code>：BaseRedisConfig、BaseSwaggerConfig；</li>
           <li><code class="highlighter-rouge">config/</code>：存放 <strong>Java 配置类</strong>，如 MyBatis、Swagger、Redis、Spring Security、Oss 配置类等。</li>
           <li><code class="highlighter-rouge">util/</code>：<code class="highlighter-rouge">RequestUtil</code>、<code class="highlighter-rouge">SessionUtil</code>、<code class="highlighter-rouge">JwtTokenUtil</code>、<code class="highlighter-rouge">WebResponseUtil</code>等各种工具类。</li>
@@ -89,7 +94,7 @@
           <li><code class="highlighter-rouge">domain/</code>：SwaggerProperties、WebLog 日志封装类、搜索结果信息类；</li>
           <li><code class="highlighter-rouge">service/</code>：RedisService 操作。
             <ol>
-              <li>RedisCacheAspect：Redis 缓存切面，防止Redis宕机影响正常业务逻辑；</li>
+              <li><code class="highlighter-rouge">RedisCacheAspect</code>：Redis 缓存切面，防止Redis宕机影响正常业务逻辑；</li>
               <li>简单搜索，综合搜索、筛选、排序；</li>
             </ol>
           </li>
@@ -268,18 +273,15 @@
 
 <h4 id="controler-控制层">Controler 控制层</h4>
 
-<p>存放控制器：</p>
+<p>存放控制器：类上常用用<a href="#@Controller"><code class="highlighter-rouge">@Controller</code></a>定义控制层，<code class="highlighter-rouge">@RestController</code> = <code class="highlighter-rouge">@Controller</code> + <code class="highlighter-rouge">@ResponseBody</code>；</p>
 
 <ol>
   <li>用于路由解析，<strong>对外暴露 REST API 接口</strong>；负责<strong>接收并转发</strong>请求、参数校验；
     <ol>
-      <li><a href="#@Controller">类上常用注解 @Controller，返回对象常用 @ResponseBody</a>；</li>
-      <li>方法上常用 <a href="#REST常用注解">@RequestXxx</a>；</li>
+      <li>方法上常用 <a href="#REST常用注解">@RequestXxx</a> 系列注解，如<code class="highlighter-rouge">@RequestMapping</code> 用来拦截和转发用户请求、<code class="highlighter-rouge">@RequestParam</code> 参数绑定、<code class="highlighter-rouge">@RequestBody</code> 用于获取 HTTP 请求体中的数据；</li>
+      <li>返回对象常用 <code class="highlighter-rouge">@ResponseBody</code> 返回响应结果。</li>
       <li><code class="highlighter-rouge">@Valid</code> 等用于搭配 <a href="#整合HibernateValidator">参数校验</a>（具体通过在 <strong>POJOs 对象</strong>的字段上加注解实现）；</li>
-      <li>
-        <p>根据 UI 和接口的入参和出参，编写 Controller 类中的方法。</p>
-      </li>
-      <li><code class="highlighter-rouge">BaseController/CommonResult</code> 类：用于<strong>统一封装返回对象</strong>，供所有的 controller 继承，主要提供了返回成功或失败对象的几种方法。</li>
+      <li>根据 UI 和接口的入参和出参，编写 Controller 类中的方法。</li>
     </ol>
   </li>
   <li><strong>控制业务流程</strong>、页面访问控制和交互（组织不同层面），<strong>指定视图</strong>并将响应结果发送给客户端；异常处理（给方法加上<strong>切面</strong>来统一处理异常）。</li>
@@ -307,13 +309,25 @@
 
 <h3 id="spring-mvc">Spring MVC</h3>
 
+<blockquote>
+  <p>本质上相当于传统的 Servlet 和 Struts 中的 action</p>
+</blockquote>
+
 <p>是一个基于 <strong>MVC 设计模式</strong>的轻量级 Web 开发框架，是 Spring 框架的一部分。</p>
 
-<p>本质上相当于传统的 Servlet 和 Struts 中的 action，主要体现在 Controller 层，用来拦截和转发用户请求、返回响应结果。<a href="#声明 Bean 的注解">Spring MVC 常用基本注解</a></p>
+<p>MVC：<code class="highlighter-rouge">Model-View-Controler</code> 的简称，即模型—视图—控制器。解耦。</p>
+
+<p>Spring 中通过注解来定义各层，如 <code class="highlighter-rouge">@Controller</code> 定义控制层、<code class="highlighter-rouge">@Service</code> 定义 service 业务逻辑层。</p>
+
+<blockquote>
+  <p>详情见<a href="#项目架构">项目架构</a>中。</p>
+</blockquote>
+
+<blockquote>
+  <p><a href="#声明 Bean 的注解">Spring MVC 常用基本注解</a></p>
+</blockquote>
 
 <h5 id="mvc-设计模式">MVC 设计模式</h5>
-
-<p>MVC：<code class="highlighter-rouge">Model-View-Controler</code> 的简称，即模型—视图—控制器。解耦。</p>
 
 <p><code class="highlighter-rouge">Model 1</code> 时代：</p>
 
@@ -462,25 +476,6 @@
   <li>执行过程。</li>
 </ul>
 
-<h5 id="docker-容器">Docker 容器</h5>
-
-<p>一个轻量级、可移植、自给自足的软件环境，用于<strong>运行应用程序</strong>。</p>
-
-<p>Docker 容器将应用程序及其所有依赖项（包括库、配置文件、系统工具等）封装在一个标准化的包中，使得应用能够在任何地方一致地运行。</p>
-
-<p>Docker 镜像：国内从 DockerHub 拉取镜像有时会遇到困难，此时可以配置镜像加速器。</p>
-
-<p>容器是<strong>操作系统级别</strong>的虚拟化，不需要运行完整的操作系统，启动和运行更为高效。</p>
-
-<p>Docker容器和传统VM技术，在技术实现上有所不同。逻辑组成：</p>
-
-<ul>
-  <li>VM 虚拟机：使用Hypervisor提供虚拟机的运行平台，管理每个VM中操作系统的运行。每个VM都要有自己的操作系统、应用程序和必要的依赖文件等。</li>
-  <li>Docker 容器：使用Docker引擎进行调度和隔离，提高了资源利用率，在相同硬件能力下可以<strong>运行更多的容器实例</strong>；每个容器拥有自己的隔离化用户空间。</li>
-</ul>
-
-<p><img src="assets/download" alt="在这里插入图片描述" style="zoom: 100%;" /></p>
-
 <h5 id="tomcat">Tomcat</h5>
 
 <p><img src="assets/tomcat_server_response.png" alt="在这里插入图片描述" style="zoom: 50%;" /></p>
@@ -588,7 +583,7 @@
       <li>后端用于响应的有<code class="highlighter-rouge">HttpServletResponse</code>。</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">@Requestparam</code>：具体见下面 <a href="#REST 常用注解">REST 常用注解</a>。</li>
+  <li><code class="highlighter-rouge">@RequestParam</code>：具体见下面 <a href="#REST 常用注解">REST 常用注解</a>。</li>
   <li><code class="highlighter-rouge">@RequestBody</code>：具体见下面 <a href="#REST 常用注解">REST 常用注解</a>。</li>
 </ol>
 
@@ -775,6 +770,12 @@ public ResponseEntity updateStudent(@RequestBody StudentUpdateRequest stuUpdateR
   <li><code class="highlighter-rouge">Test</code>：支持 Junit 和 TestNG 测试框架，模拟 Http 请求的功能。</li>
 </ol>
 
+<h4 id="spring-启动过程分哪些步骤">Spring 启动过程？分哪些步骤</h4>
+
+<blockquote>
+  <p>https://www.cnblogs.com/lgx211/p/18535984</p>
+</blockquote>
+
 <h3 id="ioc-设计思想">IoC 设计思想</h3>
 
 <h5 id="ioc-和-di">IoC 和 DI</h5>
@@ -923,7 +924,9 @@ UserDao dao = UserFactory.getDao();
 
 <h3 id="spring-配置">Spring 配置</h3>
 
-<p>见 Spring Boot 中。</p>
+<blockquote>
+  <p>见 Spring Boot 中。</p>
+</blockquote>
 
 <h3 id="spring-bean-定义">Spring Bean 定义</h3>
 
@@ -1038,7 +1041,7 @@ public Person personPrototype() {
 <p><strong>基本作用域</strong>：</p>
 
 <ol>
-  <li><code class="highlighter-rouge">'singleton</code>：单例模式，默认值，在整个<strong>Spring IoC 容器中</strong>只有一个<strong>共享</strong>的 Bean 实例，由 <code class="highlighter-rouge">BeanFactory</code> 维护。一旦创建成功，<strong>可重复使用</strong>。存储在高速缓存中，用于<strong>无会话状态</strong>的 Bean（如 DAO 层、Service 层）。</li>
+  <li><code class="highlighter-rouge">'singleton</code>：单例模式，<strong>默认值</strong>，在整个Spring IoC 容器中<strong>只有一个共享的</strong> Bean 实例，由 <code class="highlighter-rouge">BeanFactory</code> 维护。一旦创建成功，<strong>可重复使用</strong>。存储在<strong>高速缓存</strong>中，用于<strong>无会话状态</strong>的 Bean（如 DAO 层、Service 层）。</li>
   <li><code class="highlighter-rouge">prototype</code>：原型模式，每次获取 Bean 时，容器都会<strong>创建一个新的</strong> Bean 实例；创建成功后<strong>不再跟踪和维护</strong> Bean 实例的状态。用于<strong>需保持会话状态</strong>的 Bean（如 Struts2 的 Action 类）。</li>
 </ol>
 
@@ -1048,9 +1051,9 @@ public Person personPrototype() {
 
 <ol>
   <li><code class="highlighter-rouge">request</code>：每次 <strong>HTTP request 请求</strong>都会产生一个新的（不同的）Bean 实例，仅在当前 request 内有效（在请求完成后，Bean 会被 <strong>GC</strong> 回收）。</li>
-  <li><code class="highlighter-rouge">session</code>：每个 HTTP Session 会产生一个新的 Bean，仅在当前 session 内有效。同一个 Session 共享一个 Bean 实例。</li>
+  <li><code class="highlighter-rouge">session</code>：每个 <strong>HTTP Session</strong> 会产生一个新的 Bean，仅在当前 session 内有效。同一个 Session 共享一个 Bean 实例。</li>
   <li><del><code class="highlighter-rouge">global-session</code></del>：每个全局的 HTTP Session、用 session 定义的 Bean 都将产生一个新实例。典型情况下，仅在用 portlet context 时有效。</li>
-  <li><code class="highlighter-rouge">application</code>：类似于 singleton，同一个 <strong>Web 应用</strong>（可能有多个 IoC 容器）共享一个 Bean 实例。</li>
+  <li><code class="highlighter-rouge">application</code>：类似于 singleton，同一个 <strong>Web 应用</strong>（可能有多个 IoC 容器）<strong>共享</strong>一个 Bean 实例。</li>
   <li><del><code class="highlighter-rouge">websocket</code></del>：作用域是 WebSocket。</li>
 </ol>
 
@@ -1184,13 +1187,14 @@ public Person personPrototype() {
   <li><code class="highlighter-rouge">@Autowired</code>：用于 setter()、构造函数或<strong>字段</strong>上。步骤：
     <ol>
       <li><strong>默认</strong>用 <code class="highlighter-rouge">byType</code> 的方式（根据对象属性所属的<strong>类型</strong>）自动注入 Bean 到（同样被 Spring 容器管理的）当前 Bean 中（即自动导入对象到类中），如：<strong>Service 对象</strong>作为属性注入到当前 Controller 类中；</li>
-      <li>同一个实体类<strong>有多个实现类</strong>（配置多个 Bean）时<strong>类型相同</strong>，IoC 不知该注入哪个实现类，这时改为 <code class="highlighter-rouge">byName</code> 的方式注入，默认根据标注的<strong>成员变量名</strong>作为 id，查找 Bean、进行装配；</li>
+      <li>同一个实体类<strong>有多个实现类</strong>（配置多个 Bean）时<strong>类型相同</strong>，IoC 不知该注入哪个实现类，这时改为 <code class="highlighter-rouge">byName</code> 的方式注入；默认根据标注的<strong>成员变量名</strong>作为 id，查找 Bean、进行装配；</li>
       <li>仍失败，则通过 <code class="highlighter-rouge">@Qualifier</code> <strong>手动指定</strong>目标 Bean 的 id（变量名）；</li>
       <li>检查属性是否正常装配（设置），无法找到匹配的 Bean 装配会抛出异常；设置 <code class="highlighter-rouge">required=false</code> 允许属性不被设置，则不抛出异常。</li>
       <li><a href="https://blog.csdn.net/weixin_44296929/article/details/109527112">@Autowired注解使用的自动装配方式</a></li>
     </ol>
   </li>
-  <li><code class="highlighter-rouge">@Resource</code>：<strong>默认</strong>（指定值）是 <code class="highlighter-rouge">byName</code>，找不到与名称匹配的 Bean（或该属性为空、不指定值）时用 <code class="highlighter-rouge">byType</code>，自动用标注处的变量或方法名作为 Bean 名；相同类型在 IoC 容器中只能有一个。</li>
+  <li><code class="highlighter-rouge">@Resource</code>：<strong>默认</strong>（指定值）是 <code class="highlighter-rouge">byName</code>，找不到与名称匹配的 Bean（或该属性为空、不指定值）时用 <code class="highlighter-rouge">byType</code>，自动用标注处的变量或方法名作为 Bean 名；相同类型在 IoC 容器中<strong>只能有一个</strong>。</li>
+  <li><code class="highlighter-rouge">@Autowired</code> 加载的 Bean 相同类型可能有多个，通过 <code class="highlighter-rouge">ByName</code> 加载并区分； <code class="highlighter-rouge">@Resource</code> 加载的 Bean 相同类型在 IoC 容器中<strong>只能有一个</strong>。</li>
   <li><code class="highlighter-rouge">@Qualifier("userDAO")</code>：限定要自动注入的 Bean 的 id，一般和 <code class="highlighter-rouge">@Autowired</code> 联用，指定 Bean的名称。</li>
 </ol>
 
@@ -1404,7 +1408,7 @@ public CommonResult login(@Validated @RequestBody UmsAdminLoginParam umsAdminLog
 
 <p><img src="assets/aspect_flow.awebp" alt="img" style="zoom:70%;" /></p>
 
-<p><code class="highlighter-rouge">@Aspect</code>：用于定义切面；切面是通知和切点的结合，分别定义了<strong>何时、何处</strong>应用通知功能。</p>
+<p><code class="highlighter-rouge">@Aspect</code>：用于定义<strong>切面</strong>；切面是通知和切点的结合，分别定义了<strong>何时、何处</strong>应用通知功能。</p>
 
 <ul>
   <li>
@@ -1446,6 +1450,19 @@ public CommonResult login(@Validated @RequestBody UmsAdminLoginParam umsAdminLog
     <ul>
       <li>织入可以在编译期、类加载期和运行期完成，在编译期进行织入就是<strong>静态代理</strong>，而在运行期进行织入则是<strong>动态代理</strong>。</li>
     </ul>
+  </li>
+</ul>
+
+<h5 id="常见的通知类型">常见的通知类型</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">@Around</code>：环绕通知，通知<strong>包裹</strong>了目标方法，在目标方法<strong>调用前和调用后</strong>执行。通知方法会将目标方法封装起来。</li>
+  <li><code class="highlighter-rouge">@Before("webLog()")</code>：前置通知，通知方法会在目标方法<strong>调用前</strong>执行。</li>
+  <li><code class="highlighter-rouge">@After</code>：后置通知，通知方法会在目标方法返回或抛出异常<strong>后</strong>执行；
+    <ol>
+      <li><code class="highlighter-rouge">@AfterReturning</code>：<strong>返回通知</strong>，通知方法会在目标方法<strong>返回后</strong>执行；</li>
+      <li><code class="highlighter-rouge">@AfterThrowing</code>：异常通知，通知方法会在目标方法<strong>抛出异常后</strong>执行。</li>
+    </ol>
   </li>
 </ul>
 
@@ -1491,19 +1508,6 @@ public CommonResult login(@Validated @RequestBody UmsAdminLoginParam umsAdminLog
   <li><code class="highlighter-rouge"> ..</code>：匹配任何数量字符的重复，如在类型模式中匹配任何数量子包；而在方法参数模式中匹配任何数量参数。</li>
   <li><code class="highlighter-rouge"> +</code>：匹配指定类型的子类型；仅能作为后缀放在类型模式后边。</li>
 </ol>
-
-<h5 id="常见的通知类型">常见的通知类型</h5>
-
-<ul>
-  <li><code class="highlighter-rouge">@Around</code>：环绕通知，通知<strong>包裹</strong>了目标方法，在目标方法<strong>调用前和调用后</strong>执行。通知方法会将目标方法封装起来。</li>
-  <li><code class="highlighter-rouge">@Before("webLog()")</code>：前置通知，通知方法会在目标方法<strong>调用前</strong>执行。</li>
-  <li><code class="highlighter-rouge">@After</code>：后置通知，通知方法会在目标方法返回或抛出异常<strong>后</strong>执行；
-    <ol>
-      <li><code class="highlighter-rouge">@AfterReturning</code>：<strong>返回通知</strong>，通知方法会在目标方法<strong>返回后</strong>执行；</li>
-      <li><code class="highlighter-rouge">@AfterThrowing</code>：异常通知，通知方法会在目标方法<strong>抛出异常后</strong>执行。</li>
-    </ol>
-  </li>
-</ul>
 
 <h5 id="创建切面的步骤">创建切面的步骤</h5>
 
@@ -1690,6 +1694,12 @@ public CommonResult login(@Validated @RequestBody UmsAdminLoginParam umsAdminLog
 
 <p>事务管理：按照给定的<strong>事务规则</strong>来执行提交或回滚操作。</p>
 
+<h4 id="事务实现">事务实现</h4>
+
+<blockquote>
+  <p>AOP</p>
+</blockquote>
+
 <h4 id="事务分类">事务分类</h4>
 
 <ol>
@@ -1737,11 +1747,11 @@ public CommonResult login(@Validated @RequestBody UmsAdminLoginParam umsAdminLog
 
 <ol>
   <li><code class="highlighter-rouge">REQUIRED</code>：支持<strong>当前</strong>事务，如果当前没有事务，<strong>新建</strong>一个事务。<strong>最常见</strong>，默认；</li>
-  <li><code class="highlighter-rouge">SUPPORTS</code>：支持<strong>当前</strong>事务，如果当前没有事务，以非事务方式执行；事务将不会发生回滚；</li>
+  <li><code class="highlighter-rouge">SUPPORTS</code>：支持<strong>当前</strong>事务，如果当前没有事务，以<strong>非事务方式</strong>执行；事务将不会发生回滚；</li>
   <li><code class="highlighter-rouge">'MANDATORY</code>：支持<strong>当前</strong>事务，如果当前没有事务，抛出异常；</li>
   <li><code class="highlighter-rouge">REQUIRES_NEW</code>：新建事务，如果当前存在事务，把当前事务<strong>挂起</strong>；</li>
-  <li><code class="highlighter-rouge">NOT_SUPPORTED</code>：以非事务方式执行操作，如果当前存在事务，把当前事务<strong>挂起</strong>；事务将不会发生回滚；</li>
-  <li><code class="highlighter-rouge">NEVER</code>：以非事务方式执行，如果当前存在事务，抛出异常；事务将不会发生回滚；</li>
+  <li><code class="highlighter-rouge">NOT_SUPPORTED</code>：以<strong>非事务方式</strong>执行操作，如果当前存在事务，把当前事务<strong>挂起</strong>；事务将不会发生回滚；</li>
+  <li><code class="highlighter-rouge">NEVER</code>：以<strong>非事务方式</strong>执行，如果当前存在事务，抛出异常；事务将不会发生回滚；</li>
   <li><del><code class="highlighter-rouge">NESTED</code></del>：如果当前存在事务，则在<strong>嵌套</strong>事务内执行。如果当前没有事务，进行与 <code class="highlighter-rouge">REQUIRED</code>类似的操作。</li>
 </ol>
 
@@ -1780,7 +1790,7 @@ SERIALIZABLE(8);
       <li>注解：<code class="highlighter-rouge">@Scope(value = "singleton")</code></li>
     </ol>
   </li>
-  <li><strong>代理模式</strong>：AOP 的实现用到 <strong>JDK 动态代理</strong>和 CGLIB 字节码生成技术；</li>
+  <li><strong>代理模式</strong>：<strong>AOP 的实现</strong>用到 <strong>JDK 动态代理</strong>和 CGLIB 字节码生成技术；</li>
   <li><strong>模板模式</strong>：用来解决代码重复的问题。如 <code class="highlighter-rouge">RestTemplate, JmsTemplate, JpaTemplate、jdbcTemplate、hibernateTemplate</code> 等以 Template 结尾的对数据库操作的类。</li>
   <li>包装器（Wrapper）模式 : 可根据需求<strong>动态切换</strong>不同的数据源，使接口不兼容的类一起工作。项目需要连接多个数据库，而且不同的客户在每次访问中根据需要会去访问不同的数据库。</li>
   <li>适配器模式 : 如 Spring AOP 的通知（Advice），spring MVC 中也是用到了适配器模式适配 <code class="highlighter-rouge">Controller</code>。</li>
@@ -2647,6 +2657,10 @@ private String id;
 </ol>
 
 <h2 id="整合-hibernate-validator">整合 Hibernate Validator</h2>
+
+<blockquote>
+  <p>整合 Hibernate Validator 加强了参数验证，用注解实现参数验证，极大简化了代码，验证更简洁方便。</p>
+</blockquote>
 
 <p>参考：<a href="https://blog.csdn.net/m0_37583655/article/details/124500769">Java 参数校验validation和validator区别</a>；</p>
 
@@ -4056,6 +4070,11 @@ public interface UserDao {
 
 <p><strong>SQL 语句构建器</strong>：通过 <strong>SQL 工具类</strong>处理动态 SQL 典型问题，如加号、引号、换行、格式化问题、嵌入条件的逗号管理及 <code class="highlighter-rouge">AND </code>连接。</p>
 
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>private String selectPersonSql() {
+  return new SQL() .toString();
+}
+</code></pre></div></div>
+
 <h3 id="example-类">Example 类</h3>
 
 <p>Example类：使用Example类进行SQL语句中的<strong>where条件语句</strong>设置，相当于where后面的部分，包括条件查询、排序、去重等功能。可以根据不同的条件来查询和操作数据库，简化书写sql的过程。</p>
@@ -4843,11 +4862,11 @@ public String hello(){
 <span class="p">}</span>
 </code></pre></div></div>
 
-<h2 id="整合-swagger-ui接口文档">整合 Swagger-UI接口文档</h2>
+<h2 id="整合-swagger-ui-接口文档">整合 Swagger-UI 接口文档</h2>
 
 <h5 id="接口文档简介">接口文档简介</h5>
 
-<p>Swagger（音S歪戈）：可动态地根据<strong>注解</strong>生成在线API文档。是一套基于 OpenAPI 规范构建的开源工具，可帮助设计、构建、记录及使用 Rest API。</p>
+<p>Swagger-UI（音S歪戈）：可动态地根据<strong>注解</strong>生成在线API文档。是一套基于 OpenAPI 规范构建的开源工具，可帮助设计、构建、记录及使用 Restful 接口。</p>
 
 <p>作用： 前后端分离的情况下，只需少量注解即可生成一份自带 UI 界面的 <strong>Rest API 文档</strong>，包括接口需要的参数及返回值，还可直接对 API <strong>调试</strong>。</p>
 
@@ -4857,11 +4876,11 @@ public String hello(){
   <li>添加项目依赖；</li>
   <li>添加 Swagger-UI 的 Java 配置文件；</li>
   <li>给 XxxController 添加 Swagger 注解；</li>
-  <li>修改 MyBatis Generator 注释的生成规则，运行代码生成器重新生成 mbg 包中的代码
+  <li>修改 MyBatis Generator 注释的生成规则，运行代码生成器重新生成 model 实体类，给字段加上注解 <code class="highlighter-rouge">@ApiModelProperty</code> 来取代原来的方法注释，（<del>mapper 接口及其xml实现文件</del>）。
     <ol>
       <li>在 Generator 生成类中，读取并解析 <code class="highlighter-rouge">generatorConfig.xml</code> 配置文件，</li>
       <li>指定<strong>自定义注释生成器</strong> <code class="highlighter-rouge">CommentGenerator</code> 类中的方法，</li>
-      <li>使用<code class="highlighter-rouge">field.addJavaDocLine()</code>，给实体类的字段添加注释、Swagge 注解 <code class="highlighter-rouge">@ApiModelProperty</code> 来取代原来的方法注释。</li>
+      <li>使用 <code class="highlighter-rouge">field.addJavaDocLine()</code>，给实体类的字段添加注释、Swagger 注解 <code class="highlighter-rouge">@ApiModelProperty</code> 来取代原来的方法注释。</li>
     </ol>
   </li>
   <li>访问Swagger-UI接口文档地址：http://localhost:8080/swagger-ui/index.html</li>
@@ -4975,8 +4994,9 @@ public class CommentGenerator extends DefaultCommentGenerator {
 
 <ol>
   <li>Session 和 Cookie 方案；</li>
-  <li><code class="highlighter-rouge">Spring Security + OAuth2</code>：强大的可高度定制的<strong>认证和授权框架</strong>，是一套 Web 安全标准。</li>
+  <li>JWT；</li>
   <li>SSO 单点登录；</li>
+  <li><code class="highlighter-rouge">Spring Security + OAuth2</code>：强大的可高度定制的<strong>认证和授权框架</strong>，是一套 Web 安全标准。</li>
   <li>Apache <strong>Shiro</strong> 权限管理框架：强大易用的 Java 安全框架，提供了认证、授权、加密和会话管理功能。</li>
 </ol>
 
@@ -5542,7 +5562,7 @@ public class CommentGenerator extends DefaultCommentGenerator {
 <p><strong>开放授权</strong>（<code class="highlighter-rouge">OAuth</code>）：是一个行业的标准授权协议，主要用来<strong>授权第三方应用</strong>获取有限的权限。</p>
 
 <ul>
-  <li>最终目的是：为第三方应用颁发一个<strong>有时效性</strong>的令牌 Token，使得第三方应用能够（通过该令牌）获取相关的资源，如该用户在某一网站上存储的私密的资源（如照片）。</li>
+  <li>最终目的是：为第三方应用颁发一个<strong>有时效性</strong>的令牌 Token，使得第三方应用能够（通过该令牌）获取相关的资源，如该用户在某一网站上存储的私密资源（如照片）。</li>
   <li>OAuth 允许用户提供一个<strong>令牌（access token）</strong>，而不是<strong>用户名和密码</strong>来访问（存放在特定服务提供者的）数据。</li>
   <li>而 OAuth 2.0 是对 OAuth 1.0 的完全重新设计，OAuth 2.0 更快，更容易实现，OAuth 1.0 已经被废弃。</li>
 </ul>
@@ -5554,17 +5574,13 @@ public class CommentGenerator extends DefaultCommentGenerator {
   <li>另外，也常见于支付场景（微信支付、支付宝支付）和开发平台（微信开放平台、阿里开放平台等）。</li>
 </ul>
 
-<p>下图是 Slack OAuth 2.0 第三方登录的示意图：</p>
-
-<p><img src="assets/20210615151716340.png" alt="" /></p>
-
 <p>服务器：</p>
 
 <ol>
-  <li>Resource Owner：资源所有者，”用户”（user）。</li>
-  <li>User Agent：用户代理，<strong>客户端</strong>、浏览器。</li>
-  <li>Authorization server：<strong>认证服务器</strong>，服务提供商专门用来处理认证的服务器。</li>
-  <li>Resource server：<strong>资源服务器</strong>，服务提供商存放用户生成的资源的服务器。它与认证服务器，可以是同一台服务器，也可以是不同的服务器。</li>
+  <li><code class="highlighter-rouge">Resource Owner</code>：资源所有者，”用户”（user）。</li>
+  <li><code class="highlighter-rouge">User Agent</code>：用户代理，<strong>客户端</strong>、浏览器。</li>
+  <li><code class="highlighter-rouge">Authorization server</code>：<strong>认证服务器</strong>，服务提供商专门用来处理认证的服务器。</li>
+  <li><code class="highlighter-rouge">Resource server</code>：<strong>资源服务器</strong>，服务提供商存放用户生成的资源的服务器。与认证服务器，可以是同一台服务器，也可以是不同的。</li>
 </ol>
 
 <p>参考：</p>
@@ -5578,17 +5594,17 @@ public class CommentGenerator extends DefaultCommentGenerator {
 
 <p>客户端必须得到用户的授权（authorization grant），才能获得令牌（access token）。OAuth 2.0定义了四种授权方式。</p>
 
-<ul>
+<ol>
   <li><strong>授权码模式</strong>（authorization code）：通过客户端的后台服务器，与服务提供商的<strong>认证服务器</strong>进行互动。功能最完整、流程最严密。如常见的第三方平台登录功能。</li>
-  <li><strong>简化模式</strong>（implicit）：不通过第三方应用程序的服务器（客户端服务器），直接在浏览器中向认证服务器申请令牌，跳过了”授权码”这个步骤。
+  <li><strong>简化模式</strong>（implicit）：不通过第三方应用程序的服务器（客户端服务器），直接在浏览器中向<strong>认证服务器</strong>申请令牌，跳过了”授权码”这个步骤。
     <ul>
       <li>所有步骤在浏览器中完成，令牌对访问者是可见的，且客户端不需要认证。一般用于网站是纯静态页面。</li>
     </ul>
   </li>
-  <li><strong>密码模式</strong>（resource owner password credentials）：用户向客户端提供自己的用户名和密码。客户端使用这些信息，向服务商提供商索要授权、<strong>申请令牌（token）</strong>。</li>
-  <li><strong>客户端模式</strong>（client credentials）：指客户端以自己的名义，而不是以用户的名义，向”服务提供商”进行认证。</li>
+  <li><strong>密码模式</strong>（resource owner password credentials）：用户向客户端提供自己的用户名和密码。客户端使用这些信息，向<strong>服务提供商</strong>索要授权、<strong>申请令牌（token）</strong>。</li>
+  <li><strong>客户端模式</strong>（client credentials）：指客户端以自己的名义，而不是以用户的名义，向”<strong>服务提供商</strong>“进行认证。</li>
   <li>refresh_token：</li>
-</ul>
+</ol>
 
 <h4 id="授权码模式的认证流程">授权码模式的认证流程</h4>
 
@@ -5603,6 +5619,10 @@ public class CommentGenerator extends DefaultCommentGenerator {
 <p>（E）客户端使用令牌，向资源服务器申请获取资源。</p>
 
 <p>（F）资源服务器确认令牌无误，同意向客户端开放资源。</p>
+
+<p>下图是 Slack OAuth 2.0 第三方登录的示意图：</p>
+
+<p><img src="assets/20210615151716340.png" style="zoom:80%;" /></p>
 
 <h3 id="加密机制">加密机制</h3>
 
@@ -5937,10 +5957,10 @@ public class CommentGenerator extends DefaultCommentGenerator {
   <li>MyBatis-Flex：类似于 MybatisPlus，MyBatis-Flex 也是一个 MyBatis 增强框架。MyBatis-Flex 同样提供了数据脱敏功能，并且是可以免费使用的。MyBatis-Flex 提供了 <code class="highlighter-rouge">@ColumnMask()</code> 注解，以及内置的 9 种脱敏规则，开箱即用：</li>
 </ol>
 
-<h2 id="整合-spring-security">整合 Spring Security</h2>
+<h2 id="整合-spring-security-和-jwt-实现用户的登录和授权功能">整合 Spring Security 和 JWT 实现用户的<strong>登录和授权功能</strong></h2>
 
 <blockquote>
-  <p>整合 Spring Security 和 JWT 实现后台用户的<strong>登录和授权功能</strong>，同时改造 <code class="highlighter-rouge">Swagger-UI</code> 的配置使其可自动发送<strong>登录令牌</strong>。</p>
+  <p>整合 Spring Security 和 JWT 实现用户的<strong>登录和授权功能</strong>，同时改造 <code class="highlighter-rouge">Swagger-UI</code> 的配置使其可自动发送<strong>登录令牌</strong>。</p>
 </blockquote>
 
 <h4 id="在-pomxml-中添加项目依赖">在 <code class="highlighter-rouge">pom.xml</code> 中添加项目依赖</h4>
@@ -5957,7 +5977,13 @@ public class CommentGenerator extends DefaultCommentGenerator {
 
 <p>这里的配置表示启用基于HTTP基本身份验证的Spring Security，并指定了一个用户名为admin，密码为password的用户。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>spring:
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>jwt:
+  tokenHeader: Authorization #JWT存储的请求头
+  secret: mall-admin-secret  #JWT加解密使用的密钥
+  expiration: 604800    #JWT的超期限时间(60*60*24*7)
+  tokenHead: 'Bearer '  #JWT负载中拿到开头
+
+spring:
   security:
     user:
       name: admin
@@ -5965,20 +5991,6 @@ public class CommentGenerator extends DefaultCommentGenerator {
     basic:
       enabled: true
 </code></pre></div></div>
-
-<h4 id="添加-utiljwttokenutil-工具类">添加 <code class="highlighter-rouge">util.JwtTokenUtil</code> 工具类</h4>
-
-<blockquote>
-  <p>用于生成、解析、验证<code class="highlighter-rouge">JwtToken </code> 的工具类；</p>
-</blockquote>
-
-<p>相关方法说明：</p>
-
-<ul>
-  <li><code class="highlighter-rouge">generateToken(UserDetails userDetails)</code>：用于根据登录用户信息生成token；</li>
-  <li><code class="highlighter-rouge">getUserNameFromToken(String token)</code>：从token中获取登录用户的信息；</li>
-  <li><code class="highlighter-rouge">validateToken(String token, UserDetails userDetails)</code>：判断token是否还有效；</li>
-</ul>
 
 <h4 id="一添加-spring-security-的配置类">（一）添加 <code class="highlighter-rouge">Spring Security</code> 的配置类</h4>
 
@@ -5998,43 +6010,43 @@ public class MallSecurityConfig extends SecurityConfig {
 <p>自定义的 Spring Security 安全配置类  <code class="highlighter-rouge">SecurityConfig</code>，可以通过继承<code class="highlighter-rouge">WebSecurityConfigurerAdapter</code>类来实现。</p>
 
 <ol>
-  <li>
-    <p><code class="highlighter-rouge">configure(AuthenticationManagerBuilder auth)</code>：用于配置 <code class="highlighter-rouge">UserDetailsService</code> 及<code class="highlighter-rouge">PasswordEncoder</code>；<code class="highlighter-rouge">AuthenticationManager</code>：</p>
-
+  <li><code class="highlighter-rouge">configure(AuthenticationManagerBuilder auth)</code>：用于配置 <code class="highlighter-rouge">UserDetailsService</code> 及<code class="highlighter-rouge">PasswordEncoder</code>；<code class="highlighter-rouge">AuthenticationManager</code>：</li>
+  <li><code class="highlighter-rouge">UserDetailsService</code>：SpringSecurity 定义的<strong>核心接口</strong>，用于根据用户名获取用户信息，需要自行实现；
     <ol>
-      <li><code class="highlighter-rouge">UserDetailsService</code>：SpringSecurity 定义的<strong>核心接口</strong>，用于根据用户名获取用户信息，需要自行实现；</li>
       <li><code class="highlighter-rouge">UserDetails</code>：SpringSecurity 定义用于<strong>封装用户信息</strong>的类（主要是用户信息和权限），需要自行实现；</li>
       <li><code class="highlighter-rouge">PasswordEncoder</code>：用于对密码进行编码及<strong>校验</strong>比对的接口，目前使用的是<code class="highlighter-rouge">BCryptPasswordEncoder</code> 哈希加密算法；</li>
     </ol>
   </li>
+  <li><code class="highlighter-rouge">configure(HttpSecurity httpSecurity)</code>：用于读取并配置需拦截的 URL 路径、<strong>白名单路径</strong>，是否允许跨域（的OPTIONS请求），配置权限 JWT 过滤器、权限<strong>拒绝处理器</strong>、抛出异常后的处理器、动态权限<strong>校验过滤器</strong>等；</li>
   <li>
-    <p><code class="highlighter-rouge">configure(HttpSecurity httpSecurity)</code>：用于读取并配置需拦截的 URL 路径、<strong>白名单 URL 资源路径</strong>，是否允许跨域的OPTIONS请求，配置自定义权限 JWT 过滤器、自定义权限<strong>拒绝处理器</strong>、抛出异常后的处理器、动态权限<strong>校验过滤器</strong>等；</p>
+    <p>添加 <code class="highlighter-rouge">JwtAuthenticationTokenFilter</code> 类：自定义 JWT 登录<strong>授权过滤器</strong>/拦截器，（在用户名和密码校验前）添加<strong>过滤器</strong> ，如果请求中有 JWT 的 token 且<strong>验证</strong>有效，会自行根据token信息进行登录。</p>
 
-    <ol>
+    <ul>
       <li>
-        <p>添加 <code class="highlighter-rouge">JwtAuthenticationTokenFilter</code> 类：自定义 JWT 登录<strong>授权过滤器</strong>/拦截器，（在用户名和密码校验前）添加<strong>过滤器</strong> ，如果请求中有 JWT 的 token 且<strong>验证</strong>有效，会自行根据token信息进行登录。</p>
-
+        <p>会取出 token 中的用户名，创建 <code class="highlighter-rouge">UsernamePasswordAuthenticationToken</code> 实例，并保存至安全上下文。</p>
+      </li>
+      <li>
+        <p>调用 <code class="highlighter-rouge">UserDetailsService</code>、<code class="highlighter-rouge">UserDetails</code>、<code class="highlighter-rouge">PasswordEncoder</code> 验证、取出；</p>
         <ul>
-          <li>
-            <p>会取出 token 中的用户名，创建 <code class="highlighter-rouge">UsernamePasswordAuthenticationToken</code> 实例，并保存至安全上下文。</p>
-          </li>
-          <li>调用 <code class="highlighter-rouge">UserDetailsService</code>、<code class="highlighter-rouge">UserDetails</code>、<code class="highlighter-rouge">PasswordEncoder</code> 验证、取出；</li>
           <li><code class="highlighter-rouge">SecurityContextHolder.getContext().getAuthentication() == null</code></li>
           <li><code class="highlighter-rouge">SecurityContextHolder.getContext().setAuthentication(UsernamePasswordAuthenticationToken);</code>：将 Authentication 保存至<strong>安全上下文</strong>。</li>
         </ul>
       </li>
-      <li>
-        <p>添加 <code class="highlighter-rouge">RestfulAccessDeniedHandler</code> 类：自定义权限<strong>拒绝处理器</strong>，当用户<strong>没有访问权限</strong>时的处理器，用于返回JSON格式的处理结果；</p>
+    </ul>
+  </li>
+  <li>
+    <p>添加 <code class="highlighter-rouge">RestfulAccessDeniedHandler</code> 类：自定义权限<strong>拒绝处理器</strong>，当用户<strong>没有访问权限</strong>时的处理器，用于返回JSON格式的处理结果；</p>
 
-        <ul>
-          <li><code class="highlighter-rouge">RestAuthenticationEntryPoint</code>：当未登录或token失效（登录过期）时，返回JSON格式的结果。</li>
-        </ul>
-      </li>
-      <li>
-        <p>添加 <code class="highlighter-rouge">DynamicSecurityFilter</code> 类：动态权限<strong>校验过滤器</strong>，用于实现基于路径的动态权限过滤；</p>
+    <ul>
+      <li><del><code class="highlighter-rouge">RestAuthenticationEntryPoint</code></del>：当未登录或token失效（登录过期）时，返回JSON格式的结果。</li>
+    </ul>
+  </li>
+  <li>
+    <p>添加 <code class="highlighter-rouge">DynamicSecurityFilter</code> 类：动态权限<strong>校验过滤器</strong>，用于实现基于路径的动态权限过滤；</p>
 
+    <ol>
+      <li><code class="highlighter-rouge">DynamicAccessDecisionManager</code> 类：动态权限<strong>决策</strong>管理器，用于判断用户是否有访问权限；
         <ol>
-          <li><code class="highlighter-rouge">DynamicAccessDecisionManager</code> 类：动态权限<strong>决策</strong>管理器，用于判断用户是否有访问权限；</li>
           <li><code class="highlighter-rouge">DynamicSecurityMetadataSource</code> 类：动态权限数据源，用于获取动态权限<strong>规则</strong>；
             <ul>
               <li>实现 <code class="highlighter-rouge">DynamicSecurityService</code> 动态权限相关<strong>业务接口</strong>：读取动态权限配置；加载资源ANT通配符和资源对应MAP；</li>
@@ -6048,6 +6060,20 @@ public class MallSecurityConfig extends SecurityConfig {
 
 <p><img src="assets/8fdccbc24a2225db315a8800cdfe1c09.png" alt="img" style="zoom:70%;" /></p>
 
+<h4 id="添加-utiljwttokenutil-工具类">添加 <code class="highlighter-rouge">util.JwtTokenUtil</code> 工具类</h4>
+
+<blockquote>
+  <p>用于生成、解析、验证<code class="highlighter-rouge">JwtToken </code> 的工具类；</p>
+</blockquote>
+
+<p>相关方法说明：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">generateToken(UserDetails userDetails)</code>：用于根据登录用户信息生成token；</li>
+  <li><code class="highlighter-rouge">getUserNameFromToken(String token)</code>：从token中获取登录用户的信息；</li>
+  <li><code class="highlighter-rouge">validateToken(String token, UserDetails userDetails)</code>：判断token是否还有效；</li>
+</ul>
+
 <h4 id="二登录注册功能实现">（二）登录注册功能实现</h4>
 
 <blockquote>
@@ -6057,7 +6083,7 @@ public class MallSecurityConfig extends SecurityConfig {
 <ol>
   <li>添加用户数据库表、及 <code class="highlighter-rouge"><span class="k">model</span> </code>类 <code class="highlighter-rouge">com.macro.mall.model.UmsAdmin</code>；</li>
   <li>添加 <code class="highlighter-rouge">com.macro.mall.bo.AdminUserDetails</code>：Spring Security 需要的用户详情；</li>
-  <li>添加 <code class="highlighter-rouge">UmsAdminController</code> 类：实现后台用户登录、注册及获取权限的接口；为接口中的方法添加<strong>访问权限</strong>。</li>
+  <li>添加 <code class="highlighter-rouge">UmsAdminController</code> 类：实现用户登录、注册及获取权限的接口；为接口中的方法添加<strong>访问权限</strong>。</li>
   <li>添加 <code class="highlighter-rouge">UmsAdminService</code> 接口及其实现类：<strong>核心接口</strong>，用于根据用户名获取用户信息，需自行实现；
     <ul>
       <li><code class="highlighter-rouge">UmsAdminCacheService</code>：用户缓存操作Service实现类，存在 <code class="highlighter-rouge">RedisService </code>中。</li>
@@ -6102,10 +6128,10 @@ public CommonResult&lt;List&lt;PmsBrand&gt;&gt; getBrandList() {
         </ul>
       </li>
       <li>
-        <p>配置 <code class="highlighter-rouge">config/SwaggerConfig</code>继承此 <code class="highlighter-rouge">BaseSwaggerConfig</code> 类：Swagger API 文档相关配置，没有 .yml 配置；</p>
+        <p>配置 <code class="highlighter-rouge">config/SwaggerConfig</code> 继承此 <code class="highlighter-rouge">BaseSwaggerConfig</code> 类：Swagger API 文档相关配置，没有 .yml 配置；</p>
       </li>
       <li>
-        <p>在 <code class="highlighter-rouge">application.yml</code> 中给 <code class="highlighter-rouge">Swagger-UI</code> 放行。</p>
+        <p>在 <code class="highlighter-rouge">application.yml</code> 中给 <code class="highlighter-rouge">Swagger-UI</code> 安全路径<strong>白名单</strong>放行。</p>
 
         <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> secure:
    ignored:

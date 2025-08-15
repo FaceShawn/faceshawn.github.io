@@ -67,135 +67,9 @@ new Person("张三", 30).tell();
 
 <h2 id="一三大特性">一、三大特性</h2>
 
-<h3 id="封装">封装</h3>
-
-<p>定义：利用抽象数据类型将<strong>数据和基于数据的操作</strong>封装在一起，使其构成一个不可分割的独立实体。数据被保护在抽象数据类型的内部，尽可能地<strong>隐藏</strong>内部的细节，只保留一些对外的接口使其与外部发生联系。用户无需关心对象内部的细节，但可以通过对象对外提供的接口来访问该对象。</p>
-
-<p>定义：指把对象的成员变量/属性隐藏在内部，不允许外部对象直接访问，通过（可被外界访问的）public 方法来操作属性。控制对外隐藏和暴露哪些数据。基本单位是类。如 <strong>POJO 类</strong>的 getter/setter 方法。</p>
-
-<p>优点：</p>
-
-<ul>
-  <li>减少<strong>耦合</strong>：可以独立地开发、测试、优化、使用、理解和修改</li>
-  <li>减轻维护的负担：可以更容易被理解，并且在调试的时候可以不影响其他模块</li>
-  <li>有效地调节性能：可以通过剖析来确定哪些模块影响了系统的性能</li>
-  <li>提高软件的<strong>可重用性</strong></li>
-  <li>降低了构建大型系统的风险：即使整个系统不可用，但是这些独立的模块却有可能是可用的</li>
-</ul>
-
-<h3 id="继承">继承</h3>
-
-<p>继承：指子类可<strong>使用</strong>父类的所有属性和方法。子类 is a 父类。</p>
-
-<p>继承的特点：</p>
-
-<ol>
-  <li>
-    <p>子类<strong>拥有</strong>父类所有的属性和方法（包括私有属性和私有方法），但无法访问父类中的<strong>私有属性和方法</strong>，仅拥有。</p>
-
-    <ol>
-      <li>子类不能继承父类的构造器；</li>
-      <li>子类可重写父类的方法；继承应该遵循里氏替换原则，子类对象必须能够替换掉所有父类对象。</li>
-      <li>继承后变量和方法的访问顺序：就近原则。</li>
-    </ol>
-  </li>
-  <li>
-    <p><strong>单继承</strong>（不支持多重继承）：程序结构更清晰、便于维护。多重继承会使类型转换、构造方法的调用顺序变复杂，影响性能。</p>
-
-    <ol>
-      <li>若支持多重继承：类 C 继承自类 A 和类 B，如果类 A 和 B 都有自定义的成员方法 f()，则调用类 C.f() 会产生二义性；</li>
-      <li>通过实现多个接口、间接支持多重继承：接口由于只包含方法定义，不能有方法的实现，类 C 不能直接调用方法，需实现具体的 f() 才能调用，不会产生二义性。</li>
-    </ol>
-  </li>
-  <li>
-    <p>对于父类的包访问权限、成员变量/方法，如果子类和父类在<strong>同一个包</strong>下，则子类能继承，否则子类不能继承；</p>
-  </li>
-</ol>
-
-<h5 id="方法重载-vs-重写">方法重载 VS 重写</h5>
-
-<ul>
-  <li>重载（overload）：同一个类中，多个同名方法根据不同的传参来执行不同的逻辑处理；</li>
-  <li>重写/覆盖、覆写（override）：子类<strong>继承</strong>父类已有的方法，并重新实现其内部逻辑、功能。遵循两同两小一大。</li>
-</ul>
-
-<p>区别：</p>
-
-<ol>
-  <li>方法名都<strong>相同</strong>。</li>
-  <li>发生范围：重载在同一个类；重写在子类中。</li>
-  <li>参数列表（类型、个数、顺序） ：重载至少一个不同；重写一定<strong>相同</strong>。</li>
-  <li>返回值类型、异常：重载可不同（只有返回值不同不算重载）；<strong>两小</strong>：重写子类的返回值类型、异常范围（<code class="highlighter-rouge">RunTimeException</code>）&lt;= 父类（<code class="highlighter-rouge">Exception</code>）。</li>
-  <li>访问修饰符：重载可不同；<strong>一大</strong>：重写，子类访问权限（只能是 <code class="highlighter-rouge">public，而非private</code>）&gt;= 父类（<code class="highlighter-rouge">protected</code>），即子类修饰符不能做更严格的限制；
-    <ul>
-      <li>另外父类方法修饰符为 <code class="highlighter-rouge">private/final/static</code>或构造器时（都不能被继承），子类不能重写，但被 static 修饰的方法能被再次声明。</li>
-      <li><a href="#反射机制">反射机制</a>。</li>
-    </ul>
-  </li>
-  <li>发生阶段：重载实现的是<strong>编译时</strong>的多态性（即前绑定）；重写实现的是<strong>运行时</strong>的多态性（即后绑定）。</li>
-</ol>
-
-<h3 id="多态">多态</h3>
-
-<p>多态：即<strong>一个接口，多个方法</strong>。指多个子类继承并重写父类的同一属性或方法，或多个子类实现接口并覆盖接口中的同一方法，并将父类引用指向子类对象。</p>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 引用的自动类型转换，指存在继承关系的对象类型转换
-Animal animal = new Dog(); // 向上转型，把Dog类型转换为Animal类型
-animal.run();
-
-// 引用的强制类型转换，编译正常，运行可能报错ClassCastException类型转换异常，建议在强转前判断对象的真实类型
-Dog dog = (Dog) animal; // 向下转型，把Animal类型转换为Dog类型
-animal.run();
-
-Animal animal = new Cat();
-if (animal instanceof Cat) {
-    Cat cat = (Cat) animal; // 向下转型
-}
-</code></pre></div></div>
-
-<p>实现多态有 3 个必要条件：</p>
-
-<ol>
-  <li>子类继承父类/实现接口；</li>
-  <li>方法重写；</li>
-  <li>父类引用指向子类对象（<strong>向上转型</strong>）或接口的引用变量指向其实现类的实例对象。</li>
-</ol>
-
-<p>分类：</p>
-
-<ol>
-  <li>编译时多态：是静态的，主要指<strong>方法重载</strong>。编译后变成不同的方法；</li>
-  <li>运行时多态：是动态的，即通常所说的多态性。指程序中定义的<strong>对象引用</strong>所指向的<strong>具体类型</strong>在运行期间才确定。
-    <ul>
-      <li>指继承父类和实现接口时，可用父类引用指向子类对象。<strong>引用类型变量</strong>发出的方法调用的到底是哪个类中的方法，必须在程序运行期间才能确定。</li>
-    </ul>
-  </li>
-</ol>
-
-<p>特征：</p>
-
-<ol>
-  <li>对于方法的调用：编译看左边，运行看右边？
-    <ol>
-      <li>如果子类重写了父类方法，真正执行的是子类覆盖的方法；</li>
-      <li>如果子类没有覆盖父类的方法，执行的是父类的方法。</li>
-    </ol>
-  </li>
-  <li>对于变量：编译、运行都看左边。</li>
-</ol>
-
-<p>优势：</p>
-
-<ol>
-  <li>父类作为方法的形参（入参）用来传递对象；</li>
-  <li>便于类与类间解耦，右边对象可组件化切换，改换业务。</li>
-</ol>
-
-<p>劣势：</p>
-
-<ol>
-  <li>编译看左边，不能调用子类独有的方法。</li>
-</ol>
+<blockquote>
+  <p>封装、继承、多态。见 Java 语言基础文档中。</p>
+</blockquote>
 
 <h2 id="二uml-类图和时序图">二、UML 类图和时序图</h2>
 
@@ -219,16 +93,16 @@ if (animal instanceof Cat) {
 
 <p>类间关系及对应 UML 图例、Java 表现形式有：</p>
 <ol>
-  <li><strong>实现关系</strong>：带<strong>空心箭头</strong>的虚线 <code class="highlighter-rouge">---△</code>。表现为继承抽象类（<code class="highlighter-rouge">&lt;&lt;abstract&gt;&gt;</code>），用来<strong>实现</strong>一个接口，在 Java 中使用 <code class="highlighter-rouge">implements </code>关键字。eg：汽车类<strong>实现</strong>车接口。
+  <li><strong>实现关系</strong>：带<strong>空心箭头</strong>的虚线 <code class="highlighter-rouge">---△</code>。表现为<strong>继承抽象类</strong>（<code class="highlighter-rouge">&lt;&lt;abstract&gt;&gt;</code>），在 Java 中使用 <code class="highlighter-rouge">implements </code>关键字来<strong>实现接口</strong>。eg：汽车类<strong>实现</strong>车接口。
     <ul>
       <li>车为抽象概念（接口），在现实中无法直接用来定义对象，只有指明具体的子类（汽车or自行车），才可用来定义对象。</li>
-      <li>继承关系为 <code class="highlighter-rouge">is-a</code>，虚线 <code class="highlighter-rouge">–--</code>。eg：自行车是车、猫是动物。</li>
+      <li>继承关系为 <strong><code class="highlighter-rouge">is-a</code></strong>，虚线 <code class="highlighter-rouge">–--</code>。eg：自行车是车、猫是动物。</li>
     </ul>
   </li>
-  <li><strong>泛化关系</strong>：带<strong>空心箭头</strong>的实线 <code class="highlighter-rouge">——△</code>。表现为继承<strong>非抽象类</strong>，在 Java 中使用 <code class="highlighter-rouge">extends</code> 关键字。eg：SUV类<strong>继承</strong>汽车类。</li>
-  <li><strong>聚合关系</strong>：带<strong>空心菱形箭头</strong>的实线 <code class="highlighter-rouge">——◇</code>。表示整体由部分组成，但是整体和部分不是<strong>强依赖</strong>的，整体不存在了部分还是会存在。eg：学生类<strong>聚合</strong>成班级类。公司和员工属于聚合关系，因为公司没了员工还在。</li>
+  <li><strong>泛化关系</strong>：带<strong>空心箭头</strong>的实线 <code class="highlighter-rouge">——△</code>。表现为<strong>继承非抽象类</strong>，在 Java 中使用 <code class="highlighter-rouge">extends</code> 关键字来<strong>继承类</strong>。eg：SUV类<strong>继承</strong>汽车类。</li>
+  <li><strong>聚合关系</strong>：带<strong>空心菱形箭头</strong>的实线 <code class="highlighter-rouge">——◇</code>。表示整体由部分组成，但是整体和部分<strong>不是强依赖</strong>的，整体不存在了部分还是会存在。eg：学生类<strong>聚合</strong>成班级类。公司和员工属于聚合关系，因为公司没了员工还在。</li>
   <li><strong>组合关系</strong>：带<strong>实心菱形箭头</strong>的实线 <code class="highlighter-rouge">——◆</code>。组合中整体和部分是<strong>强依赖</strong>的，整体不存在了部分也不存在了。eg：轮胎、发动机<strong>组成</strong>汽车。比如公司和部门，公司没了部门就不存在了。</li>
-  <li><strong>依赖关系</strong>：带箭头的<strong>虚线</strong> <code class="highlighter-rouge">---&gt;</code>。描述对象在<strong>运行期间</strong>会<strong>调用到</strong>另一个对象。<strong>箭头</strong>指向被调用者，“使用”对方的方法和属性。eg：学生<strong>依赖于</strong>自行车。A 类依赖于 B 类主要有三种表现形式：
+  <li><strong>依赖关系</strong>：带箭头的<strong>虚线</strong> <code class="highlighter-rouge">---&gt;</code>。描述对象在<strong>运行期间</strong>会<strong>调用</strong>到另一个对象。<strong>箭头</strong>指向被调用者，“使用”对方的方法和属性。eg：学生<strong>依赖于</strong>自行车。A 类依赖于 B 类主要有三种表现形式：
     <ol>
       <li>B 类是 A 类方法的<strong>局部变量</strong>；</li>
       <li>B 类是 A 类方法的<strong>参数</strong>；</li>
@@ -238,7 +112,7 @@ if (animal instanceof Cat) {
   </li>
   <li><strong>关联关系</strong>：<strong>实线</strong> <code class="highlighter-rouge">——</code>。 表示不同类对象之间有关联，是一种<strong>静态</strong>关系、与<strong>运行过程的状态</strong>无关，在最开始就可以确定。用来定义不同类的对象间静态的、天然的、由常识等因素决定的结构；是一种强关联的关系。
     <ul>
-      <li>默认不强调方向，表示对象间相互知道，<strong>带箭头的实线</strong> <code class="highlighter-rouge">——&gt;</code> 表示A知道指向的对象B。通常是以<strong>成员变量</strong>的形式实现。因此也可以用 1 对 1、多对 1、多对多这种关联关系来表示。eg：乘车人和车票、学生和身份证。</li>
+      <li>默认不强调方向，表示对象间相互知道，<strong>带箭头的实线</strong> <code class="highlighter-rouge">——&gt;</code> 表示A知道指向的对象B。通常是以<strong>成员变量</strong>的形式实现。因此也可以用 <strong>1 对 1、多对 1、多对多</strong>这种关联关系来表示。eg：乘车人和车票、<strong>学生和身份证</strong>。</li>
     </ul>
   </li>
 </ol>
@@ -328,54 +202,40 @@ if (animal instanceof Cat) {
   </tbody>
 </table>
 
-<p>简记为 <strong>S.O.L.I.D</strong>：S 单一职责原则、O 开闭原则、L 里氏代换原则、I 接口隔离原则、D迪米特法则。</p>
+<p>简记为 <strong>S.O.L.I.D</strong>：S 单一职责原则、O 开闭原则、L 里氏代换原则、I 接口隔离原则、D 依赖反转。</p>
 
 <ol>
   <li><strong>S 单一职责</strong>：<strong>一个类</strong>只负责一个功能领域中的相应职责。对象应该仅具有一种单一功能。
     <ul>
       <li>承担的职责越多，复用的可能性越低。当一个职责变化时，可能会影响其他职责的运作。</li>
-    </ul>
-    <ul>
       <li>核心是<strong>解耦</strong>和增强内聚性。确定职责的粒度，得出相对合理的职责分配。</li>
     </ul>
   </li>
-  <li><strong>O 开闭原则</strong>：类应该是<strong>对扩展</strong>开放，对修改关闭。关键步骤是<strong>抽象化</strong>，实现方法有：</li>
-  <li>扩展就是添加新功能的意思，因此该原则要求在<strong>添加新功能时</strong>不需要修改代码。
+  <li><strong>O 开闭原则</strong>：类应该是<strong>对扩展</strong>开放，对修改关闭。关键步骤是<strong>抽象化</strong>，实现方法有：
     <ol>
+      <li>扩展就是添加新功能的意思，因此该原则要求在<strong>添加新功能时</strong>不需要修改代码。</li>
       <li>通过<strong>接口或抽象类</strong>约束扩展，不允许出现在接口或抽象类中不存在的 <code class="highlighter-rouge">public</code> 方法。即，扩展要添加具体实现，而不是改变已有方法。</li>
       <li><strong>参数类型、引用对象</strong>尽量用接口或抽象类，而不是实现类。能尽量保证抽象层是稳定的。如，用抽象类代替相似内容的 <code class="highlighter-rouge">else if</code> 分支。</li>
       <li>一般抽象模块设计完成（如接口的方法已经敲定），不允许修改接口或抽象方法的定义。</li>
       <li>符合开闭原则最典型的设计模式是<strong>装饰者模式</strong>，它可以动态地将责任附加到对象上，而不用去修改类的代码。</li>
     </ol>
   </li>
-  <li><strong>L 里氏替换</strong>：子类对象必须能够完全替换掉所有父类对象。即，<strong>继承</strong>时只扩展新功能，而不要破坏父类原有的功能。
+  <li><strong>L 里氏替换</strong>：<strong>子类对象</strong>必须能够完全替换掉所有父类对象。即，<strong>继承</strong>时只扩展新功能，而不要破坏父类原有的功能。
     <ul>
       <li>程序中的对象应该是可以在不改变程序<strong>正确性</strong>的前提下被它的子类所替换的。</li>
-    </ul>
-    <ul>
       <li>是对开-闭原则的补充，继承就是抽象化的具体实现。子类可继承基类的所有非私有属性或方法。</li>
     </ul>
   </li>
   <li><strong>I 接口隔离</strong>：客户端不应依赖它不需要的接口，类间的依赖关系应建立在<strong>最小的接口</strong>上。
     <ul>
       <li>因此使用<strong>多个专门的接口</strong>比使用单一的总接口要好。</li>
-    </ul>
-    <ul>
       <li>接口在实现时拆分冗余方法，让实现类只依赖自己需要的接口方法。即，接口尽量<strong>细化</strong>，同时接口中的<strong>方法尽量少</strong>。</li>
+      <li>设计接口时有可能满足单一职责原则、但不满足接口隔离原则，接口太大时分割。</li>
     </ul>
   </li>
-</ol>
-
-<ul>
-  <li>设计接口时有可能满足单一职责原则、但不满足接口隔离原则，接口太大时分割。</li>
-</ul>
-
-<ol>
-  <li><strong>D 依赖倒转</strong>：一个方法应该依赖于抽象而不是一个实例。依赖于抽象接口，不能依赖于具体实现。本质是：<strong>面向接口编程</strong>。
+  <li><strong>D 依赖反转</strong>：一个方法应该<strong>依赖于抽象</strong>而不是一个实例。依赖于抽象接口，不能依赖于具体实现。本质是：<strong>面向接口编程</strong>。
     <ul>
       <li>高层模块不应该依赖于低层模块，二者都应该依赖于抽象；抽象不应该依赖于细节，细节应该依赖于抽象。</li>
-    </ul>
-    <ul>
       <li>传递参数时或在关联关系中，尽量引用<strong>层次高</strong>的抽象层类，即，用接口和抽象类进行变量、参数、方法返回的类型声明，及数据类型的转换等，而不要用具体类。</li>
       <li>依赖注入是该原则的一种实现方式。将具体类的对象通过<strong>依赖注入</strong>的方式注入到其他对象中，如Spring的IoC。</li>
     </ul>
@@ -388,8 +248,6 @@ if (animal instanceof Cat) {
   <li><strong>H 合成 / 聚合复用</strong>：尽量使用<strong>对象组合</strong>，而不是通过<strong>继承</strong>达到复用已有功能的目的。即，新对象通过向内部持有对象的委派、达到复用已有功能的目的。称为<strong>“黑箱”复用</strong>。
     <ul>
       <li>继承复用破坏包装，因为继承将基类的实现细节暴露给派生类，称为”白箱复用”。基类发生改变，会影响所有派生类的实现。</li>
-    </ul>
-    <ul>
       <li>不得已使用继承的话，必须符合<strong>里氏代换</strong>原则。</li>
     </ul>
   </li>

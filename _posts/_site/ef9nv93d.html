@@ -1,5 +1,7 @@
 <blockquote>
   <p>摘要：分布式、高并发/高性能、高可用、Spring Cloud 微服务等。</p>
+
+  <p>高并发编程、等各类中间件的常见问题诊断和优化技术。</p>
 </blockquote>
 
 <!-- more -->
@@ -12,64 +14,93 @@
 
 <h2 id="分布式">分布式</h2>
 
-<p>分布式或者说 SOA 分布式：不同模块部署在不同服务器上。就是把整个系统<strong>拆分</strong>成不同的服务、然后放在不同的服务器上减轻单体服务的压力、提高并发量和性能。</p>
+<h3 id="分布式微服务中间件">分布式、微服务、中间件</h3>
+
+<blockquote>
+  <p>没有统一定义，资料上的说法不一致，我的理解是。</p>
+</blockquote>
+
+<h4 id="分布式-1">分布式</h4>
+
+<p>分布式、SOA 分布式：<strong>不同模块</strong>部署在不同服务器上。就是把整个系统<strong>拆分</strong>成不同的服务、然后放在不同的服务器上减轻单体服务的压力、提高并发量和性能。</p>
 
 <ul>
   <li>如电商系统可简单地拆分成订单系统、商品系统、登录系统等，如果某个服务的访问量较大的话、也可同时部署在多台机器上。</li>
 </ul>
 
-<h3 id="中间件">中间件</h3>
+<h4 id="微服务">微服务</h4>
 
-<p><strong>中间件</strong>：是一类提供系统软件和应用软件之间<strong>连接</strong>、便于软件各部件之间的<strong>沟通</strong>的软件，应用软件可以借助中间件在<strong>不同的技术架构</strong>之间共享信息与资源。中间件位于客户机服务器的操作系统之上，管理着计算资源和网络通信。</p>
+<p>微服务：一种软件开发技术- 面向服务的体系结构（SOA）架构样式的一种变体，它提倡将单一应用程序划分成一组小的服务，服务之间互相协调、互相配合，为用户提供最终价值。</p>
+
+<p>每个服务运行在其独立的进程中，服务与服务间采用轻量级的通信机制互相沟通（通常是基于HTTP的RESTful API）。</p>
+
+<p>每个服务都围绕着具体业务进行构建，并且能够独立地部署到生产环境、类生产环境等。</p>
+
+<p>另外，应尽量避免统一的、集中式的服务管理机制，对具体的一个服务务而言，应根据上下文，选择合适的语言、工具对其进行构建。</p>
+
+<h4 id="中间件">中间件</h4>
+
+<blockquote>
+  <p><strong>中间件</strong>、中介层维基：是一类提供系统软件和应用软件之间<strong>连接</strong>、便于软件各部件之间的<strong>沟通</strong>的软件，应用软件可以借助中间件在<strong>不同的技术架构</strong>之间共享信息与资源。中间件位于客户机服务器的操作系统之上，管理着计算资源和网络通信。</p>
+</blockquote>
+
+<p><strong>中间件</strong>：是一种应用于<strong>分布式系统</strong>的基础软件，位于应用与操作系统、数据库之间，主要用于解决分布式环境下数据传输、数据访问、应用调度、系统构建和系统集成、流程管理等问题，是分布式环境下支撑应用开发、运行和集成的平台。</p>
 
 <ul>
-  <li>中间件是应用软件与系统软件之间的“中介件”“介中软件”，起到支撑与连接作用；</li>
-  <li>中间件不是开发工具，但它具有开发、管理和部署的功能；</li>
-  <li>中间件是为应用软件服务的，应用软件是为最终用户服务的，最终用户并不直接使用中间件；</li>
+  <li>简单来说：中间件就是一类<strong>为应用软件服务的软件</strong>，应用软件是为用户服务的，用户不会接触或者使用到中间件。</li>
+  <li>中间件：是指介于两个不同系统之间的软件组件，它可以在两个系统之间传递、处理、转换数据，以达到协同工作的目的。</li>
 </ul>
 
-<p>是一种应用于<strong>分布式系统</strong>的基础软件，位于应用与操作系统、数据库之间，主要用于解决分布式环境下数据传输、数据访问、应用调度、系统构建和系统集成、流程管理等问题，是分布式环境下支撑应用开发、运行和集成的平台。</p>
-
-<p>中间件是指介于两个不同系统之间的软件组件，它可以在两个系统之间传递、处理、转换数据，以达到协同工作的目的。</p>
-
-<p>它们的关系是什么样的？</p>
+<h4 id="它们的关系是什么样的">它们的关系是什么样的？</h4>
 
 <ul>
   <li>分布式和中间件的关系可以简单理解为父与子的关系，分布式是父，中间件是子。</li>
   <li>微服务和分布式的关系是一种演变关系，以先有鸡还是先有蛋的比喻来说，是先有微服务，再有分布式，很简单，因为分布式用到了微服务这种架构模式。</li>
 </ul>
 
-<p>Java 常用中间件：</p>
+<h4 id="常见分布式中间件">常见分布式中间件</h4>
+
+<p>分布式：</p>
 
 <ol>
-  <li>网关：Nginx、Kong、Zuul、Gateway</li>
-  <li><strong>缓存</strong>：Redis、MemCached、OsCache、EhCache</li>
-  <li><strong>搜索</strong>：ElasticSearch、Solr</li>
-  <li>熔断：Hystrix、resilience4j</li>
-  <li>负载均衡：DNS、F5、LVS、Nginx、OpenResty、HAproxy</li>
-  <li>注册中心：Nacos、Eureka、Zookeeper、Redis、Etcd、Consul</li>
-  <li><strong>认证鉴权</strong>：JWT、SpringSecurity</li>
-  <li><strong>消费队列</strong>：RabbitMQ、Kafka、RocketMQ、ActiveMQ、Redis</li>
-  <li>系统监控：Grafana、Prometheus、Influxdb、Telegraf、Lepus</li>
-  <li>文件系统：OSS、NFS、FastDFS、MogileFS</li>
-  <li>RPC框架：Dubbo、Motan、Thrift、grpc</li>
-  <li><strong>构建工具</strong>：Maven、Gradle</li>
-  <li><strong>集成部署</strong>：Docker、Jenkins、Git、Maven</li>
-  <li>分布式配置：Disconf、Apollo、Nacos 、Spring Cloud Config、Diamond</li>
-  <li>压测：LoadRunner、JMeter、AB、webbench</li>
-  <li><strong>数据库</strong>：MySQL、Redis、MongoDB、PostgreSQL、Memcache、HBase</li>
-  <li>网络：专用网络VPC、弹性公网IP、CDN</li>
-  <li>数据库中间件：DRDS、Mycat、360 Atlas、Cobar</li>
-  <li><strong>分布式框架</strong>：Dubbo、Motan、Spring-Could</li>
-  <li>分布式任务：XXL-JOB、Elastic-Job、Saturn、Quartz,Hangfire</li>
-  <li>分布式追踪：Pinpoint、CAT、zipkin</li>
-  <li><strong>分布式日志</strong>：elasticsearch、logstash、Kibana 、redis、kafka</li>
-  <li>版本发布：蓝绿部署、A/B测试、灰度发布/金丝雀发布</li>
+  <li>API 网关：</li>
+  <li>配置中心</li>
+  <li><strong>RPC 框架</strong>：Dubbo、Motan、Thrift、grpc</li>
+  <li>分布式 ID</li>
+  <li><strong>分布式事务</strong></li>
+  <li>分布式链路追踪</li>
+  <li>分布式 Session</li>
+  <li>分布式日志：elasticsearch、logstash、Kibana 、redis、kafka</li>
+</ol>
+
+<p>高并发 &amp; 高性能：</p>
+
+<ol>
+  <li><strong>负载均衡</strong></li>
+  <li>CDN：GSLB 全局负载均衡；</li>
+  <li><strong>消息队列</strong>：RabbitMQ、RocketMQ、Kafka；</li>
+  <li>数据库<strong>读写分离、分库分表</strong>。</li>
+</ol>
+
+<p>高可用：</p>
+
+<ol>
+  <li>冗余：集群、灾备 &amp; 多活；</li>
+  <li><strong>限流、降级、熔断</strong></li>
+  <li>超时和重试机制</li>
+</ol>
+
+<p>Spring Security 中的：</p>
+
+<ol>
+  <li>认证和授权：JWT、OAuth2</li>
 </ol>
 
 <h3 id="cap-定理和-base-理论">CAP 定理和 BASE 理论</h3>
 
 <blockquote>
+  <p>分布式理论。</p>
+
   <p>ACID 是数据库事务完整性的理论，CAP 是分布式系统设计理论，BASE 是 CAP 理论中 AP 方案的延伸。</p>
 </blockquote>
 
@@ -78,24 +109,34 @@
 <p>CAP 定理：对于一个分布式系统来说，当设计读写操作时，只能同时满足CAP中的两个。</p>
 
 <ol>
-  <li><code class="highlighter-rouge">Consistency</code>（<strong>一致性</strong>）：所有节点访问同一份最新的<strong>数据副本</strong>。</li>
-  <li><code class="highlighter-rouge">Availability</code>（<strong>可用性</strong>）：非故障的节点在合理的时间内返回<strong>合理</strong>（不是错误或超时）<strong>的响应</strong>。</li>
-  <li><code class="highlighter-rouge">Partition Tolerance</code>（<strong>分区容错性</strong>）：分布式系统出现<strong>网络分区</strong>时，仍能对外提供服务。</li>
+  <li><code class="highlighter-rouge">Consistency</code>（<strong>一致性</strong>）：数据在多个副本之间能够保持一致。所有节点访问同一份最新的<strong>数据副本</strong>。</li>
+  <li><code class="highlighter-rouge">Availability</code>（<strong>可用性</strong>）：每次请求（非故障的节点）在合理的时间内返回<strong>非错</strong>（不是错误或超时）<strong>的响应</strong>。</li>
+  <li><code class="highlighter-rouge">Partition Tolerance</code>（<strong>分区容错性</strong>）：分布式系统出现<strong>网络分区</strong>故障时，仍能对外提供（满足一致性和可用性的）服务，除非整个网络环境都发生了故障。</li>
 </ol>
 
-<p>网络分区：分布式系统中，因故障（某些网络节点间不再连通），整个网络分成几块区域。</p>
+<p><img src="assets/cap.webp" alt="图片" style="zoom: 40%;" /></p>
+
+<p>网络分区：分布式系统中，因故障（某些网络节点间不再连通），整个网络分成几块孤立区域。对于<strong>分布式系统</strong>，分区是必然存在的。</p>
+
 <ul>
-  <li>（绝大部分时候），网络分区是正常的，即不需保证 P 时，C 和 A 能同时保证。</li>
-  <li>当发生<strong>网络分区</strong>时，如果要继续对外提供服务，那么强一致性和可用性只能 2 选 1。即，分区容错性 P 是一定要满足的，在此基础上，只能满足其中一个：
+  <li><strong>CA 模型</strong>：（绝大部分时候），网络分区是正常的，即不需保证 P 时，C 和 A 能同时保证。常见应用：
     <ol>
-      <li>可用性 A（<strong>AP架构</strong>，如Cassandra、Eureka尤瑞卡）
+      <li>集群数据库</li>
+      <li>xFS文件系统</li>
+    </ol>
+  </li>
+  <li>当发生<strong>网络分区</strong>时，如果要继续对外提供服务，那么强一致性和可用性只能 2 选 1。即，<strong>分区容错性 P</strong> 是一定要满足的，在此基础上，只能满足其中一个：
+    <ol>
+      <li>可用性 A（<strong>AP架构</strong>，放弃 C 一致性，如<code class="highlighter-rouge">Cassandra</code>、<code class="highlighter-rouge">Eureka</code>尤瑞卡）。
         <ul>
-          <li>Eureka 中不存在 Leader 节点，<strong>每个节点都是一样的</strong>、平等的。保证即使大部分节点挂掉也不会影响正常提供服务，只要有一个节点可用就行，不过这个节点上的数据可能并<strong>不是最新的</strong>。</li>
+          <li>常见应用：Web缓存、DNS。</li>
+          <li><code class="highlighter-rouge">Eureka</code> 注册中心中不存在 Leader 节点，<strong>每个节点都是一样的</strong>、平等的。保证即使大部分节点挂掉也不会影响正常提供服务，只要有一个节点可用就行，不过这个节点上的数据可能并<strong>不是最新的</strong>（不保证一致性 C）。</li>
         </ul>
       </li>
-      <li>一致性 C（CP架构，如 ZooKeeper、HBase），用于需确保强一致性的场景，如银行；
+      <li>一致性 C（<strong>CP架构</strong>，放弃 A 可用性，如 <code class="highlighter-rouge">ZooKeeper</code>、<code class="highlighter-rouge">HBase</code>），用于需确保强一致性的场景，如银行。
         <ul>
-          <li>任何时刻对 ZooKeeper 的<strong>读请求</strong>都能得到一致性的结果，但不保证每次请求的可用性，如在 Leader 选举过程中或半数以上的机器不可用时，服务就是不可用的。</li>
+          <li>常见应用：分布式数据库、分布式锁。</li>
+          <li>任何时刻对 <code class="highlighter-rouge">ZooKeeper</code> 注册中心的<strong>读请求</strong>都能得到一致性的结果，但不保证每次请求的可用性，如在 Leader 选举过程中或半数以上的机器不可用时，服务就是不可用的。</li>
         </ul>
       </li>
     </ol>
@@ -105,28 +146,34 @@
 <p>注意：</p>
 
 <ul>
-  <li>Nacos 支持 CP 和 AP 架构 。</li>
-  <li>不可能兼顾选择 CA 架构，如：若系统出现分区，某个节点在进行写操作
-    <ol>
-      <li>为了保证 C， 必须要禁止其他节点的读写操作，这和 A 冲突。</li>
-      <li>为了保证 A，其他节点的读写操作正常的话，和 C 冲突。</li>
-    </ol>
-  </li>
+  <li>注册中心 <code class="highlighter-rouge">Nacos </code>同时支持 CP 和 AP 架构 。</li>
 </ul>
+
+<h5 id="不可能兼顾选择-ca-架构"><strong>不可能兼顾</strong>选择 CA 架构</h5>
+
+<p>如：若系统出现分区，某个节点在进行写操作</p>
+
+<ol>
+  <li>为了保证一致性 C， 必须要禁止其他节点的<strong>读写操作</strong>，这和可用性 A 冲突。</li>
+  <li>为了保证可用性 A，其他节点的<strong>读写操作</strong>正常的话，和一致性 C 冲突。</li>
+</ol>
 
 <h4 id="base-理论">BASE 理论</h4>
 
-<p><strong>BASE 核心思想</strong>：即使无法做到强一致性，但每个应用都可根据自身业务特点，采用适当的方式来使系统达到<strong>最终一致性</strong>。即，牺牲数据的一致性来满足系统的<strong>高可用性 AP</strong>，系统中一部分数据不可用或不一致时，仍需保持系统整体“主要可用”。</p>
+<p><strong>BASE 核心思想</strong>：即使无法做到强一致性，但每个应用都可根据自身业务特点，采用适当的方式来使系统达到<strong>最终一致性 E</strong>。</p>
 
-<p>来源于对大规模互联网系统分布式实践的总结，本质上是对 CAP 中 <strong>AP 方案</strong>的延伸和补充：AP 方案只是在系统发生分区时放弃一致性，而不是永远放弃一致性。在分区故障恢复后，系统应达到最终一致性。</p>
+<ul>
+  <li>即，牺牲数据的一致性来满足系统的<strong>高可用性 AP</strong>，系统中一部分数据不可用或不一致时，仍需保持系统整体“主要可用”。</li>
+  <li>来源于对大规模互联网系统分布式实践的总结，本质上是对 CAP 中 <strong>AP 方案的延伸和补充</strong>：AP 方案只是在系统发生分区时放弃一致性，而不是永远放弃一致性。在分区故障恢复后，系统应达到最终一致性。</li>
+</ul>
 
 <p>BASE：</p>
 
 <ol>
-  <li><code class="highlighter-rouge">Basically Available</code>（<strong>BA 基本可用</strong>） ：是指分布式系统在出现不可预知故障时，<strong>允许损失部分可用性</strong>。
+  <li><code class="highlighter-rouge">Basically Available</code>（<strong>BA 基本可用</strong>） ：指分布式系统在出现不可预知故障时，<strong>允许损失部分可用性</strong>。
     <ul>
       <li><strong>响应时间</strong>上的损失：正常情况下，处理用户请求需 0.5s 返回结果，但由于系统出现故障，变为 3 s。</li>
-      <li><strong>系统功能</strong>上的损失：正常情况下，用户可用系统的全部功能，但由于系统访问量剧增，系统的部分非核心功能无法使用。</li>
+      <li><strong>系统功能</strong>上的降级：正常情况下，用户可用系统的全部功能，但由于系统访问量剧增，系统的部分<strong>非核心功能</strong>无法使用。</li>
     </ul>
   </li>
   <li><code class="highlighter-rouge">Soft-state</code>（<strong>S 软状态</strong>） ：允许系统中的数据存在<strong>中间状态</strong>（CAP 理论中的数据不一致），且不会影响系统的整体可用性，即允许系统在不同节点的数据副本间进行数据同步的过程<strong>存在延时</strong>。</li>
@@ -143,52 +190,86 @@
 
 <h3 id="paxos-算法和-raft-算法">Paxos 算法和 Raft 算法</h3>
 
-<p>Paxos 算法是一种解决<strong>分布式系统一致性</strong>的经典算法 ，但非常难理解和实现。不是一致性算法、而是共识算法。</p>
+<blockquote>
+  <p>分布式算法。</p>
+</blockquote>
+
+<h4 id="basic-paxos-算法">Basic Paxos 算法</h4>
+
+<p>Paxos 算法：<strong>基于消息传递</strong> 且具有 <strong>高效容错特性</strong> 的一致性算法，目前公认的解决 <strong>分布式一致性问题</strong> 最有效的经典算法之一。但非常难理解和实现。不是一致性算法、而是共识算法。</p>
 
 <ul>
-  <li>Basic Paxos 算法： 描述的是多节点间如何就某个值（提案 Value）达成共识。存在 3 个重要的角色：
-    <ol>
-      <li><strong>提议者（Proposer）</strong>：也叫协调者（coordinator），负责接受<strong>客户端</strong>发起的提议，然后尝试让接受者接受（<strong>达成共识</strong>），同时保证即使多个提议间产生了冲突，算法也能进行下去。</li>
-      <li><strong>接受者（Acceptor）</strong>：也叫投票员（voter），负责对提议者的提议投票，同时需记住自己的投票历史；向学习者<strong>通知结果</strong>。</li>
-      <li><strong>学习者（Learner）</strong>：如果有超过半数接受者就某个提议达成了共识，那么学习者就需接受这个提议，<strong>处理请求</strong>，作出运算、并将结果返回给客户端。</li>
-    </ol>
-
-    <p><img src="assets/Basic_Paxos" alt="img" style="zoom:60%;" /></p>
-  </li>
-  <li>Multi-Paxos <strong>思想</strong>： 核心是通过多个 Basic Paxos 实例，就一系列值达成共识。
-    <ol>
-      <li>针对没有恶意节点的情况，Raft 算法、ZAB 协议、 Fast Paxos 算法都是基于 Paxos 算法改进而来；
-        <ul>
-          <li>Raft 算法是更易理解和实现的分布式一致性算法，是Multi-Paxos的变种。</li>
-          <li><a href="https://github.com/Snailclimb/JavaGuide/blob/main/docs/distributed-system/theorem&amp;algorithm&amp;protocol/raft-algorithm.md">Raft 算法解读</a></li>
-        </ul>
-      </li>
-      <li>针对存在恶意节点的情况，一般用工作量证明（POW，Proof-of-Work）、权益证明（PoS，Proof-of-Stake ）等<strong>共识算法</strong>。最典型应用就是区块链，需解决的核心问题是 <strong>拜占庭将军问题</strong>。
-        <ul>
-          <li>共识是可容错系统中的一个基本问题：即使面对故障，服务器也可在共享状态上达成一致。</li>
-          <li><strong>共识算法</strong>：允许一组节点像整体一样一起工作，即使其中的一些节点出现故障也能继续工作下去。其正确性主要是源于<strong>复制状态机的性质</strong>：一组<code class="highlighter-rouge">Server</code>的状态机计算相同状态的副本，即使有一部分的<code class="highlighter-rouge">Server</code>宕机了仍能继续运行。</li>
-        </ul>
-      </li>
-    </ol>
-  </li>
+  <li>描述的是多节点间如何就某个值（提案 Value）达成共识。</li>
 </ul>
 
-<h3 id="分布式中间件">分布式中间件</h3>
-
-<p>分布式中间件是在分布式系统中用于解决通信、数据传输、负载均衡、数据存储和处理等问题的软件组件。它们能够帮助构建可靠、高效、可扩展的分布式系统。以下是一些常见的分布式中间件以及它们的应用场景和作用：</p>
+<p>Paxos 算法存在 3 个重要的角色：</p>
 
 <ol>
-  <li>消息队列系统：Kafka、RabbitMQ、ActiveMQ： 用于异步通信、解耦系统、实现事件驱动架构，适用于日志收集、消息传递、异步任务处理等场景。</li>
-  <li>分布式缓存系统： Redis、Memcached： 提供高速缓存服务，用于加速数据访问、存储频繁访问的数据、缓解数据库压力。</li>
-  <li>分布式存储系统：HDFS、Ceph、GlusterFS： 提供分布式文件系统支持，用于大规模数据存储、容错、可扩展性和高可用性。</li>
-  <li>分布式数据库系统：MySQL Cluster、CockroachDB、TiDB： 提供分布式数据库服务，支持高并发、水平扩展和数据一致性。</li>
-  <li>分布式计算系统：Hadoop、Spark、Flink： 用于大数据处理和分析，支持并行计算、批处理和实时流处理。</li>
-  <li>服务注册与发现：Consul、ZooKeeper、etcd：提供服务注册、发现和配置管理，用于构建微服务架构、服务发现和负载均衡。</li>
-  <li>分布式事务管理：Atomikos、Seata：解决分布式系统中的事务问题，确保跨多个数据库、服务之间的事务一致性。</li>
-  <li>分布式任务调度：Distributed Cron、Airflow：用于任务的调度和管理，支持定时任务、依赖任务等场景。</li>
+  <li><strong>提议者（Proposer）</strong>：也叫协调者（coordinator），提议者提出提案，用于投票表决。
+    <ul>
+      <li>负责接受<strong>客户端</strong>发起的提议，然后尝试让接受者接受（<strong>达成共识</strong>），同时保证即使多个提议间产生了冲突，算法也能进行下去。</li>
+    </ul>
+  </li>
+  <li><strong>接受者（Acceptor）</strong>：也叫投票员（voter），负责对提议者的提议投票，并接受达成共识的提案。
+    <ul>
+      <li>同时需记住自己的投票历史；向学习者<strong>通知结果</strong>。</li>
+    </ul>
+  </li>
+  <li><strong>学习者（Learner）</strong>：被告知投票的结果，接受达成共识的提案。
+    <ul>
+      <li>如果有超过半数接受者就某个提议达成了共识，那么学习者就需接受这个提议，<strong>处理请求</strong>，作出运算、并将结果返回给客户端。</li>
+    </ul>
+  </li>
 </ol>
 
-<p>这些分布式中间件在不同的场景下发挥着重要的作用，能够解决分布式系统中的各种挑战，包括但不限于数据一致性、容错性、可扩展性、性能和可靠性等问题。选择适合自己场景的分布式中间件需要考虑到业务需求、数据量、系统复杂性和性能要求等因素。</p>
+<p><img src="assets/Basic_Paxos" alt="img" style="zoom: 67%;" /></p>
+
+<p>缺点：假如有多个提议者互不相让，那么就可能导致整个提议的过程进入了死循环。</p>
+
+<p>因此，引入了 Multi Paxos 的算法思想。</p>
+
+<h4 id="multi-paxos-思想">Multi-Paxos 思想</h4>
+
+<p>Multi-Paxos <strong>思想</strong>： 在多个提议者的情况下，选出一个Leader（领导者），由领导者作为唯一的提议者，这样就可以解决提议者冲突的问题。核心是通过多个 Basic Paxos 实例，就一系列值达成共识。</p>
+
+<ol>
+  <li>针对没有恶意节点的情况，<strong>Raft 算法</strong>、ZAB 协议、 Fast Paxos 算法都是基于 Paxos 算法改进而来；
+    <ul>
+      <li><strong>Raft 算法</strong>是更易理解和实现的分布式一致性算法，是Multi-Paxos的变种。</li>
+    </ul>
+  </li>
+  <li>针对存在恶意节点的情况，一般用工作量证明（POW，Proof-of-Work）、权益证明（PoS，Proof-of-Stake ）等<strong>共识算法</strong>。最典型应用就是区块链，需解决的核心问题是 <strong>拜占庭将军问题</strong>。
+    <ul>
+      <li>共识是可容错系统中的一个基本问题：即使面对故障，服务器也可在共享状态上达成一致。</li>
+      <li><strong>共识算法</strong>：允许一组节点像整体一样一起工作，即使其中的一些节点出现故障也能继续工作下去。其正确性主要是源于<strong>复制状态机的性质</strong>：一组<code class="highlighter-rouge">Server</code>的状态机计算相同状态的副本，即使有一部分的<code class="highlighter-rouge">Server</code>宕机了仍能继续运行。</li>
+    </ul>
+  </li>
+</ol>
+
+<h4 id="raft-算法">Raft 算法</h4>
+
+<p><code class="highlighter-rouge">Raft</code> 是一个 <strong>易于理解的一致性算法</strong>。过程如同选举一样，<strong>参选者</strong> 需要说服 <strong>大多数选民</strong> (Server) 投票给他，一旦选定后就跟随其操作。</p>
+
+<ul>
+  <li>和 <code class="highlighter-rouge">Paxos</code> 目标相同，都是为了实现 <strong>一致性</strong> 产生的。<code class="highlighter-rouge">Paxos</code> 和 <code class="highlighter-rouge">Raft</code> 的区别在于选举的 <strong>具体过程</strong> 不同。</li>
+</ul>
+
+<p><code class="highlighter-rouge">Raft</code> 协议将 <code class="highlighter-rouge">Server</code> 进程分为三种角色：</p>
+
+<ol>
+  <li><strong>Leader（领导者）</strong>：领导者由跟随者投票选出。</li>
+  <li><strong>Follower（跟随者）</strong>：刚开始没有 <strong>领导者</strong>，所有集群中的 <strong>参与者</strong> 都是 <strong>跟随者</strong>。</li>
+  <li><strong>Candidate（候选人）</strong></li>
+</ol>
+
+<p>Raft算法的工作流程：</p>
+
+<ol>
+  <li>首先开启一轮大选。在大选期间 <strong>所有跟随者</strong> 都能参与竞选，这时所有跟随者的角色就变成了 <strong>候选人</strong>，民主投票选出领袖后就开始了这届领袖的任期；</li>
+  <li>然后选举结束，所有除 <strong>领导者</strong> 的 <strong>候选人</strong> 又变回 <strong>跟随者</strong> 服从领导者领导。</li>
+</ol>
+
+<p><a href="https://github.com/Snailclimb/JavaGuide/blob/main/docs/distributed-system/theorem&amp;algorithm&amp;protocol/raft-algorithm.md">Raft 算法解读</a></p>
 
 <h3 id="api-网关">API 网关</h3>
 
@@ -208,6 +289,10 @@
   <li>Shenyu：基于 WebFlux 的可扩展、高性能、响应式网关，Apache 顶级开源项目。</li>
   <li><a href="https://tech.meituan.com/2021/05/20/shepherd-api-gateway.html">百亿规模API网关服务Shepherd的设计与实现</a></li>
 </ol>
+
+<h3 id="服务注册与发现">服务注册与发现</h3>
+
+<p>Consul、ZooKeeper、etcd：提供服务注册、发现和配置管理，用于构建微服务架构、服务发现和负载均衡。</p>
 
 <h3 id="配置中心">配置中心</h3>
 
@@ -251,7 +336,7 @@
 
 <h4 id="nio-框架非常火">NIO 框架：非常火</h4>
 
-<h3 id="分布式-id">分布式 id</h3>
+<h3 id="分布式-id">分布式 ID</h3>
 
 <p>分布式 ID 是分布式系统下的 ID。如，分库后， 数据遍布在不同服务器上的数据库，为不同的数据节点生成<strong>全局唯一</strong>自增主键。</p>
 
@@ -301,17 +386,100 @@
   <li><strong>高可用</strong> ：锁服务是高可用的。并且，即使客户端的释放锁的代码逻辑出现问题，锁最终一定还是会被释放，不会影响其他线程对共享资源的访问。</li>
 </ol>
 
-<p>通常情况下，一般会选择基于 Redis 或者 ZooKeeper 实现分布式锁，Redis 用的要更多一点。</p>
+<p>常见的分布式锁实现方案有三种：</p>
 
-<h5 id="基于-redis-实现分布式锁">基于 Redis 实现分布式锁</h5>
+<ol>
+  <li>MySQL 分布式锁</li>
+  <li>ZooKepper 分布式锁</li>
+  <li>Redis 分布式锁。Redis 用的要更多一点。</li>
+</ol>
 
-<p>这里也以 Redis 为例介绍分布式锁的实现：</p>
+<h4 id="mysql-分布式锁">MySQL 分布式锁</h4>
+
+<p>MySQL分布式锁如何实现呢？</p>
+
+<ul>
+  <li>
+    <p>比较简单，就是创建一张锁表，数据库对字段作唯一性约束。</p>
+  </li>
+  <li>
+    <p>加锁的时候，在锁表中增加一条记录即可；释放锁的时候删除记录就行。</p>
+  </li>
+  <li>
+    <p>如果有并发请求同时提交到数据库，数据库会保证只有一个请求能够得到锁。</p>
+  </li>
+</ul>
+
+<blockquote>
+  <p>这种属于数据库 IO 操作，效率不高，而且频繁操作会增大数据库的开销，因此这种方式在高并发、高性能的场景中用的不多。</p>
+</blockquote>
+
+<h4 id="zookepper-分布式锁">ZooKepper 分布式锁</h4>
+
+<p>ZooKeeper如何实现分布式锁？</p>
+
+<p>ZooKeeper的数据节点和文件目录类似，例如有一个lock节点，在此节点下建立子节点是可以保证先后顺序的，即便是两个进程同时申请新建节点，也会按照先后顺序建立两个节点。</p>
+
+<p>所以可以用此特性实现分布式锁。</p>
+
+<ol>
+  <li>以某个资源为目录，然后这个目录下面的节点就是<strong>需要获取锁的客户端</strong>，每个服务在目录下创建节点，如果它的节点，序号在目录下最小，那么就获取到锁，否则等待。</li>
+  <li>释放锁，就是删除服务创建的节点。</li>
+</ol>
+
+<blockquote>
+  <p>ZK实际上是一个比较重的分布式组件，实际上应用没那么多了，所以用ZK实现分布式锁，其实相对也比较少。</p>
+</blockquote>
+
+<p><img src="assets/zookepper_lock" alt="图片" style="zoom: 60%;" /></p>
+
+<h4 id="redis-分布式锁">Redis 分布式锁</h4>
+
+<blockquote>
+  <p>基于 Redis Redis实现分布式锁，是当前应用最广泛的分布式锁实现方式。</p>
+</blockquote>
+
+<p>Redis执行命令是<strong>单线程</strong>的，Redis实现分布式锁就是利用这个特性。</p>
+
+<ul>
+  <li>
+    <p>实现分布式锁最简单的一个命令：<code class="highlighter-rouge">setNx(set if not exist)</code>，如果不存在则更新：<code class="highlighter-rouge">setNx resourceName value</code>。</p>
+  </li>
+  <li>
+    <p>加锁了之后如果机器宕机，那这个锁就无法释放，所以需要加入过期时间。而且过期时间需要和setNx同一个原子操作，在Redis2.8之前需要用lua脚本，但是redis2.8之后redis支持nx和ex操作是同一原子操作。</p>
+  </li>
+</ul>
+
+<p><strong>Redission</strong>：一般生产中都是使用Redission客户端，非常良好地封装了分布式锁的api，而且支持RedLock。</p>
 
 <h3 id="分布式事务">分布式事务</h3>
 
 <p>分布式事务：指事务的参与者、支持事务的服务器、资源服务器、事务管理器分别位于不同的分布式系统的不同节点上。</p>
 
-<p>简单的说，就是一次大的操作由不同的<strong>小操作</strong>组成，分布在不同的服务器上，且属于不同的应用。分布式事务需保证这些小操作要么全部成功，要么全部失败。本质上，就是为了保证不同数据库的数据一致性。</p>
+<ul>
+  <li>分布式事务是相对本地事务而言的：
+    <ol>
+      <li>对于本地事务，利用数据库本身的事务机制，就可以保证事务的ACID特性。</li>
+      <li>分布式事务其实就是将对同一库事务的概念扩大到了对多个库的事务。</li>
+    </ol>
+  </li>
+  <li>简单的说，就是一次大的操作由不同的<strong>小操作</strong>组成，分布在不同的服务器上，且属于不同的应用。分布式事务需保证这些小操作要么全部成功，要么全部失败。</li>
+  <li>本质上，目的就是为了保证（分布式系统中）不同数据库的数据一致性。</li>
+</ul>
+
+<h4 id="常见实现方案">常见实现方案</h4>
+
+<ol>
+  <li><strong>2PC</strong> 两阶段提交：思路可以概括为，参与者将操作成败通知协调者，再由协调者根据所有参与者的反馈情况决定各参与者是否要提交操作还是回滚操作。</li>
+  <li><strong>3PC</strong> 三阶段提交：是 <code class="highlighter-rouge">2PC</code> 的一种改进版本 ，为解决两阶段提交协议的单点故障和同步阻塞问题。<code class="highlighter-rouge">3PC</code> 有三个阶段：<code class="highlighter-rouge">CanCommit</code>，<code class="highlighter-rouge">PreCommit</code>，<code class="highlighter-rouge">DoCommit</code>三个阶段</li>
+  <li><strong>TCC</strong>（<code class="highlighter-rouge">Try Confirm Cancel</code>）：是两阶段提交的一个变种，针对每个操作，都需要有一个其对应的确认和取消操作，当操作成功时调用确认操作，当操作失败时调用取消操作，类似于二阶段提交，只不过是这里的提交和回滚是针对业务上的，所以基于TCC实现的分布式事务也可以看做是对业务的一种补偿机制。</li>
+  <li><strong>本地消息表</strong>：核心思想是将分布式事务拆分成本地事务进行处理。</li>
+  <li><strong>MQ消息事务</strong>：原理是将两个事务通过<strong>消息队列</strong>进行异步解耦。</li>
+  <li><strong>最大努力通知</strong>：适用于一些对最终一致性实时性要求没那么高的业务，比如支付通知，短信通知。</li>
+  <li><strong>SEAGA事务</strong> ：设计目标是对业务无侵入，因此它是从业务无侵入的两阶段提交（全局事务）着手，在传统的两阶段上进行改进，他把一个分布式事务理解成一个包含了若干分支事务的全局事务。而全局事务的职责是协调它管理的分支事务达成一致性，要么一起成功提交，要么一起失败回滚。也就是一荣俱荣一损俱损~</li>
+</ol>
+
+<p>详细方案及示意图参考：<a href="https://mp.weixin.qq.com/s/nLwHEmVGtl-2FDugMqYs3A?poc_token=HMnhnWijFwwTVIChiqnBJATa4Btx4vn1lb4ski9F">分布式八股文（背诵版）</a></p>
 
 <h3 id="分布式协调">分布式协调</h3>
 
@@ -346,7 +514,7 @@
   <li>数据发布/订阅 ：通过 <strong>Watcher 机制</strong> 可很方便地实现数据发布/订阅。当将数据发布到 ZooKeeper 被监听的节点上，其他机器可通过监听 ZooKeeper 上节点的变化来实现配置的动态更新。</li>
 </ol>
 
-<h3 id="链路追踪">链路追踪</h3>
+<h3 id="分布式链路追踪">分布式链路追踪</h3>
 
 <p>Zipkin</p>
 
@@ -356,7 +524,7 @@
 
 <h3 id="分布式搜索引擎">分布式搜索引擎</h3>
 
-<p>ElasticSearch</p>
+<p>Elasticsearch</p>
 
 <p>Solr</p>
 
@@ -364,7 +532,9 @@
 
 <p>客户端发送一个请求，经过<strong>负载均衡</strong>后被分配到其中一个服务器，由于不同服务器含有不同的web服务器（如Tomcat），并不能发现之前web服务器保存的session信息，就会再次生成一个JSESSIONID，之前的状态就会丢失。</p>
 
-<p><strong>分布式 Session 一致性</strong>的4种解决方案：</p>
+<h4 id="session-一致性的-4-种解决方案">Session 一致性的 4 种解决方案</h4>
+
+<p>分布式 Session 一致性的 4 种解决方案：</p>
 
 <ol>
   <li><strong>客户端存储</strong>：直接将信息存储在客户端上的cookie中，客户端通过http协议和服务器进行cookie交互，常用来存储不敏感信息；缺点：
@@ -387,46 +557,867 @@
   <li><strong>基于redis存储session</strong>：直接引入依赖，将所有服务器的<code class="highlighter-rouge">session</code>进行统一管理，可用<code class="highlighter-rouge">redis</code>等高性能服务器来集中管理session，spring官方提供的<code class="highlighter-rouge">spirng-session</code>就是这样处理<code class="highlighter-rouge">session</code>的一致性问题；用的最多。</li>
 </ol>
 
+<h3 id="分布式日志">分布式日志</h3>
+
+<p>elasticsearch、logstash、Kibana 、redis、kafka</p>
+
 <h2 id="高并发--高性能">高并发 / 高性能</h2>
+
+<blockquote>
+  <p>高并发、高可用是现在互联网<strong>分布式框架设计</strong>必须要考虑的因素之一。</p>
+</blockquote>
+
+<h3 id="高并发">高并发</h3>
+
+<p>高并发（<code class="highlighter-rouge">High Con’currency</code>）：通过设计保证系统能够<strong>同时并行处理很多请求</strong>。</p>
+
+<p>衡量、性能指标有：</p>
+
+<ol>
+  <li>响应时间：系统对请求做出响应的时间。指从发出请求开始到收到最后响应数据所需要的时间。<strong>反映系统快慢。</strong>例如系统处理一个HTTP请求需要200ms，这个200ms就是系统的响应时间。<del>比如打开一个页面需要1秒，那么这1秒就是响应时间。</del></li>
+  <li>吞吐量：单位时间内处理的请求数量，通常使用每秒的请求数来衡量。<strong>体现系统处理能力</strong>。
+    <ol>
+      <li>HTTP请求数（HPS）</li>
+      <li>每秒事务数（TPS）</li>
+      <li>每秒查询数（<strong>QPS</strong>，Queries Per Second）：每秒响应请求数。在互联网领域，这个指标和吞吐量区分的没有这么明显。</li>
+    </ol>
+  </li>
+  <li>并发用户数：同时承载<strong>正常使用系统功能</strong>的用户数量。例如一个即时通讯系统，同时在线量一定程度上代表了系统的并发用户数。
+    <ul>
+      <li>并发数：系统同时处理的请求数。<strong>反映系统负载。</strong></li>
+    </ul>
+  </li>
+</ol>
+
+<blockquote>
+  <p>在没有并发存在的系统中，请求被顺序执行。此时响应时间为吞吐量的倒数。</p>
+
+  <p>例如系统支持的吞吐量为 100 req/s，那么平均响应时间应该为 0.01s。</p>
+</blockquote>
+
+<h4 id="如何提高并发能力">如何提高并发能力</h4>
+
+<ul>
+  <li>垂直扩展（Scale Up）
+    <ol>
+      <li><strong>增强单机硬件性能</strong>（优先）：例如：增加CPU核数如32核，升级更好的网卡如万兆，升级更好的硬盘如SSD，扩充硬盘容量如2T，扩充系统内存如128G。</li>
+      <li><strong>提升单机架构性能</strong>：例如：使用Cache来减少IO次数，使用异步来增加单服务吞吐量，使用无锁数据结构来减少响应时间。</li>
+      <li>总结：管是提升单机硬件性能，还是提升单机架构性能，都有一个致命的不足：单机性能总是有极限的。所以互联网分布式架构设计高并发终极解决方案还是<strong>水平扩展</strong>。</li>
+    </ol>
+  </li>
+  <li>水平扩展（Scale Out）
+    <ol>
+      <li>只要增加服务器数量，就能线性扩充系统性能。水平扩展对系统架构设计是有要求的，难点在于：如何在架构各层进行可水平扩展的设计。</li>
+    </ol>
+  </li>
+</ul>
+
+<h3 id="高性能">高性能</h3>
+
+<p>高性能（High Performance）：就是指<strong>程序处理速度快</strong>，所占内存少，cpu占用率低。</p>
+
+<blockquote>
+  <p>高并发和高性能是紧密相关的，提高应用的性能，是肯定可以提高系统的并发能力的。</p>
+</blockquote>
+
+<p>应用性能优化的时候，对于<strong>计算密集型</strong>和<strong>IO密集型</strong>还是有很大差别，需要分开来考虑。</p>
+
+<ul>
+  <li>增加服务器资源（CPU、内存、服务器数量），绝大部分时候是可以提高应用的并发能力和性能 （前提是应用能够支持多任务并行计算，多服务器分布式计算才行），</li>
+  <li>但也是要避免其中的一些问题，才可以更好的<strong>更有效率</strong>的利用服务器资源。</li>
+</ul>
+
+<p>那么怎么样提高性能呢？</p>
+
+<ol>
+  <li>避免因为<strong>IO阻塞</strong>让CPU闲置，导致CPU的浪费。</li>
+  <li>避免<strong>多线程间增加锁</strong>来保证同步，导致并行系统串行化。</li>
+  <li>避免创建、销毁、维护太多进程、线程，导致操作系统浪费资源在调度上。</li>
+  <li>避免分布式系统中多服务器的关联，比如：依赖同一个mysql，程序逻辑中使用<strong>分布式锁</strong>，导致瓶颈在mysql，分布式又变成串行化运算。</li>
+</ol>
+
+<h3 id="负载均衡">负载均衡</h3>
+
+<blockquote>
+  <p>高并发首选方案就是<strong>集群化</strong>部署，一台服务器承载的QPS有限，多台服务器叠加效果就不一样了。</p>
+
+  <p><strong>负载均衡</strong>负责将流量转发到服务器集群。当某个节点故障时，负载均衡器会将用户请求转发到另外的节点上，从而保证所有服务持续可用。</p>
+</blockquote>
+
+<p>负载均衡：用于将如用户请求<strong>分配</strong>到多个服务器处理，以提高系统整体的<strong>并发处理能力</strong>和可靠性。</p>
+
+<p>负载均衡器运行过程包含两个部分：</p>
+
+<ol>
+  <li>根据<strong>负载均衡算法</strong>得到转发的节点；</li>
+  <li>进行<strong>转发</strong>。</li>
+</ol>
+
+<h4 id="常见的负载均衡算法">常见的负载均衡算法</h4>
+
+<p>常用的负载均衡算法有：轮询、加权轮询、最小连接数、加权最小连接、随机法、源地址哈希法。</p>
+
+<ol>
+  <li><strong>随机算法</strong>：把请求随机发送到服务器上。和轮询算法类似。适合<strong>每个服务器的性能差不多</strong>的场景。缺陷：即使是大家权重一样，部分机器在一段时间之内<strong>无法被随机到</strong>。</li>
+  <li><strong>轮询算法</strong>：把每个请求<strong>轮流发送</strong>到每个服务器上。适合<strong>每个服务器的性能差不多</strong>的场景。</li>
+  <li><strong>加权轮询</strong>：在轮询的基础上，根据服务器的<strong>性能差异</strong>，为服务器赋予一定的<strong>权值</strong>，性能高的服务器分配更高的权值。</li>
+  <li><strong>最少连接算法</strong>：将请求发送给<strong>当前最少连接数</strong>的服务器上。解决<strong>每个请求的连接时间</strong>不一样造成的负载不均衡的问题。</li>
+  <li>最少活跃法：</li>
+  <li>最快响应时间法：</li>
+  <li><strong>加权最少连接</strong>：在最少连接的基础上，根据<strong>服务器的性能</strong>为每台服务器分配权重，再根据权重计算出每台服务器<strong>能处理的连接数</strong>。</li>
+  <li><strong>源地址哈希法</strong>：通过对客户端 IP 计算哈希值之后，再<strong>对服务器数量取模</strong>得到目标服务器的序号。可以保证<strong>同一 IP 的客户端的请求</strong>会转发到同一台服务器上，用来实现<strong>会话粘滞</strong>（Sticky Session）。</li>
+</ol>
+
+<h5 id="随机算法">随机算法</h5>
+
+<p>随机算法（<code class="highlighter-rouge">Random</code>）：把请求随机发送到服务器上。适合<strong>服务器性能差不多</strong>的场景。</p>
+
+<p>比较明显的缺陷：即使是大家权重一样，部分机器在一段时间之内<strong>无法被随机到</strong>。</p>
+
+<p><strong>两次随机法</strong>：在随机法的基础上多增加了一次随机，多选出一个服务器。随后再根据两台服务器的负载等情况，从其中选择出一个最合适的服务器。</p>
+
+<ul>
+  <li>好处是：可以动态地调节后端节点的负载，使其更加均衡。如果只使用一次随机法，可能会导致某些服务器过载，而某些服务器空闲。</li>
+</ul>
+
+<h5 id="轮询">轮询</h5>
+
+<p>轮询算法（<code class="highlighter-rouge">Round Robin</code>）：把每个请求<strong>轮流发送</strong>到每个服务器上。</p>
+
+<ul>
+  <li>该算法比较适合每个服务器的性能差不多的场景，如果有性能存在差异的情况下，那么性能较差的服务器可能无法承担过大的负载（下图的 Server 2）。</li>
+</ul>
+
+<p>下图中，一共有 6 个客户端产生了 6 个请求，这 6 个请求按 (1, 2, 3, 4, 5, 6) 的顺序轮流发送到两个服务器。</p>
+
+<ul>
+  <li>(1, 3, 5) 的请求会被发送到服务器 1，</li>
+  <li>(2, 4, 6) 的请求会被发送到服务器 2。</li>
+</ul>
+
+<p><img src="assets/bfea8772-d01b-4a51-8adc-edfd7d3dce84.jpg" style="zoom: 50%;" /> <img src="assets/4ab87717-e264-4232-825d-8aaf08f14e8b.jpg" style="zoom:50%;" /></p>
+
+<h5 id="加权轮询">加权轮询</h5>
+
+<p>加权轮询（<code class="highlighter-rouge">Weighted Round Robbin</code>）：是在轮询的基础上，根据服务器的<strong>性能差异</strong>，为服务器赋予一定的<strong>权值</strong>，性能高的服务器分配更高的权值。</p>
+
+<p>例如上图中，服务器 1 被赋予的权值为 5，服务器 2 被赋予的权值为 1，那么 (1, 2, 3, 4, 5) 请求会被发送到服务器 1，(6) 请求会被发送到服务器 2。</p>
+
+<p>在加权轮询的基础上，还有进一步改进得到的负载均衡算法，比如<strong>平滑的加权轮训算法</strong>。</p>
+
+<h5 id="最少连接">最少连接</h5>
+
+<p>由于<strong>每个请求的连接时间</strong>不一样，使用轮询或者加权轮询算法的话，可能会让一台服务器当前连接数过大，而另一台服务器的连接过小，造成负载不均衡。</p>
+
+<p>例如下图中，</p>
+
+<ul>
+  <li>(1, 3, 5) 请求会被发送到服务器 1，但是 (1, 3) 很快就断开连接，此时只有 (5) 请求连接服务器 1；</li>
+  <li>(2, 4, 6) 请求被发送到服务器 2，只有 (2) 的连接断开，此时 (6, 4) 请求连接服务器 2。该系统继续运行时，服务器 2 会承担过大的负载。</li>
+</ul>
+
+<p>最少连接算法（<code class="highlighter-rouge">least Connections</code>）：就是将请求发送给<strong>当前最少连接数</strong>的服务器上。</p>
+
+<p>例如下图中，服务器 1 当前连接数最小，那么新到来的请求 6 就会被发送到服务器 1 上。</p>
+
+<p><img src="assets/e98deb5a-d5d4-4294-aa9b-9220d4483403.jpg" style="zoom: 50%;" /></p>
+
+<h5 id="加权最少连接">加权最少连接</h5>
+
+<p>加权最少连接（<code class="highlighter-rouge">Weighted Least Connection</code>）：在最少连接的基础上，根据<strong>服务器的性能</strong>为每台服务器分配权重，再根据权重计算出每台服务器<strong>能处理的连接数</strong>。</p>
+
+<h5 id="最少活跃法">最少活跃法</h5>
+
+<blockquote>
+  <p>和最小连接法类似，但要更科学一些。</p>
+</blockquote>
+
+<p>最少活跃法：以<strong>活动连接数</strong>为标准，活动连接数可以理解为当前正在处理的请求数。活跃数越低，说明处理能力越强，这样就可以使处理能力强的服务器处理更多请求。相同活跃数的情况下，可以进行加权随机。</p>
+
+<h5 id="最快响应时间法">最快响应时间法</h5>
+
+<blockquote>
+  <p>不同于最小连接法和最少活跃法</p>
+</blockquote>
+
+<p>最快响应时间法：以<strong>响应时间</strong>为标准来选择具体是哪一台服务器处理。客户端会维持每个服务器的响应时间，每次请求挑选响应时间最短的。相同响应时间的情况下，可以进行加权随机。</p>
+
+<p>这种算法可以使得请求被更快处理，但可能会造成<strong>流量过于集中于高性能服务器</strong>的问题。</p>
+
+<h5 id="源地址哈希法">源地址哈希法</h5>
+
+<p>源地址哈希（<code class="highlighter-rouge">IP Hash</code>）：通过对客户端 IP 计算哈希值之后，再<strong>对服务器数量取模</strong>得到目标服务器的序号。</p>
+
+<ul>
+  <li>可以保证<strong>同一 IP 的客户端的请求、同一个用户的请求</strong>会转发到同一台服务器上，用来实现<strong>会话粘滞</strong>（Sticky Session）。</li>
+</ul>
+
+<p><img src="assets/0f399a9f-1351-4b2d-b8a4-2ebe82b1a703.jpg" alt="img" style="zoom: 67%;" /></p>
+
+<p>一致性 Hash 法：和哈希法类似，一致性 Hash 法也可以让相同参数的请求总是发到同一台服务器处理。</p>
+
+<ul>
+  <li>不过，它解决了哈希法存在的一些问题。</li>
+  <li>常规哈希法在服务器数量变化时，哈希值会重新落在不同的服务器上。</li>
+  <li>而一致性哈希法的核心思想是：将数据和节点都映射到一个<strong>哈希环</strong>上，然后根据<strong>哈希值的顺序</strong>来确定数据属于哪个节点。</li>
+  <li>当<strong>服务器增加或删除</strong>时，只影响该服务器的哈希，而不会导致整个服务集群的哈希键值重新分布。</li>
+</ul>
+
+<h5 id="目的地址哈希调度">目的地址哈希调度</h5>
+
+<blockquote>
+  <p>LVS 中的</p>
+</blockquote>
+
+<h4 id="负载均衡分类">负载均衡分类</h4>
+
+<p>负载均衡可以简单分为：</p>
+
+<ol>
+  <li>服务端负载均衡：
+    <ol>
+      <li>硬件负载均衡： 通过专门的硬件设备（如 F5 ）来实现（硬件价格一般很贵）。</li>
+      <li>软件负载均衡：通过负载均衡软件（如 Nginx ）来实现。比如：LVS 和 Nginx。</li>
+    </ol>
+  </li>
+  <li>客户端负载均衡：主要应用于系统内部的不同的服务之间，可以使用<strong>现成的负载均衡组件</strong>来实现。
+    <ol>
+      <li>在客户端负载均衡中，客户端会自己维护一份<strong>服务器的地址列表</strong>，发送请求之前，客户端会根据对应的负载均衡算法来选择具体某一台服务器处理请求。</li>
+      <li>Java 领域主流的微服务框架 Dubbo、Spring Cloud 等都内置了开箱即用的客户端负载均衡实现。</li>
+      <li>比较常用的是 Netflix <strong>Ribbon</strong> 和 <strong>Spring Cloud Load Balancer</strong> 就是目前 Java 生态最流行的两个负载均衡组件。
+        <ol>
+          <li>Ribbon 是老牌负载均衡组件，由 Netflix 开发，功能比较全面，支持的负载均衡策略也比较多。（已被弃用）</li>
+          <li>Spring Cloud Load Balancer 是 Spring 官方为了取代 Ribbon 而推出的，功能相对更简单一些，支持的负载均衡也少一些。（官方，推荐）</li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+</ol>
+
+<p>根据 OSI 模型，<strong>服务端</strong>负载均衡还可以分为：</p>
+
+<ol>
+  <li>二层负载均衡</li>
+  <li>三层负载均衡</li>
+  <li><strong>四层负载均衡</strong></li>
+  <li><strong>七层负载均衡</strong></li>
+</ol>
+
+<blockquote>
+  <p>最常见的是四层和七层负载均衡。</p>
+</blockquote>
+
+<p>简单来说，<strong>四层负载均衡性能很强，七层负载均衡功能更强！</strong> 不过，对于绝大部分业务场景来说，四层负载均衡和七层负载均衡的性能差异基本可以忽略不计的。</p>
+
+<p><img src="assets/osi-7-model.png" alt="OSI 七层模型" style="zoom: 67%;" /></p>
+
+<h4 id="转发实现">转发实现</h4>
+
+<h5 id="http-重定向">HTTP 重定向</h5>
+
+<p>HTTP 重定向负载均衡服务器：使用某种负载均衡算法计算得到服务器的 IP 地址之后，将该地址写入 <strong>HTTP 重定向报文</strong>中，<strong>状态码为 302</strong>。客户端收到重定向报文之后，需要重新向服务器发起请求。</p>
+
+<p>缺点：</p>
+
+<ul>
+  <li>需要两次请求，因此访问延迟比较高；</li>
+  <li>HTTP 负载均衡器处理能力有限，会限制集群的规模。</li>
+</ul>
+
+<blockquote>
+  <p>该负载均衡转发的缺点比较明显，实际场景中很少使用它。</p>
+</blockquote>
+
+<h5 id="七层dns-域名解析">（七层）DNS 域名解析</h5>
+
+<p>在 DNS 解析域名的同时使用负载均衡算法计算服务器 IP 地址。</p>
+
+<p>原理：在 DNS 服务器中为<strong>同一个主机记录</strong>配置多个 IP 地址，这些 IP 地址对应不同的服务器。当用户请求域名的时候，DNS 服务器采用<strong>轮询算法</strong>返回 IP 地址，这样就实现了轮询版负载均衡。</p>
+
+<p>优点：DNS 能够根据<strong>地理位置</strong>进行域名解析，返回<strong>离用户最近的</strong>服务器 IP 地址。</p>
+
+<p>缺点：由于 DNS 具有多级结构，每一级的域名记录都可能被缓存，当下线一台服务器需要修改 DNS 记录时，需要过很长一段时间才能生效。</p>
+
+<blockquote>
+  <p>大型网站基本使用了 DNS 做为<strong>第一级</strong>负载均衡手段，然后在内部使用其它方式做第二级负载均衡。</p>
+</blockquote>
+
+<ul>
+  <li>也就是说，域名解析的结果为内部的<strong>负载均衡服务器 IP 地址</strong>。</li>
+</ul>
+
+<p><img src="assets/6997605302452f07e8b28d257d349bf0.png" alt="img" style="zoom: 67%;" /></p>
+
+<h5 id="七层反向代理服务器">（七层）反向代理服务器</h5>
+
+<blockquote>
+  <p>反向代理服务器位于源服务器前面，用户的请求需要先经过反向代理服务器才能到达源服务器。反向代理可以用来进行缓存、日志记录等，同时也可以用来做为负载均衡服务器。</p>
+</blockquote>
+
+<p>原理：客户端将请求发送到反向代理服务器，由反向代理服务器去选择目标服务器，<strong>获取数据后</strong>再返回给客户端。</p>
+
+<ul>
+  <li>对外暴露的是反向代理服务器地址，隐藏了真实服务器 IP 地址。</li>
+  <li>反向代理“代理”的是<strong>目标服务器</strong>，这一个过程对于客户端而言是透明的。</li>
+  <li>客户端不直接请求源服务器，因此源服务器不需要外部 IP 地址，而反向代理需要配置<strong>内部和外部两套 IP 地址</strong>。</li>
+</ul>
+
+<p>优点：与其它功能集成在一起，部署简单。</p>
+
+<p>缺点：所有请求和响应都需要经过反向代理服务器，它可能会成为性能瓶颈。</p>
+
+<p><strong>Nginx</strong> 就是最常用的反向代理服务器，它可以将接收到的客户端请求以一定的规则（负载均衡策略）均匀地分配到这个服务器集群中所有的服务器上。</p>
+
+<blockquote>
+  <p>反向代理负载均衡同样属于七层负载均衡。</p>
+</blockquote>
+
+<p><strong>七层负载均衡</strong> 工作在 OSI 模型第七层，即应用层，这一层的主要协议是 <strong>HTTP</strong> 。</p>
+
+<ul>
+  <li>这一层的负载均衡比四层负载均衡<strong>路由网络请求</strong>的方式更加复杂，它会读取报文的数据部分（比如说我们的 HTTP 部分的报文），然后根据读取到的数据内容（如 URL、Cookie）做出负载均衡决策。</li>
+  <li>也就是说，七层负载均衡器的核心是<strong>报文内容</strong>（如 URL、Cookie）层面的负载均衡，执行第七层负载均衡的设备通常被称为 <strong>反向代理服务器</strong> 。</li>
+</ul>
+
+<p>七层负载均衡比四层负载均衡会消耗更多的性能，不过，也相对更加灵活，能够更加智能地路由网络请求，比如说你可以根据请求的内容进行优化如缓存、压缩、加密。</p>
+
+<h5 id="四层传输层">（四层）传输层</h5>
+
+<p><strong>四层负载均衡</strong> 工作在 OSI 模型第四层，即传输层，这一层的主要协议是 <strong>TCP/UDP</strong>，。</p>
+
+<ul>
+  <li>负载均衡器在这一层能够看到<strong>数据包</strong>里的源端口地址以及目的端口地址，会基于这些信息通过一定的负载均衡算法将数据包转发到后端真实服务器。</li>
+  <li>也就是说，四层负载均衡的核心就是 <strong>IP+端口层面</strong>的负载均衡，不涉及具体的报文内容。</li>
+</ul>
+
+<h5 id="三层网络层">（三层）网络层</h5>
+
+<p>在操作系统<strong>内核</strong>进程获取<strong>网络数据包</strong>，根据负载均衡算法<strong>计算源服务器的 IP 地址</strong>，并修改请求数据包的目的 IP 地址，最后进行转发。</p>
+
+<p>源服务器返回的<strong>响应</strong>也需要经过负载均衡服务器，通常是让负载均衡服务器同时作为集群的<strong>网关服务器</strong>来实现。</p>
+
+<p>优点：在内核进程中进行处理，性能比较高。</p>
+
+<p>缺点：和反向代理一样，所有的请求和响应都经过负载均衡服务器，会成为性能瓶颈。</p>
+
+<h5 id="二层链路层">（二层）链路层</h5>
+
+<p>在链路层根据负载均衡算法<strong>计算源服务器的 MAC 地址</strong>，并修改请求数据包的目的 MAC 地址，并进行转发。</p>
+
+<ul>
+  <li>通过配置源服务器的<strong>虚拟 IP 地址</strong>和负载均衡服务器的 IP 地址一致，从而不需要修改 IP 地址就可以进行转发。</li>
+  <li>也正因为 IP 地址一样，所以源服务器的响应不需要转发回负载均衡服务器，可以<strong>直接转发给客户端</strong>，避免了负载均衡服务器的成为瓶颈。</li>
+</ul>
+
+<p>这是一种<strong>三角传输模式</strong>，被称为<strong>直接路由</strong>。对于提供下载和视频服务的网站来说，直接路由避免了大量的网络传输数据经过负载均衡服务器。</p>
+
+<blockquote>
+  <p>这是目前大型网站<strong>使用最广</strong>负载均衡转发方式，在 Linux 平台可以使用的负载均衡服务器为 LVS。</p>
+</blockquote>
+
+<h4 id="lvs-负载均衡服务器">LVS 负载均衡服务器</h4>
+
+<p><strong>LVS</strong>（<code class="highlighter-rouge">Linux Virtual Server</code>）：是一个虚拟的服务器集群系统，可以在UNIX/LINUX平台下实现负载均衡集群功能。LVS不直接处理请求，而是将请求转发至位于它后端真正的服务器realserver上。</p>
+
+<ol>
+  <li>通过将客户端请求分发到多个后端真实服务器，提高系统性能和可靠性。</li>
+  <li>LVS支持多种调度算法，如轮询、最少连接、源地址哈希等，用于决定请求的转发方式。</li>
+  <li>还提供了高可用性的机制，包括热备份和故障自动切换。</li>
+  <li>LVS具有灵活的配置和扩展性，适用于各种网络环境和应用场景。</li>
+  <li>通过实现负载均衡，LVS能够提供稳定、高效的服务，满足大规模系统的需求。</li>
+  <li>LVS是<strong>四层</strong>，<strong>传输层 tcp/udp</strong>。</li>
+</ol>
+
+<p>业务实战：对于千万级流量的秒杀业务，一台LVS扛不住流量洪峰，通常需要 10 台左右，其上面用DDNS（Dynamic DNS）做域名解析负载均衡。搭配高性能网卡，单台LVS能够提供百万以上并发能力。</p>
+
+<blockquote>
+  <p>注意， LVS 负责网络四层协议转发，无法按 HTTP 协议中的<strong>请求路径</strong>做负载均衡，所以还需要 Nginx。</p>
+</blockquote>
+
+<p>参考：<a href="https://www.cnblogs.com/YinJay/articles/17683044.html">负载均衡服务-LVS</a></p>
+
+<h5 id="工作原理">工作原理</h5>
+
+<p>LVS集群负载均衡器接受服务的所有入站客户端计算机请求，并根据调度算法决定哪个集群节点应该处理回复请求。负载均衡器（简称LB）有时也被称为LVS Director（简称Director）。</p>
+
+<h5 id="三种工作模式">三种工作模式</h5>
+
+<ol>
+  <li>NAT 模式</li>
+  <li>TUN 模式</li>
+  <li>DR 模式</li>
+</ol>
+
+<h5 id="十种调度算法">十种调度算法</h5>
+
+<p>当Director调度器收到来自客户端计算机访问它的VIP上的集群服务的入站请求时，Director调度器必须决定哪个集群节点应该处理请求。Director调度器可用于做出该决定的调度方法分成两个基本类别：</p>
+
+<ul>
+  <li>固定调度方法：rr 轮询，wrr 权重轮循，dh 目的地址哈希调度，sh 源地址哈希调度</li>
+  <li>动态调度算法：wlc 加权最小连接数调度，lc 最小连接数调度，lblc，lblcr，SED，NQ</li>
+</ul>
+
+<h4 id="nginx-支持的负载均衡算法">NginX 支持的负载均衡算法</h4>
+
+<p>Nginx是一款轻量级的<strong>Web 服务器</strong>/<strong>反向代理服务器</strong>及电子邮件（IMAP/POP3）代理服务器，在BSD-like 协议下发行。</p>
+
+<ul>
+  <li>其特点是占有内存少，并发能力强，事实上nginx的并发能力在同类型的网页服务器中表现较好。</li>
+  <li>可以使用 nginx 作为高效的 <strong>HTTP 负载均衡器</strong>，将流量分布到多个应用服务器，并通过 nginx 提高 web 应用程序的性能、可扩展性和可靠性。</li>
+</ul>
+
+<p>Nginx 支持以下负载均衡算法：</p>
+
+<ol>
+  <li><strong>轮询</strong> - 发送给应用服务器的请求以轮询的方式分发；</li>
+  <li><strong>最少连接</strong> - 下一个请求被分配给具有最少数量活动连接的服务器；</li>
+  <li><strong>ip 哈希</strong> - 使用哈希函数确定下一个请求应该选择哪一个服务器（基于客户端的 IP 地址）；</li>
+</ol>
+
+<h3 id="cdn">CDN</h3>
+
+<blockquote>
+  <p>分布在全国各地，主要用来处理<strong>静态资源</strong>的请求。通过<code class="highlighter-rouge">CDN</code>的负载均衡系统，智能调度边缘节点提供服务。</p>
+</blockquote>
+
+<p><strong>CDN</strong> 全称 <code class="highlighter-rouge">Content Delivery/Distribution Network</code>，即<strong>内容分发网络</strong> 。简单来讲，<code class="highlighter-rouge">CDN</code> 就是根据<strong>用户位置</strong>分配<strong>最近</strong>的资源。</p>
+
+<p>关键技术主要：</p>
+
+<ol>
+  <li>内容存储：指的是静态资源，比如图片、视频、文档、JS、CSS、HTML。</li>
+  <li>分发网络技术：指的是将这些<strong>静态资源</strong>分发到位于多个<strong>不同的地理位置</strong>机房中的服务器上，以实现<strong>就近访问</strong>。
+    <ul>
+      <li>进而加快静态资源的访问速度，减轻服务器以及带宽的负担。</li>
+      <li>比如北京的用户直接访问北京机房的数据。</li>
+    </ul>
+  </li>
+</ol>
+
+<p><strong>边缘节点</strong>：用户在上网的时候不用直接访问源站，而是访问离他“最近的”一个 CDN 节点，其实就是缓存了源站内容的代理服务器。</p>
+
+<h4 id="cdn-工作原理">CDN 工作原理</h4>
+
+<p>搞懂下面 3 个问题也就搞懂了 CDN 的工作原理：</p>
+
+<ol>
+  <li>静态资源是如何被缓存到 CDN 节点中的？<strong>预热、回源、刷新</strong>。</li>
+  <li>如何找到最合适的 CDN 节点？通过 <strong>GSLB</strong> 找到距离请求地址最近的 CDN 节点。</li>
+  <li>如何防止静态资源被盗用？可以利用 <strong>Referer 防盗链</strong> + <strong>时间戳防盗链</strong> 。</li>
+</ol>
+
+<h4 id="缓存代理系统回源">缓存代理系统、回源</h4>
+
+<p>CDN有的<strong>核心能力</strong>有两个，一个是缓存，一个是回源。</p>
+
+<h5 id="缓存系统">缓存系统</h5>
+
+<p>缓存系统：是 <code class="highlighter-rouge">CDN</code>的另一个关键组成部分，会<strong>有选择地缓存</strong>那些<strong>最常用的</strong>那些资源。</p>
+
+<p>其中有两个衡量<code class="highlighter-rouge">CDN</code>服务质量的重要指标：</p>
+
+<ul>
+  <li>命中率：用户访问的资源恰好在缓存系统里，可以直接返回给用户，<strong>命中次数</strong>与所有访问次数之比。</li>
+  <li>回源率：缓存里没有，必须用<strong>代理</strong>的方式回<strong>源站</strong>取，<strong>回源次数</strong>与所有访问次数之比。</li>
+</ul>
+
+<blockquote>
+  <p>命中率越高越好，回源率越低越好。</p>
+</blockquote>
+
+<p>缓存系统也可以划分出层次，分成一级缓存节点和二级缓存节点。</p>
+
+<ul>
+  <li>
+    <p>一级缓存配置高一些，直连源站，二级缓存配置低一些，直连用户。</p>
+  </li>
+  <li>
+    <p>回源的时候<strong>二级缓存只找一级缓存</strong>，一级缓存没有才回源站，可以有效地减少真正的回源。</p>
+  </li>
+</ul>
+
+<h5 id="预热回源刷新">预热、回源、刷新</h5>
+
+<p><strong>回源</strong>：访问的资源不在 CDN 节点中，CDN 节点将请求<strong>源站</strong>获取资源。</p>
+
+<ol>
+  <li><strong>预热</strong>：将源站的资源同步到 CDN 的节点中。用户首次请求资源可以直接从 CDN 节点中取，无需回源。</li>
+  <li>如果资源有更新的话，可以对其<strong>刷新</strong> ，删除 CDN 节点上缓存的资源，当用户访问对应的资源时直接回源获取最新的资源，并重新缓存。</li>
+</ol>
+
+<h4 id="gslb-全局负载均衡">GSLB 全局负载均衡</h4>
+
+<p><strong>GSLB</strong> （Global Server Load Balance，<strong>全局负载均衡</strong>）：是 CDN 的大脑，负责多个 CDN 节点之间<strong>相互协作</strong>。</p>
+
+<ul>
+  <li>最常用的是<strong>基于 DNS</strong> 的 GSLB。</li>
+  <li>GSLB 内部可以看作是 <strong>CDN 专用 DNS 服务器</strong>和负载均衡系统组合。</li>
+</ul>
+
+<p>步骤：</p>
+
+<ol>
+  <li>浏览器向 <strong>DNS 服务器</strong>发送域名请求；</li>
+  <li>DNS 服务器根据 <strong>CNAME 别名记录</strong>直接？向 GSLB 发送请求；CNAME 指向<code class="highlighter-rouge">CDN</code>的全局负载均衡系统 IP 地址；
+    <ol>
+      <li><del>（CDN 专用）DNS 服务器返回 <strong>CNAME 别名记录</strong>给浏览器，CNAME 指向<code class="highlighter-rouge">CDN</code>的全局负载均衡系统 IP 地址；</del></li>
+      <li><del>浏览器使用 IP 地址请求负载均衡系统进而找到对应的 CDN 节点。</del></li>
+    </ol>
+  </li>
+  <li>GSLB （会根据请求的 IP 地址、CDN 节点状态（比如负载情况、性能、响应时间、带宽）等指标来综合判断具体），返回性能最好、最合适的（通常<strong>距离请求地址最近</strong>）的 CDN 节点（<strong>边缘服务器</strong>，真正缓存内容的地方）的地址给浏览器；</li>
+  <li>浏览器直接访问指定的 CDN 节点。</li>
+</ol>
+
+<p><img src="assets/cdn-overview.png" alt="img" style="zoom:70%;" /></p>
+
+<h4 id="如何防止资源被盗刷">如何防止资源被盗刷？</h4>
+
+<p>为了防止静态资源被盗用，可以利用 <strong>Referer 防盗链</strong> + <strong>时间戳防盗链</strong> 。</p>
+
+<ol>
+  <li>
+    <p><strong>Referer 防盗链</strong>：即根据 HTTP 请求的头信息里面的 <strong>Referer 字段</strong>对请求进行限制。可以通过 Referer 字段获取到当前请求页面的<strong>来源页面的网站地址</strong>，确定请求是否来自合法的网站。</p>
+
+    <ul>
+      <li>不过，如果站点的防盗链配置允许 Referer 为空的话，通过隐藏 Referer，可以直接绕开防盗链。</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>时间戳防盗链</strong>：安全性更强一些。加密的 URL 具有时效性，过期之后就无法再被允许访问。通常有两个参数：</p>
+
+    <ol>
+      <li>
+        <p><code class="highlighter-rouge">wsSecret</code> 签名字符串：一般是通过对用户设定的加密字符串、请求路径、过期时间通过 MD5 哈希算法取哈希的方式获得。</p>
+      </li>
+      <li>
+        <p><code class="highlighter-rouge">wsTime</code> 过期时间</p>
+
+        <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> // 时间戳防盗链 URL 示例
+ http://cdn.wangsu.com/4/123.mp3? wsSecret=79aead3bd7b5db4adeffb93a010298b5&amp;wsTime=1601026312
+</code></pre></div>        </div>
+      </li>
+    </ol>
+  </li>
+  <li>
+    <p>其它：<strong>IP 黑白名单</strong>配置、IP 访问限频配置等机制来防盗刷。</p>
+  </li>
+</ol>
 
 <h3 id="消息队列">消息队列</h3>
 
 <p>消息队列（Message Queue / <strong>MQ</strong> ）：是存放消息的容器，当需使用消息时，直接从容器中取出消息使用。</p>
 
-<p><img src="assets/message_queue_12306.png" alt="img" style="zoom: 67%;" /></p>
+<ul>
+  <li>参与消息传递的双方称为 <strong>生产者</strong> 和 <strong>消费者</strong> ，生产者负责发送消息，消费者负责处理消息。</li>
+  <li>由于队列 Queue 是一种<strong>先进先出</strong>的数据结构，所以消费消息时也是按照顺序来消费的。</li>
+</ul>
 
-<h5 id="带来的好处">带来的好处</h5>
+<blockquote>
+  <p>操作系统中的进程通信的一种很重要的方式就是消息队列。</p>
+
+  <p>这里提到的消息队列稍微有点区别，更多指的是各个服务以及系统内部各个组件/模块之前的通信，属于一种 <strong>中间件</strong> 。</p>
+</blockquote>
+
+<p><img src="assets/message_queue_12306.png" alt="img" style="zoom: 80%;" /></p>
+
+<h4 id="优点使用场景">优点、使用场景</h4>
 
 <ol>
-  <li><strong>异步</strong>：通过异步处理提高系统性能（减少响应所需时间）：如用户提交订单。</li>
-  <li><strong>削峰</strong>/限流：先将短时间<strong>高并发</strong>产生的事务消息存储在消息队列中，然后后端服务再慢慢（根据自己的能力）去消费这些消息，避免直接把后端服务打垮；如秒杀、促销活动。</li>
-  <li><strong>解耦</strong>：降低系统耦合性（提升可扩展性）：发布-订阅模式中，生产者发布消息；消费者订阅主题，从消息队列拉取消息并消费（进行后续处理），不需知道消息来源。</li>
+  <li>应用<strong>解耦</strong>：如果模块之间不直接进行调用，模块之间耦合度就会很低，那么修改一个模块或者新增一个模块对其它模块的影响会很小，从而实现可扩展性。
+    <ul>
+      <li>通过使用消息队列，一个模块只需要向消息队列中发送消息，其它模块可以选择性地<strong>从消息队列中订阅消息</strong>从而完成调用。</li>
+    </ul>
+  </li>
+  <li>流量<strong>削锋</strong>/限流：在高并发的场景下，如果<strong>短时间有大量的请求到达</strong>会压垮服务器。可以将请求发送到消息队列中，服务器按照其处理能力慢慢<strong>从消息队列中订阅消息</strong>进行处理。</li>
+  <li><strong>异步处理</strong>：发送者将消息发送给消息队列之后，不需要同步等待消息接收者处理完毕，而是立即返回进行其它操作。消息接收者<strong>从消息队列中订阅消息</strong>之后异步处理。
+    <ul>
+      <li>例如：在注册流程中，用户在填写完注册信息之后就可以完成注册，而将<strong>发送验证邮件</strong>这一消息发送到<strong>消息队列</strong>中。</li>
+    </ul>
+  </li>
+  <li><del>消息通讯</del>：消息队列内置了高效的通信机制，可用于消息通讯。如实现点对点消息队列、聊天室等。</li>
+  <li><del>远程调用</del></li>
 </ol>
 
-<h5 id="引入-mq-后缺点">引入 MQ 后缺点</h5>
+<h4 id="缺点消息消费问题">缺点、消息消费问题</h4>
 
 <ol>
   <li>一致性（<code class="highlighter-rouge">Consistency</code>）问题：真正消费者没有正确消费消息、导致数据不一致；</li>
-  <li>系统可用性（<code class="highlighter-rouge">Availability</code>）降低： 需考虑消息丢失、或 MQ 挂掉等情况；</li>
-  <li>系统复杂性提高： 需解决消息重复消费、消息传递顺序、分布式事务、消息堆积、消息丢失，需考虑高可用、集群等。</li>
+  <li>系统可用性（<code class="highlighter-rouge">Availability</code>）降低： 需考虑<strong>消息丢失</strong>、或 MQ 挂掉等情况；</li>
+  <li>系统复杂性提高： 需解决<strong>消息重复消费</strong>、消息传递顺序、分布式事务、<strong>消息堆积</strong>、<strong>消息丢失</strong>，需考虑高可用、集群等。</li>
 </ol>
 
-<h4 id="jms-消息模型">JMS 消息模型</h4>
-
-<p><strong>JMS</strong>（JAVA Message Service，Java 消息服务）：JMS 的客户端间可通过 JMS 服务进行异步的消息传输。ActiveMQ 就是基于 JMS 规范实现的。</p>
-
-<p>JMS 的两种<strong>消息模型</strong>：</p>
+<h5 id="如何解决消费问题">如何解决消费问题</h5>
 
 <ol>
-  <li>队列模型、点到点（Peer-2-Peer）模型：用<strong>队列</strong>作为消息通信载体；满足生产者与消费者模式，一条消息只能被一个消费者使用，未被消费的消息在队列中保留直到被消费或超时。如，RabbitMQ 的生产者与消费者。</li>
-  <li>发布/订阅（Pub/Sub）模型、主题模型：使用<strong>主题</strong>作为消息通信载体，类似于广播模式；
+  <li><strong>消息丢失</strong>：</li>
+  <li><strong>顺序消费</strong>：将同一语义下的消息放入同一个队列，如用 <strong>Hash 取模法</strong>保证同一订单在同一队列中。
     <ul>
-      <li>消息的生产者称为发布者（Publisher） ，消息的消费者称为订阅者（Subscriber)），存放消息的容器称为主题（Topic)）。</li>
-      <li>其中，发布者将消息发送到指定主题中，订阅者需提前订阅主题才能接收特定主题的消息（在一条消息广播后才订阅的用户收不到该消息）。</li>
-      <li>对于主题模型的实现，每个消息中间件的底层设计都不一样，如 <code class="highlighter-rouge">Kafka</code> 中的<strong>分区</strong> ，<code class="highlighter-rouge">RocketMQ</code> 中的<strong>队列</strong>，<code class="highlighter-rouge">RabbitMQ</code> 中的 <code class="highlighter-rouge">Exchange</code> 。观察者模式。</li>
+      <li><code class="highlighter-rouge">RocketMQ</code> 在主题上是无序的，只有在队列层面才保证有序；</li>
+      <li>普通顺序和严格顺序；</li>
     </ul>
   </li>
+  <li><strong>重复消费</strong>：<strong>幂等操作</strong>，即任意多次执行所产生的影响均与一次执行的影响相同。具体实现可用：
+    <ol>
+      <li>写入 <code class="highlighter-rouge">Redis</code>：因为 <code class="highlighter-rouge">Redis</code> 的 <code class="highlighter-rouge">key</code> 和 <code class="highlighter-rouge">value</code> 是<strong>天然支持幂等</strong>的；</li>
+      <li>数据库插入法：基于唯一键来保证不会插入重复数据。</li>
+    </ol>
+  </li>
+  <li><strong>消息堆积</strong>：指峰值太大导致消息堆积在队列中。<strong>限流降级</strong>（削峰）。</li>
+  <li><strong>高可用性</strong>：</li>
+  <li><strong>数据一致性、分布式事务</strong>：事务消息加上<strong>事务反查机制</strong>。</li>
 </ol>
+
+<h5 id="消息丢失">消息丢失</h5>
+
+<p>一个消息从生产者产生，到被消费者消费，主要经过三个过程。</p>
+
+<p>因此如何保证MQ不丢失消息，可以从这三个阶段阐述：</p>
+
+<ol>
+  <li>生产者保证不丢消息：生产者调用<code class="highlighter-rouge">send</code>方法发送消息后，可能<strong>因网络问题</strong>并没有发送过去。
+    <ol>
+      <li>采用<strong>同步方式</strong>发送，<code class="highlighter-rouge">send</code>消息方法返回<strong>成功</strong>状态，就表示消息正常到达了存储端 <code class="highlighter-rouge">Broker</code>。</li>
+      <li>如果send消息<strong>异常</strong>或者返回<strong>非成功</strong>状态，<strong>自动重试</strong>消息发送。</li>
+      <li>可以使用<strong>事务消息</strong>，<code class="highlighter-rouge">RocketMQ</code> 的事务消息机制就是为了保证零丢失来设计的。</li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">Broker</code> 代理存储端不丢消息：确保消息持久化到磁盘。<code class="highlighter-rouge">RocketMQ</code> 的<strong><a href="#刷盘机制">刷盘机制</a></strong>。</li>
+  <li>消费者不丢消息：消费者刚拿到消息准备进行真正消费时，突然挂掉，实际上并没有被消费。解决：消费者执行完业务逻辑，再反馈会Broker说消费成功。</li>
+</ol>
+
+<h6 id="rocketmq-刷盘机制">RocketMQ 刷盘机制</h6>
+
+<blockquote>
+  <p>队列中的消息又是如何进行存储持久化？</p>
+</blockquote>
+
+<p>在单个结点层面：</p>
+
+<ul>
+  <li>
+    <p><strong>同步刷盘</strong>：生产者消息发过来时，只有<strong>持久化</strong>到磁盘，RocketMQ 的存储端 Broker 才返回一个成功的 <code class="highlighter-rouge">ACK</code> 。能保证消息不丢失，但是影响了性能。一般适用于<strong>金融</strong>等特定业务场景；</p>
+  </li>
+  <li>
+    <p><strong>异步刷盘</strong>：采用后台<strong>异步线程</strong>提交的方式执行刷盘操作。只要消息写入PageCache 缓存，就返回一个成功的ACK响应。这样提高了MQ的性能，但是如果这时候<strong>机器断电</strong>了，就会丢失消息。一般适用于（如<strong>发验证码</strong>等）对于消息保证要求不太高的业务场景。</p>
+  </li>
+</ul>
+
+<p><code class="highlighter-rouge">Borker</code> 一般是集群部署的，主从模式下，根据主节点返回消息给客户端时是否需<strong>同步从节点</strong>：</p>
+
+<ul>
+  <li><strong>同步复制</strong>： 也叫 “同步双写”，即，只有主节点和从节点都写入成功，才反馈成功的ack给生产者。 它保证了消息不丢失，但是降低了系统的吞吐量。</li>
+  <li><strong>异步复制</strong>： 只要消息写入主节点成功，就返回成功的ack，它速度快，但是会有性能问题。</li>
+</ul>
+
+<h5 id="保证消息的顺序性">保证消息的顺序性</h5>
+
+<p>消息的有序性：就是指可以按照消息的<strong>发送顺序</strong>来消费。</p>
+
+<ul>
+  <li>有些业务对消息的顺序是有要求的，比如，先下单再付款，最后再完成订单。</li>
+  <li>假设生产者先后产生了两条消息，分别是下单消息（M1），付款消息（M2），M1比M2先产生，<strong>如何保证M1比M2先被消费</strong>呢。</li>
+</ul>
+
+<p><img src="https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/613bf417eff24ad8b6d82f98e0feda58~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?" alt="image.png" /></p>
+
+<p>保证消息的顺序性的方法：生产者有序存储，消费者有序消费。</p>
+
+<ul>
+  <li>发送至同一个<strong>MQ服务器</strong>上，发往同一个消费者，且等到M1消费端ACK成功后，M2再发送。</li>
+  <li>比如<code class="highlighter-rouge">Kafka</code>的<strong>全局有序消息</strong>：生产者发消息时，1个<code class="highlighter-rouge">Topic</code>只能对应一个<code class="highlighter-rouge">Partition</code>、一个 <code class="highlighter-rouge">Consumer</code>，内部单线程消费。发送消息时指定 key/Partition。</li>
+</ul>
+
+<p><img src="https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/7b6dd910c6164e6d85c078b4b0b538fd~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?" alt="image.png" /></p>
+
+<h5 id="消息重复消费幂等性">消息重复消费、幂等性</h5>
+
+<p>消息队列是可能发生重复消费的：</p>
+
+<ol>
+  <li>生产端：为保证消息可靠性，可能想MQ重复发送消息，直到拿到成功的ACK。</li>
+  <li>消费端：消费消息一般是这个流程：拉取消息、业务逻辑处理、提交消费位移。假设业务逻辑处理完，事务提交了，但是需要<strong>更新消费位移</strong>时，消费者挂了，这时候另一个消费者就会拉取到重复的消息。</li>
+</ol>
+
+<p>解决方案：使用<strong>消息幂等性校验</strong>处理重复消息，开启<code class="highlighter-rouge">KafKa</code>的幂等性功能。</p>
+
+<ol>
+  <li>建一个带<strong>唯一业务标记</strong>的本地表，利用<strong>主键</strong>或者<strong>唯一性索引</strong>，每次处理业务，先校验一下。<strong>Redis 的se</strong>t、MySQL 的主键等天然的幂等功能。最有效。</li>
+  <li>又或者用<code class="highlighter-rouge">redis</code>缓存下业务标记，将消息生成md5，每次在处理消息之前先查Redis，判断是否已消费。</li>
+  <li><del>Kafak将<code class="highlighter-rouge">enable.auto.commit</code>参数设置为 false，关闭自动提交，拉取到消息、手动提交 offset。</del></li>
+</ol>
+
+<h6 id="幂等性">幂等性</h6>
+
+<p>幂等性：一个方法无论被多少次重复执行，所期望的结果和第一次执行所期望的结果保持一致。</p>
+
+<ul>
+  <li>用在接口上就可以理解为：同一个接口，多次发出同一个请求，请求的结果是一致的。</li>
+</ul>
+
+<p>导致幂等性的原因：</p>
+
+<ul>
+  <li>用户重复提交、恶意攻击；</li>
+  <li>分布式系统中，为避免数据丢失，采用的超时重试机制；</li>
+</ul>
+
+<p>怎么保证幂等性：</p>
+
+<ol>
+  <li>insert前先select：在保存数据的接口中，在<code class="highlighter-rouge">insert</code>前，先根据<code class="highlighter-rouge">requestId</code>等字段先<code class="highlighter-rouge">select</code>一下数据。如果该数据已存在，则直接返回，如果不存在，才执行  <code class="highlighter-rouge">insert</code>操作。</li>
+  <li>加唯一索引：加唯一索引是个非常简单但很有效的办法，如果重复插入数据的话，就会抛出异常，为了保证幂等性，一般需要捕获这个异常。</li>
+  <li>加悲观锁：更新逻辑，比如更新用户账户余额，可以加悲观锁，把对应用户的哪一行数据锁住。同一时刻只允许一个请求获得锁，其他请求则等待。这种方式有一个缺点，获取不到锁的请求一般只能报失败，比较难保证接口返回相同值。</li>
+  <li>加乐观锁：更新逻辑，也可以用乐观锁，性能更好。可以在表中增加一个<code class="highlighter-rouge">timestamp</code>或者<code class="highlighter-rouge">version</code>字段，例如<code class="highlighter-rouge">version</code>:在更新前，先查询一下数据，将version也作为更新的条件，同时也更新version：</li>
+  <li>建防重表：有时候表中并非所有的场景都不允许产生重复的数据，只有某些特定场景才不允许。这时候，就可以使用防重表的方式。例如消息消费中，创建防重表，存储消息的唯一ID，消费时先去查询是否已经消费，已经消费直接返回成功。</li>
+  <li>状态机：有些业务表是有状态的，比如订单表中有：1-下单、2-已支付、3-完成、4-撤销等状态，可以通过限制状态的流动来完成幂等。</li>
+  <li>分布式锁：直接在数据库上加锁的做法性能不够友好，可以使用分布式锁的方式，目前最流行的分布式锁实现是通过Redis，具体实现一般都是使用Redission框架。</li>
+  <li>token机制：请求接口之前，需要先获取一个唯一的token，再带着这个token去完成业务操作，服务端根据这个token是否存在，来判断是否是重复的请求。</li>
+</ol>
+
+<p><img src="assets/midneg.webp" alt="图片" style="zoom: 58%;" /></p>
+
+<h6 id="可靠性">可靠性</h6>
+
+<ul>
+  <li>发送端的可靠性：发送端完成操作后一定能将消息成功发送到消息队列中。</li>
+  <li>接收端的可靠性：接收端能够从消息队列成功消费一次消息。</li>
+</ul>
+
+<p>两种实现方法：</p>
+
+<ul>
+  <li>保证<strong>接收端</strong>处理消息的业务逻辑具有<strong>幂等性</strong>：只要具有幂等性，那么消费多少次消息，最后处理的结果都是一样的。</li>
+  <li>保证消息具有唯一编号，并使用一张日志表来记录已经消费的消息编号。</li>
+</ul>
+
+<h5 id="消息堆积">消息堆积</h5>
+
+<p>消息积压：因为生产者的生产速度，远大于消费者的消费速度。</p>
+
+<blockquote>
+  <p>导致几百万消息持续积压几小时。</p>
+</blockquote>
+
+<p>遇到消息积压问题时：</p>
+
+<ol>
+  <li><strong>临时紧急扩容消费者</strong>，先保证消息都消费完。</li>
+  <li><strong>消息迁移 Queue 扩容</strong>，恢复队列中丢失的数据。</li>
+  <li>再排查是不是有bug产生了，如果是bug需要解决bug。</li>
+  <li>如果不是bug，可以<strong>优化一下消费的逻辑</strong>：
+    <ol>
+      <li>比如之前是一条一条消息消费处理的话，可以确认是不是可以优为<strong>批量处理</strong>消息。</li>
+      <li>如果还是慢，可以考虑水平扩容，增加Topic的队列数，和消费组机器的数量，提升整体消费能力。
+  如果。</li>
+    </ol>
+  </li>
+</ol>
+
+<h5 id="高可用">高可用</h5>
+
+<blockquote>
+  <p>消息中间件如何做到高可用？</p>
+</blockquote>
+
+<p>单机是没有高可用可言的，高可用都是对集群来说的，如kafka的高可用。</p>
+
+<ul>
+  <li>Kafka 的基础集群架构，由多个<code class="highlighter-rouge">broker</code>组成，每个<code class="highlighter-rouge">broker</code>都是一个节点。</li>
+  <li>当创建一个<code class="highlighter-rouge">topic</code>时，它可以划分为多个<code class="highlighter-rouge">partition</code>，而每个<code class="highlighter-rouge">partition</code>放一部分数据，分别存在于不同的 broker 上。</li>
+  <li>也就是说，一个 topic 的数据，是分散放在多个机器上的，每个机器就放一部分数据。</li>
+</ul>
+
+<p>有些伙伴可能有疑问，每个<code class="highlighter-rouge">partition</code>放一部分数据，如果对应的broker挂了，那这部分数据是不是就丢失了？那还谈什么高可用呢？</p>
+
+<ul>
+  <li>Kafka 0.8 之后，提供了<strong>复制多副本机制</strong>来保证高可用，即每个 partition 的数据都会同步到其它机器上，形成多个副本。</li>
+  <li>然后所有的副本会选举一个 leader 出来，让leader去跟生产和消费者打交道，其他副本都是follower。</li>
+  <li>写数据时，leader 负责把数据同步给所有的follower，读消息时，直接读 leader 上的数据即可。</li>
+  <li>如何保证高可用的？就是假设某个 broker 宕机，这个broker上的partition 在其他机器上都有副本的。如果挂的是leader的broker呢？其他follower会重新选一个leader出来。</li>
+</ul>
+
+<h5 id="如何保证数据一致性事务消息如何实现">如何保证数据一致性，事务消息如何实现</h5>
+
+<blockquote>
+  <p>存储机制？</p>
+</blockquote>
+
+<p>一条普通的MQ消息，从产生到被消费，大概流程如下：</p>
+
+<ol>
+  <li>生产者产生消息，发送到MQ服务器；</li>
+  <li>MQ服务器收到消息后，将消息持久化到存储系统；</li>
+  <li>MQ服务器返回ACK到生产者；</li>
+  <li>MQ服务器把消息push给消费者；</li>
+  <li>消费者消费完消息，响应ACK；</li>
+  <li>MQ服务器收到ACK，认为消息消费成功，即在存储中删除消息。</li>
+</ol>
+
+<p><img src="https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/b887e085cfcc42d797a6b5fe9422e4fb~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?" alt="image.png" style="zoom:80%;" /></p>
+
+<p>如，订单系统创建完订单后，再发送消息给下游系统。如果订单创建成功，然后消息没有成功发送出去，下游系统就无法感知这个事情，导致<strong>数据不一致</strong>。
+<strong>如何保证数据一致性呢？</strong>可以使用<strong>事务消息</strong>加上<strong>事务反查机制</strong>。如 Rocket 中的分布式事务。</p>
+
+<p>事务消息是的实现：</p>
+
+<ol>
+  <li>生产者产生消息，发送一条<strong>半事务消息</strong>到MQ服务器；</li>
+  <li>MQ收到消息后，将消息<strong>持久化</strong>到存储系统，这条消息的状态是<strong>待发送</strong>状态；</li>
+  <li>MQ服务器返回ACK确认到生产者，此时MQ不会触发消息推送事件；</li>
+  <li>生产者执行本地事务；</li>
+  <li>如果本地事务执行成功，即<code class="highlighter-rouge">commit</code>执行结果到MQ服务器；如果执行失败，发送<code class="highlighter-rouge">rollback</code>；</li>
+  <li>如果是正常的<code class="highlighter-rouge">commit</code>，MQ服务器更新消息状态为<strong>可发送</strong>；如果是<code class="highlighter-rouge">rollback</code>，即删除消息；</li>
+  <li>如果消息状态更新为可发送，则MQ服务器会<code class="highlighter-rouge">push</code>消息给消费者。</li>
+  <li>消费者消费完返回ACK；</li>
+  <li>如果MQ服务器长时间没有收到<strong>生产者</strong>的<code class="highlighter-rouge">commit</code>或者<code class="highlighter-rouge">rollback</code>，它会<strong>反查生产者</strong>，然后根据查询到的结果执行最终状态。</li>
+</ol>
+
+<p><img src="https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/64d944a6253f4a83bddd5534bc47eb67~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?" alt="image.png" style="zoom:80%;" /></p>
+
+<h4 id="消息模型">消息模型</h4>
+
+<h5 id="队列模型">队列模型</h5>
+
+<p><strong>队列模型</strong>、<del>点到点模型（Peer-2-Peer）</del>：消息生产者向消息队列中发送了一个消息之后，只能被一个消费者<strong>消费一次</strong>。用<strong>队列</strong>作为消息通信载体。</p>
+
+<ul>
+  <li>
+    <p>满足生产者与消费者模式，一条消息只能被一个消费者使用，未被消费的消息在队列中保留直到被消费或超时。</p>
+  </li>
+  <li>如，<strong><code class="highlighter-rouge">RabbitMQ</code></strong> 的<strong>生产者与消费者模型</strong>。</li>
+  <li>如：<strong><code class="highlighter-rouge">RocketMQ</code></strong> 中的<strong>队列模型</strong>。</li>
+</ul>
+
+<h5 id="发布订阅">发布/订阅</h5>
+
+<p><strong>发布/订阅</strong>（Pub/Sub）模型、主题模型：消息生产者向频道发送一个消息之后，<strong>多个消费者</strong>可以从该频道订阅到这条消息并消费。使用<strong>主题</strong>作为消息通信载体，类似于广播模式。</p>
+
+<ul>
+  <li>消息的生产者称为发布者（Publisher） ，消息的消费者称为订阅者（Subscriber)），存放消息的容器称为<strong>主题</strong>（Topic)）。</li>
+  <li>其中，发布者将消息发送到指定主题中，订阅者需提前订阅主题才能接收特定主题的消息（在一条消息广播后才订阅的用户收不到该消息）。</li>
+  <li>对于主题模型的实现，每个消息中间件的底层设计都不一样。</li>
+  <li>如：<del><strong><code class="highlighter-rouge">RabbitMQ</code></strong> 中的 <code class="highlighter-rouge">Exchange</code>。</del></li>
+  <li>如：<strong><code class="highlighter-rouge">Kafka</code></strong> 中的<strong>发布 / 订阅模型</strong>、分区？  。</li>
+</ul>
+
+<p><img src="assets/message-queue-pub-sub-model.png" alt="发布/订阅（Pub/Sub）模型" style="zoom: 80%;" /></p>
+
+<p>发布与订阅模式和<strong>观察者模式</strong>有以下不同：</p>
+
+<ul>
+  <li>观察者模式中，观察者和主题都<strong>知道对方的存在</strong>；而在发布与订阅模式中，生产者与消费者<strong>不知道对方的存在</strong>，它们之间通过频道进行通信。</li>
+  <li>观察者模式是<strong>同步的</strong>，当事件触发时，主题会调用观察者的方法，然后等待方法返回；而发布与订阅模式是<strong>异步的</strong>，生产者向频道发送一个消息之后，就不需要关心消费者何时去订阅这个消息，可以立即返回。</li>
+</ul>
+
+<p><img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/image-20191212011747967.png" style="zoom: 50%;" /></p>
+
+<h4 id="jms-消息服务"><del>JMS 消息服务</del></h4>
+
+<p><strong>JMS</strong>（JAVA Message Service，Java 消息服务）：JMS 的客户端间可通过 JMS 服务进行<strong>异步</strong>的消息传输。</p>
+
+<ul>
+  <li>ActiveMQ 就是基于 JMS 规范实现的。</li>
+</ul>
 
 <p>JMS 定义的五种<strong>消息正文格式</strong>及调用的消息类型，<del>允许发送并接收一些不同形式的数据，提供现有消息格式的一些级别的兼容性</del>。</p>
 
@@ -440,13 +1431,32 @@
 
 <h5 id="amqp">AMQP</h5>
 
-<p><strong>AMQP</strong>（Advanced Message Queuing Protocol 高级消息队列协议）：提供<strong>统一消息服务</strong>的应用层标准（二进制应用层协议），面向消息的中间件设计，兼容 JMS。有跨平台、跨语言特性。</p>
+<p><strong>AMQP</strong>（<code class="highlighter-rouge">Advanced Message Queuing Protocol</code> <strong>高级消息队列协议</strong>）：提供<strong>统一消息服务</strong>的<strong>应用层</strong>标准（二进制应用层协议），面向消息的中间件设计，兼容 JMS。有跨平台、跨语言特性。</p>
 
-<p>RabbitMQ 就是基于 AMQP 协议实现的。</p>
+<blockquote>
+  <p>RabbitMQ 就是基于 AMQP 协议实现的。</p>
+</blockquote>
+
+<h4 id="消息队列技术选型">消息队列技术选型</h4>
+
+<blockquote>
+  <p>Kafka还是RocketMQ，还是RabbitMQ</p>
+</blockquote>
+
+<ul>
+  <li>Kafka：单机吞吐量，基于 topic 进行正则匹配，支持大量堆积、顺序消息，天然Leader-Slave，无状态集群，每台服务器既是Master也是Slave，性能稳定性较差。大数据领域实时计算、日志采集等，用Kafka为业内标准。</li>
+  <li>RocketMQ：基于topic、messageTag，根据类型和属性正则匹配，支持大量堆积、顺序消息，常用“多对Master-Slave”，开源版需要手动切换从节点变主节点。阿里出品。大型软件公司有能力对rocketMQ进行定制化开发。</li>
+  <li>RabbitMQ：支持direct、topic、Headers、fanout四种模式，性能稳定性好。开源，稳定支持、活跃度高，但不是Java开发。中小型软件公司，技术实力较为一般，建议选：
+    <ul>
+      <li>一方面，erlang语言天生具备高并发的特性，而且管理界面用起来十分方便。</li>
+      <li>代码是开源的，而且社区十分活跃，可以解决开发过程中遇到的bug，这点对于中小型公司来说十分重要。</li>
+    </ul>
+  </li>
+</ul>
 
 <h4 id="rabbitmq">RabbitMQ</h4>
 
-<p>基于 AMQP 协议实现的消息中间件，RabbitMQ 整体上是一个生产者与消费者模型，主要负责接收、存储和转发消息。默认端口是15672。</p>
+<p><strong>基于 AMQP 协议</strong>实现的消息中间件，RabbitMQ 整体上是一个<strong>生产者与消费者模型</strong>，主要负责接收、存储和转发消息。默认端口是<strong>15672</strong>。</p>
 
 <h5 id="消息组成部分">消息组成部分</h5>
 
@@ -461,22 +1471,31 @@
   <li>消息体：也可称为 payLoad，不透明。</li>
 </ol>
 
-<h5 id="生产者与消费者模型">生产者与消费者模型</h5>
+<h5 id="重要组件">重要组件</h5>
+
+<blockquote>
+  <p>生产者与消费者模型</p>
+
+  <p>如何实现路由？</p>
+</blockquote>
+
+<p><img src="assets/e7dbb6f3a1e8ab9944d486d3030a199b.png" alt="RabbitMQ 内部结构" /></p>
 
 <ol>
   <li><code class="highlighter-rouge">Producer</code>（消息生产者）、<code class="highlighter-rouge">Consumer</code>（消息消费者）：生产者把消息交由 RabbitMQ  后，RabbitMQ 会（根据消息头）把消息发送给感兴趣的消费者。</li>
-  <li><code class="highlighter-rouge">Exchange</code>（交换器）：用来接收生产者发送的消息、并将这些消息<strong>路由</strong>（分配）给服务器对应的 Queue  中。如果路由不到，会返回给生产者、或直接丢弃 。有4种 Exchange Types，对应着不同的<strong>路由</strong>（转发消息）<strong>策略</strong>：
+  <li><code class="highlighter-rouge">Exchange</code>（交换器）：用来接收生产者发送的消息、并将这些消息<strong>路由</strong>（分配）给服务器对应的 Queue  中。如果路由不到，会返回给生产者、或直接丢弃 。有<strong>4种 Exchange Types</strong>，对应着不同的<strong>路由</strong>（转发消息）<strong>策略</strong>：
     <ol>
-      <li>direct（默认）：把消息路由到那些 Bindingkey 与 RoutingKey 完全匹配的 Queue 中。常用在处理有优先级的任务，根据<strong>任务的优先级</strong>把消息发送到对应队列，这样可指派更多的资源去处理高优先级的队列。</li>
-      <li>fanout：把所有（发送到该 Exchange 的）消息路由到<strong>所有与它绑定的 Queue</strong> 中，不需做任何判断操作，所以速度最快。常用来广播消息。</li>
-      <li>topic：与 direct 类型相似，但匹配规则有些不同。</li>
-      <li><del>headers</del>：不推荐，不依赖于路由键的匹配规则来路由消息，而是根据<strong>发送的消息内容</strong>中的 headers 属性进行匹配。性能很差，也不实用，基本上不用。</li>
+      <li><code class="highlighter-rouge">direct</code>（默认）：把消息路由到那些 <code class="highlighter-rouge">Bindingkey</code> 与 <code class="highlighter-rouge">RoutingKey</code> 完全匹配的 Queue 中。常用在处理<strong>有优先级</strong>的任务，根据<strong>任务的优先级</strong>把消息发送到对应队列，这样可指派更多的资源去处理高优先级的队列。</li>
+      <li><code class="highlighter-rouge">topic</code>：与 direct 类型相似，但匹配规则有些不同。</li>
+      <li><code class="highlighter-rouge">fanout</code>：把所有（发送到该 Exchange 的）消息路由到<strong>所有与它绑定的 Queue</strong> 中，不需做任何判断操作，所以<strong>速度最快</strong>。常用来广播消息。</li>
+      <li><del><code class="highlighter-rouge">headers</code></del>：不推荐，不依赖于路由键的匹配规则来路由消息，而是根据<strong>发送的消息内容</strong>中的 headers 属性进行匹配。性能很差，也不实用，基本上不用。</li>
     </ol>
   </li>
   <li><code class="highlighter-rouge">Binding</code>（绑定）：一个绑定就是基于<strong>路由键</strong>将交换器（Exchange）和消息队列（Queue）连接起来的<strong>路由规则</strong>，绑定时指定一个 <strong>BindingKey</strong> ，用于将消息路由到队列，所以可将交换器理解成一个由绑定构成的路由表。绑定可是多对多的关系。</li>
-  <li><strong><code class="highlighter-rouge">Queue</code>（消息队列）</strong>：用来保存消息直到发送给消费者。是消息的容器，也是消息的终点。一个消息可投入一个或多个队列。消息一直在队列里，等待消费者连接到这个队列将其取走。 RabbitMQ 的生产者生产消息并最终投递到队列中，消费者可从队列中获取消息并消费。
+  <li><strong><code class="highlighter-rouge">Queue</code>（消息队列）</strong>：用来保存消息直到发送给消费者。是消息的容器，<del>也是消息的终点</del>。 RabbitMQ 的生产者生产消息并最终投递到队列中，消费者可从队列中获取消息并消费。
     <ol>
       <li>RabbitMQ 中消息只能存储在 <strong>队列</strong> 中，这和 Kafka 这种消息中间件相反。Kafka 将消息存储在 topic 这个逻辑层面，而相对应的队列逻辑只是 topic 实际存储文件中的位移标识。</li>
+      <li>一个消息可投入一个或多个队列。</li>
       <li>多个消费者可<strong>订阅</strong>同一个队列，队列中的消息会被<strong>平均分摊</strong>（Round-Robin，即轮询）给多个消费者进行处理，<del>而不是每个消费者都收到所有的消息并处理，</del>避免消息被重复消费。</li>
       <li>RabbitMQ 不支持队列层面的<strong>广播消费</strong>。</li>
     </ol>
@@ -488,15 +1507,15 @@
 
 <p>阿里开源的一个<strong>队列模型</strong>的消息中间件，有高性能、高吞吐量、高可靠、高实时、分布式的特点。</p>
 
-<h5 id="消息模型">消息模型</h5>
+<h5 id="消息模型-1">消息模型</h5>
 
 <p><img src="assets/rocketmq.png" alt="img" style="zoom:60%;" /></p>
 
-<p><code class="highlighter-rouge">RocketMQ</code> 通过在一个 <code class="highlighter-rouge">Topic</code> 中配置多个队列、且每个队列维护每个消费者组的消费位置，实现了主题模式/发布订阅模式 。</p>
+<p><code class="highlighter-rouge">RocketMQ</code> 通过在一个 <code class="highlighter-rouge">Topic</code> 中<strong>配置多个队列</strong>、且每个队列维护每个消费者组的<strong>消费位置</strong>，实现了主题模式/发布订阅模式 。</p>
 
 <ol>
-  <li><code class="highlighter-rouge">Producer Group</code> 生产者组： 代表某一类的生产者，如多个秒杀系统合在一起，一般生产相同的消息。生产消息后指定主题中的某个队列发送消息。</li>
-  <li><code class="highlighter-rouge">Con'sumer Group</code> 消费者组： 代表某一类的消费者，如多个短信系统合在一起，一般消费相同的消息。每个消费组在每个队列上维护一个消费位移 。</li>
+  <li><code class="highlighter-rouge">Producer Group</code> 生产者组： 代表某一类的生产者，如多个<strong>秒杀系统</strong>合在一起，一般生产相同的消息。生产消息后指定主题中的某个队列发送消息。</li>
+  <li><code class="highlighter-rouge">Con'sumer Group</code> 消费者组： 代表某一类的消费者，如多个<strong>短信系统</strong>合在一起，一般消费相同的消息。每个消费组在每个队列上维护一个<strong>消费位移</strong> 。</li>
   <li><code class="highlighter-rouge">Topic</code> 主题： 代表一类消息，如订单消息，物流消息等。一个主题中需维护多个队列，提高并发能力。</li>
 </ol>
 
@@ -514,55 +1533,15 @@
     <p><img src="assets/rocketmq_broker.png" alt="img" style="zoom: 50%;" /></p>
   </li>
   <li>
-    <p><code class="highlighter-rouge">NameServer</code> 注册中心：主要提供两个功能，Broker 管理和路由信息管理 。<code class="highlighter-rouge">Broker</code> 会将路由表注册到 <code class="highlighter-rouge">NameServer</code> 中，消费者和生产者就从中获取路由表、然后按照路由表的信息和对应的 <code class="highlighter-rouge">Broker</code> 进行通信。如<code class="highlighter-rouge">ZooKeeper</code> 和 <code class="highlighter-rouge">Spring Cloud</code> 中的 <code class="highlighter-rouge">Eu'reka</code> 。</p>
+    <p><code class="highlighter-rouge">NameServer</code> 注册中心：主要提供两个功能，Broker 管理和<strong>路由信息管理</strong> 。<code class="highlighter-rouge">Broker</code> 会将路由表注册到 <code class="highlighter-rouge">NameServer</code> 中，消费者和生产者就从中获取路由表、然后按照路由表的信息和对应的 <code class="highlighter-rouge">Broker</code> 进行通信。如<code class="highlighter-rouge">ZooKeeper</code> 和 <code class="highlighter-rouge">Spring Cloud</code> 中的 <code class="highlighter-rouge">Eu'reka</code> 。</p>
   </li>
 </ol>
-
-<h5 id="如何解决消费问题">如何解决消费问题</h5>
-
-<ol>
-  <li><strong>顺序消费</strong>：将同一语义下的消息放入同一个队列，如用 Hash <strong>取模法</strong>保证同一订单在同一队列中。
-    <ul>
-      <li><code class="highlighter-rouge">RocketMQ</code> 在主题上是无序的，只有在队列层面才保证有序；</li>
-      <li>普通顺序和严格顺序；</li>
-    </ul>
-  </li>
-  <li><strong>重复消费</strong>：幂等操作，即任意多次执行所产生的影响均与一次执行的影响相同。具体实现可用：
-    <ol>
-      <li>写入 <code class="highlighter-rouge">Redis</code>：因为 <code class="highlighter-rouge">Redis</code> 的 <code class="highlighter-rouge">key</code> 和 <code class="highlighter-rouge">value</code> 是天然支持幂等的；</li>
-      <li>数据库插入法：基于唯一键来保证不会插入重复数据。</li>
-    </ol>
-  </li>
-  <li>分布式事务：事务消息加上事务反查机制。</li>
-  <li>消息堆积：指峰值太大导致消息堆积在队列中。<strong>限流降级</strong>（削峰）。</li>
-  <li>回溯消费：指 <code class="highlighter-rouge">Consumer</code> 已消费成功的消息，由于业务需重新消费。</li>
-</ol>
-
-<h5 id="刷盘机制">刷盘机制</h5>
-
-<p>在单个结点层面：</p>
-
-<ul>
-  <li>
-    <p>同步刷盘：需等待一个刷盘成功的 <code class="highlighter-rouge">ACK</code> ，对 <code class="highlighter-rouge">MQ</code> 消息可靠性来说是一种不错的保障，但性能上会有较大影响 ，一般适用于<strong>金融</strong>等特定业务场景；</p>
-  </li>
-  <li>
-    <p>异步刷盘：往往是开启一个<strong>线程</strong>去异步地执行刷盘操作。采用后台异步线程提交的方式进行， 降低了<strong>读写延迟</strong> ，提高了 <code class="highlighter-rouge">MQ</code> 的性能和吞吐量，一般适用于（如发验证码等）对于消息保证要求不太高的业务场景。</p>
-  </li>
-</ul>
-
-<p><code class="highlighter-rouge">Borker</code> 主从模式下，主节点返回消息给客户端时是否需同步从节点：</p>
-
-<ul>
-  <li>同步复制： 也叫 “同步双写”，即，只有消息同步双写到主从节点上时才返回写入成功 ；</li>
-  <li>异步复制： 消息写入主节点后就直接返回写入成功 。</li>
-</ul>
 
 <h5 id="存储机制">存储机制</h5>
 
-<p>在 <code class="highlighter-rouge">Topic</code> 中的队列是以什么样的形式存在？</p>
-
-<p>队列中的消息又是如何进行存储持久化？</p>
+<blockquote>
+  <p>在 <code class="highlighter-rouge">Topic</code> 中的队列是以什么样的形式存在？</p>
+</blockquote>
 
 <h4 id="kafka">Kafka</h4>
 
@@ -583,9 +1562,9 @@
   <li>数据处理：构建实时的流数据处理程序、来转换或处理数据流。</li>
 </ol>
 
-<h5 id="消息模型-1">消息模型</h5>
+<h5 id="消息模型-2">消息模型</h5>
 
-<p>与 RocketMQ 的消息模型基本一样，唯一区别是没有队列这个概念，对应的是 <code class="highlighter-rouge">Partition</code>（分区）。默认端口 9090，producer、consumer 9092？</p>
+<p>与 RocketMQ 的消息模型基本一样，唯一区别是没有队列这个概念，对应的是 <code class="highlighter-rouge">Partition</code>（分区）。默认端口 <strong>9090</strong>，producer、consumer 9092？</p>
 
 <ol>
   <li>
@@ -614,88 +1593,203 @@
   <li>负载均衡</li>
 </ol>
 
-<h5 id="消息的消费顺序问题">消息的消费顺序问题</h5>
+<h3 id="数据库优化">数据库优化</h3>
 
 <ol>
-  <li>1 个 Topic 只对应一个 Partition；</li>
-  <li>（推荐）发送消息时指定 key/Partition。</li>
+  <li><strong>读写分离</strong>：主要是为了将对数据库的读写操作分散到不同的数据库节点上。 这样的话，就能够小幅提升写性能，大幅提升读性能。读写分离基于<strong>主从复制</strong>，MySQL 主从复制是依赖于 <strong>binlog</strong> 。需要尽量避免主从延迟。</li>
+  <li><strong>分库分表</strong>：
+    <ol>
+      <li><strong>分库</strong>：就是将数据库中的数据分散到不同的数据库上。</li>
+      <li><strong>分表</strong>：就是对单表的数据进行拆分，可以是垂直拆分，也可以是水平拆分。常见的分片算法。</li>
+      <li>引入分库分表之后，需要系统解决事务、分布式 id、无法 join 操作问题。</li>
+    </ol>
+  </li>
+  <li><strong>冷热分离</strong>：指根据数据的<strong>访问频率和业务重要性</strong>，将数据分为冷数据和热数据。</li>
 </ol>
-
-<h5 id="消息丢失问题">消息丢失问题</h5>
-
-<ul>
-  <li>生产者调用<code class="highlighter-rouge">send</code>方法发送消息后，可能因网络问题并没有发送过去：为 Producer 的<code class="highlighter-rouge">retries </code>（重试次数）设置一个合理值，自动重试消息发送；</li>
-  <li>消费者刚拿到消息准备进行真正消费时，突然挂掉，实际上并没有被消费，但 offset 却被自动提交：手动关闭自动提交 offset，每次在真正消费完消息后再手动提交 offset ；</li>
-  <li>Kafka 弄丢了消息。</li>
-</ul>
-
-<h5 id="消息重复消费问题">消息重复消费问题</h5>
-
-<p>服务端侧已消费的数据没有成功提交 offset。</p>
-
-<ul>
-  <li>消费消息服务做幂等校验，如 Redis 的set、MySQL 的主键等天然的幂等功能。最有效。</li>
-  <li>将<code class="highlighter-rouge">enable.auto.commit</code>参数设置为 false，关闭自动提交，拉取到消息、手动提交 offset。</li>
-</ul>
 
 <h3 id="读写分离">读写分离</h3>
 
-<p>主要是为了将数据库的读和写操作<strong>分散到</strong>不同的数据库节点上。主服务器负责写，从服务器负责读，主从库间会进行<strong>数据同步</strong>，通常一主多从。可<strong>大幅提高读性能</strong>，小幅提高写的性能。因此更适合单机并发读、写少读多请求较多的场景。</p>
+<p>读写分离：主要是为了将数据库的读和写操作<strong>分散到</strong>不同的数据库节点上。部署多台数据库，主服务器负责写，从服务器负责读，主从库间会进行<strong>数据实时同步</strong>（主从复制），通常<strong>一主多从</strong>。</p>
 
-<h5 id="主从同步延迟问题">主从同步延迟问题</h5>
+<ul>
+  <li>读写分离基于<strong>主从复制</strong>，MySQL 主从复制是依赖于 binlog 。</li>
+  <li>优点：可<strong>大幅提高读性能</strong>，小幅提高写的性能。</li>
+  <li>用途：因此更适合<strong>单机并发读</strong>、<strong>写少读多</strong>请求较多的场景。</li>
+</ul>
 
-<ol>
-  <li>强制将读请求路由到主库处理；如 <code class="highlighter-rouge">Sharding-JDBC</code>。</li>
-  <li>延迟读取。</li>
-</ol>
-
-<h5 id="实现读写分离">实现读写分离</h5>
-
-<p>步骤：</p>
+<h4 id="常用实现方式">常用实现方式</h4>
 
 <ol>
-  <li>部署多台数据库，选择其中的一台作为主数据库，其他的一台或多台作为从数据库。</li>
-  <li><strong>主从复制</strong>原理：保证主从数据库间的<strong>数据实时同步</strong>。</li>
-  <li>将<strong>写请求</strong>交给主数据库处理，读请求交给从数据库处理。</li>
+  <li>代理方式：代理层负责<strong>分离</strong>读写请求，再路由到对应的数据库中。提供类似功能的中间件有 MySQL Router（官方）、Atlas（基于 MySQL Proxy）、Maxscale、MyCat。</li>
+  <li>SDK 组件方式：引入第三方组件来帮助读写请求，<strong>推荐</strong>用 <code class="highlighter-rouge">sharding-jdbc</code>。</li>
 </ol>
 
-<p>常用方式：</p>
+<h4 id="主从复制原理">主从复制原理</h4>
+
+<p>MySQL 主从复制是依赖于 <strong>binlog 日志文件</strong> 。</p>
+
+<ul>
+  <li><strong>MySQL binlog</strong>（binary log 二进制日志文件) ：主要记录了 MySQL 数据库中数据的所有变化（数据库执行的所有 <strong>DDL 和 DML 语句</strong>）。</li>
+  <li>因此，根据主库的 MySQL binlog 日志就能够将主库的数据同步到从库中。</li>
+</ul>
+
+<p>主从复制的具体过程：</p>
 
 <ol>
-  <li>代理方式：代理层负责分离读写请求，路由到对应的数据库中。提供类似功能的中间件有 MySQL Router（官方）、Atlas（基于 MySQL Proxy）、Maxscale、MyCat。</li>
-  <li>组件方式：引入第三方组件来帮助读写请求，推荐用 <code class="highlighter-rouge">sharding-jdbc</code>。</li>
+  <li>主库将数据库中数据的变化写入到 binlog；</li>
+  <li>从库连接主库；</li>
+  <li>从库会创建一个 <strong>I/O 线程</strong>向主库请求更新的 binlog；</li>
+  <li>主库会创建一个 binlog dump 线程来发送 binlog ，从库中的 I/O 线程负责接收；</li>
+  <li>从库的 I/O 线程将接收的 binlog 写入到 relay log 中。</li>
+  <li>从库的 SQL 线程读取 <strong>relay log</strong> 同步数据到本地（即再执行一遍 SQL ）。</li>
 </ol>
 
-<h4 id="sharding-jdbc"><code class="highlighter-rouge">sharding-jdbc</code></h4>
+<blockquote>
+  <p>当然，除了主从复制之外，binlog 还能帮助我们实现数据恢复。</p>
+</blockquote>
+
+<h5 id="redis-的主从复制">Redis 的主从复制</h5>
+
+<blockquote>
+  <p>分布式缓存组件 Redis 也是通过主从复制实现的读写分离。</p>
+</blockquote>
+
+<p>应用场景：电子商务网站上的商品，一般都是一次上传，无数次浏览的，说专业点也就是”多读少写”。</p>
+
+<p>实现原理：</p>
+
+<ul>
+  <li>一个Redis服务可以有多个该服务的复制品，这个Redis服务称为 <strong>Master 主库</strong>，其它复制称为 Slaves 从库。</li>
+  <li>主库只负责写数据，每次有数据更新都将更新的数据同步到它所有的从库，而从库只负责读数据。</li>
+</ul>
+
+<p>这样一来，就有了两个好处：</p>
+
+<ol>
+  <li><strong>读写分离</strong>：不仅可以提高服务器的负载能力，并且可以根据读请求的规模自由增加或者减少从库的数量。</li>
+  <li>数据被复制成了了好几份，就算有一台机器出现故障，也可以使用其他机器的数据快速恢复。</li>
+</ol>
+
+<h4 id="主从同步延迟">主从同步延迟</h4>
+
+<p>读写分离对于提升数据库的并发非常有效，但是，同时也会引来一个问题：主库和从库的数据<strong>存在延迟</strong>，比如写完主库之后，主库的数据同步到从库是需要时间的，这个时间差就导致了主库和从库的<strong>数据不一致性</strong>问题。这也就是我们经常说的 <strong>主从同步延迟</strong> 。</p>
+
+<p>如何避免主从延迟？</p>
+
+<ol>
+  <li>强制将<strong>读请求</strong>路由到主库处理；这种方案虽然会增加主库的压力，但是，实现起来比较简单。如 <code class="highlighter-rouge">Sharding-JDBC</code>。</li>
+  <li><strong>延迟读取</strong>。
+    <ol>
+      <li>方便，这样设计业务流程就会好很多：对于一些对数据比较敏感的场景，可以在完成写请求之后，避免立即进行请求操作。</li>
+      <li>比如支付成功之后，跳转到一个支付成功的页面，当你点击返回之后才返回自己的账户。</li>
+    </ol>
+  </li>
+</ol>
 
 <h3 id="分库分表">分库分表</h3>
 
-<p>读写分离：同一个数据库中的表分布在了不同的数据库中。主要应对的是数据库读并发，没有解决数据库<strong>存储压力</strong>问题。</p>
+<p>读写分离主要应对的是数据库读并发，没有解决数据库<strong>存储压力</strong>问题。通过<strong>分库分表</strong>解决数据库存储压力的问题。</p>
 
-<p>分库分表：为了解决由于库、表数据量过大导致数据库性能持续下降的问题。</p>
+<ul>
+  <li>为了解决由于库、表<strong>数据量过大</strong>导致数据库性能持续下降的问题。</li>
+</ul>
 
-<h5 id="场景">场景</h5>
+<h4 id="分库">分库</h4>
 
-<ol>
-  <li>单表的数据达到千万级别以上，数据库读写速度较缓慢（分表）。</li>
-  <li>数据库中的数据占用的空间越来越大，备份时间越来越长（分库）。</li>
-  <li>应用的并发量太大（分库）。</li>
-</ol>
-
-<h5 id="带来的问题">带来的问题</h5>
+<p><strong>分库</strong>：就是将数据库中的数据<strong>分散到</strong>不同的数据库上。</p>
 
 <ol>
-  <li>join 操作： 无法使用 join 操作，需手动进行数据封装。如你在一个数据库中查询到数据后，再根据这个数据去另一个数据库中找对应的数据。</li>
-  <li>事务问题：单个操作涉及到多个数据库，数据库自带事务无法满足要求。</li>
-  <li><strong>分布式 id</strong>：数据库的自增主键不满足生成的主键唯一。</li>
+  <li><strong>垂直分库</strong>：把单一数据库<strong>按照业务</strong>进行划分。不同的业务使用不同的数据库，进而将一个数据库的压力分担到多个数据库。如：将数据库中的用户表、订单表和商品表分别单独拆分为用户数据库、订单数据库和商品数据库。</li>
+  <li><strong>水平分库</strong>：把同一个表<strong>按一定规则</strong>拆分到不同的数据库中，每个库可以位于不同的服务器上。解决了单表的存储和性能瓶颈的问题。如：订单表数据量太大，对订单表进行了水平切分，然后将切分后的 2 张订单表分别放在两个不同的数据库。</li>
 </ol>
 
-<h5 id="常见的分库分表工具">常见的分库分表工具</h5>
+<h4 id="分表">分表</h4>
+
+<p><strong>分表</strong>：就是对<strong>单表的数据</strong>进行拆分。</p>
+
+<ol>
+  <li><strong>垂直分表</strong>：是对数据表<strong>列</strong>的拆分，把一张列比较多的表拆分为多张表。如：可以将用户信息表中的一些列单独抽出来作为一个表。</li>
+  <li><strong>水平分表</strong>：是对数据表<strong>行</strong>的拆分，把一张行比较多的表拆分为多张表，可以解决单一表数据量过大的问题。如：我们可以将用户信息表拆分成多个用户信息表，这样就可以避免<strong>单一表数据量过大</strong>对性能造成影响。</li>
+</ol>
+
+<blockquote>
+  <p>水平拆分只能解决单表数据量大的问题，为了提升性能，我们通常会选择将拆分后的多张表放在不同的数据库中。也就是说，<strong>水平分表</strong>通常和<strong>水平分库</strong>同时出现。</p>
+</blockquote>
+
+<h4 id="应用场景">应用场景</h4>
+
+<ol>
+  <li><strong>单表的数据</strong>达到千万级别以上，数据库读写速度较缓慢（分表）。</li>
+  <li>数据库中的数据<strong>占用的空间</strong>越来越大，备份时间越来越长（分库）。</li>
+  <li>应用的<strong>并发量</strong>太大（分库）。</li>
+</ol>
+
+<blockquote>
+  <p>不过，分库分表的成本太高，如非必要尽量不要采用。</p>
+
+  <p>而且，并不一定是单表千万级数据量就要分表，毕竟每张表包含的字段不同，它们在不错的性能下能够存放的数据量也不同，还是要具体情况具体分析。</p>
+</blockquote>
+
+<h4 id="常见的分片算法">常见的分片算法</h4>
+
+<p>分片算法：主要解决了数据被<strong>水平分片</strong>（拆行）之后，数据究竟该存放在哪个表的问题。</p>
+
+<p>常见的分片算法有：</p>
+
+<ol>
+  <li><strong>哈希分片</strong>：求指定分片键的哈希，然后根据哈希值确定数据应被放置在哪个表中。哈希分片比较适合随机读写的场景，不太适合经常需要范围查询的场景。哈希分片可以使每个表的数据分布相对均匀，但对动态伸缩（例如新增一个表或者库）不友好。</li>
+  <li><strong>范围分片</strong>：按照特定的范围区间（比如时间区间、ID 区间）来分配数据，比如 将 <code class="highlighter-rouge">id</code> 为 <code class="highlighter-rouge">1~299999</code> 的记录分到第一个表， <code class="highlighter-rouge">300000~599999</code> 的分到第二个表。范围分片适合需要经常进行范围查找且数据分布均匀的场景，不太适合随机读写的场景（数据未被分散，容易出现热点数据的问题）。</li>
+  <li><strong>映射表分片</strong>：使用一个单独的表（称为映射表）来存储分片键和分片位置的对应关系。映射表分片策略可以支持任何类型的分片算法，如哈希分片、范围分片等。映射表分片策略是可以灵活地调整分片规则，不需要修改应用程序代码或重新分布数据。不过，这种方式需要维护额外的表，还增加了查询的开销和复杂度。</li>
+  <li><strong>一致性哈希分片</strong>：将哈希空间组织成一个环形结构，将分片键和节点（数据库或表）都映射到这个环上，然后根据顺时针的规则确定数据或请求应该分配到哪个节点上，解决了传统哈希对动态伸缩不友好的问题。</li>
+  <li><strong>地理位置分片</strong>：很多 NewSQL 数据库都支持地理位置分片算法，也就是根据地理位置（如城市、地域）来分配数据。</li>
+  <li><strong>融合算法分片</strong>：灵活组合多种分片算法，比如将哈希分片和范围分片组合。</li>
+  <li>……</li>
+</ol>
+
+<h5 id="分片键如何选择">分片键如何选择？</h5>
+
+<p>分片键（Sharding Key）：是数据分片的关键字段。分片键的选择非常重要，它关系着数据的分布和查询效率。一般来说，分片键应该具备以下特点：</p>
+
+<ul>
+  <li>具有共性，即能够覆盖绝大多数的查询场景，尽量减少单次查询所涉及的分片数量，降低数据库压力；</li>
+  <li>具有离散性，即能够将数据均匀地分散到各个分片上，避免数据倾斜和热点问题；</li>
+  <li>具有稳定性，即分片键的值不会发生变化，避免数据迁移和一致性问题；</li>
+  <li>具有扩展性，即能够支持分片的动态增加和减少，避免数据重新分片的开销。</li>
+</ul>
+
+<blockquote>
+  <p>实际项目中，分片键很难满足上面提到的所有特点，需要权衡一下。</p>
+</blockquote>
+
+<p>并且，分片键可以是表中多个字段的组合，例如<strong>取用户 ID 后四位</strong>作为订单 ID 后缀。</p>
+
+<h4 id="带来的问题">带来的问题</h4>
+
+<p>同一个数据库中的表分布在了<strong>不同的数据库中</strong>，可能会带来的问题：</p>
+
+<ol>
+  <li><strong>join 操作</strong>：导致无法使用 join 操作。这样就导致需要手动进行数据的封装。
+    <ol>
+      <li>比如，在一个数据库中查询到一个数据之后，再根据这个数据去另外一个数据库中找对应的数据。</li>
+      <li>不过，很多大厂的资深 DBA 都是建议<strong>尽量不要使用 join 操作</strong>。因为 join 的效率低，并且会对分库分表造成影响。对于需要用到 join 操作的地方，可以采用<strong>多次查询业务层</strong>进行数据组装的方法。不过，这种方法需要考虑业务上多次查询的事务性的容忍度。</li>
+    </ol>
+  </li>
+  <li><strong>事务问题</strong>：如果单个操作涉及到多个数据库，那么数据库自带的事务就无法满足我们的要求了。这个时候，就需要引入<a href="#分布式事务">分布式事务</a>了。</li>
+</ol>
+
+<p>另外，可能会带来的问题：</p>
+
+<ol>
+  <li><strong>分布式 id</strong>：分库之后， 数据遍布在不同服务器上的数据库，数据库的自增主键已经没办法满足生成的主键唯一了。如何为不同的数据节点生成<strong>全局唯一主键</strong>呢？这个时候，就需要引入<a href="#关于分布式 ID">分布式 ID</a>。</li>
+  <li><strong>跨库聚合查询问题</strong>：分库分表会导致常规聚合查询操作，如 group by，order by 等变得异常复杂。这是因为这些操作需要在多个分片上进行数据汇总和排序，而不是在单个数据库上进行。为了实现这些操作，需要编写复杂的业务代码，或者使用中间件来协调分片间的通信和数据传输。这样会增加开发和维护的成本，以及影响查询的性能和可扩展性。</li>
+</ol>
+
+<h4 id="常见的分库分表工具">常见的分库分表工具</h4>
 
 <ol>
   <li><code class="highlighter-rouge">Sharding-Sphere</code> 项目：当当，包括 Sharding-JDBC、Sharding-Proxy 和 Sharding-Sidecar；
     <ul>
-      <li><code class="highlighter-rouge">sharding-jdbc</code>：推荐首选，是一款轻量级 <code class="highlighter-rouge">Java</code> 框架，以 <code class="highlighter-rouge">jar</code> 包形式提供服务，不需做额外运维，且兼容性很好。</li>
+      <li><code class="highlighter-rouge">sharding-jdbc</code>：<strong>推荐首选方案</strong>，是一款轻量级 <code class="highlighter-rouge">Java</code> 框架，以 <code class="highlighter-rouge">jar</code> 包形式提供服务，不需做额外运维，且兼容性很好。</li>
     </ul>
   </li>
   <li><code class="highlighter-rouge">TSharding</code>（蘑菇街）</li>
@@ -703,129 +1797,127 @@
   <li><code class="highlighter-rouge">MyCAT</code>：基于 Cobar</li>
 </ol>
 
-<h3 id="负载均衡">负载均衡</h3>
+<h5 id="分库分表推荐方案">分库分表推荐方案</h5>
 
-<p>负载均衡：用于将任务（如用户请求处理）<strong>分配</strong>到多个服务器处理以提高网站、应用或数据库的性能和可靠性。当一台服务器无法支持大量的用户访问时，将用户分摊到多个服务器上。</p>
-
-<p>常见的负载均衡系统：</p>
-
-<ol>
-  <li>DNS 负载均衡：一般用来实现地理级别的均衡。</li>
-  <li>硬件负载均衡： 通过单独的硬件设备（如 F5 ）来实现负载均衡功能（硬件价格一般很贵）。</li>
-  <li>软件负载均衡：通过负载均衡软件（如 Nginx ）来实现负载均衡功能。</li>
-</ol>
-
-<p>Ribbon
-Feign</p>
-
-<h4 id="nginx-如何做负载均衡">NginX 如何做负载均衡</h4>
-
-<h4 id="常见的负载均衡算法">常见的负载均衡算法</h4>
-
-<h4 id="哈希的一致性">哈希的一致性</h4>
-
-<p>一致性哈希是如何做哈希的</p>
-
-<h3 id="cdn">CDN</h3>
-
-<p><strong>CDN</strong> 全称是 Content Delivery Network/Content Distribution Network，即<strong>内容分发网络</strong> 。</p>
-
-<p>可以拆开来看：</p>
+<p>Apache <code class="highlighter-rouge">ShardingSphere</code>：是一款分布式的数据库生态系统， 可以将任意数据库<strong>转换为分布式数据库</strong>，并通过数据分片、弹性伸缩、加密等能力对原有数据库进行增强。</p>
 
 <ul>
-  <li>内容 ：指的是静态资源比如图片、视频、文档、JS、CSS、HTML。</li>
-  <li>分发网络 ：指的是将这些静态资源分发到位于多个不同的地理位置机房中的服务器上，这样，就可以实现静态资源的就近访问比如北京的用户直接访问北京机房的数据。</li>
+  <li><code class="highlighter-rouge">ShardingSphere</code> 项目（包括<code class="highlighter-rouge"> Sharding-JDBC、Sharding-Proxy 和 Sharding-Sidecar</code>）是当当捐入 Apache 的，目前主要由京东数科的一些巨佬维护。</li>
+  <li><code class="highlighter-rouge">ShardingSphere</code> 绝对可以说是<strong>当前分库分表的首选</strong>！<code class="highlighter-rouge">ShardingSphere</code> 的功能完善，除了支持<strong>读写分离</strong>和<strong>分库分表</strong>，还提供<strong>分布式事务</strong>、数据库治理、影子库、<strong>数据加密和脱敏</strong>等功能。</li>
 </ul>
 
-<p>所以，简单来说，CDN 就是将<strong>静态资源</strong>分发到多个不同的地方以实现<strong>就近访问</strong>，进而加快静态资源的访问速度，减轻服务器以及带宽的负担。</p>
+<h3 id="冷热分离"><del>冷热分离</del></h3>
 
-<h4 id="cdn-工作原理是什么">CDN 工作原理是什么？</h4>
-
-<p>搞懂下面 3 个问题也就搞懂了 CDN 的工作原理：</p>
-
-<ol>
-  <li>静态资源是如何被缓存到 CDN 节点中的？</li>
-  <li>如何找到最合适的 CDN 节点？</li>
-  <li>如何防止静态资源被盗用？</li>
-</ol>
-
-<h4 id="静态资源是如何被缓存到-cdn-节点中的">静态资源是如何被缓存到 CDN 节点中的？</h4>
+<p>数据冷热分离：指根据数据的<strong>访问频率和业务重要性</strong>，将数据分为冷数据和热数据，冷数据一般存储在存储在低成本、低性能的介质中，热数据高性能存储介质中。</p>
 
 <ul>
-  <li>
-    <p>通过预热的方式将源站的资源同步到 CDN 的节点中。这样的话，用户首次请求资源可以直接从 CDN 节点中取，无需回源。</p>
-  </li>
-  <li>如果不预热的话，你访问的资源可能不再 CDN 节点中，CDN 节点将请求源站获取资源，即 <strong>回源</strong>。</li>
-  <li>如果资源有更新的话，可以对其 <strong>刷新</strong> ，删除 CDN 节点上缓存的资源，当用户访问对应的资源时直接回源获取最新的资源，并重新缓存。</li>
+  <li>热数据：指经常被访问和修改且需要快速访问的数据，</li>
+  <li>冷数据：指不经常访问，对当前项目价值较低，但需要长期保存的数据。</li>
 </ul>
 
-<p><strong>命中率</strong> 和 <strong>回源率</strong> 是衡量 CDN 服务质量两个重要指标。命中率越高越好，回源率越低越好。</p>
+<h5 id="冷热分离的思想">冷热分离的思想</h5>
 
-<h4 id="如何找到最合适的-cdn-节点">如何找到最合适的 CDN 节点？</h4>
+<p>冷热分离的思想：对数据进行分类，然后分开存储。</p>
 
-<p>GSLB （Global Server Load Balance，全局负载均衡）是 CDN 的大脑，负责多个 CDN 节点之间<strong>相互协作</strong>，最常用的是<strong>基于 DNS</strong> 的 GSLB。</p>
-
-<p>CDN 会通过 GSLB 找到最合适的 CDN 节点，更具体点来说是下面这样的：</p>
-
-<ol>
-  <li>浏览器向 <strong>DNS 服务器</strong>发送域名请求；</li>
-  <li>DNS 服务器向根据 CNAME( Canonical Name ) 别名记录向 GSLB 发送请求；</li>
-  <li>GSLB 返回性能最好（通常距离请求地址最近）的 CDN 节点（边缘服务器，真正缓存内容的地方）的地址给浏览器；</li>
-  <li>浏览器直接访问指定的 CDN 节点。</li>
-</ol>
-
-<p><img src="assets/cdn-overview.png" alt="img" style="zoom:70%;" /></p>
-
-<p>GSLB 内部可以看作是 CDN 专用 DNS 服务器和负载均衡系统组合。CDN 专用 DNS 服务器会返回负载均衡系统 IP 地址给浏览器，浏览器使用 IP 地址请求负载均衡系统进而找到对应的 CDN 节点。</p>
-
-<p><strong>GSLB 是如何选择出最合适的 CDN 节点呢？</strong> GSLB 会根据请求的 IP 地址、CDN 节点状态（比如负载情况、性能、响应时间、带宽）等指标来综合判断具体返回哪一个 CDN 节点的地址。</p>
-
-<h4 id="如何防止资源被盗刷">如何防止资源被盗刷？</h4>
-
-<p>为了防止静态资源被盗用，我们可以利用 <strong>Referer 防盗链</strong> + <strong>时间戳防盗链</strong> 。</p>
-
-<ol>
-  <li>
-    <p>设置 <strong>Referer 防盗链</strong>，即根据 HTTP 请求的头信息里面的 Referer 字段对请求进行限制。可以通过 Referer 字段获取到当前请求页面的来源页面的网站地址，确定请求是否来自合法的网站。</p>
-
-    <ul>
-      <li>不过，如果站点的防盗链配置允许 Referer 为空的话，通过隐藏 Referer，可以直接绕开防盗链</li>
-    </ul>
-  </li>
-  <li>
-    <p><strong>时间戳防盗链</strong> 的安全性更强一些。加密的 URL 具有时效性，过期之后就无法再被允许访问。通常有两个参数：</p>
-
-    <ol>
-      <li>
-        <p><code class="highlighter-rouge">wsSecret</code> 签名字符串：一般是通过对用户设定的加密字符串、请求路径、过期时间通过 MD5 哈希算法取哈希的方式获得。</p>
-      </li>
-      <li>
-        <p><code class="highlighter-rouge">wsTime</code> 过期时间</p>
-
-        <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> // 时间戳防盗链 URL 示例
- http://cdn.wangsu.com/4/123.mp3? wsSecret=79aead3bd7b5db4adeffb93a010298b5&amp;wsTime=1601026312
-</code></pre></div>        </div>
-      </li>
-    </ol>
-  </li>
-  <li>
-    <p>其它：IP 黑白名单配置、IP 访问限频配置等机制来防盗刷。</p>
-  </li>
-</ol>
-
-<h3 id="池化技术">池化技术</h3>
-
-<h2 id="高可用">高可用</h2>
-
-<p>高可用：系统在大部分时间（即使发生硬件故障、或系统升级时）都是可用的、可提供服务的。</p>
+<p>可以应用到很多领域和场景中，例如：</p>
 
 <ul>
-  <li>限流</li>
-  <li>降级</li>
-  <li>熔断</li>
+  <li>邮件系统中，可以将近期的比较重要的邮件放在<strong>收件箱</strong>，将比较久远的不太重要的邮件存入<strong>归档</strong>。</li>
+  <li>日常生活中，可以将常用的物品放在显眼的位置，不常用的物品放入储藏室或者阁楼。</li>
+  <li>图书馆中，可以将最受欢迎和最常借阅的图书单独放在一个显眼的区域，将较少借阅的书籍放在不起眼的位置。</li>
+  <li>……</li>
 </ul>
 
-<h3 id="导致系统不可用的情况">导致系统不可用的情况</h3>
+<h5 id="优缺点">优缺点</h5>
+
+<ul>
+  <li>优点：热数据的查询性能得到优化（用户的绝大部分操作体验会更好）、节约成本（可以冷热数据的不同存储需求，选择对应的数据库类型和硬件配置，比如将热数据放在 SSD 上，将冷数据放在 HDD 上）</li>
+  <li>缺点：系统复杂性和风险增加（需要分离冷热数据，数据错误的风险增加）、统计效率低（统计的时候可能需要用到冷库的数据）。</li>
+</ul>
+
+<h5 id="冷数据如何存储">冷数据如何存储？</h5>
+
+<p>冷数据的存储要求主要是容量大，成本低，可靠性高，访问速度可以适当牺牲。</p>
+
+<p>冷数据存储方案：</p>
+
+<ul>
+  <li>中小厂：直接使用 <strong>MySQL</strong>/PostgreSQL 即可（不改变数据库选型和项目当前使用的数据库保持一致），比如新增一张表来存储某个业务的冷数据、或者使用单独的冷库来存放冷数据（涉及跨库查询，增加了系统复杂性和维护难度）</li>
+  <li>大厂：Hbase（常用）、RocksDB、Doris、Cassandra</li>
+</ul>
+
+<p>如果公司成本预算足的话，也可以直接上 TiDB 这种<strong>分布式关系型数据</strong>库，直接一步到位。</p>
+
+<ul>
+  <li>TiDB 6.0 正式支持数据冷热存储分离，可以降低 SSD 使用成本。</li>
+  <li>使用 TiDB 6.0 的数据放置功能，可以在同一个集群实现海量数据的冷热存储，将新的热数据存入 SSD，历史冷数据存入 HDD。</li>
+</ul>
+
+<h3 id="池化技术"><del>池化技术</del></h3>
+
+<p>复用单个连接无法承载高并发，如果每次请求都新建连接、关闭连接，考虑到TCP的三次握手、四次挥手，有时间开销浪费。</p>
+
+<p>池化技术的核心：是资源的“预分配”和“循环使用”，常用的池化技术有<strong>线程池、进程池、对象池、内存池、连接池、协程池</strong>。</p>
+
+<p>连接池的几个重要参数：最小连接数、空闲连接数、最大连接数</p>
+
+<h3 id="流量过滤"><del>流量过滤</del></h3>
+
+<blockquote>
+  <p>上面讲的是正向方式提升系统QPS，我们也可以逆向思维，做减法，拦截非法请求，将核心能力留给正常业务！</p>
+</blockquote>
+
+<p><strong>过滤器</strong>、流量拦截器：将那些非法的、无资格的、优先级低的<strong>恶意流量</strong>（比如黑客攻击、恶意爬虫、黄牛、秒杀器等）过滤掉，减轻系统的并发压力。</p>
+
+<ul>
+  <li>设计一套自己的规则，对请求进行前置校验（如校验IP、校验请求参数是否合法等），如果不符合要求，直接拒绝，不进行后面的真正的业务逻辑处理。</li>
+</ul>
+
+<p>拦截器分层：</p>
+
+<ul>
+  <li>网关和 WAF（Web Application Firewall，Web 应用防火墙）</li>
+</ul>
+
+<p>方法：</p>
+
+<ol>
+  <li>封禁攻击者来源 IP</li>
+  <li>拒绝带有非法参数的请求</li>
+  <li>按来源 IP 限流</li>
+  <li>按用户 ID 限流等</li>
+</ol>
+
+<h2 id="高可用-1">高可用</h2>
+
+<p>高可用（<code class="highlighter-rouge">High Availability</code>）：通常是指，一个系统经过专门的设计，从而减少<strong>停工时间</strong>（不能提供服务的时间），而保持其服务的<strong>高度可用性</strong>。</p>
+
+<ul>
+  <li>系统在大部分时间（即使发生硬件故障、或系统升级时）都是可用的、可提供服务的。</li>
+</ul>
+
+<p>举例：</p>
+
+<ul>
+  <li>全年停机不能超过<strong>31.5秒</strong>，</li>
+  <li>很多公司的高可用目标是<strong>4个9</strong>，也就是99.99%，这就意味着，系统的年停机时间为8.76个小时。</li>
+  <li><strong>6个9的性能</strong>：一直能用的概率为99.9999%</li>
+  <li>百度的搜索首页，是业内公认高可用保障非常出色的系统，甚至人们会通过百度能不能访问来判断“网络的连通性”。</li>
+</ul>
+
+<h3 id="如何保障系统的高可用">如何保障系统的高可用？</h3>
+
+<blockquote>
+  <p>保证系统高可用，架构设计的核心准则是：集群化（即冗余）。</p>
+</blockquote>
+
+<ol>
+  <li><strong>避免单点</strong>：使用单个服务器，一旦该服务器意外宕机，将导致服务不可用；</li>
+  <li>使用<strong>集群</strong>：如果有<strong>冗余</strong>备份，一台服务器挂了，还有其他<strong>后备服务器</strong>能够顶上；如<a href="#Redis的主从复制">Redis的主从复制</a></li>
+  <li><strong>心跳机制</strong>：用于<strong>监控</strong>服务器状态，挂了就进行<strong>故障修复</strong>，<strong>自动故障转移</strong>。</li>
+</ol>
+
+<h4 id="导致系统不可用的情况">导致系统不可用的情况</h4>
 
 <ol>
   <li>黑客攻击；</li>
@@ -836,66 +1928,152 @@ Feign</p>
   <li>自然灾害或人为破坏。</li>
 </ol>
 
-<p>以下为提高系统可用性的方法：</p>
-
-<ol>
-  <li>注重代码质量，测试严格把关：code review 解决内存泄漏、循环依赖。</li>
-</ol>
-
 <h3 id="冗余思想">冗余思想</h3>
 
-<p><strong>冗余</strong>的思想：相同的服务<strong>部署多</strong>份、相同的数据备份多份，减少单点故障。</p>
+<blockquote>
+  <p>冗余设计是保证系统和数据<strong>高可用</strong>的最常的手段。</p>
+</blockquote>
+
+<p><strong>冗余</strong>的思想：</p>
 
 <ul>
-  <li>高可用集群：同一份服务部署两份或者多份，当正在使用的服务突然挂掉的话，可以切换到另外一台服务，从而保证服务的高可用。</li>
-  <li><strong>灾备</strong>设计
-    <ul>
-      <li>容灾： 在异地建立两个完全相同的系统。当某个地方的系统突然挂掉，整个应用系统可切换到另一个，系统就可正常提供服务。</li>
-      <li>备份： 所有重要数据多备份几份。</li>
-    </ul>
-  </li>
-  <li><strong>异地多活</strong>：将服务部署在异地、且同时对外提供服务。和传统灾备设计最主要区别在于“多活”，即所有站点都是同时在对外提供服务的。为了应对突发状况如火灾、地震等自然或人为灾害。</li>
-  <li>例如：哨兵模式的 Redis 集群中，如果 Sentinel（哨兵） 检测到 master 节点出现故障的话， 它就会帮助我们实现故障转移，自动将某一台 slave 升级为 master，确保整个 Redis 系统的可用性。整个过程完全自动，不需要人工介入。</li>
-  <li>例如：Nginx 可以结合 Keepalived 来实现高可用。如果 Nginx 主服务器宕机的话，Keepalived 可以自动进行故障转移，备用 Nginx 主服务器升级为主服务。并且，这个切换对外是透明的，因为使用的虚拟 IP，虚拟 IP 不会改变。</li>
+  <li>对于服务来说，就是<strong>相同的服务部署多份</strong>。如果正在使用的服务突然挂掉的话，系统可以很快切换到备份服务上，大大减少系统的不可用时间，提高系统的<strong>可用性</strong>。</li>
+  <li>对于数据来说，就是<strong>相同的数据备份多份</strong>，这样就可以很简单地提高<strong>数据的安全性</strong>。</li>
 </ul>
 
-<h3 id="限流">限流</h3>
-
-<p>限流：流量控制（flow control），限制对服务端接口<strong>接受请求的频率</strong>，防止服务挂掉。对超过限制的请求放弃处理或放到队列中（排队）等待处理。可有效应对<strong>突发</strong>请求过多。常见限流算法：</p>
-
-<ol>
-  <li>固定窗口计数器算法</li>
-  <li>滑动窗口计数器算法</li>
-  <li>漏桶算法</li>
-  <li>令牌桶算法</li>
-</ol>
-
-<h3 id="降级">降级</h3>
-
-<p>降级：当服务器<strong>压力剧增</strong>的情况下，根据当前业务情况及流量对一些服务和页面有策略的降级，以此释放服务器资源以<strong>保证核心任务</strong>的正常运行。目的在于应对系统自身的故障。</p>
-
-<h3 id="熔断">熔断</h3>
-
-<p>熔断机制：系统自动收集所依赖服务的资源使用情况和性能指标，当恶化或调用失败次数达到某个阈值时就迅速失败，立即<strong>切换依赖</strong>其他备用服务。目的在于应对依赖的外部系统或第三方系统的故障。</p>
+<p>冗余思想在<strong>高可用</strong>系统设计中最典型的应用：</p>
 
 <ul>
-  <li>常用的流量控制和熔断降级框架是 <strong>Netflix 的 Hystrix</strong> 和 alibaba 的 Sentinel。</li>
-  <li>降级和熔断的区别：</li>
+  <li><strong>高可用集群</strong>（High Availability Cluster，简称 HA Cluster） : 同一份服务<strong>部署</strong>两份或者多份，当正在使用的服务<strong>突然挂掉</strong>的话，可以<strong>切换</strong>到另外一台服务，从而保证服务的高可用。
+    <ul>
+      <li>将多台服务器组成集群，使用<strong>负载均衡</strong>（根据每个节点的负载情况）将用户请求转发到集群中合适的节点上，避免单一服务器的负载压力过大导致性能降低。</li>
+    </ul>
+  </li>
+  <li><strong>（同城）灾备</strong>：相同服务部署在<strong>同一个城市的不同机房</strong>中。并且，备用服务不处理请求。这样可以避免机房出现意外情况比如停电、火灾。</li>
+  <li><strong>异地灾备</strong>：类似于同城灾备，不同的是，相同服务部署在<strong>异地</strong>的不同机房中（通常距离较远，甚至是在不同的城市或者国家）。</li>
+  <li><strong>同城多活</strong>：类似于同城灾备，不同的是，备用服务可以处理请求、所有站点都是<strong>同时在对外提供服务</strong>的。这样可以充分利用系统资源，提高系统的并发。</li>
+  <li><strong>异地多活</strong> : 类似于同城多活，不同的是，服务部署在<strong>异地</strong>。</li>
+  <li><strong>故障转移</strong>：实现不可用服务<strong>快速且自动地切换</strong>到可用服务，整个过程不需要人为干涉。</li>
+</ul>
+
+<blockquote>
+  <p>高可用集群单纯是<strong>服务的冗余</strong>，并没有强调地域。同城灾备、异地灾备、同城多活和异地多活实现了<strong>地域上的冗余</strong>。</p>
+</blockquote>
+
+<h3 id="限流降级熔断">限流、降级、熔断</h3>
+
+<blockquote>
+  <p><del>如何保障系统的高可用？</del></p>
+</blockquote>
+
+<p><strong>过载保护</strong>：指负载超过<strong>系统的承载能力</strong>时，系统会自动采取保护措施，确保自身不被压垮。</p>
+
+<p>限流的原理跟<strong>熔断</strong>有点类似：都是通过判断某个条件来确定是否执行某个策略。但是又有所区别，</p>
+
+<ul>
+  <li>限流，则是只处理自己能力范围之内的请求，超量的请求会被限流。</li>
+  <li>熔断触发过载保护，该节点会暂停服务，直到恢复。</li>
+</ul>
+
+<p>降级和熔断的区别：</p>
+
+<p>常用的流量控制和熔断降级框架是 <strong>Netflix 的 Hystrix</strong> 和 alibaba 的 Sentinel。</p>
+
+<h4 id="限流">限流</h4>
+
+<p>限流：流量控制（flow control），限制对服务端接口<strong>接受请求的频率</strong>，防止服务挂掉。对超过限制的请求放弃处理或放到队列中（排队）等待处理。可有效应对<strong>突发请求过多</strong>。</p>
+
+<h5 id="常见限流算法主要有">常见限流算法主要有：</h5>
+
+<ol>
+  <li><strong>计数器算法</strong>：（固定窗口）比如要限制 1s 能够通过的请求数，实现的思路就是从第一个请求进来开始计时，在接下来的 1s 内，每个请求进来请求数就+1，超过最大请求数的请求会被拒绝，等到 1s 结束后计数清零，重新开始计数。
+    <ul>
+      <li>有个很大的弊端：比如前 10ms 已经通过了最大的请求数，那么后面的 990ms 的请求只能拒绝，这种现象叫做“<strong>突刺现象</strong>”。</li>
+    </ul>
+  </li>
+  <li><strong>滑动窗口算法</strong>：</li>
+  <li><strong>漏桶算法</strong>：桶底出水的速度恒定，进水的速度可能快慢不一，但是当进水量大于出水量的时候，水会被装在桶里，不会直接被丢弃；但是桶也是有容量限制的，当桶装满水后溢出的部分还是会被丢弃的。
+    <ol>
+      <li>算法实现：可以准备一个队列来保存暂时处理不了的请求，然后通过一个线程池定期从队列中获取请求来执行。</li>
+    </ol>
+  </li>
+  <li><strong>令牌桶算法</strong>：令牌桶就是生产访问令牌的一个地方，生产的速度恒定，用户访问的时候当桶中有令牌时就可以访问，否则将触发限流。
+    <ul>
+      <li>实现方案：Guava RateLimiter 限流，是一个谷歌提供的限流，其基于令牌桶算法，比较适用于单实例的系统。</li>
+    </ul>
+  </li>
+</ol>
+
+<h4 id="降级">降级</h4>
+
+<p>降级：当服务器<strong>压力剧增</strong>的情况下，根据当前<strong>业务情况及流量</strong>对一些服务和页面有策略的降级，以此释放服务器资源以<strong>保证核心任务</strong>的正常运行。目的在于应对<strong>系统自身的故障</strong>。</p>
+
+<ul>
+  <li>比如<strong>电商大促</strong>，业务在峰值时刻，把商品评价、成交记录等功能临时关掉。弃车保帅，保证创建订单、支付等<strong>核心功能</strong>的正常使用。</li>
+</ul>
+
+<h4 id="熔断">熔断</h4>
+
+<p>熔断机制：在系统濒临崩溃的时候，立即中断服务，从而保障系统稳定避免崩溃。类似于电器中的“保险丝”。目的在于应对<strong>依赖的外部系统或第三方系统的故障</strong>。</p>
+
+<ul>
+  <li><del>系统自动收集所依赖服务的资源使用情况和性能指标，当<strong>恶化或调用失败次数</strong>达到某个阈值时就迅速失败，立即切换依赖其他<strong>备用服务</strong>。</del></li>
+  <li>例子：熔断触发条件往往跟系统节点的<strong>承载能力</strong>和服务质量有关，比如 CPU 的使用率超过 90%、请求错误率超过 5%、请求延迟超过 500ms。</li>
 </ul>
 
 <h3 id="超时和重试机制">超时和重试机制</h3>
 
-<p>超时和重试机制：一旦用户的请求超过某个时间得不到响应、就结束此次请求并抛出异常。尤其适合读取第三方服务时，如 RPC 框架自带。</p>
+<p>超时机制：一旦用户的请求超过某个时间得不到响应、就结束此次请求并抛出异常。</p>
 
-<h3 id="异步调用">异步调用</h3>
+<p>重试机制：一般配合超时机制一起使用，指的是<strong>多次发送相同的请求</strong>来避免<strong>瞬态故障和偶然性故障</strong>。</p>
+
+<ul>
+  <li>瞬态故障可以简单理解为某一瞬间系统偶然出现的故障，并不会持久。</li>
+  <li>偶然性故障可以理解为哪些在某些情况下偶尔出现的故障，频率通常较低。</li>
+</ul>
+
+<p>重试的核心思想是：通过消耗服务器的资源来尽可能获得请求更大概率被成功处理。由于瞬态故障和偶然性故障是很少发生的，因此，重试对于服务器的资源消耗几乎是可以被忽略的。</p>
+
+<h4 id="重试幂等">重试幂等</h4>
+
+<p>超时和重试机制在实际项目中使用的话，需要注意保证<strong>同一个请求没有被多次执行</strong>。</p>
+
+<p>什么情况下会出现一个请求被多次执行呢？</p>
+
+<p>客户端等待服务端完成请求超时，但此时服务端已经执行了请求，只是由于短暂的网络波动导致响应在发送给客户端的过程中延迟了。</p>
+
+<p>举个例子：用户支付购买某个课程，结果用户支付的请求由于重试的问题导致用户购买同一门课程支付了两次。对于这种情况，我们在执行用户购买课程的请求的时候需要判断一下用户是否已经购买过。这样的话，就不会因为重试的问题导致重复购买了。</p>
+
+<h3 id="其它">其它</h3>
+
+<h4 id="异步调用">异步调用</h4>
 
 <p>异步调用：在程序中实现异步，还可使用 <a href="#消息队列">消息队列</a>。</p>
 
-<h3 id="使用缓存">使用缓存</h3>
+<p>某些流程可以将操作转换为消息，将消息发送到消息队列之后立即返回，之后这个操作会被异步处理。</p>
+
+<h4 id="使用缓存">使用缓存</h4>
 
 <p>使用缓存：缓存热点数据，存储在内存中，所以速度相当快。</p>
 
-<h3 id="灰度发布">灰度发布</h3>
+<p><strong>高性能缓存</strong></p>
+
+<p>对一些热点数据每次都从 DB 中读取，会给 DB 带来较大的压力，导致性能大幅下降。所以，需要用缓存来提升<strong>热点数据</strong>的访问性能，比如将活动信息数据在浏览器的缓存中保存一段时间。</p>
+
+<p>缓存根据性能由高到低分为：寄存器、L1缓存、L2缓存，L3缓存，本地内存、分布式缓存。</p>
+
+<ol>
+  <li>上层的寄存器、L1 缓存、L2 缓存是位于 <strong>CPU 核内</strong>的高速缓存，访问延迟通常在 10 纳秒以下。</li>
+  <li>L3 缓存是位于 <strong>CPU 核外部但在芯片内部</strong>的共享高速缓存，访问延迟通常在十纳秒左右。高速缓存具有成本高、容量小的特点，容量最大的 L3 缓存通常也只有几十MB。</li>
+  <li>本地内存是计算机内的<strong>主存储器</strong>。相比 CPU 芯片内部的高速缓存，内存的成本要低很多，容量通常是 GB 级别，访问延迟通常在几十到几百纳秒。</li>
+  <li>分布式缓存</li>
+</ol>
+
+<blockquote>
+  <p>内存和高速缓存都属于掉电易失的存储器，如果机器断电了，这类存储器中的数据就丢失了。</p>
+</blockquote>
+
+<h4 id="灰度发布">灰度发布</h4>
 
 <p>灰度发布： 将服务器集群分成若干部分，每天只发布一部分机器，观察运行稳定没有故障，第二天继续发布一部分机器，持续几天才把整个集群全部发布完毕。期间如果发现问题，只需要回滚已发布的一部分服务器即可。</p>
 
@@ -903,15 +2081,5 @@ Feign</p>
   <li>灰度发布和回滚的关系：</li>
 </ul>
 
-<h3 id="netflix">Netflix</h3>
-
-<h2 id="微服务">微服务</h2>
-
-<p>微服务：一种软件开发技术- 面向服务的体系结构（SOA）架构样式的一种变体，它提倡将单一应用程序划分成一组小的服务，服务之间互相协调、互相配合，为用户提供最终价值。每个服务运行在其独立的进程中，服务与服务间采用轻量级的通信机制互相沟通（通常是基于HTTP的RESTful API）。每个服务都围绕着具体业务进行构建，并且能够独立地部署到生产环境、类生产环境等。另外，应尽量避免统一的、集中式的服务管理机制，对具体的一个服务务而言，应根据上下文，选择合适的语言、工具对其进行构建。</p>
-
-<h3 id="springcloud">SpringCloud</h3>
-
-<p>SpringCloud应用也属于SpringBoot应用的一种。</p>
-
-<h4 id="eureka"><code class="highlighter-rouge">Eu'reka</code></h4>
+<h4 id="netflix">Netflix</h4>
 

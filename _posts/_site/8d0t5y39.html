@@ -1,5 +1,5 @@
 <blockquote>
-  <p>摘要：Java高级之多线程，包括线程的生命周期、创建方式、调度、同步，线程安全，volatile 和 synchronized 关键字，线程池，JUC 工具类，AQS 等。</p>
+  <p>摘要：Java高级之多线程、并发编程，包括线程的生命周期、创建方式、调度、同步，线程安全，volatile 和 synchronized 关键字，线程池，JUC 工具类，AQS 等。</p>
 </blockquote>
 
 <!-- more -->
@@ -19,38 +19,42 @@
 
 <ol>
   <li>
-    <p>串行：多个任务由同一线程<strong>按顺序</strong>执行；时间上不重叠；一个队列和一台机器。</p>
+    <p>串行 xing：多个任务由同一线程<strong>按顺序</strong>执行；时间上不重叠；一个队列和一台机器。</p>
   </li>
   <li>
-    <p>并行：多个任务（在多核CPU上，由不同线程？）同一时刻执行；（逻辑上）互不干扰；两个队列和两台机器。目前发展方向。</p>
+    <p>并行：多个任务（在多核CPU上，由不同线程）同一时刻执行；（逻辑上）互不干扰；两个队列和两台机器。目前发展方向。</p>
   </li>
   <li>
-    <p>并发：多个任务（在同一CPU上，）在同一时间段内（按时间片轮流）交替执行，逻辑上是同时执行；允许两个任务<strong>彼此干扰</strong>；两个队列和一台机器。</p>
+    <p><strong>并发</strong>：多个任务（在同一CPU上，）在同一时间段内（按时间片轮流）交替执行，逻辑上是同时执行；允许两个任务<strong>彼此干扰</strong>；两个队列和一台机器。</p>
   </li>
 </ol>
 
-<h5 id="进程-vs-线程">进程 VS 线程</h5>
+<h5 id="同步-vs-异步">同步 VS 异步</h5>
 
-<p>进程：程序的一次执行（Windows 任务管理器查看，<code class="highlighter-rouge">.exe</code> 文件的运行）。</p>
+<ul>
+  <li>
+    <p>同步：必须等被调用的方法结束后，后面的代码才能执行。发出一个调用后，在没有得到结果前， 该调用就不可返回，一直等待。</p>
+  </li>
+  <li>
+    <p>异步：不管被调用方法是否完成，都会继续执行后面的代码，调用完成后会通知调用者。调用在发出后，不用等待返回结果，该调用直接返回。</p>
+  </li>
+</ul>
 
-<p>线程：进程中的一个执行任务（控制单元），负责当前进程中程序的执行。</p>
+<blockquote>
+  <p>简单来理解就是：同步<strong>按代码顺序</strong>执行，异步不按照代码顺序执行，异步的执行效率更高。</p>
+</blockquote>
 
-<p><img src="assets/java-runtime-data-areas-jdk1.8.png" alt="Java 运行时数据区域（JDK1.8 之后）" style="zoom:50%;" /></p>
+<p>线程同步：两个或多个共享关键资源的线程<strong>并发</strong>执行。用于避免关键资源使用冲突。</p>
 
-<p>区别：</p>
+<ul>
+  <li>异步代码题，说出打印顺序</li>
+</ul>
 
-<ol>
-  <li>根本：进程是系统<strong>资源分配</strong>的基本单位；线程是<strong>CPU任务调度和执行</strong>的基本单位。</li>
-  <li>关系：一个进程至少有一个线程（可有多个线程）。</li>
-  <li>内存空间：进程有<strong>独立</strong>内存空间；所有线程共享堆和方法区（JDK1.8 之后由元空间实现），每个线程有自己（独享的）PC 程序计数器、虚拟机栈和本地方法栈。</li>
-  <li>开销：进程开销大；线程开销小。</li>
-  <li>健壮：一个进程崩溃后，（在保护模式下）不会对其他进程产生影响；但一个线程崩溃会导致整个进程崩溃。</li>
-  <li>独立执行：进程有程序运行的入口和出口；但线程不能独立执行，必须依存于进程。</li>
-</ol>
+<p><img src="assets/async-sync.png" style="zoom:33%;" /></p>
 
 <h5 id="多线程">多线程</h5>
 
-<p>多线程：一个<strong>进程运行时</strong>产生了多个线程。多个线程并发执行？</p>
+<p>多线程：多个线程<strong>并发</strong>执行。一个<strong>进程运行时</strong>产生了多个线程。</p>
 
 <p>优点：</p>
 
@@ -112,48 +116,50 @@ thread.start();
 
 <p><code class="highlighter-rouge">java.lang.Thread.State</code> 枚举类中定义了六种线程的状态，可以调用线程 Thread 中的 <code class="highlighter-rouge">getState()</code> 方法获取当前线程的状态。</p>
 
-<p><img src="assets/thread_state.png" alt="Java 线程状态变迁图" style="zoom: 50%;" />
-<img src="assets/640.png" alt="Java 线程状态变迁图" style="zoom: 50%;" /></p>
+<p><img src="assets/thread_state.png" alt="Java 线程状态变迁图" style="zoom: 80%;" /></p>
 
 <ol>
-  <li><code class="highlighter-rouge">new</code>：新建线程对象（仅由JVM 为其分配内存，并初始化<strong>成员变量</strong>的值）。
+  <li><strong><code class="highlighter-rouge">new</code> 新建</strong>：新建线程对象（仅由 JVM 为其<strong>分配内存</strong>，并初始化<strong>成员变量</strong>的值）。
     <ul>
       <li>在调用 <code class="highlighter-rouge">Thread.start()</code> 启动线程后进入<code class="highlighter-rouge">ready</code> 就绪状态；不允许对一个线程多次使用 start() 方法；</li>
     </ul>
   </li>
   <li><code class="highlighter-rouge">runnable</code> 可运行（线程池）：
     <ul>
-      <li><code class="highlighter-rouge">ready</code> 就绪：（JVM 为线程创建 PC 程序计数器、VM 栈、本地方法调用栈），等待<strong>被线程调度选中</strong>、等待获取 CPU 使用权；
+      <li><strong><code class="highlighter-rouge">ready</code> 就绪</strong>：等待<strong>被线程调度选中</strong>、等待获取 CPU 使用权；（JVM 为线程创建 PC 程序计数器、VM 栈、本地方法调用栈）；
         <ul>
-          <li>（唯一入口）获得 CPU 资源后进入 <code class="highlighter-rouge">running</code>；</li>
+          <li><strong>唯一</strong>入口：通过 <code class="highlighter-rouge">join()</code> 获得 CPU 执行权、CPU 资源后进入 <code class="highlighter-rouge">running</code>；</li>
         </ul>
       </li>
-      <li><code class="highlighter-rouge">running</code> 运行：除非此线程主动放弃 CPU 资源（时间片用完进入 <code class="highlighter-rouge">blocked</code> 阻塞、或 <code class="highlighter-rouge">ready</code> 就绪状态）或有<strong>更高优先级</strong>的线程进入，将一直运行、直到结束。
+      <li><strong><code class="highlighter-rouge">running</code> 运行</strong>：除非此线程<strong>主动放弃</strong> CPU 资源（时间片用完通过 <code class="highlighter-rouge">yield()</code> 进入  <code class="highlighter-rouge">ready</code> 就绪）或有<strong>更高优先级</strong>的线程进入（通过<code class="highlighter-rouge">wait()</code> 进入 <code class="highlighter-rouge">blocked</code> 阻塞），将一直运行、直到结束。
         <ul>
+          <li><del><code class="highlighter-rouge">join()</code> 的线程执行完毕后</del>进入 <code class="highlighter-rouge">ready</code> 就绪状态。</li>
           <li>时间片：指将可用的 CPU 时间分配给线程，可基于优先级或等待时间；</li>
-          <li>对于单核处理器，一个时刻只能有一个线程处于运行状态。</li>
         </ul>
       </li>
+      <li>对于单核处理器，一个时刻只能有一个线程处于运行状态。</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">blocked</code> 阻塞：线程因某种原因（如发出阻塞式I/O请求）让出 CPU，暂时停止运行、等待获取锁；
+  <li><strong><code class="highlighter-rouge">blocked</code> 阻塞</strong>（图中上方的）：线程因某种原因（如发出阻塞式I/O请求、通过 <code class="highlighter-rouge">sleep()</code>）<strong>让出 CPU</strong>，暂时停止运行、<strong>等待获取锁</strong>；
     <ul>
-      <li><strong>解除阻塞</strong>、获取到锁（如阻塞式IO处理完毕、操作结果返回等）后重新进入<code class="highlighter-rouge">ready</code> 就绪状态；</li>
+      <li><strong>解除阻塞</strong>、获取到锁（如阻塞式IO处理完毕、操作结果返回等）后（sleep 时间到、<code class="highlighter-rouge">interrupt()</code> 中断）重新进入<code class="highlighter-rouge">ready</code> 就绪状态；</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">waiting</code> 等待阻塞：（线程内）执行 <code class="highlighter-rouge">wait()、Thread.join()</code> 后进入此状态：JVM 会把该线程放入<strong>等待池</strong>，释放占用的所有资源（包括持有的锁)；
+  <li><strong><code class="highlighter-rouge">waiting</code> 等待阻塞</strong>（图中下方的）：（线程内）执行 <code class="highlighter-rouge">wait()、Thread.join()</code> 后进入此状态：JVM 会把该线程放入<strong>等待池</strong>，释放占用的所有资源（包括持有的锁)；
     <ul>
       <li>不会去<strong>竞争同步锁</strong>，不能<strong>自动唤醒</strong>（需被其他线程显式唤醒），收到其他线程发出的通知后才会去竞争锁。</li>
-      <li>当前线程需等待其它线程 <code class="highlighter-rouge">notify()/notifyAll()</code> 通知或中断（如某项资源就绪/另一个线程放弃排他锁）、<code class="highlighter-rouge">join()</code> 的线程执行完毕后进入 <code class="highlighter-rouge">ready</code> 就绪状态。</li>
+      <li>当前线程需等待其它线程 <code class="highlighter-rouge">notify()/notifyAll()</code> 通知或<del>中断</del>（如某项资源就绪/另一个线程放弃排他锁）、<del><code class="highlighter-rouge">join()</code> 的线程执行完毕后</del>进入 <code class="highlighter-rouge">ready</code> 就绪状态。</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">timed_waiting</code> 超时等待：不分配CPU，超时<strong>自动唤醒</strong>。在一定时间后结束等待（进入 <code class="highlighter-rouge">ready</code> 就绪状态）。
+  <li><strong><code class="highlighter-rouge">timed_waiting</code> 超时等待</strong>：不分配CPU，超时<strong>自动唤醒</strong>。在一定时间后结束等待（进入 <code class="highlighter-rouge">ready</code> 就绪状态）。
     <ul>
       <li>线程调用 <code class="highlighter-rouge">wait(long)、Thread.join(long)、Thread.sleep(long)</code> （传入等待时间的参数后）进入此状态。</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">terminted</code> 终止：线程执行完或因异常退出 <code class="highlighter-rouge">run()</code> 方法。</li>
+  <li><strong><code class="highlighter-rouge">terminted</code> 终止、死亡</strong>：<code class="highlighter-rouge">run()</code> 线程执行完或因异常调用 <code class="highlighter-rouge">stop()</code>退出 <code class="highlighter-rouge">run()</code> 方法。</li>
 </ol>
+
+<p><img src="assets/640.png" alt="Java 线程状态变迁图" style="zoom: 50%;" /></p>
 
 <h3 id="线程调度线程通信">线程调度/线程通信</h3>
 
@@ -222,22 +228,23 @@ thread.start();
 
 <p><code class="highlighter-rouge">boolean isAlive()</code>：判断线程是否还活着。</p>
 
-<h5 id="wait-vs-sleep">wait() VS sleep()</h5>
+<h5 id="sleepwait">sleep()、wait()</h5>
 
 <p>共同点 ：二者都可以暂停线程的执行。</p>
 
 <p>区别 ：</p>
 
 <ol>
-  <li>用途：wait() 常用于线程间交互/通信；sleep() 常用于当前线程休眠或轮询暂停执行操作。</li>
-  <li>所属类：wait() 是 <code class="highlighter-rouge">Object</code> 类的普通本地方法；sleep() 是 <code class="highlighter-rouge">Thread</code> 类的静态本地方法。</li>
-  <li><code class="highlighter-rouge">wait()</code> 是让获得对象锁的线程实现等待，会自动释放当前线程占有的对象锁，并让其进入 WAITING 状态。
+  <li><strong>用途</strong>：<code class="highlighter-rouge">wait()</code> 是让获得对象锁的线程实现等待，会自动释放当前线程占有的对象锁，并让其进入 <strong>waiting 等待阻塞</strong>状态。sleep() 常用于<strong>当前线程休眠</strong>、或轮询暂停执行操作，让线程进入 <strong>blocking 阻塞</strong>状态。
     <ul>
+      <li><del>wait() 常用于线程间交互/通信</del></li>
+      <li><code class="highlighter-rouge">wait()</code> 是让获得对象锁的线程实现等待，会自动释放当前线程占有的对象锁</li>
       <li>每个对象都拥有对象锁，要操作对应的对象（<code class="highlighter-rouge">Object</code>）而非当前的线程（<code class="highlighter-rouge">Thread</code>）；因为 <code class="highlighter-rouge">sleep()</code> 是让当前线程暂停执行，不涉及到对象类，也不需获得对象锁。</li>
     </ul>
   </li>
-  <li><strong>释放锁</strong>（最大不同）：wait() 会释放锁，加入等待池，可能还有机会重新竞争到锁继续执行；sleep() 一直持有锁，即使有<code class="highlighter-rouge">synchronized</code> 同步块，其他线程仍不能访问共享数据，会让出 CPU 执行时间且强制上下文切换。</li>
-  <li><strong>唤醒</strong>：wait() 需其它线程调用 <code class="highlighter-rouge">notify()/notifyAll()</code> 唤醒，或 <code class="highlighter-rouge">timed_waiting</code> 超时；sleep() 执行完自动唤醒，也可用 <code class="highlighter-rouge">wait(long timeout)</code> 超时后线程会自动唤醒。</li>
+  <li>所属类：wait() 是 <code class="highlighter-rouge">Object</code> 类的<strong>普通</strong>本地方法；sleep() 是 <code class="highlighter-rouge">Thread</code> 类的<strong>静态</strong>本地方法。</li>
+  <li><strong>释放锁</strong>（<strong>最大不同</strong>）：wait() 会释放锁，加入等待池，可能还<strong>有机会重新竞争到锁</strong>继续执行；sleep() 一直持有锁，即使有<code class="highlighter-rouge">synchronized</code> 同步块，其他线程仍不能访问共享数据，会<strong>让出 CPU</strong> 执行时间且强制上下文切换。</li>
+  <li><strong>唤醒</strong>：wait() 需其它线程调用 <code class="highlighter-rouge">notify()/notifyAll()</code> 唤醒，或 <code class="highlighter-rouge">timed_waiting</code> 超时；sleep() 执行完<strong>自动唤醒</strong>，也可用 <code class="highlighter-rouge">wait(long timeout)</code> 超时后线程会自动唤醒。</li>
   <li><del>依赖</del>：线程调用对象的 <code class="highlighter-rouge">wait()/notify()/notifyAll()</code> 时，都必须先获得对象的锁==&gt; 所以只能在同步方法/同步块中被调用。wait() 依赖同步器 <code class="highlighter-rouge">synchronized</code>，而sleep()不依赖。</li>
 </ol>
 
@@ -245,11 +252,11 @@ thread.start();
 
 <p>原则：同步的范围越小越好。</p>
 
-<h5 id="sleep-vs-yield">sleep() VS yield()</h5>
+<h5 id="sleepyield">sleep()、yield()</h5>
 
 <ol>
   <li>优先级：sleep() 不考虑线程的优先级，会给低优先级的线程运行的机会；yield()只会给相同或更高优先级的线程机会；</li>
-  <li>作用：执行 sleep() 后转入blocked，而执行 yield() 后转入ready；</li>
+  <li>作用：执行 sleep() 后<strong>转入blocked</strong>，而执行 yield() 后<strong>转入ready</strong>；</li>
   <li>异常：sleep() 声明抛出 <code class="highlighter-rouge">InterruptedException</code>，而 yield() 没有声明任何异常；</li>
   <li>移植性：sleep() 比 yield()（跟OS CPU 调度相关）更可移植，不建议用 yield()来控制并发线程。</li>
 </ol>
@@ -258,41 +265,42 @@ thread.start();
 
 <h5 id="创建线程的方式">创建线程的方式</h5>
 
-<p>&lt;img src=”assets/Executor框架的使用示意图.36e59afa.png“ style=”zoom:70%;“ /&gt;</p>
+<p><img src="assets/Executor框架的使用示意图.36e59afa.png" style="zoom:80%;" /></p>
 
 <ol>
-  <li>继承 <code class="highlighter-rouge">Thread</code> 类，重写 <code class="highlighter-rouge">run()</code>，调用 <code class="highlighter-rouge">start()</code> 启动线程。
-    <ul>
-      <li>缺点：单继承</li>
-    </ul>
-  </li>
-  <li>实现 <code class="highlighter-rouge">Runnable</code> 接口，重写 <code class="highlighter-rouge">run()</code>，并将创建的子类对象（作为参数）传给 Thread 类的构造器 <code class="highlighter-rouge">new Thread(Runnable obj)</code> 来创建线程对象，调用 <code class="highlighter-rouge">start()</code> 启动线程。
-    <ul>
-      <li>可继承其他类，多实现；</li>
-      <li>void，无返回值；</li>
-      <li><code class="highlighter-rouge">run()</code> 只能抛出运行时异常，且无法捕获处理；</li>
-      <li>可用匿名内部类简化。</li>
-    </ul>
-  </li>
-  <li>实现 <code class="highlighter-rouge">Callable</code> 接口，重写 <code class="highlighter-rouge">call()</code>，将创建的子类对象（作为参数）传给 Thread 类的构造器来创建线程对象，调用 <code class="highlighter-rouge">start()</code> 开启线程。
-    <ul>
-      <li>有泛型返回值，和 <code class="highlighter-rouge">Future、FutureTask</code> 配合可用来获取异步执行的结果：创建 <code class="highlighter-rouge">FutureTask(Callable cal)</code> 对象，传给 Thread 的构造器，提交给 <code class="highlighter-rouge">ExecutorsService</code> 执行，放入线程池中；</li>
-      <li><code class="highlighter-rouge">call()</code> 允许抛出异常，可获取异常信息；</li>
-    </ul>
-  </li>
-  <li>（用两种方式）创建<strong><a href="#线程池">线程池</a></strong>（都实现了 ExecutorService 接口）：用时直接获取，用完放回。</li>
+  <li><strong>继承 <code class="highlighter-rouge">Thread</code> 类</strong>，重写 <code class="highlighter-rouge">run()</code>，调用 <code class="highlighter-rouge">start()</code> 启动线程。缺点：单继承</li>
+  <li><strong>实现 <code class="highlighter-rouge">Runnable</code> 接口</strong>，重写 <code class="highlighter-rouge">run()</code>，并将<strong>创建的子类对象</strong>（作为参数）传给 <strong>Thread 类的构造器</strong> <code class="highlighter-rouge">new Thread(Runnable obj)</code> 来创建线程对象，调用 <code class="highlighter-rouge">start()</code> 启动线程。</li>
+  <li><strong>实现 <code class="highlighter-rouge">Callable</code> 接口</strong>，重写 <code class="highlighter-rouge">call()</code>，并将<strong>创建的子类对象</strong>（作为参数）传给 <strong>Thread 类的构造器</strong>来创建线程对象，调用 <code class="highlighter-rouge">start()</code> 开启线程。</li>
+  <li>实现了 <code class="highlighter-rouge">ExecutorService</code> 接口；</li>
+  <li>使用线程工厂 <code class="highlighter-rouge">ThreadFactory</code>；</li>
+  <li>（用两种方式）<del>创建<strong><a href="#线程池">线程池</a></strong></del>（都实现了 <code class="highlighter-rouge">ExecutorService</code> 接口）：用时直接获取，用完放回。</li>
+</ol>
+
+<h5 id="runnable-接口callable-接口区别"><code class="highlighter-rouge">Runnable</code> 接口、<code class="highlighter-rouge">Callable</code> 接口区别</h5>
+
+<ol>
+  <li><code class="highlighter-rouge">Runnable</code> 接口通过重写 <code class="highlighter-rouge">run()</code> 创建对象，<code class="highlighter-rouge">Callable</code> 接口通过重写 <code class="highlighter-rouge">call()</code>；</li>
+  <li><code class="highlighter-rouge">Runnable</code> 接口<strong>没有返回值</strong>，<code class="highlighter-rouge">Callable</code> 接口<strong>有泛型返回值</strong>，和 <code class="highlighter-rouge">Future、FutureTask</code> 配合可用来获取异步执行的结果：创建 <code class="highlighter-rouge">FutureTask(Callable cal)</code> 对象，传给 Thread 的构造器，提交给 <code class="highlighter-rouge">ExecutorsService</code> 执行，放入线程池中；</li>
+  <li><code class="highlighter-rouge">Runnable</code> 接口 <code class="highlighter-rouge">run()</code> 只能抛出<strong>运行时异常</strong>，且无法捕获处理；，<code class="highlighter-rouge">Callable</code> 接口 <code class="highlighter-rouge">call()</code> 允许<strong>抛出异常</strong>，可获取异常信息；</li>
+  <li><code class="highlighter-rouge">Runnable</code> 接口可继承其他类，多实现；可用匿名内部类简化。</li>
 </ol>
 
 <h5 id="start-vs-run">start() VS run()</h5>
 
 <ul>
-  <li><code class="highlighter-rouge">start()</code>：用于（启动线程）创建新线程，并<strong>自动执行</strong>在 <code class="highlighter-rouge">run()</code> 里的代码，使线程进入 <code class="highlighter-rouge">ready</code> 状态；<strong>只能调用一次</strong>；
-    <ul>
-      <li>多次start一个线程会怎么样</li>
-    </ul>
+  <li>
+    <p><code class="highlighter-rouge">start()</code>：用于（启动线程）创建新线程，并<strong>自动执行</strong>在 <code class="highlighter-rouge">run()</code> 里的代码，使线程进入 <code class="highlighter-rouge">ready</code> 状态；<strong>只能调用一次</strong>；</p>
   </li>
-  <li><code class="highlighter-rouge">run()</code>：用于执行线程的运行时代码；可重复调用；只是 Thread 的一个普通方法，仍在主线程内执行；不会创建新线程也不会调用线程的代码。</li>
+  <li>
+    <p><code class="highlighter-rouge">run()</code>：用于执行线程的运行时代码；<strong>可重复调用</strong>；只是 Thread 的一个普通方法，仍在<strong>主线程内</strong>执行；不会创建新线程也不会调用线程的代码。</p>
+  </li>
 </ul>
+
+<blockquote>
+  <p>多次start一个线程会怎么样？</p>
+</blockquote>
+
+<p>启动多个线程，多线程。</p>
 
 <p>多线程执行时要用 <code class="highlighter-rouge">start()</code> 而不是直接调用 <code class="highlighter-rouge">run()</code>：</p>
 
@@ -330,10 +338,10 @@ thread.start();
 <p>提交一个新任务到线程池时：</p>
 
 <ol>
-  <li>若<strong>核心线程池</strong>未满/其中的线程不全在执行 -&gt; 创建新线程执行任务；</li>
-  <li>若核心线程池已满，<strong>任务（等待）队列</strong>未满 -&gt; 放入任务队列等待执行；</li>
-  <li>若任务队列已满，判断线程数 &lt; 线程池最大线程数（<strong>线程池未满</strong>）-&gt; 创建临时线程处理任务；</li>
-  <li>线程数 &gt; 最大线程数 -&gt; 根据<strong>拒绝策略</strong>处理任务。</li>
+  <li>若<strong>核心线程池</strong>未满/其中的线程不全在执行 ==&gt; 创建新线程执行任务；</li>
+  <li>若核心线程池已满，<strong>任务（等待）队列</strong>未满 ==&gt; 放入任务队列等待执行；</li>
+  <li>若任务队列已满，判断线程数 &lt; 线程池最大线程数（<strong>线程池未满</strong>）==&gt; 创建临时线程处理任务；</li>
+  <li>线程数 &gt; 最大线程数 ==&gt; 根据<strong>拒绝策略</strong>处理任务。</li>
 </ol>
 
 <h4 id="executor-框架">Executor 框架</h4>
@@ -402,20 +410,22 @@ try {
 
 <h4 id="创建线程池">创建线程池</h4>
 
-<h5 id="一通过构造器-threadpoolexecutor">一、通过构造器 ThreadPoolExecutor()</h5>
+<h5 id="一通过构造器-threadpoolexecutor">一、通过构造器 <code class="highlighter-rouge">ThreadPoolExecutor()</code></h5>
 
-<p>方式一：通过构造器 <code class="highlighter-rouge">ThreadPoolExecutor()</code> 创建；Alibaba 推荐，更明确线程池的运行规则，规避资源耗尽的风险。</p>
+<blockquote>
+  <p>Alibaba 推荐，更明确线程池的运行规则，规避资源耗尽的风险。</p>
+</blockquote>
 
 <p><img src="assets/ThreadPoolExecutor构造方法.png" alt="ThreadPoolExecutor构造方法" style="zoom:80%;" /></p>
 
-<p>四个构造器 <code class="highlighter-rouge">ThreadPoolExecutor()</code> 的参数有：</p>
+<p>构造器 <code class="highlighter-rouge">ThreadPoolExecutor()</code> 的四个参数有：</p>
 
 <ol>
-  <li><strong><code class="highlighter-rouge">int corePoolSize</code></strong>：核心线程数，线程池中活跃的线程数；最小可同时运行的线程数量；</li>
-  <li><strong><code class="highlighter-rouge">int maxinumPoolSize</code></strong>：允许同时运行的最大线程数；当队列中存放的任务达到队列容量时，可同时运行的线程数量变为最大线程数；</li>
-  <li><code class="highlighter-rouge">long keepAliveTime</code>：空闲线程（超出核心线程数外的）的最大存活时间；</li>
+  <li><strong><code class="highlighter-rouge">int corePoolSize</code></strong>：<strong>核心</strong>线程数，线程池中活跃的线程数；最小可同时运行的线程数量；</li>
+  <li><strong><code class="highlighter-rouge">int maxinumPoolSize</code></strong>：允许<strong>同时运行</strong>的最大线程数；当队列中存放的任务达到队列容量时，可同时运行的线程数量变为最大线程数；</li>
+  <li><code class="highlighter-rouge">long keepAliveTime</code>：<strong>空闲线程</strong>（超出核心线程数外的）的最大存活时间；</li>
   <li><code class="highlighter-rouge">TimeUnit unit</code>：空闲时间的单位；</li>
-  <li><strong><code class="highlighter-rouge">BlockingQueue&lt;runnable&gt; workQueue</code></strong>：任务队列，存放等待执行的任务； 若当前运行的线程数量达到核心线程数，新任务会被存放在队列中。</li>
+  <li><strong><code class="highlighter-rouge">BlockingQueue&lt;runnable&gt; workQueue</code></strong>：<strong>任务队列</strong>，存放等待执行的任务； 若当前运行的线程数量达到核心线程数，新任务会被存放在队列中。</li>
 </ol>
 
 <p>其中前5个为共有，可选参数有：</p>
@@ -440,32 +450,34 @@ try {
       <li>会降低对于新任务提交速度，影响程序的整体性能。用于可承受此延迟、且要求任何一个任务请求都要被执行的情况。</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">.DiscardPolicy</code>： 不处理新任务，直接丢弃掉。</li>
-  <li><code class="highlighter-rouge">.DiscardOldestPolicy</code>： 此策略将丢弃最早的未处理的任务请求。</li>
+  <li><code class="highlighter-rouge">.DiscardPolicy</code>： 不处理新任务，<strong>直接丢弃</strong>。</li>
+  <li><code class="highlighter-rouge">.DiscardOldestPolicy</code>： 此策略将丢弃<strong>最早的未处理的</strong>任务请求。</li>
 </ol>
 
-<h5 id="二通过-executor-框架的-executors-工具类">二、通过 Executor 框架的 Executors 工具类</h5>
+<h5 id="二通过-executors-静态工厂类">二、通过 Executors 静态工厂类</h5>
 
-<p>方式二： 通过 <code class="highlighter-rouge">Executor</code> 框架的工具类/线程池的静态工厂类 <code class="highlighter-rouge">Executors</code> 来实现。目的是将任务提交和运行分离，用户不需从代码层考虑设计任务的提交运行。<strong>不推荐</strong>。</p>
+<p>通过 <code class="highlighter-rouge">Executor</code> 框架的工具类/线程池的静态工厂类 <code class="highlighter-rouge">Executors</code> 来实现。</p>
+
+<p>目的是将任务提交和运行分离，用户不需从代码层考虑设计任务的提交运行。<strong>不推荐</strong>。</p>
 
 <p><img src="assets/Executor框架的工具类.png" alt="Executor框架的工具类" style="zoom: 80%;" /></p>
 
-<p>常见线程池及创建接口（应用场景）：</p>
+<h5 id="常见线程池及创建接口">常见线程池及创建接口</h5>
 
 <ol>
-  <li><code class="highlighter-rouge">newSingleThreadExecutor()</code>：创建只有一个线程的线程池。若多个任务被提交到线程池，任务会被保存在一个任务队列中，待线程空闲，按先入先出的顺序执行队列中的任务。</li>
-  <li><code class="highlighter-rouge">newFixedThreadPool(n)</code>：创建（可重用）固定线程数的线程池；不推荐。线程池中的线程数量始终不变。当有一个新的任务提交时，线程池中若有空闲线程，则立即执行；若没有，则新的任务会被暂存在一个任务队列中，待有线程空闲时再处理。</li>
-  <li><code class="highlighter-rouge">newCachedThreadPool()</code>：创建可按需创建新线程的线程池。线程池的线程数量不确定，但若有空闲线程可复用，则会优先使用可复用的线程；若所有线程均在工作，又有新的任务提交，则会创建新的线程处理任务。所有线程在当前任务执行完毕后，将返回线程池进行复用。</li>
+  <li><code class="highlighter-rouge">newSingleThreadExecutor()</code>：创建只有<strong>一个线程</strong>的线程池。若多个任务被提交到线程池，任务会被保存在一个任务队列中，待线程空闲，按先入先出的顺序执行队列中的任务。</li>
+  <li><code class="highlighter-rouge">newFixedThreadPool(n)</code>：创建（可重用）<strong>固定线程数</strong>的线程池；不推荐。线程池中的线程数量始终不变。当有一个新的任务提交时，线程池中若有空闲线程，则立即执行；若没有，则新的任务会被暂存在一个任务队列中，待有线程空闲时再处理。</li>
+  <li><code class="highlighter-rouge">newCachedThreadPool()</code>：创建<strong>可按需创建新线程</strong>的线程池。线程池的线程数量不确定，但若有空闲线程可复用，则会优先使用可复用的线程；若所有线程均在工作，又有新的任务提交，则会创建新的线程处理任务。所有线程在当前任务执行完毕后，将返回线程池进行复用。</li>
   <li>
-    <p><code class="highlighter-rouge">newScheduledThreadPool(corePoolSize)</code>：创建可定时执行的线程池，指定核心线程数。</p>
+    <p><code class="highlighter-rouge">newScheduledThreadPool(corePoolSize)</code>：创建<strong>可定时执行</strong>的线程池，指定核心线程数。</p>
   </li>
-  <li><code class="highlighter-rouge">newWorkStealingPool()</code>：创建有多个任务队列的线程池。</li>
+  <li><code class="highlighter-rouge">newWorkStealingPool()</code>：创建有<strong>多个任务队列</strong>的线程池。</li>
 </ol>
 
 <p>注意：</p>
 
 <ul>
-  <li>1、2：允许的请求队列长度为 <code class="highlighter-rouge">Integer.MAX_VALUE</code>，可能会堆积大量的请求，从而导致 OOM；</li>
+  <li>1、2：允许的<strong>请求队列</strong>长度为 <code class="highlighter-rouge">Integer.MAX_VALUE</code>，可能会堆积大量的请求，从而导致 OOM；</li>
   <li>3、4：允许的创建线程数量为 <code class="highlighter-rouge">Integer.MAX_VALUE</code>，可能会创建大量的线程，从而导致 OOM；</li>
 </ul>
 
@@ -496,96 +508,6 @@ try {
     </ul>
   </li>
 </ol>
-
-<h3 id="线程同步机制">线程同步机制</h3>
-
-<h5 id="同步-vs-异步">同步 VS 异步</h5>
-
-<p>同步：必须等被调用的方法结束后，后面的代码才能执行。发出一个调用后，在没有得到结果前， 该调用就不可返回，一直等待。</p>
-
-<p>异步：不管被调用方法是否完成，都会继续执行后面的代码，调用完成后会通知调用者。调用在发出后，不用等待返回结果，该调用直接返回。</p>
-
-<ul>
-  <li>异步代码题，说出打印顺序</li>
-</ul>
-
-<p>简单来理解就是：同步按代码顺序执行，异步不按照代码顺序执行，异步的执行效率更高。</p>
-
-<p><img src="assets/async-sync.png" style="zoom:33%;" /></p>
-
-<h5 id="线程间的同步方式">线程间的同步方式</h5>
-
-<p>线程同步：两个或多个共享关键资源的线程并发执行。用于避免关键资源使用冲突。</p>
-
-<ol>
-  <li>synchronized</li>
-  <li>同步工具类：
-    <ol>
-      <li>阻塞队列</li>
-      <li>闭锁</li>
-    </ol>
-  </li>
-  <li><a href="#常用的 AQS 组件/同步器">常用的 AQS 组件/同步器</a>
-    <ol>
-      <li>信号量（Semphares)）</li>
-      <li>栅栏/屏障（barrier）</li>
-      <li>FutureTask；</li>
-    </ol>
-  </li>
-  <li>互斥量（Mutex）：采用互斥对象机制，只有拥有互斥对象的线程才有访问公共资源的权限。如 synchronized 关键词和各种 Lock（互斥锁、读写锁、记录锁、自旋锁）。</li>
-  <li>事件（Event)）：Wait/Notify：通过通知的方式来保持多线程同步，方便比较多线程优先级。</li>
-  <li>条件变量</li>
-</ol>
-
-<h5 id="synchronized">synchronized</h5>
-
-<p>用来控制线程同步：可保证在任意时刻只有一个线程执行方法/代码段</p>
-
-<ul>
-  <li>作用范围是 synchronized 后大括号{}中的代码</li>
-  <li>作用对象是调用{}的对象；</li>
-</ul>
-
-<p>用法：</p>
-
-<ol>
-  <li>
-    <p>修饰实例方法（同步方法）：作用于当前对象实例加锁，进入同步代码前要获得当前对象实例的锁。</p>
-  </li>
-  <li>
-    <p>修饰静态方法：因其是类成员，相当于给当前类加锁，作用于类的所有对象实例，访问静态 synchronized 方法、进入同步代码前要获得当前类的锁，而访问非静态 synchronized 方法占用的是当前实例对象锁，二者不互斥。</p>
-  </li>
-  <li>
-    <table>
-      <tbody>
-        <tr>
-          <td>修饰代码块（同步语句块）：synchronized(this</td>
-          <td>object) 表示进入同步代码库前要获得给定对象的锁。</td>
-        </tr>
-      </tbody>
-    </table>
-  </li>
-  <li>不能修饰构造器：其本身就是线程安全的，不存在同步的构造方法一说。</li>
-</ol>
-
-<h5 id="生产者消费者模型">生产者消费者模型</h5>
-
-<p>作用：</p>
-
-<ol>
-  <li>通过平衡生产者的生产能力和消费者的消费能力来提升整个系统的运行效率；</li>
-  <li>解耦；</li>
-</ol>
-
-<p>实现</p>
-
-<ul>
-  <li>wait 和 notify</li>
-  <li>ReentrantLock</li>
-  <li>BlockQueue</li>
-  <li>Semaphore</li>
-  <li>PipedInputStream</li>
-</ul>
 
 <h3 id="jmmjava-内存模型">JMM（Java 内存模型）</h3>
 
@@ -681,11 +603,11 @@ try {
 
 <h5 id="volatile">volatile</h5>
 
-<p>volatile 修饰共享变量：保证每个线程都能获取主存中的最新值，避免出现数据脏读。</p>
+<p>volatile 修饰共享变量：保证每个线程都能获取<strong>主存中的最新值</strong>，避免出现数据脏读。</p>
 
 <ol>
   <li><strong>保证变量对所有线程的可见性</strong>：一个线程修改了变量值，立即更新到主存，对其他线程立即可见。其他线程直接从主存读取新值，而不是工作内存中的副本；</li>
-  <li>禁止指令重排，保证有序性；</li>
+  <li>禁止<strong>指令重排</strong>，保证有序性；</li>
   <li>不能单独保证原子性，结合 CAS 可保证。</li>
 </ol>
 
@@ -698,10 +620,20 @@ try {
 
 <h5 id="volatile-vs-synchronized">volatile VS synchronized</h5>
 
+<p><code class="highlighter-rouge">synchronized</code> 关键字和 <code class="highlighter-rouge">volatile</code> 关键字是两个互补的存在，而不是对立的存在！</p>
+
+<ul>
+  <li><code class="highlighter-rouge">volatile</code> 关键字是线程同步的轻量级实现，所以 <code class="highlighter-rouge">volatile</code>性能肯定比<code class="highlighter-rouge">synchronized</code>关键字要好 。但是 <code class="highlighter-rouge">volatile</code> 关键字只能用于<strong>变量</strong>而 <code class="highlighter-rouge">synchronized</code> 关键字可以修饰<strong>方法以及代码块</strong> 。</li>
+  <li><code class="highlighter-rouge">volatile</code> 关键字能保证数据的可见性，但不能保证数据的原子性。<code class="highlighter-rouge">synchronized</code> 关键字两者都能保证。</li>
+  <li><code class="highlighter-rouge">volatile</code>关键字主要用于解决变量在多个线程之间的可见性，而 <code class="highlighter-rouge">synchronized</code> 关键字解决的是多个线程之间访问资源的同步性。</li>
+</ul>
+
+<p>区别：</p>
+
 <ol>
-  <li>修饰：volatile 只能用于变量而 synchronized 可修饰类、方法、变量及代码块；</li>
   <li>作用：volatile 用于解决变量在多个线程间的<strong>可见性</strong>（线程通信）； synchronized 用于解决多个线程间访问资源的同步性（线程同步）。</li>
   <li>性质：volatile 能保证数据的可见性（和有序性），但不能保证原子性；synchronized 两者都能保证。</li>
+  <li>修饰：volatile 只能用于变量而 synchronized 可修饰类、方法、变量及代码块；</li>
   <li>性能：volatile 是线程同步的轻量级实现，性能比 synchronized 好；</li>
   <li>阻塞：volatile 不会造成线程阻塞；synchronized 可能造成 。</li>
   <li>优化：volatile 变量不会被编译器优化；synchronized变量可被优化。</li>
@@ -709,20 +641,20 @@ try {
 
 <h5 id="threadlocal">ThreadLocal</h5>
 
-<p><code class="highlighter-rouge">ThreadLocal</code>（线程共享变量）：为每个线程维护一个本地 Map，key 为 ThreadLocal 对象，value 为对应线程的变量副本（Entry 对象）==&gt;用于查找；以空间换时间。</p>
+<p><code class="highlighter-rouge">ThreadLocal</code>（线程共享变量）：为每个线程维护一个本地 Map，key 为 ThreadLocal 对象，value 为对应线程的<strong>变量副本</strong>（Entry 对象）==&gt;用于查找；以空间换时间。</p>
 
 <p>用途：</p>
 
 <ol>
-  <li>（主要）用于线程间的数据隔离，解决线程安全问题；填充的数据只属于当前线程；</li>
-  <li>对象跨层传递时可避免多次传递，打破层次约束；</li>
+  <li>（主要）用于线程间的<strong>数据隔离</strong>，解决线程安全问题；填充的数据只属于当前线程；</li>
+  <li><strong>对象跨层传递</strong>时可避免多次传递，打破层次约束；</li>
   <li>进行事务操作，用于存储线程事物信息；</li>
   <li>数据库连接，Session会话管理。</li>
 </ol>
 
 <p><img src="assets/5.deed12c8.png" alt="img" style="zoom:100%;" /></p>
 
-<p>内存泄漏：由于 ThreadLocal 是弱引用，Entry 的 value 是强引用，因此当 ThreadLocal 被回收后，value 依旧不会被释放，产生内存泄漏。</p>
+<p>内存泄漏：由于 ThreadLocal 是<strong>弱引用</strong>，Entry 的 value 是强引用，因此当 ThreadLocal 被回收后，value 依旧不会被释放，产生内存泄漏。</p>
 
 <p>避免：</p>
 
@@ -731,7 +663,7 @@ try {
   <li>用 <code class="highlighter-rouge">private static ThreadLocal</code> 修饰变量，任何时候都能访问 value，进而清除掉。是针对一个线程内所有操作共享的，故设置为 static，所有此类实例共享此静态变量。即，类第一次被使用时装载，只分配一块存储空间，所有（本线程内定义的）此类的对象都可操控这个变量。</li>
 </ul>
 
-<h3 id="线程安全">线程安全</h3>
+<h3 id="线程安全线程同步">线程安全、线程同步</h3>
 
 <p>定义：多线程下（重复）运行的结果与单线程的结果始终一致，且其他变量的值也和预期的值始终一致。</p>
 
@@ -758,14 +690,6 @@ try {
     <p>相对线程安全，即通常所说的线程安全：如 Vector 的 <code class="highlighter-rouge">add()、remove()</code> 都是原子操作，但如果多个线程同时执行遍历和add() ，会出现ConcurrentModificationException（即 <code class="highlighter-rouge">fail-fast</code> 机制）。</p>
   </li>
   <li>线程非安全：ArrayList、LinkedList、HashMap等。</li>
-</ol>
-
-<h5 id="线程安全工具">线程安全工具</h5>
-
-<ol>
-  <li>同步容器：<code class="highlighter-rouge">Collections.synchorizedXXX</code>；</li>
-  <li><a href="#线程间的同步方式">同步工具类</a>：阻塞队列、闭锁、信号量、栅栏、FutureTask；</li>
-  <li>并发容器类：<code class="highlighter-rouge">CopyOnWriteArrayList</code>、<code class="highlighter-rouge">ConcurrentLinkedQueue</code>、<code class="highlighter-rouge">BlockingQueue</code>、<code class="highlighter-rouge">ConcurrentHashMap</code>、<code class="highlighter-rouge">ConcurrentSkipListMap</code> ，见 Java 集合框架；</li>
 </ol>
 
 <h5 id="线程安全策略三要素">线程安全策略/三要素</h5>
@@ -804,48 +728,367 @@ try {
 
 <h5 id="悲观锁-vs-乐观锁">悲观锁 VS 乐观锁</h5>
 
-<p>悲观锁：每次获取数据时，都担心数据被修改，因此加独占锁，确保自己使用的过程中数据不会被别人修改，使用完成后解锁；期间对该数据读写的其他线程都会等待/阻塞；synchronized 的实现，传统的关系型数据库如行锁，表锁等，读锁，写锁等。遵循一锁二判三更新四释放的原则。</p>
+<p><img src="assets/d10348ed49fb4c5be79ad30f0804ae4b.png" alt="img" style="zoom:80%;" /></p>
+
+<p>悲观锁：每次获取数据时，<strong>都担心数据被修改</strong>，因此加<strong>独占锁</strong>，确保自己使用的过程中数据不会被别人修改，使用完成后解锁。期间对该数据读写的其他线程都会<strong>等待/阻塞</strong>。</p>
 
 <ul>
   <li>使用场景：写多读少，并发量不大</li>
-  <li>乐观锁在获得锁的同时已完成了更新，校验逻辑易出现漏洞，另外，对冲突的解决策略有较复杂的要求，处理不当易造成系统压力或数据异常，所以资金相关的金融敏感信息不建议使用乐观锁更新。</li>
-  <li>缺点：导致频繁的上下文切换和调度延时，降低性能；一个线程持有锁会导致其他所有需要此锁的线程挂起。</li>
+  <li>
+    <p>如 synchronized 的实现，传统的关系型数据库如行锁、表锁，读锁、写锁。遵循一锁二判三更新四释放的原则。</p>
+
+    <ul>
+      <li>缺点：导致频繁的上下文切换和调度延时，降低性能；一个线程持有锁会导致其他所有需要此锁的线程挂起。</li>
+    </ul>
+  </li>
 </ul>
 
-<p>乐观锁：对于并发间操作产生的线程安全问题持乐观状态，认为竞争不总是会发生，不需持有锁；每次获取数据时，都不担心数据被修改，因此读操作前不加锁，写操作时才判断数据在此期间是否被其他线程修改。如果发生修改，则返回写入失败；如果没有被修改，则执行修改操作，返回修改成功。</p>
+<p>乐观锁：对于<strong>并发</strong>操作产生的线程安全问题持乐观状态，<strong>认为竞争不总是会发生</strong>，不需持有锁；每次获取数据时，都不担心数据被修改，因此<strong>读操作前不加锁</strong>，<strong>写操作时</strong>才判断数据在此期间是否被其他线程修改。如果发生修改，则返回写入失败；如果没有被修改，则执行修改操作，返回修改成功。</p>
 
 <ul>
   <li>期间该数据可被其他线程读写；</li>
   <li>使用场景：读多写少</li>
   <li>一般用CAS算法实现。</li>
-  <li>在项目开发中的实践：SVN、Git等版本控制管理器，提交时对比版本号，如果远程仓库的版本号和本地的不一样表示有人已提交过代码，需要先更新到本地处理一下版本冲突问题。</li>
+  <li>乐观锁在获得锁的同时已完成了更新，校验逻辑易出现漏洞，另外，对冲突的解决策略有较复杂的要求，处理不当易造成系统压力或数据异常，所以资金相关的金融敏感信息不建议使用乐观锁更新。</li>
+  <li>在项目开发中的实践：SVN、Git 等版本控制管理器，提交时对比版本号，如果远程仓库的版本号和本地的不一样表示有人已提交过代码，需要先更新到本地处理一下版本冲突问题。</li>
 </ul>
+
+<h5 id="aba-问题">ABA 问题</h5>
+
+<p>线程1准备将内存值由A改为C：</p>
+
+<ol>
+  <li>线程1从内存位置 V读取了数据A；</li>
+  <li>由于没有锁，线程2将内存位置 V 的值由A改为B，又由B改回A；</li>
+  <li>线程1通过<strong>CAS比较</strong>，发现数据仍是A没变，很容易认为在此期间<strong>没有线程修改过数据</strong>，就写成了C，返回成功；</li>
+  <li>如果C的值（与内存值存在运算关系？）在ABA的线程中发生改变，则不能实现预期结果。</li>
+</ol>
+
+<p>解决：JUC包中 <code class="highlighter-rouge">AtomicStampedReference</code> 类（加入版本号，对比内存值+版本号）解决 ABA 问题。</p>
 
 <h5 id="cascompare-and-swap比较-交换">CAS，Compare and Swap，比较-交换</h5>
 
-<p>原理：基于乐观锁，当且仅当预期原值 A 和内存位置 V 的值相同时，才将 V 修改为新值 B 并返回true，否则处理器什么都不做。解决多线程并行情况下使用锁造成性能损耗的一种机制，这是硬件实现的原子操作。</p>
+<p>原理：基于<strong>乐观锁</strong>，当且仅当预期原值 A 和内存位置 V 的值相同时，才将 V 修改为新值 B 并返回true，否则处理器什么都不做。解决多线程并行情况下使用锁造成性能损耗的一种机制，这是硬件实现的原子操作。</p>
 
 <p>产生的问题：</p>
 
 <ol>
-  <li><strong>ABA 问题</strong>：线程1准备将内存值由A改为C：
-    <ol>
-      <li>线程1从内存位置 V读取了数据A；</li>
-      <li>由于没有锁，线程2将内存位置 V 的值由A改为B，又由B改回A；</li>
-      <li>线程1通过CAS比较，发现数据仍是A没变，很容易认为在此期间没有线程修改过数据，就写成了C，返回成功；</li>
-      <li>如果C的值在ABA的线程中发生改变，则不能实现预期结果。</li>
-      <li>JUC包中 AtomicStampedReference 类（加入版本号，对比内存值+版本号）解决 ABA 问题。</li>
-    </ol>
+  <li>
+    <p><strong>ABA 问题</strong>：</p>
   </li>
   <li>
     <p>循环时间长开销大：并发量较高，资源竞争严重时，许多线程反复尝试更新某一个变量，CAS操作却又一直不成功（自旋），相当于死循环，浪费CPU 资源。</p>
   </li>
-  <li>只能保证一个共享变量的原子操作：对多个共享变量无法保证。
+  <li>
+    <p>只能保证一个共享变量的原子操作：对多个共享变量无法保证。</p>
     <ul>
       <li>此时可用synchronized锁；可用AtomicReference来保证对象间的原子性，把多个对象放入CAS中。</li>
     </ul>
   </li>
 </ol>
+
+<h3 id="线程同步机制并发加锁">线程同步机制、并发加锁</h3>
+
+<h4 id="线程安全工具">线程安全工具</h4>
+
+<ol>
+  <li>同步容器：<code class="highlighter-rouge">Collections.synchorizedXXX</code>；</li>
+  <li><a href="#线程间的同步方式">同步工具类</a>：阻塞队列、闭锁、信号量、栅栏、FutureTask；</li>
+  <li>并发容器类：<code class="highlighter-rouge">CopyOnWriteArrayList</code>、<code class="highlighter-rouge">ConcurrentLinkedQueue</code>、<code class="highlighter-rouge">BlockingQueue</code>、<code class="highlighter-rouge">ConcurrentHashMap</code>、<code class="highlighter-rouge">ConcurrentSkipListMap</code> ，见 Java 集合框架；</li>
+</ol>
+
+<h4 id="线程间的同步三种并发加锁方式">线程间的同步、三种并发加锁方式</h4>
+
+<p>线程同步：两个或多个共享关键资源的线程<strong>并发</strong>执行。用于避免关键资源使用冲突。</p>
+
+<p>三种并发控制方法：</p>
+
+<ol>
+  <li>互斥量（Mutex）：采用互斥对象机制，只有拥有互斥对象的线程才有访问公共资源的权限。如
+    <ol>
+      <li><strong>synchronized 关键字</strong></li>
+      <li>各种 Lock（互斥锁、读写锁、记录锁、自旋锁）。</li>
+    </ol>
+  </li>
+  <li>JUC 同步/并发工具类、核心类 AQS <a href="#常用的 AQS 组件/同步器">常用的 AQS 组件/同步器</a>
+    <ol>
+      <li>信号量（Semphares)）</li>
+      <li><strong>ReentrantLock 可重入锁</strong></li>
+      <li>阻塞队列、闭锁、栅栏、FutureTask</li>
+    </ol>
+  </li>
+  <li>事件（Event)）：<strong>Wait()/Notify()</strong> 通过通知的方式来保持多线程同步，方便比较多线程优先级。</li>
+</ol>
+
+<p>另一种：</p>
+
+<ol>
+  <li>内置锁（synchronized）</li>
+  <li>重入锁（ReentrantLock）</li>
+  <li>读写锁（ReadWriteLock）</li>
+  <li>乐观锁</li>
+  <li>悲观锁</li>
+  <li>分布式锁</li>
+</ol>
+
+<h4 id="synchronized-关键字">synchronized 关键字</h4>
+
+<p>用来<strong>控制线程同步</strong>：主要解决的是多个线程之间访问资源的同步性，可以保证（被它修饰的方法或者代码块）在任意时刻只能有一个线程执行。</p>
+
+<ul>
+  <li>在 Java 早期版本中，<code class="highlighter-rouge">synchronized</code> 属于<strong>重量级锁</strong>，效率低。</li>
+</ul>
+
+<p>总结：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">synchronized</code> 关键字加到 <code class="highlighter-rouge">static</code> 静态方法和 <code class="highlighter-rouge">synchronized(class)</code> 代码块上都是是给 Class 类上锁；</li>
+  <li><code class="highlighter-rouge">synchronized</code> 关键字加到实例方法上是给对象实例上锁；</li>
+  <li>尽量不要使用 <code class="highlighter-rouge">synchronized(String a)</code> 因为 JVM 中，字符串常量池具有缓存功能。</li>
+</ol>
+
+<h5 id="修饰实例方法同步方法">修饰实例方法（同步方法）</h5>
+
+<p>给<strong>当前对象实例</strong>加锁，进入<strong>同步代码</strong>前要获得当前对象实例的锁。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>synchronized void method() {
+    //业务代码
+}
+</code></pre></div></div>
+
+<h5 id="修饰静态方法">修饰静态方法</h5>
+
+<p>给<strong>当前类</strong>加锁，作用于类的所有对象实例 ，进入同步代码前要获得 <strong>当前 class 的锁</strong>。</p>
+
+<ul>
+  <li>因为静态成员不属于任何一个实例对象，归整个类所有，不依赖于类的特定实例，被类的所有实例共享。</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>synchronized static void method() {
+    //业务代码
+}
+</code></pre></div></div>
+
+<p>静态 <code class="highlighter-rouge">synchronized</code> 方法和非静态 <code class="highlighter-rouge">synchronized</code> 方法之间的调用互斥么？</p>
+
+<blockquote>
+  <p>不互斥！</p>
+
+  <p>如果一个线程 A 调用一个实例对象的非静态 <code class="highlighter-rouge">synchronized</code> 方法，而线程 B 需要调用这个实例对象所属类的静态 <code class="highlighter-rouge">synchronized</code> 方法，是允许的，不会发生互斥现象。</p>
+
+  <p>因为访问静态 <code class="highlighter-rouge">synchronized</code> 方法占用的锁是<strong>当前类的锁</strong>，而访问非静态 <code class="highlighter-rouge">synchronized</code> 方法占用的锁是<strong>当前实例对象锁</strong>，二者不互斥。</p>
+</blockquote>
+
+<h5 id="修饰代码块同步语句块">修饰代码块（同步语句块）</h5>
+
+<p>对<strong>括号里指定的对象/类</strong>加锁：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">synchronized(object)</code>：表示进入同步代码块前要获得 <strong>给定对象的锁</strong>。</li>
+  <li><code class="highlighter-rouge">synchronized(类.class)</code>：表示进入同步代码块前要获得 <strong>给定 Class 的锁</strong>。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">synchronized</span><span class="o">(</span><span class="k">this</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">//业务代码</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h5 id="不能修饰构造器">不能修饰构造器</h5>
+
+<p><strong>构造方法</strong>不能使用 synchronized 关键字修饰。不过，可以在构造方法<strong>内部</strong>使用 synchronized 代码块。</p>
+
+<p>另外，构造方法本身是<strong>线程安全</strong>的，但如果在构造方法中涉及到共享资源的操作，就需要采取适当的同步措施来保证整个构造过程的线程安全。</p>
+
+<h5 id="synchronized-底层原理">synchronized 底层原理</h5>
+
+<blockquote>
+  <p>synchronized 关键字底层原理属于 <strong>JVM 层面</strong>的东西。</p>
+</blockquote>
+
+<h4 id="reentrantlock">ReentrantLock</h4>
+
+<p><code class="highlighter-rouge">ReentrantLock</code> 实现了 <code class="highlighter-rouge">Lock</code> 接口，是一个<strong>可重入且独占式</strong>的锁，和 <code class="highlighter-rouge">synchronized</code> 关键字类似。</p>
+
+<ul>
+  <li>能对共享/临界资源重复加锁，即当前线程再次获取该锁不会阻塞。</li>
+  <li>基于AQS。</li>
+</ul>
+
+<p>不过，<code class="highlighter-rouge">ReentrantLock</code> 更灵活、更强大，增加了轮询、超时、中断、公平锁和非公平锁等高级功能。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ReentrantLock</span> <span class="kd">implements</span> <span class="n">Lock</span><span class="o">,</span> <span class="n">java</span><span class="o">.</span><span class="na">io</span><span class="o">.</span><span class="na">Serializable</span> <span class="o">{}</span>
+
+<span class="mi">1</span><span class="o">.</span> <span class="err">新建锁对象</span><span class="n">Lock</span> <span class="n">l</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ReentrantLock</span><span class="o">();</span>
+<span class="mi">2</span><span class="o">.</span> <span class="err">加锁</span> <span class="n">l</span><span class="o">.</span><span class="na">lock</span><span class="o">()</span>
+<span class="mi">3</span><span class="o">.</span> <span class="err">解锁</span> <span class="n">l</span><span class="o">.</span><span class="na">unlock</span><span class="o">()</span>
+</code></pre></div></div>
+
+<h5 id="实现原理非公平锁">实现原理、非公平锁</h5>
+
+<p>底层就是由 <strong>AQS</strong> 来实现的。<code class="highlighter-rouge">ReentrantLock</code> 里面有一个内部类 <code class="highlighter-rouge">Sync</code>，<code class="highlighter-rouge">Sync</code> 继承 AQS（<code class="highlighter-rouge">AbstractQueuedSynchronizer</code>），添加锁和释放锁的大部分操作实际上都是在 <code class="highlighter-rouge">Sync</code> 中实现的。</p>
+
+<ul>
+  <li><code class="highlighter-rouge">Sync</code> 有公平锁 <code class="highlighter-rouge">FairSync</code> 和非公平锁 <code class="highlighter-rouge">NonfairSync</code> 两个子类。
+    <ul>
+      <li><strong>公平锁</strong> : 锁被释放之后，<strong>先申请的线程</strong>先得到锁。性能较差一些，因为公平锁为了保证时间上的绝对顺序，上下文切换更频繁。</li>
+      <li><strong>非公平锁</strong>：锁被释放之后，<strong>后申请的线程</strong>可能会先获取到锁，是随机或者按照其他优先级排序的。性能更好，但可能会导致某些线程永远无法获取到锁。</li>
+      <li>公平锁：按线程在队列中（发出请求）的<strong>排队顺序</strong>获得锁，先到先得；</li>
+      <li>非公平锁：当线程要获取锁时，无视队列顺序直接去抢锁（发出请求后立即尝试获取锁），<strong>谁抢到就是谁的</strong>，获取失败才排队等待。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">ReentrantLock</code> 默认使用<strong>非公平锁</strong>，也可以通过构造器来显式的指定使用公平锁。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 传入一个 boolean 值，true 时为公平锁，false 时为非公平锁</span>
+<span class="kd">public</span> <span class="nf">ReentrantLock</span><span class="o">(</span><span class="kt">boolean</span> <span class="n">fair</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">sync</span> <span class="o">=</span> <span class="n">fair</span> <span class="o">?</span> <span class="k">new</span> <span class="n">FairSync</span><span class="o">()</span> <span class="o">:</span> <span class="k">new</span> <span class="n">NonfairSync</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p><img src="assets/reentrantlock-class-diagram.png" alt="img" style="zoom: 30%;" /></p>
+
+<h5 id="可重入锁">可重入锁</h5>
+
+<p><strong>可重入锁</strong> 也叫递归锁：指的是线程可以<strong>再次获取自己的内部锁</strong>。</p>
+
+<ul>
+  <li>比如一个线程获得了某个对象的锁，此时这个对象锁还没有释放，当其再次想要获取这个对象的锁的时候还是可以获取的。如果是不可重入锁的话，就会造成<strong>死锁</strong>。</li>
+</ul>
+
+<p>可重入锁包括：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">synchronized</code> 关键字锁；</li>
+  <li>JDK 提供的所有现成的 <code class="highlighter-rouge">Lock</code> 实现类（ReentrantLock 类、<code class="highlighter-rouge">ReentrantReadWriteLock</code>、等）。</li>
+</ol>
+
+<h5 id="synchronized-和-reentrantlock-有什么区别">synchronized 和 ReentrantLock 有什么区别</h5>
+
+<ol>
+  <li>两者都是可重入锁；</li>
+  <li><code class="highlighter-rouge">synchronized</code> 依赖于 <strong>JVM</strong> 实现，而 <code class="highlighter-rouge">ReentrantLock</code> 依赖于 <strong>JDK 层面</strong>实现的（即 <strong>API 层面</strong>，需要 <code class="highlighter-rouge">lock()</code> 和 <code class="highlighter-rouge">unlock()</code> 方法配合 <code class="highlighter-rouge">try/finally</code> 语句块来完成）。</li>
+  <li>相比<code class="highlighter-rouge">synchronized</code>，<code class="highlighter-rouge">ReentrantLock</code>增加了一些高级功能：等待可中断、可实现公平锁、可实现选择性通知（锁可以绑定多个条件）、支持超时</li>
+</ol>
+
+<h5 id="可中断锁和不可中断锁有什么区别">可中断锁和不可中断锁有什么区别？</h5>
+
+<ul>
+  <li><strong>可中断锁</strong>：获取锁的过程中可以被中断，不需要一直<strong>等到获取锁之后</strong> 才能进行其他逻辑处理。<code class="highlighter-rouge">ReentrantLock</code> 就属于是可中断锁。</li>
+  <li><strong>不可中断锁</strong>：一旦线程申请了锁，就只能<strong>等到拿到锁以后</strong>才能进行其他的逻辑处理。 <code class="highlighter-rouge">synchronized</code> 就属于是不可中断锁。</li>
+</ul>
+
+<h4 id="reentrantreadwritelock">ReentrantReadWriteLock</h4>
+
+<blockquote>
+  <p>在实际项目中使用的并不多，面试中也问的比较少，简单了解即可。JDK 1.8 引入了性能更好的读写锁 <code class="highlighter-rouge">StampedLock</code> 。</p>
+</blockquote>
+
+<p><code class="highlighter-rouge">ReentrantReadWriteLock</code> 实现了 <code class="highlighter-rouge">ReadWriteLock</code> ，是一个<strong>可重入</strong>的<strong>读写锁</strong>，既可以保证多个线程同时读的效率，同时又可以保证有写入操作时的线程安全。</p>
+
+<ul>
+  <li><strong>一般锁</strong>进行<strong>并发控制</strong>的规则：读读互斥、读写互斥、写写互斥。</li>
+  <li><strong>读写锁</strong>进行并发控制的规则：读读不互斥、读写互斥、写写互斥（只有读读不互斥）。</li>
+</ul>
+
+<p><code class="highlighter-rouge">ReentrantReadWriteLock</code> 其实是两把锁，一把是 <code class="highlighter-rouge">WriteLock</code> (写锁)，一把是 <code class="highlighter-rouge">ReadLock</code>（读锁） 。读锁是共享锁，写锁是独占锁。读锁可以被同时读，可以同时被多个线程持有，而写锁最多只能同时被一个线程持有。</p>
+
+<ul>
+  <li>
+    <p>和 <code class="highlighter-rouge">ReentrantLock</code> 一样，<code class="highlighter-rouge">ReentrantReadWriteLock</code> 底层也是基于 AQS 实现的。</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">ReentrantReadWriteLock</code> 也支持公平锁和非公平锁，默认使用非公平锁，可以通过构造器来显式地指定。</p>
+  </li>
+</ul>
+
+<p>适合场景：由于 <code class="highlighter-rouge">ReentrantReadWriteLock</code> 既可以保证多个线程同时读的效率，同时又可以保证有写入操作时的线程安全。因此，在<strong>读多写少</strong>的情况下，使用 <code class="highlighter-rouge">ReentrantReadWriteLock</code> 能够明显提升系统性能。</p>
+
+<h5 id="共享锁和独占锁有什么区别">共享锁和独占锁有什么区别？</h5>
+
+<ul>
+  <li><strong>共享锁</strong>：一把锁可以被多个线程同时获得。</li>
+  <li><strong>独占锁</strong>：一把锁只能被一个线程获得。</li>
+</ul>
+
+<h5 id="线程持有读锁还能获取写锁吗">线程持有读锁还能获取写锁吗？</h5>
+
+<ul>
+  <li>在线程持有读锁的情况下，该线程不能取得写锁(因为获取写锁的时候，如果发现当前的读锁被占用，就马上获取失败，不管读锁是不是被当前线程持有)。</li>
+  <li>在线程持有写锁的情况下，该线程可以继续获取读锁（获取读锁时如果发现写锁被占用，只有写锁没有被当前线程占用的情况才会获取失败）。</li>
+</ul>
+
+<p>读写锁的源码分析，推荐阅读 <a href="https://mp.weixin.qq.com/s/h3VIUyH9L0v14MrQJiiDbw">聊聊 Java 的几把 JVM 级锁 - 阿里巴巴中间件</a> 这篇文章，写的很不错。</p>
+
+<h5 id="读锁为什么不能升级为写锁">读锁为什么不能升级为写锁？</h5>
+
+<p>写锁可以降级为读锁，但是读锁却不能升级为写锁。这是因为读锁升级为写锁会引起线程的争夺，毕竟写锁属于是独占锁，这样的话，会影响性能。</p>
+
+<p>另外，还可能会有死锁问题发生。举个例子：假设两个线程的读锁都想升级写锁，则需要对方都释放自己锁，而双方都不释放，就会产生死锁。</p>
+
+<h4 id="stampedlock">StampedLock</h4>
+
+<p><code class="highlighter-rouge">StampedLock</code> 是 JDK 1.8 引入的性能更好的读写锁，<strong>不可重入</strong>且不支持<strong>条件变量</strong> <code class="highlighter-rouge">Condition</code>。</p>
+
+<p>不同于一般的 <code class="highlighter-rouge">Lock</code> 类，<code class="highlighter-rouge">StampedLock</code> 并不是直接实现 <code class="highlighter-rouge">Lock</code>或 <code class="highlighter-rouge">ReadWriteLock</code>接口，而是基于 <strong>CLH 锁</strong> 独立实现的（AQS 也是基于这玩意）。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">StampedLock</span> <span class="kd">implements</span> <span class="n">java</span><span class="o">.</span><span class="na">io</span><span class="o">.</span><span class="na">Serializable</span> <span class="o">{</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">StampedLock</code> 提供了三种模式的读写控制模式：</p>
+
+<ul>
+  <li><strong>写锁</strong>：独占锁，一把锁只能被一个线程获得。当一个线程获取写锁后，其他请求读锁和写锁的线程必须等待。类似于 <code class="highlighter-rouge">ReentrantReadWriteLock</code> 的写锁，不过这里的写锁是不可重入的。</li>
+  <li><strong>读锁</strong> （悲观读）：共享锁，没有线程获取写锁的情况下，多个线程可以同时持有读锁。如果己经有线程持有写锁，则其他线程请求获取该读锁会被阻塞。类似于 <code class="highlighter-rouge">ReentrantReadWriteLock</code> 的读锁，不过这里的读锁是不可重入的。</li>
+  <li><strong>乐观读</strong>：允许多个线程获取乐观读以及读锁。同时允许一个写线程获取写锁。</li>
+</ul>
+
+<p>另外，<code class="highlighter-rouge">StampedLock</code> 还支持这三种锁在一定条件下进行相互转换 。</p>
+
+<h5 id="stampedlock-的性能为什么更好">StampedLock 的性能为什么更好？</h5>
+
+<p>相比于传统读写锁多出来的<strong>乐观读</strong>是<code class="highlighter-rouge">StampedLock</code>比 <code class="highlighter-rouge">ReadWriteLock</code> 性能更好的关键原因。</p>
+
+<p><code class="highlighter-rouge">StampedLock</code> 的乐观读允许一个写线程获取写锁，所以不会导致所有写线程阻塞，也就是当读多写少的时候，写线程有机会获取写锁，减少了线程饥饿的问题，吞吐量大大提高。</p>
+
+<h5 id="stampedlock-适合什么场景">StampedLock 适合什么场景？</h5>
+
+<p>和 <code class="highlighter-rouge">ReentrantReadWriteLock</code> 一样，<code class="highlighter-rouge">StampedLock</code> 同样适合<strong>读多写少</strong>的业务场景，可以作为 <code class="highlighter-rouge">ReentrantReadWriteLock</code>的替代品，<strong>性能更好</strong>。</p>
+
+<p>不过，需要注意的是<code class="highlighter-rouge">StampedLock</code>不可重入，不支持条件变量 <code class="highlighter-rouge">Condition</code>，对中断操作支持也不友好（使用不当容易导致 CPU 飙升）。如果你需要用到 <code class="highlighter-rouge">ReentrantLock</code> 的一些高级性能，就不太建议使用 <code class="highlighter-rouge">StampedLock</code> 了。</p>
+
+<p>另外，<code class="highlighter-rouge">StampedLock</code> 性能虽好，但使用起来相对比较麻烦，一旦使用不当，就会出现生产问题。</p>
+
+<h5 id="stampedlock-的底层原理">StampedLock 的底层原理</h5>
+
+<blockquote>
+  <p>如果只是准备面试的话，建议多花点精力搞懂 AQS 原理即可，<code class="highlighter-rouge">StampedLock</code> 底层原理在面试中遇到的概率非常小。</p>
+</blockquote>
+
+<p><code class="highlighter-rouge">StampedLock</code> 不是直接实现 <code class="highlighter-rouge">Lock</code>或 <code class="highlighter-rouge">ReadWriteLock</code>接口，而是基于 <strong>CLH 锁</strong> 实现的（AQS 也是基于这玩意），CLH 锁是对自旋锁的一种改良，是一种隐式的链表队列。<code class="highlighter-rouge">StampedLock</code> 通过 CLH 队列进行线程的管理，通过同步状态值 <code class="highlighter-rouge">state</code> 来表示锁的状态和类型。</p>
+
+<p><code class="highlighter-rouge">StampedLock</code> 的原理和 AQS 原理比较类似。</p>
+
+<h4 id="waitnotifynotifyall-通知">wait()、notify()、notifyAll() 通知</h4>
+
+<h4 id="生产者消费者模型">生产者消费者模型</h4>
+
+<p>作用：</p>
+
+<ol>
+  <li>通过平衡生产者的生产能力和消费者的消费能力来提升整个系统的运行效率；</li>
+  <li>解耦；</li>
+</ol>
+
+<p>实现</p>
+
+<ul>
+  <li>wait 和 notify</li>
+  <li>ReentrantLock</li>
+  <li>BlockQueue</li>
+  <li>Semaphore</li>
+  <li>PipedInputStream</li>
+</ul>
 
 <h3 id="juc-并发工具类">JUC 并发工具类</h3>
 
@@ -927,11 +1170,20 @@ public final void lazySet(int newValue) // 最终设置为newValue,使用 lazySe
 
 <h4 id="juc-核心类-aqs">JUC 核心类 AQS</h4>
 
-<p><code class="highlighter-rouge">AbstractQueuedSynchronizer(AQS)</code> 抽象队列同步器：在 <code class="highlighter-rouge">java.util.concurrent.locks</code> 包下，是（利用先进先出 CLH 队列锁实现的）底层抽象同步工具类；</p>
+<p><strong>AQS</strong> <code class="highlighter-rouge">(AbstractQueuedSynchronizer)</code> 抽象队列同步器：在 <code class="highlighter-rouge">java.util.concurrent.locks</code> 包下，是（利用<strong>先进先出 CLH 队列锁</strong>实现的）底层抽象同步工具类；</p>
 
 <ul>
   <li>用来构建锁和同步器的框架，（通过继承 <code class="highlighter-rouge">AQS </code>类并重写其模版方法）能简单高效地构造出大量应用广泛的同步器。如： <a href="#常用的 AQS 组件/同步器">常用的 AQS 组件/同步器</a>。</li>
 </ul>
+
+<h5 id="aqs-的两种资源共享方式">AQS 的两种资源共享方式</h5>
+
+<p>AQS 定义两种资源共享方式：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">Exclusive</code>（独占锁）：每次只能有一个线程持有锁、能执行，如 <code class="highlighter-rouge">ReentrantLock</code>。</li>
+  <li><code class="highlighter-rouge">Share</code>（共享锁）：多个线程可同时获取锁同时执行，并发访问共享资源，如 <code class="highlighter-rouge">Semaphore、CountDownLatch、CyclicBarrier、ReadWriteLock</code>。</li>
+</ol>
 
 <h5 id="aqs-原理">AQS 原理</h5>
 
@@ -951,46 +1203,41 @@ public final void lazySet(int newValue) // 最终设置为newValue,使用 lazySe
   <li>如果被请求的共享资源被占用，多线程争用资源被阻塞时，线程获取资源/锁失败，会进入 FIFO 等待（同步）队列挂起；AQS 作为线程阻塞等待及被唤醒时锁分配的机制。</li>
 </ol>
 
-<h5 id="aqs的两种资源共享方式">AQS的两种资源共享方式</h5>
-
-<blockquote>
-  <p>两种功能共享方式</p>
-</blockquote>
-
-<ol>
-  <li><code class="highlighter-rouge">Exclusive</code>（独占锁）：每次只能有一个线程持有锁，能执行，如 <code class="highlighter-rouge">ReentrantLock</code> 提供了两种锁获取方式：
-    <ul>
-      <li>公平锁：按线程在队列中（发出请求）的排队顺序获得锁，先到先得；</li>
-      <li>非公平锁：当线程要获取锁时，无视队列顺序直接去抢锁（发出请求后立即尝试获取锁），谁抢到就是谁的，获取失败才排队等待。</li>
-    </ul>
-  </li>
-  <li><code class="highlighter-rouge">Share</code>（共享锁）：多个线程可同时获取锁同时执行，并发访问共享资源，如 <code class="highlighter-rouge">Semaphore、CountDownLatch、CyclicBarrier、ReadWriteLock</code>。</li>
-</ol>
-
 <h5 id="常用的-aqs-组件同步器">常用的 AQS 组件/同步器</h5>
 
+<p>常见的同步工具类：</p>
+
 <ol>
-  <li><code class="highlighter-rouge">Semaphore</code>（信号量）：限制某段代码块的并发数，允许同一时刻多个线程同时访问同一资源，但需控制最大线程数量。
+  <li>
+    <p><code class="highlighter-rouge">Semaphore</code>（信号量）：限制某段代码块的并发数，允许同一时刻多个线程同时访问同一资源，但需控制最大线程数量。</p>
+
     <ul>
       <li><code class="highlighter-rouge">synchronized/ReentrantLock</code>（相当于构造器参数最大并发数/计数器n=1）都是一次只允许一个线程访问某个资源。</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">CountDownLatch</code>（<strong>倒计时器</strong>）：是一个同步工具类，用来协调多个线程间的同步。用来控制当前线程等待直到倒计时结束（其它线程都执行完毕），再开始执行。
+  <li>
+    <p><code class="highlighter-rouge">CountDownLatch</code>（<strong>倒计时器</strong>）：是一个同步工具类，用来协调多个线程间的同步。用来控制当前线程等待直到倒计时结束（其它线程都执行完毕），再开始执行。</p>
+
     <ul>
       <li>通过计数器实现，初始值是线程数量，每执行完一个线程-1。只能一次性使用。</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">CyclicBarrier</code>（循环栅栏）：和 CountDownLatch 类似，但可重复使用（reset）。让一组线程到达一个屏障（同步点）时被阻塞，直到最后一个线程到达屏障（所有线程的任务都执行完毕）时，才开门，所有被屏障拦截的线程才会继续干活。
+  <li>
+    <p><code class="highlighter-rouge">CyclicBarrier</code>（循环栅栏）：和 CountDownLatch 类似，但可重复使用（reset）。让一组线程到达一个屏障（同步点）时被阻塞，直到最后一个线程到达屏障（所有线程的任务都执行完毕）时，才开门，所有被屏障拦截的线程才会继续干活。</p>
+
     <ul>
       <li>如：用多线程读取多个文件处理的场景。</li>
     </ul>
   </li>
-  <li><strong><code class="highlighter-rouge">ReentrantLock</code>（可重入锁）</strong>：能对共享/临界资源重复加锁，即当前线程再次获取该锁不会阻塞。基于AQS，唯一实现了Lock接口的类。
+  <li><strong><code class="highlighter-rouge">ReentrantLock</code>（可重入锁）</strong>：能对共享/临界资源重复加锁，即当前线程再次获取该锁不会阻塞。基于AQS，唯一实现了<strong>Lock接口</strong>的类。
     <ul>
-      <li><strong>实现原理</strong>：</li>
+      <li><strong>实现原理</strong>：
+        <ol>
+          <li><code class="highlighter-rouge">ReentrantReadWriteLock</code>（读-写锁）：可看作组合式，允许一个资源可被多个读/写操作访问，但读-写不能同时进行。允许多个线程同时对某一资源进行读。</li>
+        </ol>
+      </li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">ReentrantReadWriteLock</code>（读-写锁）：可看作组合式，允许一个资源可被多个读/写操作访问，但读-写不能同时进行。允许多个线程同时对某一资源进行读。</li>
   <li><code class="highlighter-rouge">SynchronousQueue</code>（同步队列）</li>
   <li><code class="highlighter-rouge">FutureTask</code></li>
 </ol>
