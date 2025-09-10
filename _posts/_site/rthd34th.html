@@ -1,5 +1,5 @@
 <blockquote>
-  <p>摘要：数据结构中，线性结构有数组、字符串、链表、栈和队列、哈希表，非线性结构有堆、树、二叉树、图。手撕算法多为框架，包括常用技巧、十大排序算法、二分查找、分治与递归、动态规划、BFS 框架、DFS框架与回溯、贪心、缓存淘汰算法。基本涵盖<a href="https://github.com/labuladong/fucking-algorithm">labuladong 的算法小抄</a>、<a href="https://codetop.cc/">CodeTop</a>频度前40、<a href="https://leetcode.cn/problem-list/xb9nqhhg/">剑指 Offer（第 2 版）</a>、<a href="https://leetcode.cn/problemset/all/?listId=2cktkvj&amp;page=1&amp;sorting=W3sic29ydE9yZGVyIjoiREVTQ0VORElORyIsIm9yZGVyQnkiOiJTT0xVVElPTl9OVU0ifV0%3D">LeetCode 热题 HOT 100</a>常见例题。</p>
+  <p>摘要：数据结构中，线性结构有数组、字符串、链表，栈和队列、哈希表，非线性结构有堆、树、二叉树、图。手撕算法多为框架，包括常用技巧、十大排序算法、查找、分治与递归、动态规划、贪心、BFS 框架、DFS框架与回溯、缓存淘汰算法。基本涵盖<a href="https://github.com/labuladong/fucking-algorithm">labuladong 的算法小抄</a>、<a href="https://codetop.cc/">CodeTop</a>频度前40、<a href="https://leetcode.cn/problem-list/xb9nqhhg/">剑指 Offer（第 2 版）</a>、<a href="https://leetcode.cn/problemset/all/?listId=2cktkvj&amp;page=1&amp;sorting=W3sic29ydE9yZGVyIjoiREVTQ0VORElORyIsIm9yZGVyQnkiOiJTT0xVVElPTl9OVU0ifV0%3D">LeetCode 热题 HOT 100</a>常见例题。</p>
 </blockquote>
 
 <!-- more -->
@@ -13,15 +13,9 @@
 <h2 id="数据结构">数据结构</h2>
 
 <blockquote>
-  <p>由 Java 数组、String 类和 Java 集合框架实现。</p>
-</blockquote>
-
-<blockquote>
   <p>线性数据结构：数组（字符串）、链表、栈和队列、哈希表；</p>
-</blockquote>
 
-<blockquote>
-  <p>非线性结构有堆、树、二叉树、图。</p>
+  <p>非线性结构有：堆、树、二叉树、图。</p>
 </blockquote>
 
 <h3 id="数组">数组</h3>
@@ -496,7 +490,7 @@ ans.reverse();
   <p>数组 VS 链表 、ArrayList VS LinkedList。链表相关的题目套路比较固定，主要是双指针技巧。</p>
 </blockquote>
 
-<h5 id="头指针-vs-虚拟头结点">头指针 VS 虚拟头结点</h5>
+<h4 id="头指针-vs-虚拟头结点">头指针 VS 虚拟头结点</h4>
 
 <p>指针：Java 语言中不存在指针，但可理解为<code class="highlighter-rouge">引用</code>。</p>
 
@@ -550,7 +544,7 @@ ans.reverse();
   <li>在处理头结点和尾结点时。</li>
 </ol>
 
-<h5 id="链表快慢双指针">链表快慢双指针</h5>
+<h4 id="链表快慢双指针">链表快慢双指针</h4>
 
 <p>单链表大部分都适用<a href="#快慢双指针">数组快慢双指针</a>技巧。</p>
 
@@ -614,7 +608,7 @@ ListNode slow = head, fast = head;
   <li>循环左移</li>
 </ol>
 
-<h5 id="链表双指针">链表双指针</h5>
+<h4 id="链表双指针">链表双指针</h4>
 
 <ul>
   <li>
@@ -664,7 +658,7 @@ ListNode slow = head, fast = head;
         ) - height[i]
 </code></pre></div></div>
 
-<h5 id="经典例题-2">经典例题</h5>
+<h4 id="经典例题-2">经典例题</h4>
 
 <ul>
   <li>
@@ -739,6 +733,16 @@ void traverse(ListNode head) {
     print(head.val);
 }
 </code></pre></div></div>
+
+<h4 id="跳表">跳表</h4>
+
+<p>跳表（Skip List）：基于链表实现的有序列表，使得包含n个元素的有序序列的<strong>查找和插入</strong>操作的平均时间复杂度都是 O(logn)，优于数组的 O(n)复杂度。对并发友好。</p>
+
+<p>实现：快速的查询效果是通过维护一个多层次的<strong>链表</strong>（<code class="highlighter-rouge">ConcurrentSkipListMap</code>）实现的，实现了快速查询效果将平均时间复杂度降到了O(logn)。这是一个典型的用空间换时间数据结构。</p>
+
+<p>缺点：就是“以空间换时间”方式存在一定数据冗余。</p>
+
+<p>应用：<strong>Redis</strong>中的有序集合对象的底层数据结构就使用了跳表。</p>
 
 <h3 id="栈队列">栈、队列</h3>
 
@@ -920,37 +924,131 @@ Stack&lt;Character&gt; stack = new Stack&lt;&gt;();
 
 <h3 id="哈希表">哈希表</h3>
 
-<p>哈希表的原理是什么？为什么它的增删查改效率是 O(1)？</p>
+<blockquote>
+  <p>哈希表和常说的 Map（键值映射）是不是同一个东西？不是。</p>
+</blockquote>
 
-<p>哈希表：又称散列表，通过散列函数把键映射到一个<strong>大数组</strong>里，实现快速存取数据的功能。</p>
+<p>哈希表、<strong>散列表</strong>（Hash Table）：用于存储<strong>键值对</strong>。</p>
 
-<p>解决散列冲突的方法：</p>
+<p>原理：哈希表的本质是<strong>数组 + 哈希函数</strong>。通过<strong>散列函数</strong>把键映射到一个<strong>数组</strong>（散列表）里，得到数组的索引，进而<strong>直接访问</strong>（快速存取）索引位置的值。+ 解决哈希冲突。</p>
+
+<ul>
+  <li>散列表：存放记录的数组。只不过数组存放的是单一的数据，而哈希表中存放的是键值对。</li>
+  <li>哈希函数（哈希算法、散列函数、映射函数）：
+    <ol>
+      <li>作用是把任意长度的输入（键 key）转化成固定长度的输出（数组的索引）。</li>
+      <li>还要保证索引是合法的：输入相同的 <code class="highlighter-rouge">key</code>，输出也必须要相同，这样才能保证哈希表的正确性。</li>
+    </ol>
+  </li>
+  <li>用于查找。</li>
+</ul>
+
+<p><img src="assets/hash_function.png" alt="哈希函数工作原理" style="zoom: 50%;" /></p>
+
+<p>缺点：</p>
 
 <ol>
-  <li>拉链法：需要链表特性，操作简单，但需额外的空间存指针；</li>
-  <li>线性探查法：需要数组特性，以便连续寻址，不需指针的存储空间，但操作稍复杂。</li>
+  <li>哈希冲突；</li>
+  <li>最大缺点是：Hash 索引不支持<strong>顺序</strong>和范围查询。hash 表存储的是<strong>无序数据</strong>，范围查找时需遍历，<strong>遍历</strong>比较耗费时间。</li>
+  <li>将所有的数据文件添加到内存，比较耗费<strong>内存</strong>空间。</li>
 </ol>
 
-<p>为什么不能依赖哈希表的<strong>遍历顺序</strong>？</p>
+<h4 id="哈希冲突与扩容">哈希冲突与扩容</h4>
+
+<p>哈希冲突、哈希碰撞：不同的 key 通过<strong>哈希函数</strong>可能得到<strong>相同的索引值</strong>。</p>
+
+<p>哈希冲突是否可以避免？</p>
 
 <ul>
-  <li></li>
+  <li>
+    <p>哈希冲突<strong>不可能避免</strong>，只能在算法层面尽量处理。</p>
+  </li>
+  <li>
+    <p>哈希冲突是一定会出现的，因为这个 <code class="highlighter-rouge">hash</code> 函数相当于是把一个无穷大的空间映射到了一个有限的索引空间，所以必然会有不同的 <code class="highlighter-rouge">key</code> 映射到同一个索引上。</p>
+  </li>
 </ul>
 
-<p>key 必须是不可变的？</p>
+<p>解决方法：<del>JDK1.8 前 <code class="highlighter-rouge">HashMap</code> 用链地址法解决，JDK1.8 后 <code class="highlighter-rouge">HashMap</code> 用<strong>红黑树</strong>（数组 + 二叉树）；</del></p>
+
+<ol>
+  <li><strong>拉链法</strong>（纵向延伸思路）：<strong>数组 + 链表</strong>，哈希表的底层数组并不直接存储 <code class="highlighter-rouge">value</code> 类型，而是存储一个链表，当有多个不同的 <code class="highlighter-rouge">key</code> 映射到了同一个索引上，这些 <code class="highlighter-rouge">key -&gt; value</code> 对儿就存储在这个链表中。需<strong>额外的空间</strong>存指针。</li>
+  <li><strong>开放寻址法</strong>思想（横向延伸思路）：数组特性，如果通过哈希函数<strong>计算出的索引</strong>所对应的空间已经被占用了，就再找一个还没被占用的空间将数据存进去。
+    <ol>
+      <li><strong>线性探查法</strong>：继续向后一个位置找（连续寻址），直到<strong>找到空闲位置</strong>为止。</li>
+      <li>双重哈希法：继续用第二个哈希函数来计算索引，第二个被占用就用第三个，以此类推，直到计算出没被占用的空间对应的索引。</li>
+    </ol>
+  </li>
+  <li>可以通过<strong>哈希表扩容</strong>来减少哈希冲突。</li>
+</ol>
+
+<p><img src="assets/hash-collision-with-key.jpeg" alt="img" style="zoom:33%;" /></p>
+
+<h5 id="哈希表扩容">哈希表扩容</h5>
+
+<p><strong>负载因子</strong>、装载因子（load factor）：已插入元素的数量除以数组容量。用于<strong>衡量哈希冲突</strong>的严重程度，也常作为哈希表扩容的<strong>触发条件</strong>，装载因子超过某一<strong>阈值</strong>时就进行扩容。</p>
 
 <ul>
-  <li></li>
+  <li>例如在 Java 中，当负载因子超过 0.75 时，系统会将哈希表扩容至原先的 2 倍。</li>
 </ul>
 
-<p>加强哈希表：</p>
+<p>哈希表扩容时：缺点、过程</p>
+
+<ol>
+  <li>需将所有键值对从原哈希表<strong>迁移至</strong>新哈希表，非常耗时；</li>
+  <li>并且由于哈希表<strong>长度改变</strong>，需要（通过哈希函数来）<strong>重新计算</strong>所有键值对的存储位置，这进一步增加了扩容过程的计算开销。</li>
+</ol>
+
+<p>为此，编程语言通常会预留足够大的哈希表容量，防止频繁扩容。</p>
+
+<h4 id="哈希表的性质">哈希表的性质</h4>
+
+<h5 id="key-是唯一的value-可以重复"><code class="highlighter-rouge">key</code> 是唯一的，<code class="highlighter-rouge">value</code> 可以重复</h5>
+
+<p>哈希表中，不可能出现两个相同的 <code class="highlighter-rouge">key</code>，而 <code class="highlighter-rouge">value</code> 是可以重复的。</p>
+
+<blockquote>
+  <p>直接类比数组就行</p>
+</blockquote>
+
+<h5 id="为什么增删查改效率是-o1">为什么增删查改效率是 O(1)？</h5>
+
+<ul>
+  <li>
+    <p>因为哈希表底层就是操作一个<strong>数组</strong>，其主要的时间复杂度来自于<strong>哈希函数</strong>计算索引和哈希冲突。</p>
+  </li>
+  <li>正常情况下，只要保证哈希函数的复杂度在 O(1)，且合理解决哈希冲突的问题，那么增删查改的复杂度就都是 O(1)。</li>
+  <li>哈希表的增删查改效率<strong>不一定是 O(1)</strong> 。如果使用了错误的 <code class="highlighter-rouge">key</code> 类型，比如用 <code class="highlighter-rouge">ArrayList</code> 作为 <code class="highlighter-rouge">key</code> ，那么哈希表的复杂度就会<strong>退化</strong>成 O<em>(</em>N)。</li>
+</ul>
+
+<h5 id="哈希表的遍历顺序可能会变化">哈希表的遍历顺序可能会变化</h5>
+
+<p>哈希表中键的遍历顺序是<strong>无序的</strong>，<strong>不能依赖</strong>哈希表的遍历顺序来编写程序。</p>
+
+<p>两个原因：</p>
+
+<ol>
+  <li>由于<strong>哈希函数</strong>对 <code class="highlighter-rouge">key</code> 进行映射，所以 <code class="highlighter-rouge">key</code> 在底层 <code class="highlighter-rouge">table</code> 数组中的分布是随机的，不像数组/链表结构那样有个明确的元素顺序。</li>
+  <li>因为哈希表在达到<strong>负载因子</strong>时会<strong>扩容</strong>，会导致哈希表底层的<strong>数组容量变化</strong>，哈希函数计算出来的索引也会变化，所以哈希表的遍历顺序也会变化。</li>
+</ol>
+
+<h5 id="一定要用不可变类型作为哈希表的-key">一定要用不可变类型作为哈希表的 <code class="highlighter-rouge">key</code></h5>
+
+<blockquote>
+  <p>所谓不可变类型，就是说这个对象一旦创建，它的值就不能再改变了。比如 Java 中的 <code class="highlighter-rouge">String, Integer</code> 等类型。</p>
+</blockquote>
+
+<ul>
+  <li>因为哈希表的主要操作都依赖于哈希函数计算出来的索引，如果 <code class="highlighter-rouge">key</code> 的哈希值会变化，会导致<strong>键值对意外丢失</strong>，产生严重的 bug。</li>
+</ul>
+
+<h5 id="加强哈希表">加强哈希表</h5>
 
 <ul>
   <li>用链表加强哈希表：LinkedHashMap</li>
   <li>用数组加强哈希表：ArrayHashMap</li>
 </ul>
 
-<h5 id="经典例题-4">经典例题</h5>
+<h4 id="经典例题-4">经典例题</h4>
 
 <ul>
   <li>
@@ -964,16 +1062,6 @@ Stack&lt;Character&gt; stack = new Stack&lt;&gt;();
     <p><img src="assets/8wyb2.gif" alt="img" style="zoom:43%;" /></p>
   </li>
 </ul>
-
-<h3 id="跳表">跳表</h3>
-
-<p>跳表（Skip List）：基于链表实现的有序列表，使得包含n个元素的有序序列的<strong>查找和插入</strong>操作的平均时间复杂度都是 O(logn)，优于数组的 O(n)复杂度。对并发友好。</p>
-
-<p>实现：快速的查询效果是通过维护一个多层次的<strong>链表</strong>（<code class="highlighter-rouge">ConcurrentSkipListMap</code>）实现的，实现了快速查询效果将平均时间复杂度降到了O(logn)。这是一个典型的用空间换时间数据结构。</p>
-
-<p>缺点：就是“以空间换时间”方式存在一定数据冗余。</p>
-
-<p>应用：<strong>Redis</strong>中的有序集合对象的底层数据结构就使用了跳表。</p>
 
 <h3 id="堆">堆</h3>
 
@@ -1108,7 +1196,7 @@ int e = pq.poll(); // 删除/弹出堆顶元素
 
 <h3 id="树">树</h3>
 
-<h5 id="基本概念">基本概念</h5>
+<h4 id="基本概念">基本概念</h4>
 
 <ul>
   <li>节点的高度 ：该节点到<strong>叶子节点</strong>的最长路径所包含的<strong>边数</strong>；
@@ -1122,12 +1210,6 @@ int e = pq.poll(); // 删除/弹出堆顶元素
     </ul>
   </li>
   <li>节点的层数 ：节点的深度+1。</li>
-  <li>路径：一条从树中任意节点出发，沿父-子节点连接，达到任意节点的序列。同一节点至多出现一次 ；至少包含一个节点，且不一定经过根节点。
-    <ul>
-      <li>路径和：路径中各节点值的总和。</li>
-      <li>单边路径和：从根节点 root 为起点的路径和。</li>
-    </ul>
-  </li>
 </ul>
 
 <p><img src="assets/二叉树-2.png" alt="二叉树" style="zoom: 50%;" /></p>
@@ -1139,7 +1221,7 @@ class TreeNode {
 }
 </code></pre></div></div>
 
-<h5 id="树图的遍历">树、图的遍历</h5>
+<h4 id="树图的遍历">树、图的遍历</h4>
 
 <p>树的 <code class="highlighter-rouge">DFS/BFS</code> 遍历算法</p>
 
@@ -1154,7 +1236,7 @@ void traverse(TreeNode root) {
 }
 </code></pre></div></div>
 
-<h5 id="经典题目">经典题目</h5>
+<h4 id="经典题目">经典题目</h4>
 
 <ul>
   <li><a href="https://leetcode.cn/problems/lowest-common-ancestor-of-a-binary-tree/">236.二叉树的最近公共祖先</a>
@@ -1165,7 +1247,52 @@ void traverse(TreeNode root) {
   </li>
 </ul>
 
-<h5 id="huffman-哈夫曼树">Huffman 哈夫曼树</h5>
+<h4 id="huffman-霍夫曼树">Huffman 霍夫曼树</h4>
+
+<p>树中的概念：</p>
+
+<ul>
+  <li>路径：一条从树中任意节点出发，沿父-子节点连接，达到任意节点的通路（序列）。同一节点至多出现一次 ；至少包含一个节点，且不一定经过根节点。
+    <ul>
+      <li>路径和：路径中各节点值的总和。</li>
+      <li>单边路径和：从根节点 root 为起点的路径和。</li>
+      <li>路径长度：路径上分支的数目。</li>
+      <li>节点的权：为树中的每一个节点赋予的一个非负的值。</li>
+    </ul>
+  </li>
+  <li>节点的带权路径长度：从根节点到该节点之间的路径长度与该节点权的乘积。</li>
+</ul>
+
+<p><img src="assets/v2-561bb507a8adcbbed29281abac1d3485_1440w.jpg" alt="img" style="zoom: 67%;" /></p>
+
+<ul>
+  <li><strong>树的带权路径长度</strong>（Weighted Path Length of Tree，<strong>WPL</strong>）：设二叉树具有 N 个带权叶结点，从根结点到各叶结点的<strong>路径长度</strong>与相应叶节点权值的<strong>乘积之和</strong>。
+    <ul>
+      <li>所有叶子节点的带权路径长度之和。</li>
+    </ul>
+  </li>
+</ul>
+
+<p><strong>Huffman树</strong>（霍夫曼树、哈夫曼树、最优二叉树、最优树）：在含有 N 个<strong>带权叶子结点</strong>的<strong>二叉树</strong>中，其中带权路径长度（WPL）最小的二叉树。</p>
+
+<ul>
+  <li>哈夫曼树中权越大的叶子离根越近。</li>
+  <li>用途：Huffman编码。</li>
+</ul>
+
+<p><img src="assets/edea6726e75ed5d793a96ed1a21c9ab5.png" alt="img" style="zoom:67%;" /></p>
+
+<h5 id="huffman树的构建">Huffman树的构建</h5>
+
+<blockquote>
+  <p>略。</p>
+</blockquote>
+
+<h5 id="huffman编码">Huffman编码</h5>
+
+<p>Huffman编码：由Huffman树生成的二进制前缀编码。</p>
+
+<p>前缀编码：即一个字符的编码不是另一个字符编码的前缀。</p>
 
 <h3 id="二叉树">二叉树</h3>
 
@@ -1183,72 +1310,103 @@ void traverse(TreeNode root) {
   <li>非递归，用「层序遍历」的思维模式解题，即 BFS 算法的原型。</li>
 </ol>
 
-<h5 id="分类">分类</h5>
+<h4 id="分类">分类</h4>
+
+<h5 id="满二叉树完全二叉树">满二叉树、完全二叉树</h5>
+
+<p>满二叉树：二叉树每层（第 k 层，深度为 k-1）的结点数都达到最大值 2^(k-1)^，即结点总数是(2^k^) -1。</p>
+
+<p>完全二叉树：最后一层若不满则缺少的节点都在右边，其余层都是满的。性质：父子节点的序号有对应关系。</p>
+
+<p><img src="assets/完全二叉树.c4f02f51.png" alt="img" style="zoom: 50%;" /><img src="assets/balance_bst.jpg" alt="数据结构与算法-二叉查找树平衡(DSW) - 知乎" style="zoom: 50%;" /></p>
+
+<h5 id="bst-二叉查找树二叉搜索树">BST 二叉查找树、二叉搜索树</h5>
+
+<p><strong><code class="highlighter-rouge">BST</code> 树</strong>（<code class="highlighter-rouge">Binary Search Tree、ordered binary tree、sorted binary tree</code>）：</p>
 
 <ol>
-  <li>
-    <p>满二叉树：二叉树每层（第 k 层，深度为 k-1）的结点数都达到最大值 2^(k-1)^，即结点总数是(2^k^) -1。</p>
-  </li>
-  <li>
-    <p>完全二叉树：最后一层若不满则缺少的节点都在右边，其余层都是满的。性质：父子节点的序号有对应关系。</p>
+  <li>（<strong>左小右大</strong>）若不为空，任意节点的值均 &gt; 左子树任意结点、均 &lt; 右子树任意节点（所有节点的值都不相等），</li>
+  <li>且左右子树都是二叉查找树（即<strong>中序遍历</strong>为单调递增的二叉树 + 二分查找思想）。</li>
+</ol>
 
-    <p><img src="assets/完全二叉树.c4f02f51.png" alt="img" style="zoom: 45%;" /><img src="assets/balance_bst.jpg" alt="数据结构与算法-二叉查找树平衡(DSW) - 知乎" style="zoom: 40%;" /></p>
-  </li>
-  <li>
-    <p>二叉查找/搜索/排序树、<code class="highlighter-rouge">BST</code> 树（<code class="highlighter-rouge">Binary Search Tree、ordered binary tree、sorted binary tree</code>）：（<strong>左小右大</strong>）若不为空，任意节点的值均 &gt; 左子树任意结点、均 &lt; 右子树任意节点（所有节点的值都不相等），且左右子树都是二叉查找树（即<strong>中序遍历</strong>为单调递增的二叉树 + 二分查找思想）。</p>
+<p>性质：</p>
 
+<ul>
+  <li>压扁了就是无重复值的有序数组。<del>由二叉树的<strong>层序遍历</strong>扩展而来，常用于求无权图的<strong>最短路径</strong>。维护了一组数据的顺序性，得到一个数据的上下界。</del></li>
+  <li><strong>查找</strong>、插入、删除（CRUD）节点：复杂度均为 <code class="highlighter-rouge">O(h+1)</code>，<code class="highlighter-rouge">h</code>为树的高度/深度，最好（即<strong>平衡二叉树</strong>）为 <code class="highlighter-rouge">O(lgN)</code>，最坏（斜树）为 <code class="highlighter-rouge">lgN</code>；</li>
+  <li>缺点：若插入的是已有序的序列，可能退化成<strong>斜树、链表</strong>，CRUD 的性能均从 <code class="highlighter-rouge">lgN</code> 降为 <code class="highlighter-rouge">O(N)</code>；因此引入平衡二叉树。</li>
+</ul>
+
+<p>经典题目：</p>
+
+<ul>
+  <li>注意不是所有的 BST 题目都需递归，有的只需 <code class="highlighter-rouge">while</code> 循环即可；</li>
+  <li><a href="https://leetcode.cn/problems/convert-sorted-array-to-binary-search-tree/">108.将升序数组转为高度平衡的二叉搜索树</a>：在前序位置，取 <code class="highlighter-rouge">mid</code> 位置的元素构造当前 <code class="highlighter-rouge">root</code> 节点，递归创建左右子树；【】
     <ul>
-      <li>压扁了就是无重复值的有序数组。<del>由二叉树的<strong>层序遍历</strong>扩展而来，常用于求无权图的<strong>最短路径</strong>。维护了一组数据的顺序性，得到一个数据的上下界。</del></li>
-      <li>注意不是所有的 BST 题目都需递归，有的只需 <code class="highlighter-rouge">while</code> 循环即可；</li>
-      <li><strong>查找</strong>、插入、删除（CRUD）节点：复杂度均为 <code class="highlighter-rouge">O(h+1)</code>，<code class="highlighter-rouge">h</code>为树的高度/深度，最好（平衡二叉树）为 <code class="highlighter-rouge">O(lgN)</code>，最坏（斜树）为 <code class="highlighter-rouge">lgN</code>；</li>
-      <li>缺点：若插入的是已有序的序列，可能退化成斜树、链表，CRUD 的性能均从 <code class="highlighter-rouge">lgN</code> 降为 <code class="highlighter-rouge">O(N)</code>；因此引入平衡二叉树。</li>
-    </ul>
-  </li>
-  <li>
-    <p>平衡二叉树、<code class="highlighter-rouge">AVL</code> 树：除了空树，每个节点的左右子树都是一棵平衡二叉树、且高度差的绝对值不超过1。常用实现方法有 <strong>红黑树</strong>、<strong>替罪羊树</strong>、<strong>加权平衡树</strong>、<strong>伸展树</strong> 等。</p>
-  </li>
-  <li>
-    <p>红黑树（自平衡二叉查找树、对称二叉 <code class="highlighter-rouge">B</code> 树）：<a href="https://zhuanlan.zhihu.com/p/78249704">一篇漫画告诉你–什么是红黑树？</a></p>
-
-    <ul>
-      <li>一种<strong>二叉查找树</strong>，满足：
+      <li><a href="https://leetcode.cn/problems/convert-sorted-list-to-binary-search-tree/">109.有序链表转换二叉搜索树</a>：链表和数组相比一个关键差异是无法通过索引快速访问元素；【】
         <ol>
-          <li>根、所有叶子节点（为空、<code class="highlighter-rouge">NIL/null</code>）都是黑色；</li>
-          <li>每个红节点必须有两个黑子节点。（或红节点的父、子节点均是黑色）（或从每个叶子到根的所有路径上不能有两个连续的红节点）（或不存在两个相邻（父子关系）的红节点）；</li>
-          <li>从任一节点到每个叶子的所有简单路径都包含相同数目的黑节点。确保没有一条路径会比其他路径长出两倍。</li>
+          <li>把链表转化成数组；</li>
+          <li>用双指针获取链表的中点；</li>
+          <li>利用中序遍历的特点写出最优化的解法。</li>
         </ol>
       </li>
-      <li>既有线性表的二分查找、有序，又有链表的增删性能。可在 <code class="highlighter-rouge">O(lgN)</code> 时间内完成查找、插入和删除。</li>
-      <li>典型用途是实现关联数组，<code class="highlighter-rouge">TreeMap、TreeSet</code> 及 <code class="highlighter-rouge">JDK1.8</code> 的 <code class="highlighter-rouge">HashMap</code> 底层都用到红黑树。</li>
-      <li>变色：添加、删除；</li>
-      <li>
-        <p>左旋算法：父节点被自己的<strong>右孩子</strong>取代。</p>
-
-        <p><img src="assets/450px-Red-black_tree_example.svg.png" alt="An example of a red-black tree" style="zoom: 75%;" /><img src="assets/left_handed.jpg" alt="img" style="zoom: 60%;" /></p>
-      </li>
     </ul>
   </li>
-  <li>
-    <p><code class="highlighter-rouge">B</code> 树 / 多路平衡查找树、<code class="highlighter-rouge">B+</code> 树：用于<strong>数据库索引</strong>的实现。<code class="highlighter-rouge">B</code> 树 VS <code class="highlighter-rouge">B+</code> 树：</p>
+</ul>
 
+<h5 id="avl-平衡二叉树红黑树">AVL 平衡二叉树、红黑树</h5>
+
+<p>平衡二叉树、<code class="highlighter-rouge">AVL</code> 树（）：除了空树，每个节点的左右子树都是一棵平衡二叉树、且<strong>高度差</strong>的绝对值不超过1。常用实现方法有 <strong>红黑树</strong>、<strong>替罪羊树</strong>、<strong>加权平衡树</strong>、<strong>伸展树</strong> 等。</p>
+
+<p><strong>红黑树</strong>（自平衡二叉查找树、对称二叉 <code class="highlighter-rouge">B</code> 树）：<a href="https://zhuanlan.zhihu.com/p/78249704">一篇漫画告诉你–什么是红黑树？</a></p>
+
+<ul>
+  <li>一种<strong>二叉查找树</strong>，满足：
     <ol>
-      <li>节点：<code class="highlighter-rouge">B</code> 树的所有节点存放键和数据，而 <code class="highlighter-rouge">B+</code> 树只有叶子节点存放<code class="highlighter-rouge">key</code> 和 <code class="highlighter-rouge">data</code>，其他内节点只存放 <code class="highlighter-rouge">key</code>。</li>
-      <li>叶子节点：<code class="highlighter-rouge">B</code> 树的叶子节点是独立的；<code class="highlighter-rouge">B+</code> 树的叶子节点有<strong>引用链</strong>指向相邻的叶子节点。</li>
-      <li>查找：<code class="highlighter-rouge">B</code> 树的检索相当于对节点的关键字做<strong>二分查找</strong>，可能不到叶子节点就找到；而 <code class="highlighter-rouge">B+</code> 树的查找是从根节点到叶子节点。</li>
+      <li>根、所有叶子节点（为空、<code class="highlighter-rouge">NIL/null</code>）都是黑色；</li>
+      <li>每个红节点必须有<strong>两个黑子节点</strong>。即：
+        <ol>
+          <li>红节点的父、子节点均是黑色；</li>
+          <li>从每个叶子到根的所有路径上不能有两个连续的红节点；</li>
+          <li>不存在两个相邻（父子关系）的红节点；</li>
+        </ol>
+      </li>
+      <li>从任一节点到每个叶子的所有<strong>简单路径</strong>都包含<strong>相同数目</strong>的黑节点。确保没有一条路径会比其他路径长出两倍。</li>
     </ol>
   </li>
+  <li>既有线性表的<strong>二分查找、有序</strong>，又有链表的<strong>增删性能</strong>。可在 <code class="highlighter-rouge">O(lgN)</code> 时间内完成查找、插入和删除。</li>
+  <li>典型用途是实现<strong>关联数组</strong>，<code class="highlighter-rouge">TreeMap、TreeSet</code> 及 <code class="highlighter-rouge">JDK1.8</code> 的 <code class="highlighter-rouge">HashMap</code> 底层都用到红黑树。</li>
+  <li>变色：添加、删除；</li>
   <li>
-    <p><code class="highlighter-rouge">Trie</code> 树、字典树、前缀树、单词查找树：由二叉树衍生出来，主要用于处理字符串前缀相关的操作、保存和统计大量的字符串和相关的信息。</p>
+    <p>左旋算法：父节点被自己的<strong>右孩子</strong>取代。</p>
+
+    <p><img src="assets/450px-Red-black_tree_example.svg.png" alt="An example of a red-black tree" style="zoom: 75%;" /><img src="assets/left_handed.jpg" alt="img" style="zoom: 60%;" /></p>
   </li>
+</ul>
+
+<h5 id="b-树--多路平衡查找树">B 树 / <strong>多路平衡查找树</strong></h5>
+
+<p><code class="highlighter-rouge">B+</code> 树（<code class="highlighter-rouge">B</code> 树的变形）：用于<strong>数据库索引</strong>的实现。是一种红黑树，也是一种 BST 二分查找树？</p>
+
+<p><code class="highlighter-rouge">B</code> 树 VS <code class="highlighter-rouge">B+</code> 树：</p>
+
+<ol>
+  <li>节点：<code class="highlighter-rouge">B</code> 树的所有节点存放键和数据，而 <code class="highlighter-rouge">B+</code> 树只有叶子节点存放<code class="highlighter-rouge">key</code> 和 <code class="highlighter-rouge">data</code>，其他非叶子节点只存放 <code class="highlighter-rouge">key</code>。</li>
+  <li>叶子节点：<code class="highlighter-rouge">B</code> 树的叶子节点是独立的；<code class="highlighter-rouge">B+</code> 树的叶子节点有<strong>引用链</strong>指向相邻的叶子节点。</li>
+  <li>查找：<code class="highlighter-rouge">B</code> 树的检索相当于对节点的关键字做<strong>二分查找</strong>，可能不到叶子节点就找到；而 <code class="highlighter-rouge">B+</code> 树的查找是从根节点到叶子节点。</li>
+</ol>
+
+<h5 id="其他二叉树">其他二叉树</h5>
+
+<ol>
+  <li><code class="highlighter-rouge">Trie</code> 树、字典树、前缀树、单词查找树：由二叉树衍生出来，主要用于处理字符串前缀相关的操作、保存和统计大量的字符串和相关的信息。</li>
   <li>
     <p><strong>线段树</strong>：叶子节点是数组中的元素，非叶子节点就是索引区间（线段）的汇总信息。用于高效解决数组的区间查询和区间动态修改问题。如处理数组区间信息的汇总（求和、最值等）、单点更新、区间更新问题。</p>
   </li>
-  <li>
-    <p>树状数组：处理数组的前缀和、单点更新、区间更新问题。</p>
-  </li>
+  <li>树状数组：处理数组的前缀和、单点更新、区间更新问题。</li>
 </ol>
 
-<h5 id="二叉树的存储">二叉树的存储</h5>
+<h4 id="二叉树的存储">二叉树的存储</h4>
 
 <ul>
   <li>链式存储</li>
@@ -1277,7 +1435,7 @@ void traverse(TreeNode root) {
   </li>
 </ul>
 
-<h5 id="定义-1">定义</h5>
+<h5 id="代码实现">代码实现</h5>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/**
  * Definition for a binary tree node.
@@ -1296,21 +1454,7 @@ void traverse(TreeNode root) {
  */
 </code></pre></div></div>
 
-<h5 id="bst-二叉查找树">BST 二叉查找树</h5>
-
-<ul>
-  <li><a href="https://leetcode.cn/problems/convert-sorted-array-to-binary-search-tree/">108.将升序数组转为高度平衡的二叉搜索树</a>：在前序位置，取 <code class="highlighter-rouge">mid</code> 位置的元素构造当前 <code class="highlighter-rouge">root</code> 节点，递归创建左右子树；【】
-    <ul>
-      <li><a href="https://leetcode.cn/problems/convert-sorted-list-to-binary-search-tree/">109.有序链表转换二叉搜索树</a>：链表和数组相比一个关键差异是无法通过索引快速访问元素；【】
-        <ol>
-          <li>把链表转化成数组；</li>
-          <li>用双指针获取链表的中点；</li>
-          <li>利用中序遍历的特点写出最优化的解法。</li>
-        </ol>
-      </li>
-    </ul>
-  </li>
-</ul>
+<h4 id="二叉树遍历">二叉树遍历</h4>
 
 <h5 id="层序遍历">层序遍历</h5>
 
@@ -1494,7 +1638,7 @@ void levelOrderTraverse(TreeNode root) {
 }
 </code></pre></div></div>
 
-<h5 id="非递归不用栈中序遍历">非递归不用栈中序遍历</h5>
+<h5 id="非递归不用栈的中序遍历">（非递归不用栈的）中序遍历</h5>
 
 <p>用循环/迭代、中序遍历。</p>
 
@@ -1549,7 +1693,7 @@ void levelOrderTraverse(TreeNode root) {
 }
 </code></pre></div></div>
 
-<h5 id="经典题目-1">经典题目</h5>
+<h4 id="经典题目-1">经典题目</h4>
 
 <ol>
   <li></li>
@@ -1571,7 +1715,7 @@ void levelOrderTraverse(TreeNode root) {
   <li>无权图和带权图；</li>
 </ul>
 
-<p>树和图的根本区别：树不含环，图可能含环。树是一种图，即无环连通图，图是多叉树的延伸。如果图没有环，可拉伸成一棵树。</p>
+<p>树和图的根本区别：树不含环，图可能含<strong>环</strong>。树是一种图，即无环连通图，图是多叉树的延伸。如果图没有环，可拉伸成一棵树。</p>
 
 <ul>
   <li>度（degree）：每个节点相连的边数。
@@ -1580,6 +1724,12 @@ void levelOrderTraverse(TreeNode root) {
       <li>出度（outdegree）：有向图中从每个节点出发的边数。</li>
     </ul>
   </li>
+</ul>
+
+<p>用途：</p>
+
+<ul>
+  <li>哈希环：用于负载均衡算法中的一致性哈希法。</li>
 </ul>
 
 <h5 id="图的存储">图的存储</h5>
@@ -1718,10 +1868,14 @@ void traverse(int[][] graph, int s, LinkedList&lt;Integer&gt; path) {
 <h5 id="dijkstra-最短路径算法">Dijkstra 最短路径算法</h5>
 
 <blockquote>
-  <p>经典算法，学有余力可以掌握一下</p>
+  <p>，经典算法，学有余力可以掌握一下。</p>
 </blockquote>
 
-<p>简单图（有向无向皆可）的最短路径 <code class="highlighter-rouge">Dijkstra</code> 迪杰斯特拉算法：注意是长度而不是具体的路径。是 BFS 算法的加强版，都是从二叉树的层序遍历衍生出来。</p>
+<p>简单图（有向无向皆可）的最短路径 <code class="highlighter-rouge">Dijkstra</code> 迪杰斯特拉（戴克斯特拉）算法：注意是长度而不是具体的路径。是 BFS 算法的加强版，都是从二叉树的层序遍历衍生出来。</p>
+
+<ul>
+  <li>用于计算 OSPF 动态<strong>路由选择</strong>协议。</li>
+</ul>
 
 <h5 id="经典题目-2">经典题目</h5>
 
@@ -1733,7 +1887,7 @@ void traverse(int[][] graph, int s, LinkedList&lt;Integer&gt; path) {
 
 <ul>
   <li>
-    <p>有向图的<strong>环检测</strong>、循环依赖判断：<a href="https://leetcode.cn/problems/course-schedule/">207.课程表 选修依赖先修</a>【】、<a href="https://labuladong.github.io/algo/2/20/49/">二分图判定算法</a>，常用邻接表，DFS 算法遍历图的框架 + <code class="highlighter-rouge">visited</code> 数组</p>
+    <p>有向图的<strong>环路检测</strong>、循环依赖判断：<a href="https://leetcode.cn/problems/course-schedule/">207.课程表 选修依赖先修</a>【】、<a href="https://labuladong.github.io/algo/2/20/49/">二分图判定算法</a>，常用邻接表，DFS 算法遍历图的框架 + <code class="highlighter-rouge">visited</code> 数组</p>
 
     <ul>
       <li>DFS 实现</li>
@@ -1772,10 +1926,6 @@ void traverse(int[][] graph, int s, LinkedList&lt;Integer&gt; path) {
     </ul>
   </li>
 </ul>
-
-<h3 id="布隆过滤器">布隆过滤器</h3>
-
-<p>布隆过滤器：可非常方便地判断一个给定数据<strong>不存在于</strong>海量数据中（哈希函数）；用于解决 Redis 中的<strong>缓存穿透</strong>。</p>
 
 <h2 id="手撕算法">手撕算法</h2>
 
@@ -1822,19 +1972,23 @@ void traverse(int[][] graph, int s, LinkedList&lt;Integer&gt; path) {
       <li>反转链表</li>
     </ul>
   </li>
-  <li>递归类：
+  <li>三大牛逼算法：回溯、贪心、动态规划（DP）
     <ul>
-      <li>二叉树：
+      <li>递归类：
         <ul>
-          <li><strong>回溯</strong>算法核心框架：遍历一遍二叉树得出答案；</li>
-          <li><strong>动态规划</strong>核心框架：通过分解问题计算出答案；</li>
+          <li>二叉树：
+            <ul>
+              <li><strong>回溯</strong>算法核心框架：遍历一遍二叉树得出答案；</li>
+              <li><strong>动态规划</strong>核心框架：通过分解问题计算出答案；</li>
+            </ul>
+          </li>
         </ul>
       </li>
-    </ul>
-  </li>
-  <li>非递归类：无遗漏（正确不出错）、无冗余（优化算法的时间、空间复杂度）聪明的穷举。
-    <ul>
-      <li><strong>贪心</strong>：在题目中发现一些规律（专业点叫贪心选择性质），不用完整穷举所有解。</li>
+      <li>非递归类：无遗漏（正确不出错）、无冗余（优化算法的时间、空间复杂度）聪明的穷举。
+        <ul>
+          <li><strong>贪心</strong>：在题目中发现一些规律（专业点叫贪心选择性质），不用完整穷举所有解。</li>
+        </ul>
+      </li>
     </ul>
   </li>
   <li><strong>分治</strong>：核心依然是大问题分解成子问题，只不过没有重叠子问题</li>
@@ -2549,7 +2703,11 @@ public static int[] getMinAndMax(List&lt;Integer&gt; arr) {
   <li>内存 1000M、文件 1G、10个出现次数最多的网址；</li>
 </ul>
 
-<h3 id="二分查找">二分查找</h3>
+<h3 id="查找">查找</h3>
+
+<h4 id="顺序查找">顺序查找</h4>
+
+<h4 id="二分查找">二分查找</h4>
 
 <p>基本思想：减而治之（减治）思想，逐渐（减半）缩小问题规模。</p>
 
@@ -2563,11 +2721,11 @@ int index = Arrays.binarySearch(nums, [0, nums.length,] target);
 <ol>
   <li>有序数组中查找 <code class="highlighter-rouge">target</code> 的下标；用于折半插入排序、二叉查找树等；
     <ul>
-      <li>计算满足约束条件 <code class="highlighter-rouge">f(x) == target</code> 时自变量、下标 <code class="highlighter-rouge">x</code> 的值，<code class="highlighter-rouge">x</code> 取值范围即搜索区间：</li>
+      <li>计算满足约束条件 <code class="highlighter-rouge">f(x) == target</code> 时自变量、下标 <code class="highlighter-rouge">x</code> 的取值范围（即搜索区间）；</li>
     </ul>
   </li>
   <li>找左、右边界的下标；</li>
-  <li>对时间复杂度要求 <code class="highlighter-rouge">logN</code>；</li>
+  <li>对时间复杂度要求 <code class="highlighter-rouge">O(log n)、log(n)</code>；</li>
 </ol>
 
 <p><img src="assets/left_bound.jpeg" alt="找左边界示意图" style="zoom: 35%;" /></p>
@@ -2576,7 +2734,7 @@ int index = Arrays.binarySearch(nums, [0, nums.length,] target);
 
 <ul>
   <li>
-    <p><a href="https://leetcode.cn/problems/binary-search/">704.二分查找</a>【】</p>
+    <p><a href="https://leetcode.cn/problems/binary-search/">704.二分查找</a></p>
   </li>
   <li>
     <p><a href="https://leetcode.cn/problems/find-first-and-last-position-of-element-in-sorted-array/">34.在非递减数组中查找元素的第一个和最后一个位置</a></p>
@@ -2631,14 +2789,19 @@ int index = Arrays.binarySearch(nums, [0, nums.length,] target);
 
 <h5 id="二分查找框架">二分查找框架</h5>
 
+<blockquote>
+  <p>常用 <code class="highlighter-rouge">[begin,end) </code>表示左闭右开，<code class="highlighter-rouge">[left, right]</code>、<code class="highlighter-rouge">[from, to]</code> 表示左闭右闭，范围包括左右端点。</p>
+</blockquote>
+
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// leftBound()
 // searchFistPos()
 int binarySearch(int[] nums, int target) {
+	int result = -1;
 	int n = nums.length;
-    if (n &lt;= 0) return -1;
+    if (n &lt;= 0) return -1; //
     int left = 0;
     int right = n-1; // 查找区间为[left, right]，left = right + 1 时搜索区间为空，故while条件为l &lt;= r。推荐。
-    // int right = n; // 查找区间为[left, right)，left = right 时搜索区间为空，故while条件为l &lt; r
+    // //int right = n; // 查找区间为[left, right)，left = right 时搜索区间为空，故while条件为l &lt; r；不采用
 
 	// 终止条件是查找区间为[]时，表示在区间里只剩下一个元素时仍需继续查找
     while (left &lt;= right) {
@@ -2653,12 +2816,13 @@ int binarySearch(int[] nums, int target) {
         	// 右边界向左收缩
             right = mid - 1;
             
-            // [left, right)，当 nums[mid] 被检测后，下一步应去 mid 的左侧[left, mid)或右侧区间[mid + 1, right)搜索
-            // left = mid + 1; right = mid;
-            
-        } else if (num == target) {
+            // //[left, right)，当 nums[mid] 被检测后，下一步应去 mid 的左侧[left, mid)或右侧区间[mid + 1, right)搜索，不采用
+            // //left = mid + 1; right = mid;
+        } else {
             // 0.当 nums[mid] == target 时立即返回
-            return mid;
+            result = mid;
+            break;
+
             // 1.找左边界时，当中间值和目标值相等时，右边界也需向左收缩，最终达到left锁定左边界的目的。
     		right = mid - 1;
     		// 2.找右边界时，收缩左侧边界
@@ -2666,7 +2830,7 @@ int binarySearch(int[] nums, int target) {
         }
     }
     // 0.二分查找，未找到
-    return -1;
+    return result;
     
     // 1.找左边界时，检查 left 是否越界、是否未找到目标值（未找到时left == right+1，查找区间为[]）
     if (left &gt;= n || nums[left] != target) { return -1; }
@@ -2677,6 +2841,20 @@ int binarySearch(int[] nums, int target) {
     return right;
 }
 </code></pre></div></div>
+
+<h4 id="b-树和-b-树">B 树和 B+ 树</h4>
+
+<h4 id="哈希表-1">哈希表</h4>
+
+<h4 id="字符串模式匹配">字符串模式匹配</h4>
+
+<p><a href="#链表">KMP 字符串匹配算法</a></p>
+
+<h3 id="滑动窗口-1">滑动窗口</h3>
+
+<blockquote>
+  <p>见字符串中的<a href="#滑动窗口">滑动窗口</a></p>
+</blockquote>
 
 <h3 id="分治与递归">分治与递归</h3>
 
@@ -2770,225 +2948,6 @@ int dp(string&amp; ring, int i, string&amp; key, int j) {
   <li>汉诺塔</li>
 </ul>
 
-<h3 id="动态规划">动态规划</h3>
-
-<p>核心思想：如何聪明地<strong>穷举求最值</strong>。本质上是穷举「状态」，做「选择」找最优解。</p>
-
-<p>动态规划的暴力穷举解法一般是递归形式，优化方法非常固定，要么是添加备忘录，要么是改写成迭代形式。</p>
-
-<h5 id="动态规划三要素">动态规划三要素</h5>
-
-<ol>
-  <li><strong>重复子问题</strong>：在计算的过程中，有一些问题会重复计算，必须记住结果；若没有重复子问题，可用「分治法」求解。</li>
-  <li>最优子结构：子问题间必须互相独立、可同时最优，不能互相影响。如要总分最高，则子问题为语文、数学等分别最高。如果语文、数学成绩互相制约、影响，不能同时达到最高，子问题并不独立，无法同时最优。</li>
-  <li><strong>状态转移方程</strong>（暴力解）：
-    <ol>
-      <li>明确 <strong>base case</strong>：直接从<del>最底下、</del>最简单、问题规模最小<del>、已知结果的</del>，开始往上推，直到想要的答案。如 <code class="highlighter-rouge">f(1)</code> 和 <code class="highlighter-rouge">f(2) </code> 推出 <code class="highlighter-rouge">f(20)</code>。</li>
-      <li>明确<strong>状态</strong>：记录解决问题到了哪一步，通常是原问题和子问题中随自变量变化的（题目中的）因变量，状态一般作为 <code class="highlighter-rouge">dp</code> 数组的下标/key ；如目标金额 <code class="highlighter-rouge">n</code>。</li>
-      <li>做选择：导致状态产生变化的行为，通过<strong>选择</strong>从一个状态转移到另一个状态。如，选择了一枚 1、2、5 元的硬币，从而目标金额 <code class="highlighter-rouge">n</code> 减少了对应的 1、2、5 元。</li>
-      <li>定义 <code class="highlighter-rouge">dp</code> 数组/函数的含义：一般 { key / 参数， value / 函数返回值 } = { 状态，题目要求计算的量/做选择的（最少）次数}。如 { 目标金额 <code class="highlighter-rouge">n</code>，凑出 <code class="highlighter-rouge">n</code> 所需的最少硬币数量 / 至少需 <code class="highlighter-rouge">dp[n]</code> 枚硬币凑出}。</li>
-      <li><strong>状态转移方程</strong>：对最后一步，可由已知的<strong>状态</strong>，通过<strong>选择</strong>所有情况（1、2、5元），<strong>转移</strong>到目标状态：
-        <ul>
-          <li>还差1元，dp[n] = dp[n - <strong>1</strong>] + 1;</li>
-          <li>还差2元，dp[n] = dp[n - <strong>2</strong>] + 1;</li>
-          <li>还差5元，dp[n] = dp[n - <strong>5</strong>] + 1;</li>
-        </ul>
-      </li>
-      <li>循环迭代：一般都脱离了递归，由<strong>循环迭代</strong>计算，自底向上进行递推求解。</li>
-      <li>优化递归树，消除<strong>重叠子问题</strong>：通过<strong>递归树</strong>找到<strong>被重复计算的子问题节点</strong>，寻找算法低效的原因。
-        <ol>
-          <li>通过<strong>剪枝</strong>，消除巨量冗余（重叠子问题），极大减少了子问题的个数。</li>
-          <li>分析递归算法的时间复杂度：子问题个数（即递归图中节点总数） X 解决一个子问题需要的时间。
-            <ul>
-              <li>降低时间复杂度：用空间换时间。</li>
-            </ul>
-          </li>
-          <li>降低空间复杂度：如果每次状态转移只需 DP table 中的一部分，可尝试缩小 DP table 的大小，只记录必要的数据。</li>
-        </ol>
-      </li>
-    </ol>
-  </li>
-</ol>
-
-<h5 id="子序列">子序列</h5>
-
-<blockquote>
-  <p>子序列 != 子串</p>
-</blockquote>
-
-<p>子序列：不改变剩余字符顺序的情况下，删除某些字符或不删除任何字符形成的一个序列。另外定义见<a href="#回文串">回文串</a>。</p>
-
-<ul>
-  <li>
-    <p>双字符串动态规划（大多为二维）</p>
-
-    <ul>
-      <li><a href="https://leetcode.cn/problems/longest-common-subsequence/">1143.最长公共子序列</a>：
-        <ul>
-          <li>定义：<code class="highlighter-rouge">dp[i][j]</code> 的含义是 <code class="highlighter-rouge">s1[0..i-1]</code> 和 <code class="highlighter-rouge">s2[0..j-1]</code> 的 LCS 长度；</li>
-          <li>目标：<code class="highlighter-rouge">s1[0..m-1]</code> 和 <code class="highlighter-rouge">s2[0..n-1]</code> 的 lcs 长度，即 <code class="highlighter-rouge">dp[m][n]</code>；</li>
-          <li><code class="highlighter-rouge">base case</code>: <code class="highlighter-rouge">dp[0][..] = dp[..][0] = 0 </code>；</li>
-          <li><a href="https://leetcode.cn/problems/qJnOS7/">剑指 Offer II 095.最长公共子序列</a>【】</li>
-        </ul>
-      </li>
-      <li><a href="https://leetcode.cn/problems/edit-distance/">72.最小编辑距离</a>：将 <code class="highlighter-rouge">word1</code> 转成 <code class="highlighter-rouge">word2</code> 所使用的最少操作数 。【】
-        <ul>
-          <li>定义 <code class="highlighter-rouge">dp</code> 数组：<code class="highlighter-rouge">dp[i-1][j-1]</code> 存储 <code class="highlighter-rouge">s1[0..i]</code> 和 <code class="highlighter-rouge">s2[0..j]</code> 的最小编辑距离。<code class="highlighter-rouge">dp</code> 数组索引至少是 0，所以索引会偏移一位。</li>
-        </ul>
-
-        <p><img src="assets/lcs.png" alt="img" style="zoom:40%;" /><img src="assets/delete.gif" alt="img" style="zoom:25%;" /></p>
-
-        <p><img src="assets/insert.gif" alt="img" style="zoom:25%;" /><img src="assets/replace.gif" alt="img" style="zoom:25%;" /></p>
-      </li>
-    </ul>
-  </li>
-  <li>
-    <p><a href="https://leetcode.cn/problems/longest-palindromic-subsequence/">516.最长回文子序列</a>：区间 DP <del>与划分型 DP</del>，在子串 <code class="highlighter-rouge">s[i,j]</code> 中，最长回文子序列的长度为 <code class="highlighter-rouge">dp[i][j]</code>；上一个可能的状态如下图：</p>
-
-    <p><img src="assets/palin_dp.jpg" alt="img" style="zoom: 25%;" /></p>
-  </li>
-  <li>
-    <p>（一维）<a href="https://leetcode.cn/problems/lian-xu-zi-shu-zu-de-zui-da-he-lcof/">剑指 Offer 42.连续子数组的最大和</a>、<a href="https://leetcode.cn/problems/maximum-subarray/">53.最大子数组和</a>【】</p>
-
-    <ul>
-      <li><a href="https://leetcode.cn/problems/longest-increasing-subsequence/">300.最长递增子序列</a>：<code class="highlighter-rouge">dp[i] = Math.max(dp[i], dp[j] + 1)</code></li>
-    </ul>
-  </li>
-</ul>
-
-<h5 id="经典例题-8">经典例题</h5>
-
-<ul>
-  <li>
-    <p><a href="https://leetcode.cn/problems/fei-bo-na-qi-shu-lie-lcof/">剑指 Offer 10-I.斐波那契数列</a>：</p>
-
-    <ul>
-      <li>递归：简单，注意 <code class="highlighter-rouge">0、1、2</code> 的情况，但大量的重复计算会导致内存溢出；</li>
-      <li><del>带「备忘录」、哈希表的递归算法，「自顶向下」进行递归求解。</del></li>
-      <li>由动态规划的 <code class="highlighter-rouge">dp</code> 数组通过消除递归得到迭代（递推）解法：（滚动数组）re0、re1交替前进，注意最值取模 <code class="highlighter-rouge">1e9+7</code>、<code class="highlighter-rouge">10,0000,0007</code> 防止溢出。</li>
-    </ul>
-  </li>
-  <li>
-    <p><a href="https://leetcode.cn/problems/climbing-stairs/">剑指 Offer 10-II.青蛙跳台阶、爬楼梯问题</a>：重复子问题，滚动数组。</p>
-
-    <ul>
-      <li>状态：</li>
-      <li>（最后一次）选择：还差跳 1 或 2 阶；</li>
-      <li>dp 数组：{当前阶数，做的选择数、跳到 n 级台阶的方法个数}；</li>
-      <li>状态转移方程：<code class="highlighter-rouge">dp[n] = dp[n-1]*1 + dp[n-2]*1;</code></li>
-      <li>本质可理解为斐波那契数列：爬到第 <code class="highlighter-rouge">n</code> 级台阶的方法个数等于爬到 <code class="highlighter-rouge">n-1</code> 的方法个数和爬到 <code class="highlighter-rouge">n-2</code> 的方法个数之和。</li>
-    </ul>
-  </li>
-  <li>
-    <p><a href="https://leetcode.cn/problems/coin-change/">322.零钱兑换</a>、<a href="https://leetcode.cn/problems/gaM7Ch/">剑指 Offer II 103. 最少的硬币数目</a>：见 <a href="#动态规划算法框架">动态规划算法框架</a>，最优子结构、如何列出状态转移方程【】</p>
-  </li>
-  <li>
-    <p>分割问题：<a href="https://leetcode.cn/problems/partition-equal-subset-sum/">416.分割等和子集</a>：【】</p>
-
-    <ul>
-      <li>先对集合求和，得出 <code class="highlighter-rouge">sum</code>，把问题转化为<strong>背包问题</strong>：背包容量为 <code class="highlighter-rouge">sum / 2</code> 和 <code class="highlighter-rouge">N</code> 个物品，每个物品的重量为 <code class="highlighter-rouge">nums[i]</code>。</li>
-      <li><code class="highlighter-rouge">dp</code> 数组的定义：<code class="highlighter-rouge">dp[i][j] = x</code> 表示，对于前 <code class="highlighter-rouge">i</code> 个物品，当前背包的容量为 <code class="highlighter-rouge">j</code> 时，若 <code class="highlighter-rouge">x</code> 为 <code class="highlighter-rouge">true</code>，则说明可恰好将背包装满，若 <code class="highlighter-rouge">x</code> 为 <code class="highlighter-rouge">false</code>，则说明不能恰好将背包装满。</li>
-      <li><a href="https://labuladong.github.io/article/wx.html?wx=RXfnhSpVBmVneQjDSUSAVQ">0-1 背包问题</a>：每个物体只有两种可能的状态（取与不取），对应二进制中的 0 和 1【重要】</li>
-      <li>
-        <p><a href="https://leetcode.cn/problems/maximum-bags-with-full-capacity-of-rocks/">2279.装满石头的背包的最大数量</a>【】</p>
-
-        <p><img src="assets/coin_change.jpg" alt="img" style="zoom: 35%;" /></p>
-      </li>
-    </ul>
-  </li>
-  <li>
-    <p>各种玩小游戏</p>
-  </li>
-  <li>
-    <p>二维动态规划：<a href="https://leetcode.cn/problems/best-time-to-buy-and-sell-stock/">121.买卖股票的最佳时机</a>、<a href="https://leetcode.cn/problems/gu-piao-de-zui-da-li-run-lcof/">剑指 Offer 63. 股票的最大利润</a>：<code class="highlighter-rouge">dp[i][k][0 or 1]</code> 表示从第 i 天的这笔交易中获取的最大利润，0 和 1 代表是否持有股票， <code class="highlighter-rouge">0 &lt;= i &lt; n, 1 &lt;= k &lt;= K</code>，k 为交易次数（大 K 为交易数上限）。</p>
-
-    <ul>
-      <li><a href="https://leetcode.cn/problems/maximum-difference-between-increasing-elements/">2016.增量元素间的最大差值</a>【】</li>
-    </ul>
-
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>特化到 k = 1 买入或卖出一次的情况：
-状态转移方程：max(今天选择 rest, 今天选择 sell);
-  
-今天未持有股票，对于昨天来说，有两种可能，从中求最大利润：
-1、昨天未持有，今天选择 rest 休息，仍未持有；
-2、昨天持有，今天选择 sell，未持有股票。
-dp[i][0] = max(dp[i-1][0], dp[i-1][1] + prices[i]);
-  
-今天持有股票，有两种可能，从中求最大利润：
-1、昨天就持有股票，今天选择 rest，今天仍持有股票；
-2、昨天本没有持有，但今天选择 buy，持有了股票。
-dp[i][1] = max(dp[i-1][1], -prices[i]);
-// 即前一天没有持有股票时、使dp[i-1][0]=0，今天选择买入则利润为-prices[i]
-  
-base case：
-dp[0][0] = 0;
-dp[0][1] = -prices[i]; // Integer.MIN_VALUE;负数表示买入
-</code></pre></div>    </div>
-  </li>
-</ul>
-
-<h5 id="动态规划算法框架">动态规划算法框架</h5>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 一、递归（可看做动态规划函数），推荐
-int[] dp;
-// 返回要凑出金额 amount 至少需要的硬币数
-int coinDp(int[] coins, int amount) {
-    if (amount &lt; 0) return -1;
-    // base case
-    if (amount == 0) return 0;
-    // 查备忘录，防止重复计算
-    if (dp[amount] != dp.length) {
-    	return dp[amount];
-    }
-    
-    int res = Integer.MAX_VALUE;
-    // 遍历当前状态的所有取值,1、2、5
-    for (int coin : coins) {
-        // 计算子问题的结果
-        // amount - coin表示扣除当前面额，还需凑的金额
-        int subProblem = coinChange(coins, amount - coin);
-        // 子问题无解则跳过
-        if (subProblem == -1) continue;
-        // 在子问题中选择最优解，加1表示当前这枚硬币，面额可能为1、2、5
-        res = Math.min(res, subProblem + 1);
-    }
-    // 未正好凑出金额amount，则返回-1，把计算结果存入备忘录
-    dp[amount] = (res == Integer.MAX_VALUE) ? -1 : res;
-    return dp[amount];
-}
-
-int coinChange(int[] coins, int amount) {
-    // coins表示硬币面额，可取1、2、5
-	dp = new int[amount + 1];
-	// dp 数组全都初始化为特殊值
-	Arrays.fill(dp, amount + 1);
-	return dp(coins, amount);
-}
-
-// 二、动态规划数组
-int coinChange(int[] coins, int amount) {
-    int[] dp = new int[amount + 1];
-    // dp 数组全都初始化为特殊值，如 amount + 1，数组大小也为 amount + 1，
-    // 因凑成 amount 金额的硬币数最多只可能等于 amount（全用 1 元），永远不可能为 amount + 1;
-    // 若初始化为 Integer.MAX_VALUE 的话，dp[i-coin] + 1 会导致整型溢出。
-    Arrays.fill(dp, amount + 1);
-    
-    dp[0] = 0;
-    // 遍历所有状态
-    for (int i = 0; i &lt; dp.length; i++) {
-        // 遍历当前状态的所有取值，1、2、5求所有选择的最小值
-        for (int coin : coins) {
-            // dp下界溢出，子问题无解，跳过
-            if (i - coin &lt; 0) {
-                continue;
-            }
-            dp[i] = Math.min(dp[i], 1 + dp[i - coin]);
-        }
-    }
-    return (dp[amount] == amount + 1) ? -1 : dp[amount];
-}
-</code></pre></div></div>
-
 <h3 id="bfs-框架">BFS 框架</h3>
 
 <p>BFS 也是一种暴力穷举算法，必须掌握。本质就是二叉树的层序遍历，适合解决最短路径问题。</p>
@@ -3004,7 +2963,7 @@ int coinChange(int[] coins, int amount) {
   <li>遍历图（或树）</li>
 </ul>
 
-<h5 id="经典例题-9">经典例题</h5>
+<h5 id="经典例题-8">经典例题</h5>
 
 <ul>
   <li><a href="#布隆过滤器">最短路径 Dijkstra 算法模板</a>：就是改造版 BFS 算法 + 类似 dp table 的数组。</li>
@@ -3088,7 +3047,7 @@ int BFSTree(Node start, Node target) {
   </li>
 </ol>
 
-<h5 id="经典例题-10">经典例题</h5>
+<h5 id="经典例题-9">经典例题</h5>
 
 <ul>
   <li><a href="https://leetcode.cn/problems/permutations/">46.全排列（元素无重不可复选）</a>：<strong>回溯框架</strong>。
@@ -3229,6 +3188,235 @@ private void backtrack(int[] nums, 路径track, 选择列表) {
   <li><a href="#二叉树">哈夫曼编码</a></li>
 </ul>
 
+<h3 id="动态规划">动态规划</h3>
+
+<p>核心思想：如何聪明地<strong>穷举求最值</strong>。本质上是穷举「状态」，做「选择」找最优解。</p>
+
+<p>动态规划的暴力穷举解法一般是递归形式，优化方法非常固定，要么是添加备忘录，要么是改写成迭代形式。</p>
+
+<h5 id="动态规划三要素">动态规划三要素</h5>
+
+<ol>
+  <li><strong>重复子问题</strong>：在计算的过程中，有一些问题会重复计算，必须记住结果；若没有重复子问题，可用「分治法」求解。</li>
+  <li>最优子结构：子问题间必须互相独立、可同时最优，不能互相影响。如要总分最高，则子问题为语文、数学等分别最高。如果语文、数学成绩互相制约、影响，不能同时达到最高，子问题并不独立，无法同时最优。</li>
+  <li><strong>状态转移方程</strong>（暴力解）：
+    <ol>
+      <li>明确 <strong>base case</strong>：直接从<del>最底下、</del>最简单、问题规模最小<del>、已知结果的</del>，开始往上推，直到想要的答案。如 <code class="highlighter-rouge">f(1)</code> 和 <code class="highlighter-rouge">f(2) </code> 推出 <code class="highlighter-rouge">f(20)</code>。</li>
+      <li>明确<strong>状态</strong>：记录解决问题到了哪一步，通常是原问题和子问题中随自变量变化的（题目中的）因变量，状态一般作为 <code class="highlighter-rouge">dp</code> 数组的下标/key ；如目标金额 <code class="highlighter-rouge">n</code>。</li>
+      <li>做选择：导致状态产生变化的行为，通过<strong>选择</strong>从一个状态转移到另一个状态。如，选择了一枚 1、2、5 元的硬币，从而目标金额 <code class="highlighter-rouge">n</code> 减少了对应的 1、2、5 元。</li>
+      <li>定义 <code class="highlighter-rouge">dp</code> 数组/函数的含义：一般 { key / 参数， value / 函数返回值 } = { 状态，题目要求计算的量/做选择的（最少）次数}。如 { 目标金额 <code class="highlighter-rouge">n</code>，凑出 <code class="highlighter-rouge">n</code> 所需的最少硬币数量 / 至少需 <code class="highlighter-rouge">dp[n]</code> 枚硬币凑出}。</li>
+      <li><strong>状态转移方程</strong>：对最后一步，可由已知的<strong>状态</strong>，通过<strong>选择</strong>所有情况（1、2、5元），<strong>转移</strong>到目标状态：
+        <ul>
+          <li>还差1元，dp[n] = dp[n - <strong>1</strong>] + 1;</li>
+          <li>还差2元，dp[n] = dp[n - <strong>2</strong>] + 1;</li>
+          <li>还差5元，dp[n] = dp[n - <strong>5</strong>] + 1;</li>
+        </ul>
+      </li>
+      <li>循环迭代：一般都脱离了递归，由<strong>循环迭代</strong>计算，自底向上进行递推求解。</li>
+      <li>优化递归树，消除<strong>重叠子问题</strong>：通过<strong>递归树</strong>找到<strong>被重复计算的子问题节点</strong>，寻找算法低效的原因。
+        <ol>
+          <li>通过<strong>剪枝</strong>，消除巨量冗余（重叠子问题），极大减少了子问题的个数。</li>
+          <li>分析递归算法的时间复杂度：子问题个数（即递归图中节点总数） X 解决一个子问题需要的时间。
+            <ul>
+              <li>降低时间复杂度：用空间换时间。</li>
+            </ul>
+          </li>
+          <li>降低空间复杂度：如果每次状态转移只需 DP table 中的一部分，可尝试缩小 DP table 的大小，只记录必要的数据。</li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+</ol>
+
+<h5 id="子序列">子序列</h5>
+
+<blockquote>
+  <p>子序列 != 子串</p>
+</blockquote>
+
+<p>子序列：不改变剩余字符顺序的情况下，删除某些字符或不删除任何字符形成的一个序列。另外定义见<a href="#回文串">回文串</a>。</p>
+
+<ul>
+  <li>
+    <p>双字符串动态规划（大多为二维）</p>
+
+    <ul>
+      <li>
+        <p><a href="https://leetcode.cn/problems/longest-common-subsequence/">1143.最长公共子序列</a>：</p>
+
+        <ul>
+          <li>定义：<code class="highlighter-rouge">dp[i][j]</code> 的含义是 <code class="highlighter-rouge">s1[0..i-1]</code> 和 <code class="highlighter-rouge">s2[0..j-1]</code> 的 LCS 长度；</li>
+          <li>目标：<code class="highlighter-rouge">s1[0..m-1]</code> 和 <code class="highlighter-rouge">s2[0..n-1]</code> 的 lcs 长度，即 <code class="highlighter-rouge">dp[m][n]</code>；</li>
+          <li><code class="highlighter-rouge">base case</code>: <code class="highlighter-rouge">dp[0][..] = dp[..][0] = 0 </code>；</li>
+          <li><a href="https://leetcode.cn/problems/qJnOS7/">剑指 Offer II 095.最长公共子序列</a>【】</li>
+        </ul>
+      </li>
+      <li>
+        <p><a href="https://leetcode.cn/problems/edit-distance/">72.最小编辑距离</a>：将 <code class="highlighter-rouge">word1</code> 转成 <code class="highlighter-rouge">word2</code> 所使用的最少操作数 。【】</p>
+
+        <ul>
+          <li>定义 <code class="highlighter-rouge">dp</code> 数组：<code class="highlighter-rouge">dp[i-1][j-1]</code> 存储 <code class="highlighter-rouge">s1[0..i]</code> 和 <code class="highlighter-rouge">s2[0..j]</code> 的最小编辑距离。<code class="highlighter-rouge">dp</code> 数组索引至少是 0，所以索引会偏移一位。</li>
+        </ul>
+
+        <p><img src="assets/lcs.png" alt="img" style="zoom:40%;" /><img src="assets/delete.gif" alt="img" style="zoom:25%;" /></p>
+
+        <p><img src="assets/insert.gif" alt="img" style="zoom:25%;" /><img src="assets/replace.gif" alt="img" style="zoom:25%;" /></p>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><a href="https://leetcode.cn/problems/longest-palindromic-subsequence/">516.最长回文子序列</a>：区间 DP <del>与划分型 DP</del>，在子串 <code class="highlighter-rouge">s[i,j]</code> 中，最长回文子序列的长度为 <code class="highlighter-rouge">dp[i][j]</code>；上一个可能的状态如下图：</p>
+
+    <p><img src="assets/palin_dp.jpg" alt="img" style="zoom: 25%;" /></p>
+  </li>
+  <li>
+    <p>（一维）<a href="https://leetcode.cn/problems/lian-xu-zi-shu-zu-de-zui-da-he-lcof/">剑指 Offer 42.连续子数组的最大和</a>、<a href="https://leetcode.cn/problems/maximum-subarray/">53.最大子数组和</a>【】</p>
+
+    <ul>
+      <li><a href="https://leetcode.cn/problems/longest-increasing-subsequence/">300.最长递增子序列</a>：<code class="highlighter-rouge">dp[i] = Math.max(dp[i], dp[j] + 1)</code></li>
+    </ul>
+  </li>
+</ul>
+
+<h5 id="经典例题-10">经典例题</h5>
+
+<ul>
+  <li>
+    <p><a href="https://leetcode.cn/problems/fei-bo-na-qi-shu-lie-lcof/">剑指 Offer 10-I.斐波那契数列</a>：</p>
+
+    <ul>
+      <li>递归：简单，注意 <code class="highlighter-rouge">0、1、2</code> 的情况，但大量的重复计算会导致内存溢出；</li>
+      <li><del>带「备忘录」、哈希表的递归算法，「自顶向下」进行递归求解。</del></li>
+      <li>由动态规划的 <code class="highlighter-rouge">dp</code> 数组通过消除递归得到迭代（递推）解法：（滚动数组）re0、re1交替前进，注意最值取模 <code class="highlighter-rouge">1e9+7</code>、<code class="highlighter-rouge">10,0000,0007</code> 防止溢出。</li>
+    </ul>
+  </li>
+  <li>
+    <p><a href="https://leetcode.cn/problems/climbing-stairs/">剑指 Offer 10-II.青蛙跳台阶、爬楼梯问题</a>：重复子问题，滚动数组。</p>
+
+    <ul>
+      <li>状态：</li>
+      <li>（最后一次）选择：还差跳 1 或 2 阶；</li>
+      <li>dp 数组：{当前阶数，做的选择数、跳到 n 级台阶的方法个数}；</li>
+      <li>状态转移方程：<code class="highlighter-rouge">dp[n] = dp[n-1]*1 + dp[n-2]*1;</code></li>
+      <li>本质可理解为斐波那契数列：爬到第 <code class="highlighter-rouge">n</code> 级台阶的方法个数等于爬到 <code class="highlighter-rouge">n-1</code> 的方法个数和爬到 <code class="highlighter-rouge">n-2</code> 的方法个数之和。</li>
+    </ul>
+  </li>
+  <li>
+    <p><a href="https://leetcode.cn/problems/coin-change/">322.零钱兑换</a>、<a href="https://leetcode.cn/problems/gaM7Ch/">剑指 Offer II 103. 最少的硬币数目</a>：见 <a href="#动态规划算法框架">动态规划算法框架</a>，最优子结构、如何列出状态转移方程【】</p>
+  </li>
+  <li>
+    <p>分割问题：<a href="https://leetcode.cn/problems/partition-equal-subset-sum/">416.分割等和子集</a>：【】</p>
+
+    <ul>
+      <li>
+        <p>先对集合求和，得出 <code class="highlighter-rouge">sum</code>，把问题转化为<strong>背包问题</strong>：背包容量为 <code class="highlighter-rouge">sum / 2</code> 和 <code class="highlighter-rouge">N</code> 个物品，每个物品的重量为 <code class="highlighter-rouge">nums[i]</code>。</p>
+      </li>
+      <li>
+        <p><code class="highlighter-rouge">dp</code> 数组的定义：<code class="highlighter-rouge">dp[i][j] = x</code> 表示，对于前 <code class="highlighter-rouge">i</code> 个物品，当前背包的容量为 <code class="highlighter-rouge">j</code> 时，若 <code class="highlighter-rouge">x</code> 为 <code class="highlighter-rouge">true</code>，则说明可恰好将背包装满，若 <code class="highlighter-rouge">x</code> 为 <code class="highlighter-rouge">false</code>，则说明不能恰好将背包装满。</p>
+      </li>
+      <li>
+        <p><a href="https://labuladong.github.io/article/wx.html?wx=RXfnhSpVBmVneQjDSUSAVQ">0-1 背包问题</a>：每个物体只有两种可能的状态（取与不取），对应二进制中的 0 和 1【重要】</p>
+      </li>
+      <li>
+        <p><a href="https://leetcode.cn/problems/maximum-bags-with-full-capacity-of-rocks/">2279.装满石头的背包的最大数量</a>【】</p>
+
+        <p><img src="assets/coin_change.jpg" alt="img" style="zoom: 35%;" /></p>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>各种玩小游戏</p>
+  </li>
+  <li>
+    <p>二维动态规划：<a href="https://leetcode.cn/problems/best-time-to-buy-and-sell-stock/">121.买卖股票的最佳时机</a>、<a href="https://leetcode.cn/problems/gu-piao-de-zui-da-li-run-lcof/">剑指 Offer 63. 股票的最大利润</a>：<code class="highlighter-rouge">dp[i][k][0 or 1]</code> 表示从第 i 天的这笔交易中获取的最大利润，0 和 1 代表是否持有股票， <code class="highlighter-rouge">0 &lt;= i &lt; n, 1 &lt;= k &lt;= K</code>，k 为交易次数（大 K 为交易数上限）。</p>
+
+    <ul>
+      <li><a href="https://leetcode.cn/problems/maximum-difference-between-increasing-elements/">2016.增量元素间的最大差值</a>【】</li>
+    </ul>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  特化到 k = 1 买入或卖出一次的情况：
+  状态转移方程：max(今天选择 rest, 今天选择 sell);
+    
+  今天未持有股票，对于昨天来说，有两种可能，从中求最大利润：
+  1、昨天未持有，今天选择 rest 休息，仍未持有；
+  2、昨天持有，今天选择 sell，未持有股票。
+  dp[i][0] = max(dp[i-1][0], dp[i-1][1] + prices[i]);
+    
+  今天持有股票，有两种可能，从中求最大利润：
+  1、昨天就持有股票，今天选择 rest，今天仍持有股票；
+  2、昨天本没有持有，但今天选择 buy，持有了股票。
+  dp[i][1] = max(dp[i-1][1], -prices[i]);
+  // 即前一天没有持有股票时、使dp[i-1][0]=0，今天选择买入则利润为-prices[i]
+    
+  base case：
+  dp[0][0] = 0;
+  dp[0][1] = -prices[i]; // Integer.MIN_VALUE;负数表示买入
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h5 id="动态规划算法框架">动态规划算法框架</h5>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 一、递归（可看做动态规划函数），推荐
+int[] dp;
+// 返回要凑出金额 amount 至少需要的硬币数
+int coinDp(int[] coins, int amount) {
+    if (amount &lt; 0) return -1;
+    // base case
+    if (amount == 0) return 0;
+    // 查备忘录，防止重复计算
+    if (dp[amount] != dp.length) {
+    	return dp[amount];
+    }
+    
+    int res = Integer.MAX_VALUE;
+    // 遍历当前状态的所有取值,1、2、5
+    for (int coin : coins) {
+        // 计算子问题的结果
+        // amount - coin表示扣除当前面额，还需凑的金额
+        int subProblem = coinChange(coins, amount - coin);
+        // 子问题无解则跳过
+        if (subProblem == -1) continue;
+        // 在子问题中选择最优解，加1表示当前这枚硬币，面额可能为1、2、5
+        res = Math.min(res, subProblem + 1);
+    }
+    // 未正好凑出金额amount，则返回-1，把计算结果存入备忘录
+    dp[amount] = (res == Integer.MAX_VALUE) ? -1 : res;
+    return dp[amount];
+}
+
+int coinChange(int[] coins, int amount) {
+    // coins表示硬币面额，可取1、2、5
+	dp = new int[amount + 1];
+	// dp 数组全都初始化为特殊值
+	Arrays.fill(dp, amount + 1);
+	return dp(coins, amount);
+}
+
+// 二、动态规划数组
+int coinChange(int[] coins, int amount) {
+    int[] dp = new int[amount + 1];
+    // dp 数组全都初始化为特殊值，如 amount + 1，数组大小也为 amount + 1，
+    // 因凑成 amount 金额的硬币数最多只可能等于 amount（全用 1 元），永远不可能为 amount + 1;
+    // 若初始化为 Integer.MAX_VALUE 的话，dp[i-coin] + 1 会导致整型溢出。
+    Arrays.fill(dp, amount + 1);
+    
+    dp[0] = 0;
+    // 遍历所有状态
+    for (int i = 0; i &lt; dp.length; i++) {
+        // 遍历当前状态的所有取值，1、2、5求所有选择的最小值
+        for (int coin : coins) {
+            // dp下界溢出，子问题无解，跳过
+            if (i - coin &lt; 0) {
+                continue;
+            }
+            dp[i] = Math.min(dp[i], 1 + dp[i - coin]);
+        }
+    }
+    return (dp[amount] == amount + 1) ? -1 : dp[amount];
+}
+</code></pre></div></div>
+
 <h3 id="位运算">位运算</h3>
 
 <ul>
@@ -3248,9 +3436,20 @@ private void backtrack(int[] nums, 路径track, 选择列表) {
 
 <h3 id="缓存淘汰算法">缓存淘汰算法</h3>
 
-<h4 id="手撸lru-算法">手撸LRU 算法</h4>
+<blockquote>
+  <p>见数据库文档中的 Redis 缓存淘汰策略、操作系统中的内存页面置换算法。</p>
+</blockquote>
 
-<p>Least Recently Used，按访问顺序、优先删除最久未使用的数据。</p>
+<h4 id="手撸-lru-算法">手撸 LRU 算法</h4>
+
+<p><strong>LRU</strong>（<code class="highlighter-rouge">Least Recently Used</code>）最近最久未使用策略：优先删除、淘汰<strong>最久未使用</strong>的数据，即上次被访问时间距离现在最久的数据。可以保证内存中的数据都是<strong>热点数据</strong>（经常被访问的数据），从而保证<strong>缓存命中率</strong>。</p>
+
+<p>基于 <strong>双向链表 + HashMap</strong> 的 LRU 算法实现：</p>
+
+<ol>
+  <li>访问某个节点时，将其从原来的位置删除，并重新插入到<strong>链表头部</strong>。这样就能保证<strong>链表尾部</strong>存储的就是最近最久未使用的节点，当节点数量大于缓存最大空间时就淘汰链表尾部的节点。</li>
+  <li>为了使<strong>删除操作</strong>时间复杂度为 O(1)，就不能采用遍历的方式找到某个节点。HashMap 存储着 Key 到节点的映射，通过 Key 就能以 O(1) 的时间得到节点，然后再以 O(1) 的时间将其从<strong>双向链表</strong>中删除。</li>
+</ol>
 
 <p>核心数据结构：哈希链表 <code class="highlighter-rouge">LinkedHashMap</code>（<strong>双向链表</strong>和哈希表的结合体）</p>
 

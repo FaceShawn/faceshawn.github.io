@@ -17,50 +17,92 @@
   <li>吞吐量（throughput ）：表示在单位时间内，通过某个网络（或信道、接口）的数据量。用于测量实际上到底有多少数据量能通过网络。受网络带宽或额定速率的限制。</li>
 </ol>
 
-<h3 id="tcpip-四五层模型-vs-osi-七层模型">TCP/IP 四（五）层模型 VS OSI 七层模型</h3>
+<h3 id="tcpip-四层模型osi-七层模型">TCP/IP 四层模型、OSI 七层模型</h3>
 
 <p><img src="assets/TCP_IP_4层_7层模型.png" alt="TCP/IP 4层模型" style="zoom:70%;" /><img src="assets/协议栈.png" style="zoom:35%;" /></p>
+
+<p>OSI 模型的：</p>
+
+<ol>
+  <li>下三层是媒体层（Media Layer）：物理层、数据链路层、网络层；</li>
+  <li>上四层是主机层（Host Layer）：传输层、（会话层、表示层）、应用层。</li>
+</ol>
+
+<p>分层：为了封装、解耦</p>
 
 <ol>
   <li>网络接口层：
     <ol>
-      <li><strong>物理层</strong>：最底层，利用<strong>传输介质</strong>实现（相邻两台物理机/计算机节点间的）<strong>比特流传送</strong>。<strong>网卡</strong>/物理硬件（负责收发网线中的信号）、<strong>中继器</strong>和集线器在这层工作。</li>
-      <li><strong>数据链路层</strong>：将网络层交下来的 IP 数据报组装成<strong>帧</strong>，可靠的传输到相邻节点（/目标机）的网络层。网卡<strong>驱动</strong>程序（负责控制网卡/硬件）、<strong>交换机</strong>、网桥。</li>
+      <li><strong>物理层</strong>：最底层，利用<strong>传输介质</strong>实现（相邻两台物理机/计算机节点间的）<strong>比特流传送</strong>。<strong>网卡</strong>/物理硬件（负责收发网线中的信号）、<strong>中继器</strong>和<strong>集线器</strong>在这层工作。</li>
+      <li><strong>数据链路层</strong>：将网络层交下来的 IP 数据报组装成<strong>帧</strong>，可靠的传输到相邻节点（/目标机）的网络层。
+        <ul>
+          <li>给数据包加以太网头部。网卡<strong>驱动</strong>程序（负责控制网卡/硬件）、<strong>交换机</strong>、网桥。</li>
+        </ul>
+      </li>
     </ol>
   </li>
-  <li><strong>网络层</strong>：<strong>路由和寻址</strong>。将网络地址翻译成对应的物理地址，通过路由选择算法为 <strong>IP 数据报</strong>/分组选择（通过通信子网的）最佳路径。<strong>路由器</strong>；IP 协议。</li>
-  <li><strong>传输层</strong>：为两台<strong>主机进程</strong>间的（逻辑）通信提供通用的数据传输服务，传送<strong>应用层报文</strong>。<strong>网关</strong>；负责收发数据的 <strong>TCP 和 UDP 协议</strong>。TCP 三次握手、四次挥手。</li>
+  <li><strong>网络层</strong>：<strong>路由和寻址</strong>。将网络地址翻译成对应的物理地址，通过<strong>路由选择算法</strong>为 <strong>IP 数据报</strong>/分组选择（通过通信子网的）最佳路径。IP 协议、ARP 协议。给数据包加 IP 头部。路由器。</li>
+  <li><strong>传输层</strong>：为两台<strong>主机进程</strong>间的（逻辑）通信提供通用的数据传输服务，传送应用层报文。<strong>网关</strong>。
+    <ul>
+      <li>负责收发数据的 <strong>TCP 和 UDP 协议</strong>。TCP 三次握手、四次挥手。给数据包加 TCP 头部。</li>
+    </ul>
+  </li>
   <li>应用层：浏览器通过调用 <strong>Socket 库</strong>来委托协议栈工作；
     <ol>
       <li><strong>会话层</strong>：用于管理（建立和保持、维护、重连）应用程序间的会话，身份验证等；</li>
-      <li><strong>表示层</strong>：用于数据处理（编码解码、加密解密、压缩解压缩等）；</li>
-      <li><strong>应用层</strong>：用于定义网络通信规则（<strong>协议</strong>），为计算机用户提供服务。<strong>报文</strong>；<strong>HTTP 协议</strong>。</li>
+      <li><strong>表示层</strong>：用于数据处理（编码解码、<strong>加密解密</strong>、压缩解压缩等）；</li>
+      <li><strong>应用层</strong>：用于定义网络通信规则（<strong>协议</strong>），为计算机用户提供服务。<strong>报文</strong>；<strong>DNS 协议</strong>、HTTP 协议。</li>
     </ol>
   </li>
 </ol>
 
+<p>数据包：</p>
+
+<ul>
+  <li>
+    <p>应用层：建立 TCP 连接后，浏览器生成 <strong>HTTP 请求报文</strong>（请求行、请求头、请求体），发给服务器；</p>
+  </li>
+  <li>在发送端，（应用层）<strong>HTTP 数据包</strong>，（传输层）<strong>+ TCP 头部</strong>，（网络层）<strong>+ IP 头部</strong>，（数据链路层）<strong>+ 以太网头部</strong>。</li>
+  <li>发送端将<strong>子网掩码</strong>分别与源 IP、目标 IP进行与运算，相等则在同一个子网。
+    <ol>
+      <li>如果源 IP 与目标 IP 在同一个子网，直接将数据包通过<strong>交换机</strong>（在数据链路层）发出去。</li>
+      <li>如果源 IP 与目标 IP 不在同一个子网，将数据包（通过默认网关知道路由器的 IP 地址）交给<strong>路由器</strong>处理。</li>
+      <li>通过 ARP 协议，</li>
+    </ol>
+  </li>
+  <li>发送给（物理层的）<strong>集线器</strong>：只负责向所有节点转发数据包；</li>
+  <li>发送给（数据链路层的）<strong>交换机</strong>：没有独立的 MAC 地址，记录 MAC 地址表，向路由器的 MAC 地址发送数据包。</li>
+  <li>发送给（网络层的）<strong>路由器</strong>：有自己独立的 MAC 地址（记录在交换机的 MAC 地址表中），记录 IP 地址表，将 MAC 地址改为目标 MAC，向目标 IP 地址转发数据包。
+    <ul>
+      <li>ARP 协议：在主机中，</li>
+      <li>路由表：</li>
+    </ul>
+  </li>
+  <li>发送给（传输层的）网关：</li>
+  <li>发送给（应用层的）</li>
+</ul>
+
 <p><img src="assets/扒皮模型.png" style="zoom:38%;" /><img src="assets/IP数据包.png" style="zoom:36%;" /></p>
-
-<p><strong>为什么分层</strong>：</p>
-
-<ol>
-  <li>封装</li>
-  <li>解耦</li>
-</ol>
 
 <h3 id="一网络接口层">一、网络接口层</h3>
 
 <p><strong>CRC</strong>（Cyclic Redundancy Check）循环冗余检验：为了保证数据传输的可靠性，广泛使用的一种检错技术。</p>
 
-<h3 id="二网络层">二、网络层</h3>
+<h3 id="三网络层">三、网络层</h3>
 
-<p>常见协议：</p>
+<h4 id="常见协议">常见协议</h4>
 
 <ol>
   <li><code class="highlighter-rouge">IP</code> 协议：控制<strong>网络包收发</strong>。</li>
   <li><code class="highlighter-rouge">ICMP</code> 控制报文协议：用于告知网络包传送过程中产生的错误及各种控制信息。</li>
-  <li><code class="highlighter-rouge">OPSF</code> 路由选择协议：用于 IP 数据包（在路由器间）的<strong>路由选择</strong>。</li>
-  <li><code class="highlighter-rouge">ARP</code> 地址解析协议：路由器与服务器通信时，用于<strong>物理地址寻址</strong>，负责<strong>将 IP 地址转换为 <code class="highlighter-rouge">MAC</code> 物理地址</strong>。每台主机中都有一张 <strong>ARP 缓存表</strong>，记录主机的 IP 地址和 MAC 地址间的对应关系；
+  <li><code class="highlighter-rouge">OSPF</code> 动态<strong>路由选择</strong>协议（<code class="highlighter-rouge">Open Shortest Path First</code>，开放式最短路径优先）：用于 IP 数据包（在路由器间）的<strong>路由选择</strong>。四层负载均衡。
+    <ol>
+      <li>是一个基于链路状态、IP 协议的内部网关协议。具有路由变化收敛速度快、无路由环路、支持变长子网掩码（VLSM）和汇总、层次区域划分等优点。</li>
+      <li>用于取代 RIP（<code class="highlighter-rouge">Routing Information Protocol</code>）作为内部网关协议。</li>
+      <li>采用戴克斯特拉算法来计算<strong>最短路径树</strong>，见</li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">ARP</code> <strong>地址解析</strong>协议：路由器与服务器通信时，用于<strong>物理地址寻址</strong>，负责<strong>将 IP 地址转换为 <code class="highlighter-rouge">MAC</code> 物理地址</strong>。每台主机中都有一张 <strong>ARP 缓存表</strong>，记录主机的 IP 地址和 MAC 地址间的对应关系；
     <ol>
       <li>在 ARP 缓存中查询 IP 地址，未命中则发送（包含待查询 IP 地址的）ARP 广播请求，等待回应；</li>
       <li>收到广播的主机检查自己的 IP，符合条件的将（含有自己 <code class="highlighter-rouge">MAC</code> 地址的） ARP 包返回给广播的主机；</li>
@@ -70,40 +112,50 @@
   <li><code class="highlighter-rouge">RARP</code> 逆地址解析协议：逆向从 IP 地址反查域名。</li>
 </ol>
 
-<p>地址：</p>
+<h4 id="ip-地址">IP 地址</h4>
 
-<ol>
-  <li><code class="highlighter-rouge">MAC</code>：只负责某一区间（主机、路由器、主机）的通信传输；</li>
-  <li><code class="highlighter-rouge">IP</code> 地址：负责将数据包发给最终目的地地址；<strong>分类号 + 网络号 + 主机号</strong>。
+<p><code class="highlighter-rouge">MAC</code>：只负责某一区间（主机、路由器、主机）的通信传输；</p>
+
+<p><code class="highlighter-rouge">IP</code> 地址：负责将数据包发给最终目的地地址；<strong>分类号 + 网络号 + 主机号</strong>。</p>
+
+<ul>
+  <li>为什么要分离网络号和主机号：两台计算机的网络地址，用于判断是否处于同一广播域内。如果网络地址相同，表明接受方在本网络内，可把数据包直接发送到目标主机。如路由器寻址。
+    <ol>
+      <li>网络地址（号）：主机位全为0，网段的第一个地址，表示属于互联网的哪一个网络。本机 IP 地址 0.0.0.0。</li>
+      <li>主机地址（号）：表示属于网络中的哪一台主机。</li>
+    </ol>
+  </li>
+  <li><strong>子网掩码</strong>：网络位 + 主机位
+    <ol>
+      <li>用 IP 地址与子网掩码<strong>按位与</strong>，用于区分网络位和主机位；</li>
+      <li>将一个大的 IP 地址划分为若干子网络；</li>
+      <li>检测两个 IP 地址是否属于同一子网；</li>
+      <li>减少 IP 地址浪费；</li>
+    </ol>
+  </li>
+  <li><strong>网关地址</strong>：路由器的地址；</li>
+  <li><strong>广播地址</strong>：主机位全为1的，网络的最后一个地址；
     <ul>
-      <li>为什么要分离网络号和主机号：两台计算机的网络地址，用于判断是否处于同一广播域内。如果网络地址相同，表明接受方在本网络内，可把数据包直接发送到目标主机。如路由器寻址。
-        <ol>
-          <li>网络地址（号）：主机位全为0，网段的第一个地址，表示属于互联网的哪一个网络。本机 IP 地址 0.0.0.0。</li>
-          <li>主机地址（号）：表示属于网络中的哪一台主机。</li>
-        </ol>
-      </li>
-      <li><strong>子网掩码</strong>：网络位 + 主机位
-        <ol>
-          <li>用 IP 地址与子网掩码<strong>按位与</strong>，用于区分网络位和主机位；</li>
-          <li>将一个大的 IP 地址划分为若干子网络；</li>
-          <li>检测两个 IP 地址是否属于同一子网；</li>
-          <li>减少 IP 地址浪费；</li>
-        </ol>
-      </li>
-      <li><strong>网关地址</strong>：路由器的地址；</li>
-      <li><strong>广播地址</strong>：主机位全为1的，网络的最后一个地址；
-        <ul>
-          <li>255.255.255.255 ：受限的广播地址，只能用于本地网络；</li>
-        </ul>
-      </li>
-      <li>回送（<del>环回</del>）地址：127.0.0.0/8，表示本机地址；
-        <h3 id="三传输层">三、传输层</h3>
-      </li>
+      <li>255.255.255.255 ：受限的广播地址，只能用于本地网络；</li>
     </ul>
   </li>
-</ol>
+  <li><strong>回送</strong>（<del>环回</del>）地址：127.0.0.0/8，表示本机地址（本机服务器）。一般用来测试使用，常用来ping 127.0.0.1来看本地ip/tcp正不正常，如能ping通即可正常使用。
+    <ul>
+      <li>localhost也叫local ，指本地服务器。通过解析本机的host文件，windows自动将localhost解析为127.0.0.1。</li>
+      <li>localhot（local）不经网卡传输，不受网络防火墙和网卡相关的的限制。127.0.0.1是通过网卡传输，依赖网卡，并受相关的限制。</li>
+      <li>一般设置程序时本地服务用localhost是最好的，localhost不会解析成ip，也不会<strong>占用网卡、网络资源</strong>。</li>
+      <li>猜想localhost访问时，系统带的本机当前用户的权限去访问，而用ip的时候，等于本机是通过网络再去访问本机，可能涉及到网络用户的权限。</li>
+    </ul>
+  </li>
+</ul>
 
-<h5 id="tcp-vs-udp">TCP VS UDP</h5>
+<p><img src="assets/20131219133501281" alt="img" /></p>
+
+<h4 id="ipv4ipv6">IPV4、IPV6</h4>
+
+<h3 id="四传输层">四、传输层</h3>
+
+<h4 id="tcp-vs-udp">TCP VS UDP</h4>
 
 <ol>
   <li><code class="highlighter-rouge">TCP</code> 传输控制协议：提供<strong>面向</strong>连接的、<strong>可靠的</strong>数据传输服务；只能点对点通信。
@@ -118,9 +170,9 @@
   </li>
 </ol>
 
-<h5 id="tcp-三次握手">TCP 三次握手</h5>
+<h4 id="tcp-三次握手">TCP 三次握手</h4>
 
-<p><img src="assets/三次握手和四次挥手.png" alt="img" style="zoom: 40%;" /></p>
+<p><img src="assets/三次握手和四次挥手.png" alt="img" style="zoom: 50%;" /></p>
 
 <p>目的：保证客户端和服务端（浏览器和服务器）<strong>建立可靠的通信信道</strong>。主要作用是为了确认双方的接收和发送能力是否正常、指定自己的初始化序列号、为后面的可靠性传送做准备。</p>
 
@@ -155,7 +207,9 @@ B-to-S:	ACK		  ( ACK = y+1, [seq = x+1] )
   </li>
 </ol>
 
-<p>两次握手不可以：两次握手只能保证客户端可正常给服务端发送数据，只有经过第三次握手，双方才能确认自己与对方的发送与接收是正常的。</p>
+<h5 id="两次握手不可以">两次握手不可以</h5>
+
+<p>原因：两次握手只能保证客户端可正常给服务端发送数据，只有经过第三次握手，双方才能确认自己与对方的发送与接收是正常的。</p>
 
 <ol>
   <li>第一次握手：客户端发送数据包，服务端收到了。服务端能确认：客户端的发送能力、服务端的接收能力是正常的；</li>
@@ -172,14 +226,14 @@ B-to-S:	ACK		  ( ACK = y+1, [seq = x+1] )
   <li><strong>客户端已关闭连接</strong>，会忽略服务端发来的确认，也不发送数据，则<strong>服务端一直等待客户端发送数据</strong>，浪费资源。</li>
 </ol>
 
-<h5 id="数据传输">数据传输</h5>
+<h4 id="数据传输">数据传输</h4>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  		标志位 确认号  	序列号
 B-to-S:	ACK ( ACK = y+1, seq = x+1 )
 S-to-B:	ACK ( ACK = x+2 		   )
 </code></pre></div></div>
 
-<h5 id="tcp-四次挥手">TCP 四次挥手</h5>
+<h4 id="tcp-四次挥手">TCP 四次挥手</h4>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  	报文标志位 确认号	   序列号
 B-to-S:	FIN ( 			 seq = x )
@@ -216,13 +270,13 @@ B-to-S:	ACK ( ACK = y+1			 )
   </li>
 </ol>
 
-<p><strong>挥手为什么需要四次</strong>？</p>
+<h5 id="挥手为什么需要四次">挥手为什么需要四次？</h5>
 
 <p>四次由 TCP 的<strong>半关闭</strong>（half-close）造成的。即，TCP 提供了一种能力，连接的一端在<strong>结束发送</strong>后、还能接收来自另一端的数据。第二次挥手后。</p>
 
 <p>关闭连接时，当服务端收到 <code class="highlighter-rouge">FIN</code> 报文时，可能响应报文并没有发送完，并不会立即关闭 <code class="highlighter-rouge">SOCKET</code> 连接，所以只能先回复一个 <code class="highlighter-rouge">ACK</code> 报文，告诉客户端收到了发的 <code class="highlighter-rouge">FIN</code> 报文。只有<strong>等到服务端所有的报文都发送完</strong>了，才发送 <code class="highlighter-rouge">FIN</code> 报文，故需四次挥手。</p>
 
-<h5 id="tcp-如何保证可靠传输">TCP 如何保证可靠传输</h5>
+<h4 id="tcp-如何保证可靠传输">TCP 如何保证可靠传输</h4>
 
 <p>在不可靠服务的基础上实现可靠的信息传输。</p>
 
@@ -232,11 +286,13 @@ B-to-S:	ACK ( ACK = y+1			 )
   <li>确认应答/<strong>ARQ 自动重传请求协议</strong>：每发完一个分组就停止发送，收到对方确认后再发下一个；ACK 报文中有对应的确认序列号，告诉发送方接收了哪些数据、下一次数据从哪里传。</li>
   <li>（最关键）<strong>超时重传</strong>：当 TCP 发出一个报文段后，启动定时器，等待目的端确认收到；超时后仍未收到确认，则重发此报文段。</li>
   <li><strong>三次握手四次挥手</strong>，用来建立和关闭连接；</li>
-  <li><strong>流量控制</strong>：利用滑动窗口（接收方发送的确认报文中的窗口字段用来控制发送方窗口大小）实现流量控制，控制发送速率，解决丢包重传。</li>
+  <li><strong>流量控制</strong>：利用<strong>滑动窗口</strong>（接收方发送的（确认报文中的）窗口字段用来控制发送方窗口大小）实现流量控制，控制发送速率，解决丢包重传。</li>
   <li><strong>拥塞控制</strong>：当网络拥塞时减少数据发送。</li>
 </ol>
 
-<h3 id="四应用层">四、应用层</h3>
+<h5 id="滑动窗口">滑动窗口</h5>
+
+<h3 id="七应用层">七、应用层</h3>
 
 <h4 id="应用层协议及对应端口">应用层协议及对应端口</h4>
 
@@ -245,10 +301,12 @@ B-to-S:	ACK ( ACK = y+1			 )
 <p>运行于 TCP 协议上的：</p>
 
 <ol>
-  <li><code class="highlighter-rouge">HTTP</code> 超文本传输协议：用于浏览器与服务器间的通信（传输数据）。基于 TCP 协议，先（3 次握手）建立 TCP 连接，再发送 HTTP 请求。功能包括：事务处理、缓存控制、标记媒体类型等。代理服务器常用端口号：<code class="highlighter-rouge">80/8080/3128/8081/9098</code>。
+  <li><code class="highlighter-rouge">HTTP</code> 超文本传输协议（<code class="highlighter-rouge">HyperText Transfer Protocol</code>）：用于浏览器与服务器间的通信（传输数据）。基于 <strong>TCP 协议</strong>，先（3 次握手）建立 TCP 连接，再发送 HTTP 请求。功能包括：事务处理、缓存控制、标记媒体类型等。默认的 HTTP 通信端口是 <strong>80</strong>。
     <ol>
+      <li>当在Web浏览器中输入一个URL时，如果没有指定端口号，浏览器会默认使用<strong>端口80</strong>与Web服务器建立连接，以获取网页内容。</li>
+      <li><strong>代理服务器</strong>常用端口号：<code class="highlighter-rouge">80/8080/3128/8081/9098</code>。</li>
       <li><code class="highlighter-rouge">HTTPS </code>服务器，默认端口号为<code class="highlighter-rouge"> 443/TCP,UDP</code>。</li>
-      <li><code class="highlighter-rouge">Tomcat</code> 默认端口号为<code class="highlighter-rouge">8080</code>。</li>
+      <li><strong><code class="highlighter-rouge">Tomcat</code> 默认端口号</strong>为<code class="highlighter-rouge">8080</code>。</li>
       <li><code class="highlighter-rouge">MySQL  </code> 默认端口号为 <code class="highlighter-rouge">3306/TCP,UDP</code>。</li>
       <li><code class="highlighter-rouge">Redis  </code> 默认端口号为 <code class="highlighter-rouge">6379</code>。</li>
       <li><code class="highlighter-rouge">Elasticsearch</code> 默认端口号为 <code class="highlighter-rouge">9200/9300</code>，<code class="highlighter-rouge">Kibana</code> 默认端口为 <code class="highlighter-rouge">5601</code>。</li>
@@ -276,7 +334,11 @@ B-to-S:	ACK ( ACK = y+1			 )
   <li>RabbitMQ：<code class="highlighter-rouge">15672</code>.</li>
 </ul>
 
-<h4 id="http">HTTP</h4>
+<h4 id="dns-域名解析协议">DNS 域名解析协议</h4>
+
+<p><a href="#浏览器访问网页的过程"><code class="highlighter-rouge">DNS</code> 域名解析协议</a></p>
+
+<h4 id="httphttps-协议">HTTP、HTTPS 协议</h4>
 
 <h5 id="http10--vs--http11">HTTP/1.0  vs  HTTP/1.1</h5>
 
@@ -347,14 +409,14 @@ B-to-S:	ACK ( ACK = y+1			 )
           <li><code class="highlighter-rouge">text/plain, image/jpeg</code></li>
         </ol>
       </li>
-      <li>Referer 表示这个请求是从哪个URL过来的；</li>
+      <li><strong><code class="highlighter-rouge">Referer</code></strong> ：表示这个请求是从哪个URL过来的；用于 CDN（内容分发网络）<strong>防盗链</strong>，防止静态资源被盗刷。</li>
       <li><code class="highlighter-rouge">User-Agent:</code> （产生请求的）浏览器类型，兼容性及定制化需求；</li>
       <li><code class="highlighter-rouge">Host: localhost:8088</code> 请求的<strong>主机名</strong>，允许多个域名同处一个IP地址，即<strong>虚拟主机</strong>；</li>
-      <li><code class="highlighter-rouge">Content-Type:</code>
+      <li><code class="highlighter-rouge">Content-Type:</code> 用于定义网络文件的类型和网页的编码，决定浏览器将以什么形式、什么编码读取这个文件。在请求（例如 <code class="highlighter-rouge">POST</code> 或 <code class="highlighter-rouge">PUT</code>）中，客户端会告诉服务器实际发送的数据类型。在响应中，向客户端提供返回内容的实际内容类型。与 <code class="highlighter-rouge">@RequestParam、@RequestBody</code> 相关。
         <ol>
-          <li><code class="highlighter-rouge">application/json;charset=UTF-8</code></li>
-          <li><code class="highlighter-rouge">text/plain</code></li>
+          <li><code class="highlighter-rouge">application/json;charset=UTF-8</code>： JSON数据格式， 作为响应头肯定不陌生。实际上，现在越来越多的人把它作为请求头，用来告诉服务端消息主体是序列化后的 JSON 字符串。</li>
           <li><code class="highlighter-rouge">application/x-www-form-urlencoded</code></li>
+          <li><code class="highlighter-rouge">text/plain</code></li>
           <li><code class="highlighter-rouge">multipart/form-data; boundary=WebAppBoundary </code></li>
         </ol>
       </li>
@@ -429,48 +491,225 @@ B-to-S:	ACK ( ACK = y+1			 )
 </ul>
 
 <p>状态码：</p>
+
 <ol>
-  <li><code class="highlighter-rouge">1XX</code>：表示接收到请求，正在处理。</li>
-  <li><code class="highlighter-rouge">2XX</code>：表示请求<strong>正常</strong>处理完毕。
-    <ul>
-      <li><code class="highlighter-rouge">200 (OK</code>：<strong>请求成功</strong>，表明该请求被成功完成，所请求的资源已发送到客户端。一般用于 GET 或 POST；</li>
-      <li><code class="highlighter-rouge">202</code>：接受和处理、但处理未完成</li>
-      <li><code class="highlighter-rouge">203</code>：返回信息不确定或不完整</li>
-      <li><code class="highlighter-rouge">204</code>：请求收到，但返<strong>回信息为空</strong></li>
-      <li><code class="highlighter-rouge">205</code>：服务器完成了请求，用户代理必须复位当前已经浏览过的文件</li>
-      <li><code class="highlighter-rouge">206 (Partial Content)</code>：范围请求。</li>
-    </ul>
-  </li>
-  <li><code class="highlighter-rouge">3XX</code>：<strong>重定向</strong>，需附加操作以完成请求；让客户端再发起一个请求以完成整个处理。
-    <ul>
-      <li><del><code class="highlighter-rouge">301</code>：永久重定向，表示旧地址的资源已被永久移除（不可访问了）；</del></li>
-      <li><code class="highlighter-rouge">302</code>：临时重定向，表示旧地址的资源还在（仍可访问），只是临时跳转到新地址，搜索引擎会抓取新地址的内容而保存旧网址；SEO 302 好于 301；</li>
-      <li><code class="highlighter-rouge">303 (See Other)</code>：<strong>重定向到其它页面</strong>，目标 URL 在响应报文头的 Location 属性；</li>
-      <li><code class="highlighter-rouge">304 (Not Modified)</code>：资源（自上次取得后）<strong>并未修改</strong>，直接用本地的缓存。</li>
-    </ul>
-  </li>
-  <li><code class="highlighter-rouge">4XX</code>：<strong>客户端</strong>错误。
-    <ul>
-      <li><code class="highlighter-rouge">400 (Bad Request)</code>：客户端请求有<strong>语法错误</strong>，不能被服务器所理解；</li>
-      <li><code class="highlighter-rouge">401 (Unauthorized)</code>：<strong>请求未经授权</strong>，必须和 <code class="highlighter-rouge">WWW-Authenticate</code> 头域一起使用；常见于用户未登录的情况；</li>
-      <li><code class="highlighter-rouge">403 (Forbidden)</code>：服务器<strong>拒绝请求</strong>，禁止访问资源。常见于机密信息或复制其它登录用户链接访问服务器的情况；</li>
-      <li><code class="highlighter-rouge">404 (NotFound)</code>：服务器<strong>无法取得所请求的网页</strong>，请求资源不存在。如输入错误的URL；</li>
-      <li><code class="highlighter-rouge">409 (Conflict)</code>：请求与当前资源的规定冲突；</li>
-      <li><code class="highlighter-rouge">410 (Gone)</code>：资源已被永久转移，且没有任何已知的转发地址。</li>
-    </ul>
-  </li>
-  <li><code class="highlighter-rouge">5XX</code>：<strong>服务器端</strong>错误。
-    <ul>
-      <li><code class="highlighter-rouge">500 (Internal Server Error)</code>：服务器发生不可预期的错误，通过服务端日志查看抛出的异常；</li>
-      <li><code class="highlighter-rouge">501 (Internal Server Error)</code>：<strong>内部服务器错误</strong>；</li>
-      <li><code class="highlighter-rouge">503 (Server Unavailable)</code>：服务器当前<strong>不能处理客户端的请求</strong>，一段时间后可能恢复正常；</li>
-      <li><code class="highlighter-rouge">504</code>：关口过载（路由出错？），服务器使用另一个关口或服务来响应用户，等待时间设定值较长</li>
-      <li><code class="highlighter-rouge">505</code>：服务器不支持或拒绝支请求头中指定的HTTP版本
-        <h4 id="http-缓存机制">HTTP 缓存机制</h4>
-      </li>
-    </ul>
-  </li>
+  <li><code class="highlighter-rouge">1XX</code>：接收到请求，正在处理。</li>
+  <li><code class="highlighter-rouge">2XX</code>：请求<strong>正常</strong>处理完毕。</li>
+  <li><code class="highlighter-rouge">3XX</code>：<strong>重定向</strong>，需附加操作以完成请求；让客户端再发起一个请求以完成整个处理。</li>
+  <li><code class="highlighter-rouge">4XX</code>：<strong>客户端</strong>错误。</li>
+  <li><code class="highlighter-rouge">5XX</code>：<strong>服务器端</strong>错误。</li>
 </ol>
+
+<table>
+  <thead>
+    <tr>
+      <th>状态码</th>
+      <th>状态</th>
+      <th>解释</th>
+      <th>举例</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="highlighter-rouge">1XX</code></td>
+      <td> </td>
+      <td>接收到请求，正在处理。</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">2XX</code></td>
+      <td> </td>
+      <td>请求<strong>正常</strong>处理完毕。</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">200 </code></td>
+      <td>OK</td>
+      <td><strong>请求成功</strong>，表明该请求被成功完成，所请求的资源已发送到客户端。</td>
+      <td>一般用于 GET 或 POST。</td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">202</code></td>
+      <td> </td>
+      <td>接受和处理、但处理未完成。</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">203</code></td>
+      <td> </td>
+      <td>返回信息不确定或不完整。</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">204</code></td>
+      <td> </td>
+      <td>请求收到，但返<strong>回信息为空</strong>。</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">205</code></td>
+      <td> </td>
+      <td>服务器完成了请求，用户代理必须复位当前已经浏览过的文件。</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">206 </code></td>
+      <td>Partial Content</td>
+      <td>范围请求。</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">3XX</code></td>
+      <td> </td>
+      <td><strong>重定向</strong>，需附加操作以完成请求；让客户端再发起一个请求以完成整个处理。</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><del><code class="highlighter-rouge">301</code></del></td>
+      <td> </td>
+      <td><del>永久重定向，表示旧地址的资源已被永久移除（不可访问了）；</del></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">302</code></td>
+      <td> </td>
+      <td>临时重定向，表示旧地址的资源还在（仍可访问），只是临时跳转到新地址，搜索引擎会抓取新地址的内容而保存旧网址；</td>
+      <td>SEO 302 好于 301</td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">303 </code></td>
+      <td>See Other</td>
+      <td><strong>重定向到其它页面</strong>，目标 URL 在响应报文头的 Location 属性；</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">304 </code></td>
+      <td>Not Modified</td>
+      <td>资源（自上次取得后）<strong>并未修改</strong>，直接用本地的缓存。</td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th>状态码</th>
+      <th>状态</th>
+      <th>解释</th>
+      <th>举例</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="highlighter-rouge">4XX</code></td>
+      <td> </td>
+      <td><strong>客户端</strong>错误。</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">400 </code></td>
+      <td>Bad Request</td>
+      <td>客户端请求有<strong>语法错误</strong>，不能被服务器所理解。</td>
+      <td>如果将 Content-Type 或 Accept 标头设置为 application/json 以外的值（如 text/plain），收到 400 响应。</td>
+    </tr>
+    <tr>
+      <td><strong><code class="highlighter-rouge">401 </code></strong></td>
+      <td>Unauthorized</td>
+      <td><strong>请求未经授权</strong>，必须和 <code class="highlighter-rouge">WWW-Authenticate</code> 头域一起使用。</td>
+      <td>常见于用户未登录的情况。  使用 JWT 时，用户未登录、token 不对、已过期。<code class="highlighter-rouge">Authorization Bearer Token</code>。</td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">403 </code></td>
+      <td>Forbidden</td>
+      <td>服务器<strong>拒绝请求</strong>，禁止访问资源。常见于机密信息或复制其它登录用户链接访问服务器的情况。</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">404 </code></td>
+      <td>NotFound</td>
+      <td>服务器<strong>无法取得所请求的网页</strong>，请求资源不存在。如输入错误的URL。</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><strong><code class="highlighter-rouge">405</code></strong></td>
+      <td>Method Not Allowed</td>
+      <td>使用了不支持的<strong>请求方法</strong>来访问资源。</td>
+      <td>后端为 POST 方法，测试时却用了 GET。</td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">409 </code></td>
+      <td>Conflict</td>
+      <td>请求与当前资源的规定冲突。</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">410 </code></td>
+      <td>Gone</td>
+      <td>资源已被永久转移，且没有任何已知的转发地址。</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">5XX</code></td>
+      <td> </td>
+      <td><strong>服务器端</strong>错误。</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><strong><code class="highlighter-rouge">500</code></strong></td>
+      <td>Internal Server Error</td>
+      <td>服务器发生不可预期的错误，通过服务端日志查看抛出的异常。</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">501</code></td>
+      <td>Internal Server Error</td>
+      <td><strong>内部服务器错误</strong>。</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">503</code></td>
+      <td>Server Unavailable</td>
+      <td>服务器当前<strong>不能处理客户端的请求</strong>，一段时间后可能恢复正常。</td>
+      <td>如服务器未启动、没有可以处理请求的客户端（已被占用）</td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">504</code></td>
+      <td> </td>
+      <td>关口过载（路由出错？），服务器使用另一个关口或服务来响应用户，等待时间设定值较长。</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">505</code></td>
+      <td> </td>
+      <td>服务器不支持或拒绝支请求头中指定的HTTP版本。</td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c1">// ========== 客户端错误段 ==========</span>
+<span class="n">ErrorCode</span> <span class="n">BAD_REQUEST</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ErrorCode</span><span class="o">(</span><span class="mi">400</span><span class="o">,</span> <span class="s">"请求参数不正确"</span><span class="o">);</span>
+<span class="n">ErrorCode</span> <span class="n">UNAUTHORIZED</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ErrorCode</span><span class="o">(</span><span class="mi">401</span><span class="o">,</span> <span class="s">"账号未登录"</span><span class="o">);</span>
+<span class="n">ErrorCode</span> <span class="n">FORBIDDEN</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ErrorCode</span><span class="o">(</span><span class="mi">403</span><span class="o">,</span> <span class="s">"没有该操作权限"</span><span class="o">);</span>
+<span class="n">ErrorCode</span> <span class="n">NOT_FOUND</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ErrorCode</span><span class="o">(</span><span class="mi">404</span><span class="o">,</span> <span class="s">"请求未找到"</span><span class="o">);</span>
+<span class="n">ErrorCode</span> <span class="n">METHOD_NOT_ALLOWED</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ErrorCode</span><span class="o">(</span><span class="mi">405</span><span class="o">,</span> <span class="s">"请求方法不正确"</span><span class="o">);</span>
+<span class="n">ErrorCode</span> <span class="n">LOCKED</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ErrorCode</span><span class="o">(</span><span class="mi">423</span><span class="o">,</span> <span class="s">"请求失败，请稍后重试"</span><span class="o">);</span> <span class="c1">// 并发请求，不允许</span>
+<span class="n">ErrorCode</span> <span class="n">TOO_MANY_REQUESTS</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ErrorCode</span><span class="o">(</span><span class="mi">429</span><span class="o">,</span> <span class="s">"请求过于频繁，请稍后重试"</span><span class="o">);</span>
+
+<span class="c1">// ========== 服务端错误段 ==========</span>
+<span class="n">ErrorCode</span> <span class="n">INTERNAL_SERVER_ERROR</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ErrorCode</span><span class="o">(</span><span class="mi">500</span><span class="o">,</span> <span class="s">"系统异常"</span><span class="o">);</span>
+<span class="n">ErrorCode</span> <span class="n">NOT_IMPLEMENTED</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ErrorCode</span><span class="o">(</span><span class="mi">501</span><span class="o">,</span> <span class="s">"功能未实现/未开启"</span><span class="o">);</span>
+<span class="n">ErrorCode</span> <span class="n">ERROR_CONFIGURATION</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ErrorCode</span><span class="o">(</span><span class="mi">502</span><span class="o">,</span> <span class="s">"错误的配置项"</span><span class="o">);</span>
+
+<span class="c1">// ========== 自定义错误段 ==========</span>
+<span class="n">ErrorCode</span> <span class="n">REPEATED_REQUESTS</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ErrorCode</span><span class="o">(</span><span class="mi">900</span><span class="o">,</span> <span class="s">"重复请求，请稍后重试"</span><span class="o">);</span> <span class="c1">// 重复请求</span>
+<span class="n">ErrorCode</span> <span class="n">DEMO_DENY</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ErrorCode</span><span class="o">(</span><span class="mi">901</span><span class="o">,</span> <span class="s">"演示模式，禁止写操作"</span><span class="o">);</span>
+
+<span class="n">ErrorCode</span> <span class="n">UNKNOWN</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ErrorCode</span><span class="o">(</span><span class="mi">999</span><span class="o">,</span> <span class="s">"未知错误"</span><span class="o">);</span>
+</code></pre></div></div>
+
+<h4 id="http-缓存机制">HTTP 缓存机制</h4>
 
 <blockquote>
   <p>HTTP性能优化</p>
@@ -539,6 +778,51 @@ B-to-S:	ACK ( ACK = y+1			 )
   </li>
 </ol>
 
+<h4 id="加密和解密算法">加密和解密算法</h4>
+
+<blockquote>
+  <p>见 SSM 文档中 Spring Security 的加密机制部分。</p>
+</blockquote>
+
+<h5 id="对称加密">对称加密</h5>
+
+<p>对称加密算法：指加密和解密使用<strong>同一个密钥</strong>，也叫<strong>共享密钥</strong>加密。</p>
+
+<p><img src="assets/symmetric-encryption.png" alt="对称加密" /></p>
+
+<p>常见的对称加密算法有 DES、3DES、AES 等。</p>
+
+<p>缺点：公钥可能被泄露。</p>
+
+<h5 id="非对称加密">非对称加密</h5>
+
+<p>非对称加密算法：指加密和解密使用<strong>不同的密钥</strong>。即公钥和私钥。公钥可以公开给任何人使用，私钥则要保密。</p>
+
+<ul>
+  <li>如果用公钥加密数据，只能用对应的私钥解密；</li>
+  <li>如果用私钥加密数据，只能用对应的公钥解密（签名）。这样就可以实现数据的安全传输和身份认证。</li>
+</ul>
+
+<p><img src="assets/asymmetric-encryption.png" alt="非对称加密" /></p>
+
+<p>常见的非对称加密算法有 RSA、DSA、ECC 等。</p>
+
+<p>公钥加密（对称加密的秘钥），私钥解密。防偷看。</p>
+
+<p>可能会受到<strong>中间人攻击</strong>：中间人<strong>伪造另一个公钥</strong>加密发给对方，收到数据后根据伪造公钥解密获取数据，（再加密返回给发送方）。</p>
+
+<p>解决方法：私钥加密（签名），公钥解密（验签）。可以防篡改。</p>
+
+<h5 id="http-ca">HTTP CA</h5>
+
+<p>CA 认证：</p>
+
+<h4 id="session-和-cookie">Session 和 Cookie</h4>
+
+<blockquote>
+  <p>见</p>
+</blockquote>
+
 <h3 id="uri-和-url-的区别是什么">URI 和 URL 的区别是什么?</h3>
 
 <ul>
@@ -560,9 +844,13 @@ B-to-S:	ACK ( ACK = y+1			 )
 
 <h3 id="浏览器访问网页的过程">浏览器访问网页的过程</h3>
 
-<p><img src="assets/DNS域名解析拓扑图.jpg" alt="img" style="zoom:60%;" /></p>
+<h4 id="前端发送请求">前端发送请求</h4>
 
-<h5 id="url-网址解析">URL 网址解析</h5>
+<p>用户交互：用户在前端界面（如网页或移动应用）上进行操作，触发请求。</p>
+
+<p>构建请求：前端根据用户操作，构建 HTTP 请求，包括请求方法（如 GET 、POST）、请求头（如 Content-Type 、Authorization 等）、请求参数（如查询参数、表单数据、JSON 数据等）。</p>
+
+<h4 id="url-网址解析">URL 网址解析</h4>
 
 <p><code class="highlighter-rouge">Q1</code>：URL 统一资源定位符：用于定位互联网上资源，俗称网址。提取<strong>域名</strong>。</p>
 
@@ -574,75 +862,181 @@ scheme://host.domain:port/path/filename?&lt;参数&gt;
   <li><code class="highlighter-rouge">scheme</code>：因特网服务的类型。常见的协议有 http、https、ftp、file。</li>
   <li><code class="highlighter-rouge">host</code>：域主机（http 的默认主机是 www）；</li>
   <li><code class="highlighter-rouge">domain</code>：因特网/Web 服务器<strong>域名</strong>，主机地址，如 w3school.com.cn；</li>
-  <li><code class="highlighter-rouge">port</code>：主机上的端口号（http 的默认端口号是 80）；</li>
+  <li><code class="highlighter-rouge">port</code>：主机上的端口号（http 的<strong>默认端口号是 80</strong>）；如果没有指定端口号，浏览器会默认使用<strong>端口80</strong>与<strong>Web服务器</strong>建立连接，以获取网页内容。</li>
   <li><code class="highlighter-rouge">path</code>：服务器上的资源路径地址（如果省略，则文档必须位于网站的根目录中）；</li>
   <li><code class="highlighter-rouge">filename</code>：文档/资源名；</li>
 </ol>
 
-<h5 id="dns-域名解析">DNS 域名解析</h5>
+<p><img src="assets/DNS域名解析拓扑图.jpg" alt="img" style="zoom:60%;" /></p>
 
-<p><code class="highlighter-rouge">DNS</code> 域名解析（网络层？应用层？）：通过网址/域名查找服务器的 <strong>IP 地址</strong>，基于（网络层的）路由和 <code class="highlighter-rouge">IP</code> 寻址、（传输层的）UDP 协议；</p>
+<h4 id="dns-域名解析">DNS 域名解析</h4>
+
+<p><code class="highlighter-rouge">DNS</code> 域名解析（网络层？应用层？）：通过<strong>网址/域名</strong>查找服务器的 <strong>IP 地址</strong>，基于（网络层的）路由和 <code class="highlighter-rouge">IP</code> 寻址、（传输层的）UDP 协议。</p>
+
+<p><strong>主机记录</strong>（A记录）：将特定的主机名映射到对应主机的IP地址上。是用于名称解析的重要记录。</p>
+
+<p><strong>DNS 服务器</strong>分为四类：记录了主机名到IP地址的映射关系。</p>
+
+<ol>
+  <li><strong>根 DNS 服务器</strong>。</li>
+  <li><strong>顶级域 DNS 服务器</strong>：负责管理在该顶级域名服务器下注册的<strong>主域名</strong>。
+    <ol>
+      <li><code class="highlighter-rouge">.com</code>是<strong>顶级域名；</strong></li>
+      <li><code class="highlighter-rouge">aliyun.com</code>是<strong>主域名</strong>，也叫二级域名；</li>
+      <li><code class="highlighter-rouge">example.aliyun.com</code>、<code class="highlighter-rouge">www.aliyun.com</code>是<strong>子域名</strong>，也叫三级域名；</li>
+      <li><code class="highlighter-rouge">test.example.aliyun.com</code>是<strong>子域名的子域</strong>，也叫四级域名。</li>
+    </ol>
+  </li>
+  <li><strong>权威 DNS 服务器</strong>：在特定区域内具有唯一性，负责维护该区域内的域名与IP地址之间的对应关系。例如云解析DNS的公网权威解析。</li>
+  <li><strong>本地 DNS 服务器</strong>：是<strong>响应</strong>来自客户端的递归请求，并<strong>最终跟踪</strong>直到获取到解析结果的DNS服务器。
+    <ol>
+      <li>TCP/IP 参数中设置的首选 DNS 服务器，一般是<strong>运营商区域 DNS 服务器</strong>，根据 <strong><code class="highlighter-rouge">DHCP</code> 动态主机设置协议</strong>自动分配 IP 地址。</li>
+      <li>例如用户本机自动分配的DNS、运营商ISP分配的DNS、谷歌/223.5.5.5公共DNS等。</li>
+      <li>由 ISP（<code class="highlighter-rouge">Internet Service Provider</code>，互联网服务提供商）提供的，如电信/移动宽带、大型互联网公司。</li>
+    </ol>
+  </li>
+</ol>
+
+<p>DNS 查询有两种方式：</p>
+
+<ul>
+  <li>递归查询</li>
+  <li>迭代查询</li>
+</ul>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>域名 		  服务器外网IP地址  端口
 baidu.com	220.114.23.56 	80
 </code></pre></div></div>
 
+<h5 id="客户机本机dns-解析">客户机（<strong>本机</strong>）DNS 解析</h5>
+
 <ol>
-  <li>客户机（<strong>本机</strong>）DNS 解析：
-    <ol>
-      <li><code class="highlighter-rouge">Q2</code>：浏览器查询<strong>DNS 解析缓存</strong>（域名和 IP 地址映射关系，有时间和大小双重限制），命中则直接返回，未命中（没有找到记录或记录已过期）；</li>
-      <li><del>路由器缓存；</del></li>
-      <li><code class="highlighter-rouge">Q3</code>：查询本地 <code class="highlighter-rouge">HOSTS</code> 文件（本机操作系统缓存）；</li>
-    </ol>
-  </li>
-  <li><code class="highlighter-rouge">Q4</code>：浏览器向本地 DNS 服务器（正式）发送解析请求（递归查询）：
-    <ol>
-      <li><strong>本地 DNS 服务器</strong>：TCP/IP 参数中设置的首选 DNS 服务器，一般是运营商区域 DNS 服务器，由ISP（Internet Service Provider，互联网服务提供商，如电信/移动宽带、大型互联网公司提供的）的 DNS 服务器、根据 <strong><code class="highlighter-rouge">DHCP</code> 动态主机设置协议</strong>自动分配 IP 地址；</li>
-      <li><code class="highlighter-rouge">Q5</code>：查询本地区域资源配置：如果域名在区域中（命中），则返回解析结果，<strong>有权威性</strong>；如果不在区域中，</li>
-      <li><code class="highlighter-rouge">Q6</code>：查询<strong>本地 DNS （解析结果）缓存</strong>：命中直接返回解析结果，没有权威性；
-        <ul>
-          <li>TTL（Time To Live）参数：设置本地 DNS 服务器对于域名的缓存（最长）时间，过期失效后将删除这条记录。如，阿里云解析默认的 TTL 是10分钟。</li>
-        </ul>
-      </li>
-    </ol>
-  </li>
-  <li>本地 DNS 服务器有两种配置：
-    <ol>
-      <li>配置直接<strong>转发 DNS</strong>，<strong>递归查询</strong> DNS；每一级与本地 DNS 查询一样；一般是先向<strong>根域服务器</strong>查询（<code class="highlighter-rouge">Q7</code>），再由根域名服务器一级级（<code class="highlighter-rouge">Q8 -&gt; Q10 -&gt; Q12</code>）向下查询，最后将得到的查询结果逐级（<code class="highlighter-rouge">A12 -&gt; A10 -&gt; A8 -&gt; A7</code>）返回给本地 DNS 服务器，再返回给浏览器。</li>
-      <li>不配置转发 DNS，通过<strong>根提示</strong>进行<strong>迭代查询</strong>：根 DNS 服务器不是自己向其他 DNS 服务器进行查询，而是返回能解析该域名的其他 DNS 服务器的 IP 地址，本地 DNS 服务器再继续向这些 DNS 服务器<strong>迭代查询</strong>，直到得到结果：
-        <ol>
-          <li><code class="highlighter-rouge">Q7</code>：本地 DNS 服务器根据根提示，向<strong>根 DNS 服务器</strong>发起 DNS 解析请求；
-            <ul>
-              <li><code class="highlighter-rouge">Q8</code>：根 DNS 服务器查询（负责管理目标域名的） <code class="highlighter-rouge">.com</code> 顶级域名对应的（DNS 服务器的）IP 地址，返回给本地 DNS 服务器；</li>
-            </ul>
-          </li>
-          <li><code class="highlighter-rouge">Q9</code>：本地 DNS 服务器向 <code class="highlighter-rouge">.com</code> <strong>顶级域名 DNS 服务器</strong>发起 DNS 解析请求；
-            <ul>
-              <li><code class="highlighter-rouge">Q10</code>：<code class="highlighter-rouge">.com</code> 顶级域名 DNS 服务器查询（负责管理目标域名的） <code class="highlighter-rouge">baidu.com</code> 子域名对应的（DNS 服务器的）IP 地址，返回给本地 DNS 服务器；</li>
-            </ul>
-          </li>
-          <li><code class="highlighter-rouge">Q11、Q12</code>：不断迭代（如二级域名），直到获得目标域名对应的 IP 地址，返回给本地 DNS 服务器；</li>
-          <li><code class="highlighter-rouge">A11</code>：将域名解析的结果（以域名和 IP 地址键值对的形式）写入<strong>本地 DNS 解析缓存表</strong>，并设置 TTL；</li>
-        </ol>
-      </li>
-      <li>将域名解析的结果返回给<strong>浏览器</strong>，更新<strong>浏览器 DNS 缓存</strong>；</li>
-    </ol>
-  </li>
-  <li><code class="highlighter-rouge">Q13</code>：浏览器根据 IP 地址生成 HTTP 请求，发送给服务器。</li>
+  <li><code class="highlighter-rouge">Q2</code>：浏览器查询 <strong>DNS 解析缓存</strong>（域名和 IP 地址映射关系，有时间和大小双重限制），命中则直接返回，未命中（没有找到记录或记录已过期）；</li>
+  <li><del>路由器缓存；</del></li>
+  <li><code class="highlighter-rouge">Q3</code>：查询本地 <code class="highlighter-rouge">HOSTS</code> 文件（本机操作系统缓存）；</li>
 </ol>
 
-<h5 id="dns-负载均衡">DNS 负载均衡</h5>
+<h5 id="本地-dns-解析">本地 DNS 解析</h5>
+
+<ol>
+  <li><code class="highlighter-rouge">Q4</code>：浏览器向本地 DNS 服务器（正式）发送解析请求：</li>
+  <li><code class="highlighter-rouge">Q5</code>：查询本地区域资源配置：如果域名在区域中（命中），则返回解析结果，<strong>有权威性</strong>；如果不在区域中，</li>
+  <li><code class="highlighter-rouge">Q6</code>：查询本地 DNS <strong>解析结果缓存</strong>：命中直接返回解析结果，没有权威性；
+    <ul>
+      <li>TTL（<code class="highlighter-rouge">Time To Live</code>）参数：设置本地 DNS 服务器对于域名的最长缓存时间，过期失效后将删除这条记录。如，阿里云解析默认的 TTL 是10分钟。</li>
+    </ul>
+  </li>
+</ol>
+
+<p>如果<strong>本地 DNS 服务器</strong>自己在本地和缓存中都查不到，则有两种查询配置：</p>
+
+<ol>
+  <li>递归查询</li>
+  <li>迭代查询</li>
+</ol>
+
+<h6 id="递归查询">递归查询</h6>
+
+<p>递归查询：配置<strong>直接转发 DNS</strong>，递归查询 DNS。</p>
+
+<ol>
+  <li>本地 DNS 服务器向<strong>根服务器</strong>查询（<code class="highlighter-rouge">Q7</code>），如果<strong>根服务器</strong>在本地或缓存中查到则直接返回；</li>
+  <li>如果<strong>根服务器自己</strong>查不到，则<strong>根服务器</strong>再向顶级域服务器查询（<code class="highlighter-rouge">Q8</code>），如果<strong>顶级域服务器</strong>在本地或缓存中查到则直接返回给<strong>根服务器</strong>（<code class="highlighter-rouge">A8</code>）；</li>
+  <li>再一级级（<code class="highlighter-rouge">Q7 -&gt; Q8 -&gt; Q10 -&gt; Q12</code>）<strong>递归向下查询</strong>，直到得到目标域名对应的 IP 地址。</li>
+  <li>最后将得到的查询结果（倒序）<strong>逐级返回</strong>给<strong>权威</strong>域名服务器、顶级域服务器、根服务器、本地 DNS 服务器（<code class="highlighter-rouge">A12 -&gt; A10 -&gt; A8 -&gt; A7</code>），最后返回给浏览器。</li>
+</ol>
+
+<p>特点：</p>
+
+<ol>
+  <li>用户只需问一次、等一次。只需要等递归服务器给出最后的解析结果即可</li>
+  <li>递归服务器压力较大，需要走完整查询流程。</li>
+  <li>这是客户端和本地DNS之间<strong>最常见</strong>的方式。</li>
+</ol>
+
+<p>常见应用：</p>
+
+<ul>
+  <li>普通用户/PC/浏览器 ：只有递归查询，不处理迭代查询。</li>
+  <li>本地DNS服务器（如宽带运营商、公网8.8.8.8、公司内网DNS）：通常承担递归解析的角色，对外（向根、TLD、权威DNS）发起迭代查询。</li>
+  <li>公共DNS服务器：对用户递归，对更上级DNS迭代。</li>
+</ul>
+
+<h6 id="迭代查询">迭代查询</h6>
+
+<p>迭代查询：不转发 DNS，通过<strong>根提示</strong>进行迭代查询。</p>
+
+<ul>
+  <li>根 DNS 服务器不是自己向其他 DNS 服务器进行查询，而是返回能解析该域名的其他 DNS 服务器的 IP 地址，本地 DNS 服务器再继续向这些 DNS 服务器<strong>迭代查询</strong>，直到得到目标域名对应的 IP 地址。</li>
+</ul>
+
+<p>详细步骤：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">Q7</code>：本地 DNS 服务器根据根提示，向<strong>根 DNS 服务器</strong>发起 DNS 解析请求；
+    <ul>
+      <li><code class="highlighter-rouge">A7</code>：根 DNS 服务器查询（负责管理目标域名的） <code class="highlighter-rouge">.com</code> 顶级域名对应的（DNS 服务器的）IP 地址，返回给本地 DNS 服务器；</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">Q9</code>：本地 DNS 服务器向 <code class="highlighter-rouge">.com</code> <strong>顶级域名 DNS 服务器</strong>发起 DNS 解析请求；
+    <ul>
+      <li><code class="highlighter-rouge">A9</code>：<code class="highlighter-rouge">.com</code> 顶级域名 DNS 服务器查询（负责管理目标域名的） <code class="highlighter-rouge">baidu.com</code> 子域名对应的（DNS 服务器的）IP 地址，返回给本地 DNS 服务器；</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">Q11</code>：不断迭代（如二级域名），直到获得目标域名对应的 IP 地址，返回给本地 DNS 服务器；
+    <ul>
+      <li><code class="highlighter-rouge">A11</code>：</li>
+    </ul>
+  </li>
+</ol>
+
+<p>特点：</p>
+
+<ul>
+  <li>每一步都需要客户端自己去问。</li>
+  <li>服务器压力较小，但客户端负担大（通常不这样用）。</li>
+</ul>
+
+<p>常见应用：</p>
+
+<ul>
+  <li>根DNS服务器、TLD服务器、权威DNS服务器。</li>
+  <li>企业、学校等自建的DNS服务器。</li>
+  <li>公共DNS服务器：对用户递归，对更上级DNS迭代。</li>
+</ul>
+
+<h6 id="更新本地-dns-缓存">更新本地 DNS 缓存</h6>
+
+<ol>
+  <li>更新本地 DNS 缓存：将域名解析的结果（以域名和 IP 地址键值对的形式）写入<strong>本地 DNS 解析缓存表</strong>，并设置 TTL；</li>
+  <li><code class="highlighter-rouge">A4</code>：将域名解析的结果返回给<strong>浏览器</strong>，更新<strong>浏览器 DNS 缓存</strong>；</li>
+</ol>
+
+<h5 id="生成-http-请求"><del>生成 HTTP 请求</del></h5>
+
+<p><code class="highlighter-rouge">Q13</code>：浏览器（根据 IP 地址）生成 HTTP 请求，发送给服务器。</p>
+
+<blockquote>
+  <p><strong>DNS 缓存污染/投毒</strong>（<code class="highlighter-rouge">DNS cache pollution/poisoning</code>）：指一些刻意制造的域名服务器数据包， 把域名指往不正确的 IP 地址。是常见的黑客攻击手段，也是防火长城的主要手段之一。</p>
+</blockquote>
+
+<h4 id="反向代理">反向代理</h4>
 
 <p>如果配备了 DNS 负载均衡：一个域名可能对应多个 IP 地址；</p>
 
 <ol>
-  <li>DNS 解析获得的 IP 地址是负载<strong>均衡服务器</strong>的 IP 地址；</li>
+  <li>DNS 解析获得的 IP 地址是<strong>负载均衡服务器</strong>的 IP 地址；</li>
   <li>负载均衡服务器根据设定的分配算法和规则（如根据每台机器的负载量，离用户地理位置的距离等），选择一台后端的（真实） Web 服务器 IP 地址并返回；</li>
 </ol>
 
-<p>DNS 缓存污染/投毒（DNS cache pollution/poisoning）：指一些刻意制造的域名服务器数据包， 把域名指往不正确的 IP 地址。是常见的黑客攻击手段，也是防火长城的主要手段之一。</p>
+<ul>
+  <li><strong>路由转发</strong>：根据配置规则（如 <code class="highlighter-rouge">location</code> 指令），<code class="highlighter-rouge">Nginx</code> 将请求转发到后端网关或服务。</li>
+  <li><strong>负载均衡</strong>：如果后端有多个服务实例，<code class="highlighter-rouge">Nginx</code> 还可以根据负载均衡策略（如轮询、最小连接数等），将请求分发到不同的服务实例上。</li>
+</ul>
 
-<h5 id="三次握手建立-tcp-连接">三次握手建立 TCP 连接</h5>
+<h4 id="api-网关">API 网关</h4>
+
+<h4 id="三次握手建立-tcp-连接">三次握手建立 TCP 连接</h4>
 
 <p>（传输层）发起 <code class="highlighter-rouge">TCP</code> 请求：浏览器（选择一个大于1024的本机端口（<code class="highlighter-rouge">8080</code>？）向目标 IP 地址的 <code class="highlighter-rouge">80</code> 端口）发起 TCP 连接请求，经过<a href="传输层">三次握手</a>建立 TCP 连接；Cookie 会随请求发送给服务器。</p>
 
@@ -653,13 +1047,13 @@ baidu.com	220.114.23.56 	80
   <li>对比缓存：将<strong>缓存标识</strong>发送给<strong>服务器</strong>，判断缓存是否过期，从而决定浏览器是否使用缓存（缓存策略）；</li>
 </ol>
 
-<h5 id="发送-http-请求">发送 HTTP 请求</h5>
+<h4 id="发送-http-请求">发送 HTTP 请求</h4>
 
 <p><img src="assets/扒皮模型.png" style="zoom:38%;" /><img src="assets/IP数据包.png" style="zoom:36%;" /></p>
 
 <p>应用层：建立 TCP 连接后，浏览器生成 <strong>HTTP 请求报文</strong>（请求行、请求头、请求体），发给服务器；</p>
 
-<p>应用层：<strong>HTTP 数据，+ （传输层）TCP 头部，+ （网络层）IP 头部，+ （数据链路层）以太网头部。</strong></p>
+<p>（应用层）<strong>HTTP 数据，+ （传输层）TCP 头部，+ （网络层）IP 头部，+ （数据链路层）以太网头部。</strong></p>
 
 <p><del>浏览器按照 HTTP 协议的格式<a href="#TCP/IP 四（五）层模型 VS OSI 七层模型">组装数据</a>，最终将数据按照 TCP/IP 协议的方式发送给服务器；</del></p>
 
@@ -673,7 +1067,7 @@ baidu.com	220.114.23.56 	80
   <li><del>服务器接收报文段并重组 HTTP 请求报文，解析并进行相应的处理；</del></li>
 </ol>
 
-<h5 id="服务器处理请求并返回-http-响应报文">服务器处理请求并返回 HTTP 响应报文</h5>
+<h4 id="服务器处理请求并返回-http-响应报文">服务器处理请求并返回 HTTP 响应报文</h4>
 
 <p>将请求转发到 <strong>Nginx 负载均衡（反向代理）服务器</strong>：将同一个应用部署在多台服务器上，将大量用户的请求分配给多台机器处理；</p>
 
@@ -683,11 +1077,11 @@ baidu.com	220.114.23.56 	80
   <li><del>将网页传递给 <code class="highlighter-rouge">filters</code> 链处理，</del>再返回给浏览器。</li>
 </ol>
 
-<h5 id="四次挥手断开-tcp-连接">四次挥手断开 TCP 连接</h5>
+<h4 id="四次挥手断开-tcp-连接">四次挥手断开 TCP 连接</h4>
 
 <p>当 TCP 连接超过一定时间或不再使用时（数据传送完毕、传输完一个网页的全部资源、收到全部内容后），<a href="#数据传输">四次挥手</a>断开（与服务器间的） TCP 连接。</p>
 
-<h5 id="浏览器解析并渲染网页">浏览器解析并渲染网页</h5>
+<h4 id="浏览器解析并渲染网页">浏览器解析并渲染网页</h4>
 
 <p><img src="assets/浏览器解析渲染网页.png" alt="img" style="zoom:80%;" /></p>
 
@@ -705,42 +1099,130 @@ baidu.com	220.114.23.56 	80
   <li>根据计算好的信息<strong>绘制</strong>（渲染）网页；</li>
   <li>页面引用了其他未加载的 image、css、js 文件等静态内容，从提供<strong>静态资源</strong>的服务器加载；
     <ul>
-      <li>CDN 内容分发网络：是依靠部署在各地的边缘服务器，使用户就近获取所需内容，降低网络拥塞，提高用户访问响应速度。</li>
+      <li>依靠部署在各地的边缘服务器，通过 <strong>CDN 内容分发网络</strong>就近获取静态资源</li>
     </ul>
   </li>
 </ol>
 
 <h3 id="跨域">跨域</h3>
 
-<p>跨域：指不同域名间相互访问。浏览器不能执行其他网站的脚本，是由同源策略（对于 JavaScript 所定义的安全限制策略）造成的。</p>
+<p>跨域（<code class="highlighter-rouge">Cross Origin</code>）：指不同站点之间，使用 AJAX 无法相互调用的问题。浏览器不能执行其他网站的脚本。</p>
 
-<h5 id="什么情况会跨域">什么情况会跨域</h5>
+<ul>
+  <li>跨域问题，本质是浏览器的限制（拦截了响应）。根本原因是由<strong>同源策略</strong>引起的。所谓同源，是指网络协议、域名、端口相同。</li>
+  <li>一种保护机制（JavaScript 所定义的安全限制策略），初衷是为了防止恶意网站窃取数据，阻止用户读取到另一个域名下的内容。 问题是也限制了不同站点之间的正常调用。</li>
+  <li>因为表单并不会获取新的内容，所以可以通过表单的方式发起跨域请求。</li>
+  <li>跨域并不能完全阻止 <strong>CSRF</strong>，因为请求能发出去，服务端能收到请求并正常返回结果，只是结果被浏览器拦截了。</li>
+</ul>
+
+<h4 id="什么情况会跨域">什么情况会跨域</h4>
+
+<p>在请求时，如果出现了以下情况中的任意一种，那么它就是跨域请求：</p>
 
 <ol>
-  <li>同一协议， 如 <code class="highlighter-rouge">http</code> 或 <code class="highlighter-rouge">https</code>；</li>
-  <li>同一IP地址，如 <code class="highlighter-rouge">127.0.0.1</code>；</li>
-  <li>同一端口，如 <code class="highlighter-rouge">8080</code>；</li>
+  <li>不同网络协议， 如 <code class="highlighter-rouge">http</code> 或 <code class="highlighter-rouge">https</code>；</li>
+  <li>不同域名（包括子域名、二级域名、IP地址），如 <code class="highlighter-rouge">127.0.0.1</code>；</li>
+  <li>不同端口：如项目部署时，前端项目和后端接口项目，二者端口不一致。</li>
 </ol>
 
-<p>以上三个条件任一条件不同就会产生跨域问题。</p>
+<h4 id="解决方案">解决方案</h4>
 
-<h5 id="解决方案">解决方案</h5>
-
-<p><strong>前端解决方案</strong></p>
+<h5 id="前端解决方案">前端解决方案</h5>
 
 <ol>
   <li>使用 JSONP 方式实现跨域调用；</li>
   <li>使用 NodeJS 服务器作为服务代理，前端发起请求到 NodeJS 服务器， 代理转发请求到后端服务器；</li>
 </ol>
 
-<p><strong>后端解决方案</strong></p>
+<h5 id="后端解决方案">后端解决方案</h5>
 
 <ol>
-  <li>Nginx 反向代理解决跨域；</li>
-  <li>服务端设置 Response Header（响应头部）的 <code class="highlighter-rouge">Access-Control-Allow-Origin</code>；</li>
-  <li>在需跨域访问的类和方法中设置允许跨域访问（如 Spring 中使用 <strong><code class="highlighter-rouge">@CrossOrigin</code>注解</strong>）；</li>
-  <li>继承使用 Spring Web 的<code class="highlighter-rouge">CorsFilter</code>（适用于Spring MVC、Spring Boot）；</li>
-  <li>实现 WebMvcConfigurer 接口（适用于Spring Boot）；</li>
+  <li>
+    <p>通过 **CORS ** Response 对象解决跨域：常见，通常仅需在服务端（实现 CORS 接口）配置 <code class="highlighter-rouge">Response Header</code>（响应头部）中的 <code class="highlighter-rouge">Access-Control-Allow-Origin</code> 字段。</p>
+
+    <ul>
+      <li><code class="highlighter-rouge">Cross-origin resource sharing</code>，跨域资源共享。</li>
+      <li>实现方式：响应数据包发送给浏览器后，浏览器就会根据这里配置的<strong>白名单放行</strong>，允许白名单的服务器对应的网页来用 ajax 跨域访问 。</li>
+    </ul>
+  </li>
+  <li>
+    <p>使用<strong>Nginx 反向代理</strong>配置解决跨域：推荐，配置简单。也是通过在响应头中添加特定的 HTTP 头来实现的。</p>
+
+    <ul>
+      <li>
+        <p>原理：因为跨域是浏览器限制的，服务器<strong>请求服务器</strong>不受浏览器同源策略限制。</p>
+
+        <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  location / {
+     add_header Access-Control-Allow-Origin *;
+     add_header Access-Control-Allow-Headers X-Requested-With;
+     add_header Access-Control-Allow-Methods GET,POST,PUT,DELETE,OPTIONS;
+        
+     if ($request_method = 'OPTIONS') {
+       return 204;
+     }
+  }
+</code></pre></div>        </div>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>使用 <strong><code class="highlighter-rouge">@CrossOrigin</code>注解</strong>：在需跨域访问的部分接口（类和方法）上设置；</p>
+  </li>
+  <li>
+    <p>继承使用 Spring Web 的 <code class="highlighter-rouge">CorsFilter</code>（适用于Spring MVC、Spring Boot）；</p>
+  </li>
+  <li>
+    <p>实现 <code class="highlighter-rouge">WebMvcConfigurer </code>接口（适用于Spring Boot）；</p>
+  </li>
+  <li>
+    <p>通过实现 <code class="highlighter-rouge">ResponseBodyAdvice</code>。</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">WebSocket </code>协议解决跨域：同源策略对 WebSocket 不适用。</p>
+
+    <ol>
+      <li>WebSocket 是一种浏览器的API，目标是在一个单独的持久连接上提供全双工、双向通信。</li>
+      <li>原理：在 JS 创建了 WebSocket 之后，会有一个 HTTP 请求发送到浏览器以发起连接。取得服务器响应后，建立的连接会从 HTTP 协议交换为 WebSocket 协议。</li>
+    </ol>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">Spring Cloud Gateway</code> 跨域配置：</p>
+
+    <ul>
+      <li>通过<code class="highlighter-rouge">gateway</code> 转发的其他项目，不要进行配置跨域配置</li>
+      <li>有时即使配置了也不会起作用，这时可以根据浏览器控制的错误输出来查看问题.</li>
+    </ul>
+  </li>
 </ol>
 
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>spring: 
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            # 允许跨域的源(网站域名/ip)，设置*为全部
+            # 允许跨域请求里的head字段，设置*为全部
+            # 允许跨域的method， 默认为GET和OPTIONS，设置*为全部
+            allow-credentials: true
+            allowed-origins:
+              - "http://xb.abc.com"
+              - "http://sf.xx.com"
+            allowed-headers: "*"
+            allowed-methods:
+              - OPTIONS
+              - GET
+              - POST
+              - DELETE
+              - PUT
+              - PATCH
+            max-age: 3600
+</code></pre></div></div>
+
 <p>参考：<a href="https://cloud.tencent.com/developer/article/1668879">Java 解决跨域问题</a></p>
+
+<h3 id="网络攻击和安全">网络攻击和安全</h3>
+
+<blockquote>
+  <p>见攻击技术文档</p>
+</blockquote>

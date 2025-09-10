@@ -1,5 +1,5 @@
 <blockquote>
-  <p>摘要：计算机基础之操作系统，包括进程管理、进程调度、进程同步、进程通信，死锁，内存管理与调度、虚拟内存、页面置换算法，设备管理等。</p>
+  <p>摘要：计算机基础之操作系统，包括进程管理（进程调度、进程切换、进程同步、进程通信），死锁，内存管理与调度（虚拟内存、内存管理机制、页面置换算法），设备管理等。</p>
 </blockquote>
 
 <!-- more -->
@@ -10,12 +10,12 @@
 
 <h2 id="概述">概述</h2>
 
-<p>操作系统：是管理计算机硬件与软件资源的程序，向上对用户程序提供接口，向下负责管理硬件资源。</p>
+<p>操作系统：是管理计算机硬件与软件资源的程序，向上对<strong>用户程序</strong>提供接口，向下负责<strong>管理硬件资源</strong>。</p>
 
 <p>操作系统基本功能：</p>
 
 <ol>
-  <li>进程管理：PCB 进程控制、进程同步、进程通信、死锁处理、处理机调度等。</li>
+  <li>进程管理：处理机调度、PCB 进程控制、进程同步、进程通信、死锁处理等。</li>
   <li>内存管理：内存分配、地址映射、内存保护与共享、虚拟内存等。</li>
   <li>设备管理：完成用户的 I/O 请求，方便用户使用各种设备，并提高设备的利用率。主要包括缓冲管理、设备分配、设备处理、虛拟设备等。</li>
   <li>文件管理：文件存储空间的管理、目录管理、文件读写管理和保护等。</li>
@@ -23,30 +23,37 @@
 
 <h4 id="用户态-vs-内核态">用户态 VS 内核态</h4>
 
+<p>用户程序运行在用户态，操作系统内核运行在内核态。</p>
+
 <ul>
   <li>用户态：<strong>用户程序</strong>执行时CPU所处的状态，只能访问用户地址空间。</li>
   <li>内核态（kernel mode）：<strong>操作系统管理程序</strong>执行时CPU所处的状态，能执行（包含特权指令在内的）一切指令，访问系统内所有的存储空间。</li>
 </ul>
 
-<p>用户程序运行在用户态，操作系统内核运行在内核态。</p>
-
 <h4 id="中断分类">中断分类</h4>
+
+<p>同步中断和异步中断？</p>
+
+<ul>
+  <li>异步中断（<strong>中断</strong>）：是CPU被动接收到的，由<strong>外设</strong>发出的电信号引起，其发生时间不可预测。</li>
+  <li>同步中断（<strong>异常</strong>）：是在指令执行时由CPU主动产生的，受到CPU的控制。异常可以分为陷入（trap）、故障（fault）和终止（abort）。</li>
+</ul>
 
 <p>CPU从用户态切换到内核态的方法有三种：</p>
 
 <ol>
   <li>
-    <p><strong>外部中断</strong>：由 <strong>CPU 执行指令</strong>以外的事件引起，如 <strong>I/O 完成中断</strong>，表示设备输入/输出处理已经完成，CPU 能够发送下一个输入/输出请求。此外还有时钟中断、控制台中断等。处理器外设的状态变化，是<strong>硬中断</strong>。</p>
+    <p><strong>外部中断</strong>：由 <strong>CPU 执行指令</strong>以外的事件引起，如 <strong>I/O 操作完成中断</strong>，表示设备输入/输出处理已经完成，CPU 能够发送下一个输入/输出请求。此外还有时钟中断、控制台中断等。处理器外设的状态变化，是<strong>硬中断</strong>。</p>
   </li>
   <li>
-    <p><strong>异常</strong>/内中断：由 <strong>CPU 执行指令</strong>的内部事件引起，如非法操作码、<strong>地址越界</strong>、算术溢出等。由错误引起的，如文件损坏、缺页故障等。</p>
+    <p>内部中断（<strong>异常</strong>）：由 <strong>CPU 执行指令</strong>的内部事件引起，如非法操作码、<strong>地址越界</strong>、算术溢出等。由<strong>错误</strong>引起的，如文件损坏、缺页故障等。</p>
   </li>
   <li>
     <p><strong>陷入</strong>：在用户程序中使用<strong>系统调用</strong>，进程在用户态需要使用内核态的功能。系统调用是一种<strong>软中断</strong>。</p>
   </li>
 </ol>
 
-<h4 id="系统调用">系统调用</h4>
+<h5 id="系统调用">系统调用</h5>
 
 <p>系统调用：进程在用户态需要使用内核态的功能，就进行<strong>系统调用</strong>从而陷入内核，由操作系统代为完成。</p>
 
@@ -95,7 +102,7 @@
 
 <h4 id="进程与线程">进程与线程</h4>
 
-<p>进程：程序的一次执行。进程是系统<strong>资源分配</strong>的基本单位。（Windows 任务管理器查看，<code class="highlighter-rouge">.exe</code> 文件的运行）</p>
+<p>进程：程序的一次执行。是系统<strong>资源分配</strong>的基本单位。（Windows 任务管理器查看，<code class="highlighter-rouge">.exe</code> 文件的运行）</p>
 
 <p>线程：进程中的一个执行任务（控制单元），负责当前进程中程序的执行。线程是<strong>CPU任务调度和执行</strong>的基本单位。</p>
 
@@ -105,13 +112,16 @@
 
 <ol>
   <li><strong>根本区别</strong>：进程是<strong>系统资源分配</strong>的基本单位；线程是<strong>CPU任务调度和执行</strong>的基本单位。</li>
-  <li><strong>关系</strong>：一个进程中可以有多个线程。<del>多个进程可以并发地执行。</del></li>
   <li><strong>内存空间</strong>：进程有<strong>独立</strong>内存空间；线程不拥有资源、共享进程的资源；所有线程共享堆和方法区（元空间），每个线程有自己（独享的）PC 程序计数器、虚拟机栈和本地方法栈。</li>
   <li><strong>系统开销</strong>：（创建、撤销、切换）进程开销大；线程开销小。</li>
-  <li><strong><del>通信</del></strong>：进程通信需要借助 IPC 进程间通信；线程间可以通过直接读写<strong>同一进程中的数据</strong>进行通信。</li>
-  <li><strong><del>调度</del></strong>：线程是独立调度的基本单位。在同一进程中，线程的切换不会引起进程切换，从一个进程中的线程切换到另一个进程中的线程时，会引起进程切换。</li>
-  <li><strong>健壮</strong>：一个进程崩溃后，（在保护模式下）不会对其他进程产生影响；但一个线程崩溃会导致整个进程崩溃。</li>
-  <li><strong>独立执行</strong>：进程有程序运行的<strong>入口和出口</strong>；但线程不能独立执行，必须依存于进程。</li>
+  <li><strong>关系</strong>：一个进程中可以有多个线程。<del>多个进程可以并发地执行。</del>
+    <ol>
+      <li><strong><del>调度</del></strong>：线程是独立调度的基本单位。在同一进程中，线程的切换不会引起进程切换，从一个进程中的线程切换到另一个进程中的线程时，会引起进程切换。</li>
+      <li><strong>健壮</strong>：一个进程崩溃后，（在保护模式下）不会对其他进程产生影响；但一个线程崩溃会导致整个进程崩溃。</li>
+      <li><strong><del>通信</del></strong>：进程通信需要借助 IPC 进程间通信；线程间可以通过直接读写<strong>同一进程中的数据</strong>进行通信。</li>
+      <li><strong>独立执行</strong>：进程有程序运行的<strong>入口和出口</strong>；但线程不能独立执行，必须依存于进程。</li>
+    </ol>
+  </li>
 </ol>
 
 <h3 id="进程调度">进程调度</h3>
@@ -255,7 +265,7 @@
 
 <p><img src="assets/ProcessState.png" alt="img" style="zoom:67%;" /></p>
 
-<h4 id="进程切换的步骤过程">进程切换的步骤、过程</h4>
+<h4 id="进程切换的过程步骤">进程切换的过程、步骤</h4>
 
 <blockquote>
   <p>进程切换时操作系统都会发生什么？</p>
@@ -310,10 +320,11 @@
 
 <p>临界资源：</p>
 
-<p>临界区：对临界资源进行访问的那段代码称为临界区。</p>
+<p>临界区（Critical Section）：对临界资源进行访问的那段代码称为临界区。加锁和解锁之间的代码块。</p>
 
 <ul>
-  <li>为了互斥访问临界资源，每个进程在进入临界区之前，需要先进行检查。</li>
+  <li>任何时候临界区最多只有一个线程能执行。</li>
+  <li>为了<strong>互斥访问</strong>临界资源，每个进程在进入临界区之前，需要先进行检查。</li>
 </ul>
 
 <h4 id="经典同步问题">经典同步问题</h4>
@@ -366,7 +377,7 @@
   <li>一个互斥量 data_mutex 用于对读写的数据加锁。</li>
 </ol>
 
-<h3 id="进程通信">进程通信</h3>
+<h3 id="进程间通信">进程间通信</h3>
 
 <p><strong>进程通信</strong>、<strong>IPC</strong> 进程间通信：进程间传输信息。进程通信是一种<strong>手段</strong>，而进程同步是一种<strong>目的</strong>。为了能够达到进程同步的目的，需要让进程进行通信，传输一些进程同步所需要的信息。</p>
 
@@ -407,29 +418,27 @@
 
 <p>活锁：任务或执行者没有被阻塞，由于某些条件没有满足，导致一直重复尝试、失败。</p>
 
-<p>解决死锁的方法分为：死锁的预防，避免，检测/定位、恢复。</p>
-
-<h3 id="产生死锁的必要条件">产生死锁的必要条件</h3>
-
-<p>以下四个条件同时成立，死锁才会出现：</p>
-
-<ol>
-  <li><strong>互斥</strong>：一个资源某一时刻（每次）只能被一个线程占用，直到被释放；</li>
-  <li><strong>请求与保持</strong>：一个线程因<strong>请求</strong>资源而阻塞时，对已获得的资源<strong>保持</strong>不放；</li>
-  <li><strong>不剥夺</strong>：线程已获得的资源，在末用完前不能被其他线程强行剥夺；</li>
-  <li><strong>循环等待</strong>：多个线程间形成头尾相接的循环（环路）等待资源。</li>
-</ol>
-
-<h3 id="处理方法">处理方法</h3>
-
-<p>主要有以下四种方法：</p>
+<p><strong>解决死锁</strong>主要有以下四种<strong>方法</strong>：</p>
 
 <ol>
   <li>鸵鸟策略</li>
-  <li>死锁检测与死锁恢复</li>
+  <li>死锁检测与恢复</li>
   <li>死锁预防</li>
-  <li>死锁避免</li>
+  <li>避免死锁</li>
 </ol>
+
+<h3 id="产生死锁的四个必要条件">产生死锁的四个必要条件</h3>
+
+<p>以下四个条件<strong>同时成立</strong>，死锁才会出现：</p>
+
+<ol>
+  <li><strong>互斥</strong>：多个线程不能同时使用同一个资源。一个资源某一时刻（每次）只能被一个线程占用，直到被释放；</li>
+  <li><strong>请求与保持</strong>、持有并等待：一个线程因<strong>请求</strong>资源而阻塞时，对已获得的资源<strong>保持</strong>不放；</li>
+  <li><strong>不可剥夺</strong>：线程已获得的资源，在末用完前不能被其他线程强行剥夺；</li>
+  <li><strong>循环等待</strong>：多个线程间形成头尾相接的循环（<strong>环路</strong>）等待资源。</li>
+</ol>
+
+<p>参考：<a href="https://www.cnblogs.com/xiaolincoding/p/14604726.html">面试官：什么是死锁？怎么排查死锁？怎么避免死锁？ </a>中的举例和示意图</p>
 
 <h3 id="鸵鸟策略">鸵鸟策略</h3>
 
@@ -445,13 +454,14 @@
 
 <h3 id="死锁检测定位和恢复">死锁检测/定位和恢复</h3>
 
-<p>死锁检测/定位/排查：</p>
+<p>死锁检测/定位/排查：jdk 自带的</p>
 
 <ol>
-  <li>用 <code class="highlighter-rouge">jps </code>或系统的 <code class="highlighter-rouge">ps </code>命令、任务管理器等工具，确定进程 ID；</li>
-  <li>调用 <code class="highlighter-rouge">jstack</code> 工具获取线程栈：<code class="highlighter-rouge">jstack pid</code>，定位相互间的依赖关系，进而找到死锁；</li>
+  <li>用 <code class="highlighter-rouge">jps </code>或系统的 <code class="highlighter-rouge">ps </code>命令、任务管理器等工具，输出 JVM 中运行的进程状态信息，如 进程 id。</li>
+  <li>调用 <code class="highlighter-rouge">jstack</code> 工具获取线程栈： 线程堆栈分析工具。查看日志，检查是否有死锁。如果有，则定位相互间的依赖关系，进而找到死锁；<code class="highlighter-rouge">jstack &lt;pid&gt;</code>。</li>
+  <li>使用 <code class="highlighter-rouge">gdb</code> 工具进一步确认；</li>
   <li><code class="highlighter-rouge">studio</code> 打印日志；</li>
-  <li><code class="highlighter-rouge">JConsole</code> 可在图形界面进行有限的死锁检测。</li>
+  <li><code class="highlighter-rouge">JConsole</code> 可在图形界面进行有限的死锁检测。打开方式：Java bin安装目录下 jconsole.exe。</li>
 </ol>
 
 <p>恢复的方法：</p>
@@ -515,14 +525,16 @@
 
 <p>问题背景：最常见的一种场景： 支付宝账号A向账号B转账500元。 由于支付宝有几亿用户，账户的保存采用了<strong>分库分表</strong>的方案， 账号A和账号B分别被保存在不同的数据库实例中。</p>
 
-<p>过程见以上链接。</p>
+<blockquote>
+  <p>过程见以上链接。</p>
+</blockquote>
 
 <p><code class="highlighter-rouge">AB-BA</code> 死锁问题：</p>
 
 <ol>
   <li>线程1去拿<code class="highlighter-rouge">synchronized</code>锁A；</li>
-  <li>线程2拿<code class="highlighter-rouge">synchronized</code>锁B；</li>
-  <li>线程1拿锁B，线程2拿锁A，两个线程<strong>相互等待</strong>形成死锁。</li>
+  <li>线程2去拿<code class="highlighter-rouge">synchronized</code>锁B；</li>
+  <li>两个线程<strong>相互等待</strong>对方释放资源形成死锁。</li>
 </ol>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public class Main {
@@ -551,16 +563,43 @@
 }
 </code></pre></div></div>
 
-<h2 id="内存管理与调度">内存管理与调度</h2>
+<h2 id="内存管理">内存管理</h2>
+
+<blockquote>
+  <p>内存调度</p>
+</blockquote>
 
 <p>内存管理：负责内存的分配与回收、地址转换（将逻辑地址转换为相应的物理地址）、内存寻址等。</p>
 
-<p><img src="assets/计算机内存结构层次图.jpeg" style="zoom: 67%;" /></p>
+<h3 id="内存模型">内存模型</h3>
+
+<p><img src="assets/cpu-cache-protocol.b83e957c.jpg" alt="缓存一致性协议" style="zoom:55%;" /></p>
+
+<p>内存模型：</p>
+
+<ol>
+  <li><strong>主内存</strong>（<code class="highlighter-rouge">Main Memory</code>）：物理内存，虚拟机内存的一部分。内存缓存的是硬盘数据，用于解决<strong>硬盘访问速度过慢</strong>的问题。成本低，容量通常是 GB 级别，访问延迟通常在几十到几百纳秒。</li>
+  <li><strong>CPU 高速缓存</strong>（<code class="highlighter-rouge">CPU Cache</code>）：缓存的是内存数据，用于解决 <strong>CPU 处理速度和内存处理速度</strong>不对等的问题。通常分为三层，<code class="highlighter-rouge">L1, L2, L3 Cache</code>；具有<strong>成本高</strong>、容量小的特点，容量最大的 L3 缓存通常也只有几十MB。
+    <ol>
+      <li>上层的寄存器、L1 缓存、L2 缓存是位于 <strong>CPU 核内</strong>的高速缓存，访问延迟通常在 10 纳秒以下。</li>
+      <li>L3 缓存是位于 <strong>CPU 核外部但在芯片内部</strong>的共享高速缓存，访问延迟通常在十纳秒左右。</li>
+    </ol>
+  </li>
+  <li>工作方式： 先从主内存复制一份数据到 <code class="highlighter-rouge">CPU Cache</code> 中，CPU 可直接从 <code class="highlighter-rouge">CPU Cache</code> 中读写数据；当运算（操作）完成后，通过<strong>缓存一致性协议</strong>将（运算得到的）数据写回主内存。用来解决多核 CPU 缓存数据一致性的问题。</li>
+</ol>
+
+<p>特点：</p>
 
 <ul>
-  <li>L1-L3 高速缓存：<code class="highlighter-rouge">CPU Cache</code> （CPU 高速缓存）缓存的是内存数据，用于<strong>解决</strong> CPU 处理速度和内存不匹配的问题；</li>
-  <li>主存：<strong>内存缓存</strong>的是硬盘数据，用于解决硬盘访问速度过慢的问题。</li>
+  <li>
+    <p>根据性能由高到低分为：寄存器、L1缓存、L2缓存，L3缓存，本地主内存。</p>
+  </li>
+  <li>
+    <p>内存和高速缓存都属于<strong>掉电易失</strong>的存储器，如果机器断电了，这类存储器中的数据就永久丢失了。</p>
+  </li>
 </ul>
+
+<p><img src="assets/计算机内存结构层次图.jpeg" style="zoom: 67%;" /></p>
 
 <h3 id="逻辑虚拟物理地址">逻辑、虚拟、物理地址</h3>
 
@@ -682,22 +721,20 @@
 <p>淘汰页面的规则有：</p>
 
 <ol>
-  <li>OPT/最佳页面置换算法：选择最长时间内不再被访问的页面。是一种理论上的算法，无法实现，因为无法知道一个页面多长时间不再被访问。</li>
-  <li>FIFO 算法：淘汰最先进入内存、内存中驻留时间最久的页面。</li>
-  <li><strong>LRU</strong>（Least Recently Used <strong>最近最久未使用</strong>算法）：记录页面自上次访问以来所经历的时间 T，选择 T 值最大的。
+  <li><strong>OPT/最佳页面置换算法</strong>：选择最长时间内不再被访问的页面。是一种理论上的算法，无法实现，因为无法知道一个页面多长时间不再被访问。</li>
+  <li><strong>FIFO 先进先出算法</strong>：淘汰最先进入内存、内存中驻留时间最久的页面。可能会将经常被访问的页面换出，导致缺页率升高
+    <ol>
+      <li><strong>第二次机会算法</strong>：FIFO 算法可能会把经常使用的页面置换出去，为了避免这一问题，对该算法做一个简单的修改：</li>
+      <li><strong>时钟算法</strong>：第二次机会算法需要在链表中移动页面，降低了效率。时钟算法使用<strong>环形链表</strong>将页面连接起来，再使用一个指针指向最老的页面。</li>
+    </ol>
+  </li>
+  <li><strong>LRU</strong>（<code class="highlighter-rouge">Least Recently Used</code> <strong>最近最久未使用</strong>算法）：记录页面自上次访问以来所经历的时间 T，选择 T 值最大的。
     <ol>
       <li>为了实现 LRU，需要在内存中维护一个所有页面的<strong>链表</strong>。当一个页面被访问时，将这个页面移到链表表头。这样就能保证链表<strong>表尾</strong>的页面是最近最久未访问的。</li>
       <li>因为每次访问都需要更新链表，因此这种方式实现的 LRU 代价很高。</li>
     </ol>
   </li>
-  <li>LFU （Least Frequently Used 最少使用算法） ：随机地从类编号最小的非空类中挑选一个页面将它换出。</li>
-  <li>
-    <p>先进先出（FIFO）：选择换出的页面是最先进入的页面。该算法会将那些经常被访问的页面换出，导致缺页率升高。</p>
-  </li>
-  <li>
-    <p>第二次机会算法：FIFO 算法可能会把经常使用的页面置换出去，为了避免这一问题，对该算法做一个简单的修改：</p>
-  </li>
-  <li>时钟：第二次机会算法需要在链表中移动页面，降低了效率。时钟算法使用环形链表将页面连接起来，再使用一个指针指向最老的页面。</li>
+  <li><strong>LFU</strong> （<code class="highlighter-rouge">Least Frequently Used</code> <strong>最少使用算法</strong>） ：随机地从类编号最小的非空类中挑选一个页面将它换出。</li>
 </ol>
 
 <h3 id="手写-lrulfu-调度算法">手写 LRU/LFU 调度算法</h3>
