@@ -1,0 +1,123 @@
+<blockquote>
+  <p>摘要：指跟踪请求在分布式系统中的<strong>流转路径与状态</strong>。在分布式系统中，记录请求的处理过程、并聚合展示。</p>
+</blockquote>
+
+<!-- more -->
+
+<hr />
+
+<h3 id="目录">目录</h3>
+
+<p>[TOC]</p>
+
+<h3 id="分布式链路追踪和监控">分布式链路追踪和监控</h3>
+
+<p>分布式链路追踪（Tracing）：指跟踪请求在分布式系统中的<strong>流转路径与状态</strong>。在分布式系统中，记录请求的处理过程、并聚合展示。</p>
+
+<ul>
+  <li>
+    <p>请求在系统中的<strong>完整生命周期</strong>，包括经过的服务、调用的操作以及每个操作的延迟等。如各个服务节点上的耗时、请求具体到达哪台机器上、每个服务节点的请求状态等。</p>
+  </li>
+  <li>
+    <p>用途：用于故障诊断、容量预估、<strong>性能瓶颈分析</strong>、优化系统的性能、调用链路梳理等。</p>
+  </li>
+  <li>
+    <p>技术实现上包含了数据埋点、采集、存储、分析、可视化等环节，形成了一套完整的技术体系。</p>
+  </li>
+</ul>
+
+<h3 id="基本概念">基本概念</h3>
+
+<ul>
+  <li>Trace（追踪）：一个完整的用户请求流程，从用户发起请求开始，到请求结束。一个追踪包含多个 Span。</li>
+  <li>Span（跨度）：一种表示工作单元的结构，通常对应着请求经过的某个服务或者操作，每个Span包含以下信息：
+    <ol>
+      <li>Span ID：唯一标识当前Span</li>
+      <li>Trace ID：标识属于同一个Trace的所有Span</li>
+      <li>父Span ID：如果当前Span由另一个Span引发，则会记录父Span ID</li>
+      <li>时间戳、标签和日志</li>
+    </ol>
+  </li>
+</ul>
+
+<h3 id="基本原理">基本原理</h3>
+
+<ol>
+  <li>在分布式应用的接口方法上设置一些观察点，</li>
+  <li>然后在入口节点给每个请求分配一个全局唯一的标识 TraceId（类似快递单号），</li>
+  <li>当请求流经这些观察点时就会记录一行对应的链路日志（包含链路唯一标识，接口名称，时间戳，主机信息等）。</li>
+  <li>最后通过 TraceId 将一次请求的所有链路日志进行组装，就可以还原出该次请求的链路轨迹。</li>
+</ol>
+
+<p><img src="assets/c39fbc4e9ab19adf5ace6d9acace6816.jpeg" alt="img" style="zoom:50%;" /></p>
+
+<h3 id="spring-boot-admin-监控中心">Spring Boot Admin 监控中心</h3>
+
+<p>Spring Boot Admin 是由 codecentric 组织开发的开源项目，可以管理和监控 Spring Boot 项目。</p>
+
+<ul>
+  <li>可以对SpringBoot应用的各项指标进行监控，可以作为微服务架构中的监控中心来使用。</li>
+</ul>
+
+<p>分为客户端和服务端两部分：</p>
+
+<ul>
+  <li>客户端添加到 Spring Boot 应用，增加暴漏相关信息的 HTTP 接口，然后注册到 Spring Boot Admin 服务端（可以直接向服务端注册，也可以通过 Eureka 或者 Consul 进行注册）。</li>
+  <li>而 Spring Boot <strong>Admin Server</strong> 通过 Vue.js 程序监控信息进行可视化呈现。并且支持多种事件通知操作。</li>
+</ul>
+
+<p>SpringBoot应用可以通过<strong>Actuator</strong>来暴露应用运行过程中的各项指标，Spring Boot Admin通过这些指标来监控应用，然后通过图形化界面呈现出来。</p>
+
+<ul>
+  <li>不仅可以监控单体应用，还可以和Spring Cloud的注册中心相结合来监控微服务应用。</li>
+</ul>
+
+<p>可以提供应用的以下监控信息：</p>
+
+<ol>
+  <li>Insights监控应用运行过程中的<strong>概览</strong>信息。
+    <ol>
+      <li>细节：度量指标信息，比如健康、<strong>JVM</strong> 内存、GC，Tomcat，<strong>进程、线程</strong>信息；</li>
+      <li><del>性能；</del></li>
+      <li>环境变量信息，比如系统属性、系统环境变量以及应用配置信息；</li>
+      <li>查看所有<strong>创建的Bean</strong>（.class 类）信息；</li>
+      <li>查看应用中的所有配置信息；</li>
+      <li><del>查看可以访问的Web端点；</del></li>
+    </ol>
+  </li>
+  <li>查看应用运行日志配置。</li>
+  <li>JVM：线程转储、内存转储。</li>
+  <li>查看<strong>HTTP跟踪信息</strong>。映射：<strong>dispatcherServlet</strong>对应的方法、返回内容类型、处理程序；</li>
+  <li>缓存管理。</li>
+</ol>
+
+<h3 id="skywalking">Skywalking</h3>
+
+<p>SkyWalking和Zipkin一样，也是一个开源的应用性能监控和分析系统，在国内使用较多。</p>
+
+<p>主要功能：</p>
+
+<ul>
+  <li>全链路追踪： 支持全链路追踪，可以追踪分布式系统中请求的流程路径。</li>
+  <li>多语言支持：  提供多语言的客户端，包括：Java、Python、Go、.NET等。</li>
+  <li>性能指标收集： 除了追踪数据，还可以收集系统性能指标，比如：响应时间、吞吐量、错误率等。</li>
+  <li>告警与通知： 允许设置警报规则，当性能或指标达到预定的阈值时，可以触发告警通知。</li>
+</ul>
+
+<p>工作原理：</p>
+
+<ul>
+  <li>代理和收集器： 在应用程序中嵌入 SkyWalking 代理，它会捕获请求中的跨度数据，并将数据发送到 SkyWalking 收集器。</li>
+  <li>数据存储： 收集器将跨度数据存储在后端的存储系统中，通常是数据库或索引系统。这些存储系统用于存储、索引和检索跨度数据。</li>
+  <li>可视化界面： 存储的跨度数据可以通过可视化界面查询和展示。用户可以使用界面查看请求的路径、性能信息和指标图表。</li>
+</ul>
+
+<h3 id="zipkin">Zipkin</h3>
+
+<p>Zipkin是一款开源的分布式实时数据追踪系统，由Twitter开发并开源。</p>
+
+<p>Zipkin 提供了可视化界面，用于查看请求的流程、跨度和时间线。</p>
+
+<h3 id="spring-cloud-sleuth-分布式跟踪">Spring Cloud Sleuth 分布式跟踪</h3>
+
+<p>分布式<strong>服务跟踪</strong>，日志收集工具包。封装了Dapper和log-based追踪以及Zipkin和HTrace操作，为SpringCloud应用实现了一种分布式追踪解决方案。</p>
