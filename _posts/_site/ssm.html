@@ -1,0 +1,861 @@
+<blockquote>
+  <p>摘要：Spring + Spring MVC + Mybatis。Spring MVC，包括 MVC、Java Web。</p>
+</blockquote>
+
+<!-- more -->
+
+<h2 id="目录">目录</h2>
+
+<p>[TOC]</p>
+
+<h2 id="ssm-框架">SSM 框架</h2>
+
+<blockquote>
+  <p>至少在项目里做过。介绍项目时，用一个业务流程说说 spring mvc 如何做的。</p>
+</blockquote>
+
+<p>SSM 框架集是 <code class="highlighter-rouge">Spring + Spring MVC + Mybatis </code> 框架的整合，<code class="highlighter-rouge">Spring</code> 实现业务对象管理，<code class="highlighter-rouge">Spring MVC</code> 负责请求转发和视图管理，<code class="highlighter-rouge">Mybatis</code> 作为数据对象的持久化引擎。</p>
+
+<ul>
+  <li>是标准的 MVC 模式，将整个系统划分为 <code class="highlighter-rouge">model/DAO</code> 层、<code class="highlighter-rouge">View</code> 层、<code class="highlighter-rouge">Controller</code> 层、<code class="highlighter-rouge">Service</code> 层.</li>
+  <li>是目前比较主流的 Java EE 企业级框架，适用于搭建各种大型的企业级应用系统。</li>
+</ul>
+
+<h3 id="简化的开发步骤">简化的开发步骤</h3>
+
+<ol>
+  <li>需求分析：功能需求和非功能需求（稳定性、性能）；</li>
+  <li>系统设计：系统<strong>架构</strong>示意图：普通用户、管理员，前端（输入输出），后台，MyBatis 数据持久化，微服务，配置等；
+    <ol>
+      <li>系统概要设计：系统功能模块（划分）图：系统-子系统-功能模块，各自的描述、输入输出接口设计（格式、入参和出参/返回值）。接口文档现在都是 <a href="#接口文档">Swagger-UI</a>，注解标注在 Controller；</li>
+      <li>数据库表结构设计：
+        <ol>
+          <li><strong>逻辑设计/详细设计</strong> : 通过将 E-R 图转换成表，实现从 E-R 模型到关系模型的转换（转为 POJOs 及 DAO 接口），并应用三大范式优化；</li>
+          <li><strong>物理结构设计</strong> : 为设计的数据库选择合适的存储结构和存取路径，做具体的技术选型。</li>
+          <li>数据库<strong>实现</strong> : 包括 SQL 编程（创建数据库表）、测试和试运行。</li>
+          <li>数据库的<strong>运行和维护</strong> : log 日志，根据新需求进行建表、索引优化、大表拆分。</li>
+        </ol>
+      </li>
+      <li>功能模块详细设计：模块流程图（Controller 调用 Sercive 实现业务逻辑）。</li>
+    </ol>
+  </li>
+  <li>系统实现；</li>
+  <li>单元测试，回归测试，覆盖率测试。</li>
+</ol>
+
+<h5 id="系统业务架构示意图">系统业务架构示意图</h5>
+
+<p>项目技术架构图：</p>
+
+<p>业务架构图：</p>
+
+<p>应用架构图：</p>
+
+<p><img src="../assets/mall系统架构示意图.jpg" alt="系统架构图" style="zoom: 37%;" /></p>
+
+<h5 id="系统功能模块图">系统功能模块图</h5>
+
+<h5 id="e-r-模型图">E-R 模型图</h5>
+
+<p><img src="../assets/image-20220925110316119.png" alt="image-20220925110316119" style="zoom:100%;" /><img src="../assets/image-20220925111724175.png" alt="image-20220925111724175" style="zoom:100%;" /></p>
+
+<h3 id="项目架构">项目架构</h3>
+
+<p><img src="../assets/arch_screen_02.png" alt="img" style="zoom:70%;" /><img src="../assets/image-20250805140940884.png" alt="img" style="zoom:60%;" /></p>
+
+<h4 id="分层目录">分层目录</h4>
+
+<p>项目的目录结构展示了Maven所约定了源代码的位置，只需配置很少的信息就可以自动完成编译，测试和打包等工作。</p>
+
+<p><img src="../assets/250px-Maven_CoC.svg.png" alt="img" style="zoom:80%;" /></p>
+
+<p>Java Web 项目中的 SSM 目录结构，同时也遵循 maven 的目录规范：</p>
+
+<h5 id="mall-adminsrc"><code class="highlighter-rouge">mall-admin/src/</code></h5>
+
+<p><code class="highlighter-rouge">mall-admin/src/test/</code>：编写测试用例。</p>
+
+<p><code class="highlighter-rouge">mall-admin/src/main/</code>：自定义的代码</p>
+
+<ol>
+  <li><code class="highlighter-rouge">java/com.macro.mall/</code>：
+    <ol>
+      <li><code class="highlighter-rouge">MallAdminApplication.java</code>：程序主入口；</li>
+      <li><code class="highlighter-rouge">common/</code>：存放通用类
+        <ol>
+          <li><code class="highlighter-rouge">api/</code>：<del>参数定义</del>、<code class="highlighter-rouge">CommonResult</code> 通用返回结果、IErrorCode、ResultCode；
+            <ol>
+              <li><code class="highlighter-rouge">BaseController/CommonResult</code> 类：用于<strong>统一封装返回对象</strong>，供所有的 controller 继承，主要提供了返回成功或失败对象的几种方法。</li>
+            </ol>
+          </li>
+          <li><code class="highlighter-rouge">baseconfig/</code>：BaseRedisConfig、BaseSwaggerConfig；</li>
+          <li><code class="highlighter-rouge">config/</code>：存放 <strong>Java 配置类</strong>，如 MyBatis、Swagger、Redis、Spring Security、Oss 配置类等。</li>
+          <li><code class="highlighter-rouge">util/</code>：<code class="highlighter-rouge">RequestUtil</code>、<code class="highlighter-rouge">SessionUtil</code>、<code class="highlighter-rouge">JwtTokenUtil</code>、<code class="highlighter-rouge">WebResponseUtil</code>等各种工具类。</li>
+        </ol>
+      </li>
+      <li><code class="highlighter-rouge">component/</code>：存放通用组件、AOP 切面，如日志、异常、权限管理、搜索等
+        <ol>
+          <li><code class="highlighter-rouge">domain/</code>：SwaggerProperties、WebLog 日志封装类、搜索结果信息类；</li>
+          <li><code class="highlighter-rouge">service/</code>：RedisService 操作。
+            <ol>
+              <li><code class="highlighter-rouge">RedisCacheAspect</code>：Redis 缓存切面，防止Redis宕机影响正常业务逻辑；</li>
+              <li>简单搜索，综合搜索、筛选、排序；</li>
+            </ol>
+          </li>
+          <li><code class="highlighter-rouge">log/</code> ：WebLogAspect Controller层的统一日志处理<strong>切面</strong>；</li>
+          <li><code class="highlighter-rouge">exception/</code>：GlobalExceptionHandler 全局异常处理<strong>切面</strong>；</li>
+          <li><code class="highlighter-rouge">security/</code>：<code class="highlighter-rouge">DynamicSecurityFilter</code> 类等；</li>
+          <li><code class="highlighter-rouge">search/</code>：搜索切面。</li>
+        </ol>
+      </li>
+      <li><del><code class="highlighter-rouge">mbg/</code></del>：最好单独一个独立项目
+        <ol>
+          <li><code class="highlighter-rouge"> mapper/XxxMapper.java</code>：</li>
+          <li><code class="highlighter-rouge">model/</code>：</li>
+        </ol>
+      </li>
+      <li><code class="highlighter-rouge">dao/XxxDao.java</code>：存放自定义的 mapper 接口；
+        <ol>
+          <li><code class="highlighter-rouge">dto/</code>：存放自定义的数据传输对象，如请求参数、返回结果。</li>
+          <li><code class="highlighter-rouge">bo/</code>：</li>
+        </ol>
+      </li>
+      <li><code class="highlighter-rouge">controller/</code>：</li>
+      <li><code class="highlighter-rouge">service/</code>：
+        <ul>
+          <li><code class="highlighter-rouge">serviceImpl/</code>：</li>
+        </ul>
+      </li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">resources/</code> ：
+    <ol>
+      <li><code class="highlighter-rouge">dao/XxxDao.xml</code>：自定义的 <strong>xml 映射文件</strong>；</li>
+      <li><code class="highlighter-rouge">application.yml</code>：<a href="#Spring配置">Spring 的配置文件</a>，具体包括 datasource 数据库连接配置（含 Druid 数据池配置）、MyBatis 配置、Redis配置、logging 和 logstash 配置、JWT 配置、Secure 配置等。</li>
+      <li><strong>View 视图层/表示层/展示层</strong>：与控制层结合比较紧密，需要二者结合起来协同开发。主要负责前端 JSP 页面的显示。<del>负责处理 HTTP 请求，将 JSON 参数转换为对象。</del></li>
+      <li>WEB-INF：</li>
+    </ol>
+  </li>
+</ol>
+
+<h5 id="mall-mbgsrcmain"><code class="highlighter-rouge">mall-mbg/src/main/</code></h5>
+
+<blockquote>
+  <p>MyBatis Generator 生成器模块，生成 MBG 代码</p>
+</blockquote>
+
+<ol>
+  <li><code class="highlighter-rouge">java/com.macro.mall/</code>：
+    <ol>
+      <li><code class="highlighter-rouge"> mapper/XxxMapper.java</code>： <strong>mapper 接口/映射器</strong>，存放（MyBatis Generator 生成的）通用 mapper 接口，对应  <code class="highlighter-rouge">resources/</code> 下的 xml 映射文件；常用的<strong>单表查询</strong>接口、和 <strong><code class="highlighter-rouge">Example</code>类的条件查询</strong>等。参数为 model、id 等，供业务逻辑层调用。</li>
+      <li><code class="highlighter-rouge">model/</code>：<strong>Entity 实体层 / model / Bean</strong>，存放生成的 <strong>model 实体</strong>/ POJO 类；对业务对象与数据库的行进行相互转换，用对象<strong>映射</strong>数据表，二者一一对应，本质是数据表的<strong>对象化</strong>。是一种 ORM 对象关系映射。一般只在 DAO 层与 Service 层之间传输。</li>
+      <li><code class="highlighter-rouge">CommentGenerator.java</code>：自定义注释生成类，使用 <code class="highlighter-rouge">field.addJavaDocLine()</code> 定义注释的<strong>生成规则</strong>，给实体类的字段添加注释、添加 <strong>Swagger 注解</strong> <code class="highlighter-rouge">@ApiModelProperty</code> 来取代原来的方法注释。</li>
+      <li><code class="highlighter-rouge">Generator.java</code>： <strong>MyBatis 代码生成器</strong>，程序主入口，读取并解析 <code class="highlighter-rouge">resources/generatorConfig.xml</code> 配置文件，用来运行生成 mbg 包中的代码。</li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">resources/</code> ：
+    <ol>
+      <li><code class="highlighter-rouge">com.macro.mall.mapper/XxxMapper.xml</code>：通用的 <strong>xml 映射文件</strong>，</li>
+      <li><code class="highlighter-rouge">generatorConfig.xml</code>： MyBatis Generator 生成器的配置文件，可配置数据库连接，指定生成 model、mapper 接口及 mapper.xml 的路径，可通过 <code class="highlighter-rouge">&lt;commentGenerator&gt;</code>标签来指定添加 <strong>Swagger 注解</strong>等。详细配置见 <a href="#Mybatis Generator 配置">Mybatis Generator 配置</a>。</li>
+      <li><code class="highlighter-rouge">generator.properties</code>：配置 JDBC 数据库连接的参数。</li>
+    </ol>
+  </li>
+</ol>
+
+<h5 id="mall-searchsrcmain"><del><code class="highlighter-rouge">mall-search/src/main/</code></del></h5>
+
+<blockquote>
+  <p>搜索模块，整合到上面的主要结构中；</p>
+</blockquote>
+
+<ol>
+  <li><code class="highlighter-rouge">java/com.macro.mall.search/</code>：
+    <ol>
+      <li><code class="highlighter-rouge">config/</code>：存放 <strong>Java 配置类</strong>，如 MyBatis、Swagger 配置类。</li>
+      <li><code class="highlighter-rouge">controller/</code>：简单搜索，综合搜索、筛选、排序；</li>
+      <li><code class="highlighter-rouge">dao/XxxDao.java</code>：存放自定义的 mapper 接口；</li>
+      <li><code class="highlighter-rouge">domain/</code></li>
+      <li><code class="highlighter-rouge">repository/</code></li>
+      <li><code class="highlighter-rouge">service/</code></li>
+      <li><code class="highlighter-rouge">MallSearchApplication.java</code></li>
+    </ol>
+  </li>
+</ol>
+
+<h5 id="mall-securitysrcmain"><del><code class="highlighter-rouge">mall-security/src/main/</code></del></h5>
+
+<blockquote>
+  <p>权限管理模块</p>
+</blockquote>
+
+<ol>
+  <li><code class="highlighter-rouge">java/com.macro.mall.security/</code>：
+    <ol>
+      <li><code class="highlighter-rouge">aspect/</code>：RedisCacheAspect Redis 缓存切面，防止Redis宕机影响正常业务逻辑；</li>
+      <li><code class="highlighter-rouge">component/</code>：
+        <ul>
+          <li><code class="highlighter-rouge">DynamicSecurityFilter</code> 类</li>
+        </ul>
+      </li>
+      <li><code class="highlighter-rouge">config/</code>：RedisConfig、SecurityConfig；</li>
+      <li><code class="highlighter-rouge">util/</code>：JwtTokenUtil；</li>
+    </ol>
+  </li>
+</ol>
+
+<h5 id="mall-portalsrcmain"><del><code class="highlighter-rouge">mall-portal/src/main/</code></del></h5>
+
+<blockquote>
+  <p>微服务模块</p>
+</blockquote>
+
+<h4 id="pojo-分层领域模型">POJO 分层领域模型</h4>
+
+<p><img src="../assets/5618351-edf45bb66a4f47a3.png" alt="img" style="zoom: 80%;" /></p>
+
+<p><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2020/2/23/1706ffcfd8d1255b~tplv-t2oaga2asx-jj-mark:3024:0:0:0:q75.awebp" alt="UTOOLS1582426816862.png" /></p>
+
+<p><code class="highlighter-rouge">POJO</code>（Plain Ordinary Java Object）: 指只有 setter / getter / toString 的简单类，包括 DO / DTO / BO / VO 等。</p>
+
+<ul>
+  <li>一个POJO持久化以后就是<code class="highlighter-rouge">PO</code></li>
+  <li>直接用它传递、传递过程中就是<code class="highlighter-rouge">DTO</code></li>
+  <li>直接用来对应表示层就是<code class="highlighter-rouge">VO</code></li>
+</ul>
+
+<p>分类：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">DO</code>（Data/<strong>Domain</strong> Object）：<strong>数据库映射对象</strong>，数据/领域对象，由 DAO 层向上（Service 层 / ServiceImpl 实现层）传输的，从现实世界中抽象出的有形或无形的<strong>业务实体</strong>。
+    <ul>
+      <li><del><code class="highlighter-rouge">PO</code></del>（Persistent Object）、<strong>Entity</strong>：持久化对象，与持久层（通常是关系型数据库表）数据结构一 一对应的 POJO 类，由 DAO 层向上（Service 层）传输的 <strong>数据源对象</strong>。最形象的理解就是一个PO就是数据库中的一条记录。 好处是可以把一条记录作为一个对象处理，可以方便的转为其它对象。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">BO</code>（Business Object）：业务对象，由 Service 层向上（Controller 层）传输的，主要作用是把业务逻辑封装为一个对象。通常由 DO <strong>转化、整合</strong>而来，可包含<strong>多个 DO 的属性</strong>，也可只包含一个 DO 的部分属性。</li>
+  <li><code class="highlighter-rouge">DTO</code>（Data Transfer Object）：数据传输对象，用于展示层（前端）与服务层间的数据传输对象。存放<strong>参数类型定义类</strong>。DTO为系统与外界交互的模型对象，可以将DTO对象转化为<strong>BO对象</strong>或者是普通的<strong>entity对象</strong>，让service层去处理。
+    <ul>
+      <li><code class="highlighter-rouge">BeanUtils.copyProperties(umsAdminParam, umsAdmin);</code>，Service 中将 DTO 对象 <code class="highlighter-rouge">UmsAdminParm </code>赋值给 DO 实体类对象 <code class="highlighter-rouge">UmsAdmin</code>。</li>
+      <li>比如添加用户时，只需要传过来用户的姓名和年龄，后端接受到数据后，将添加创建时间和更新时间和默认密码三个字段，然后保存到数据库。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">VO</code>（View Object）：视图对象，通常是 Web 向<strong>模板渲染引擎层</strong>传输的对象。用于展示层，把某个指定页面（或组件）的所有数据封装起来。</li>
+  <li><del><code class="highlighter-rouge">Query</code></del>：数据查询对象，各层接收上层的查询请求。注意超过 2 个参数的查询封装，禁止使用 Map 类传输。</li>
+</ol>
+
+<h4 id="dto-数据传输对象">DTO 数据传输对象</h4>
+
+<p>用于 <strong>Service 层</strong>与 <strong>Web 层</strong>间、前后端间的传输。<strong>存放自定义的传输对象</strong>，如<strong>请求参数</strong>类型定义和返回结果。</p>
+
+<ul>
+  <li><code class="highlighter-rouge">POJO </code>对象无法满足业务需求；</li>
+  <li>面向表现层（界面UI），通过 UI 的需求来定义 <code class="highlighter-rouge">DTO</code>。实现了表现层与 <code class="highlighter-rouge">Model </code>间的解耦，<strong>表现层不引用 Model</strong>；如果开发过程中模型改变了而界面没变，就只需改 <code class="highlighter-rouge">Model </code>而不需去改表现层。要维护 <code class="highlighter-rouge">DTO</code> 与 <code class="highlighter-rouge">Model </code>间的映射关系。</li>
+</ul>
+
+<h4 id="dao-数据访问--持久层">DAO 数据访问 / 持久层</h4>
+
+<p>用于处理数据业务，存放自定义的 <code class="highlighter-rouge">Mapper</code> 映射器<strong>接口</strong>（<code class="highlighter-rouge">public interface UmsAdminDao{}</code>），由对应 <code class="highlighter-rouge">resources/dao</code>下的映射文件（<code class="highlighter-rouge">XxxDao.xml</code>）实现。MyBatis 可动态实现接口的方法，所以不需要 <code class="highlighter-rouge">daoImpl</code>。</p>
+
+<p>直接进行数据库的读写操作，返回与数据库表一一对应的<strong>数据对象 DO</strong>，即 <code class="highlighter-rouge">Domain/Entity</code> 数据库映射对象。</p>
+
+<ul>
+  <li>DAO 层的数据源配置、以及有关数据库连接的参数都在 Spring 配置文件中进行配置。</li>
+</ul>
+
+<p><del>repository 层</del>：通过对 Entity 层的封装提供 CRUD 接口 。继承 CrudRepository、PagingAndSortingRepository、JpaRepository 接口，或用<a href="#数据库（事务问题）">对应JPA各层常用注解</a>。</p>
+
+<p>二者非常类似，但从架构设计上讲有着本质的区别：侧重点完全不同。</p>
+
+<ul>
+  <li>Repository 是相对对象而言，蕴含着真正的OO概念，即一个<strong>数据仓库角色</strong>，负责所有对象的持久化管理；</li>
+  <li>DAO 则是相对数据库而言，DAO<strong>直接负责</strong>数据库的存取工作。</li>
+</ul>
+
+<h5 id="mybatis">MyBatis</h5>
+
+<blockquote>
+  <p>两个配置指定的路径相同。</p>
+</blockquote>
+
+<ul>
+  <li><strong>Spring Boot 配置类</strong>配置 MyBatis，用来指定 mapper 映射器接口的 xml 实现所在的<strong>项目目录</strong>。</li>
+  <li><strong>MyBatis 配置类</strong>中通过<code class="highlighter-rouge">@MapperScan</code>，用来指定 mapper 映射器接口的 xml 实现所在的<strong>包路径</strong>。</li>
+</ul>
+
+<h5 id="mybatis-generator-简介">Mybatis Generator 简介</h5>
+
+<p>MyBatis 的代码生成器，可根据数据库生成 <code class="highlighter-rouge">model、domain</code> 实体类，常用的<strong>单表查询</strong> <code class="highlighter-rouge">XxxMapper</code> 接口、和<strong><code class="highlighter-rouge">Example</code>类的条件查询</strong>、及对应的 <code class="highlighter-rouge">XxxMapper.xml</code>；</p>
+
+<h4 id="controler-控制层">Controler 控制层</h4>
+
+<p>存放控制器：类上常用用<a href="#@Controller"><code class="highlighter-rouge">@Controller</code></a>定义控制层，<code class="highlighter-rouge">@RestController</code> = <code class="highlighter-rouge">@Controller</code> + <code class="highlighter-rouge">@ResponseBody</code>；</p>
+
+<ol>
+  <li>用于路由解析，<strong>对外暴露 REST API 接口</strong>；负责<strong>接收并转发</strong>请求、参数校验；
+    <ol>
+      <li>方法上常用 <a href="#REST常用注解">@RequestXxx</a> 系列注解，如<code class="highlighter-rouge">@RequestMapping</code> 用来拦截和转发用户请求、<code class="highlighter-rouge">@RequestParam</code> 参数绑定、<code class="highlighter-rouge">@RequestBody</code> 用于获取 HTTP 请求体中的数据；</li>
+      <li>返回对象常用 <code class="highlighter-rouge">@ResponseBody</code> 返回响应结果。</li>
+      <li><code class="highlighter-rouge">@Valid</code> 等用于搭配 <a href="#整合HibernateValidator">参数校验</a>（具体通过在 <strong>POJOs 对象</strong>的字段上加注解实现）；</li>
+      <li>根据 UI 和接口的入参和出参，编写 Controller 类中的方法。</li>
+    </ol>
+  </li>
+  <li><strong>控制业务流程</strong>、页面访问控制和交互（组织不同层面），<strong>指定视图</strong>并将响应结果发送给客户端；异常处理（给方法加上<strong>切面</strong>来统一处理异常）。</li>
+  <li>
+    <p>调用 Service 层<strong>处理请求</strong>和<strong>响应事件</strong>（“事件”包括用户的行为和数据的改变），将 Service 层返回的 <code class="highlighter-rouge">BO/DO</code> 转化为 <code class="highlighter-rouge">DTO/VO</code>（<strong>封装成统一返回对象</strong>返回给调用方，如果返回数据用于<strong>前端模版渲染</strong>则返回 <code class="highlighter-rouge">VO</code>，否则一般返回 <code class="highlighter-rouge">DTO</code>）。</p>
+
+    <ul>
+      <li>如将 gender 属性中的 0 转化“男”，1 转化为“女”等。<a href="https://www.zhihu.com/question/434640634/answer/2640841148">一个完整后端请求的 4 个组成部分、请求参数校验、统一响应、统一异常</a>。</li>
+      <li>Service 层的代码抛出异常，可以给controller层的方法加上<strong>切面</strong>来统一处理异常。
+        <ul>
+          <li><code class="highlighter-rouge">@ControllerAdvice</code> 注解：用来定义 Controller 层的切面，所有 <code class="highlighter-rouge">@Controller</code> 注解的类中的方法执行都会进入该切面，</li>
+          <li>同时可使用 <code class="highlighter-rouge">@ExceptionHandler</code> 对不同的<a href="#异常">异常进行捕获和处理</a>；对于捕获的异常，进行日志记录，并封装返回对象。<a href="https://www.jianshu.com/p/654f4589eb8e">设计之道－controller层的设计</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ol>
+
+<h4 id="service-业务逻辑层">Service 业务逻辑层</h4>
+
+<ul>
+  <li>添加 Service 接口及实现：用于处理事件，实现具体的业务逻辑，如事务控制等。处于中间层的位置，既调用 DAO 层提供的接口处理业务逻辑，又提供接口给 Controller 层。 每个模型都有一个 Service 接口，分别封装各自的业务处理方法。</li>
+  <li>返回<strong>数据对象 DO 或业务对象 BO</strong>。外部调用（HTTP、RPC）方法也在这一层，对于外部调用来说，Service 一般会将外部调用返回的 DTO 转化为 BO。</li>
+</ul>
+
+<h3 id="spring-mvc">Spring MVC</h3>
+
+<blockquote>
+  <p>本质上相当于传统的 Servlet 和 Struts 中的 action</p>
+</blockquote>
+
+<p>是一个基于 <strong>MVC 设计模式</strong>的轻量级 Web 开发框架，是 Spring 框架的一部分。</p>
+
+<p>MVC：<code class="highlighter-rouge">Model-View-Controler</code> 的简称，即模型—视图—控制器。解耦。</p>
+
+<p>Spring 中通过注解来定义各层，如 <code class="highlighter-rouge">@Controller</code> 定义控制层、<code class="highlighter-rouge">@Service</code> 定义 service 业务逻辑层。</p>
+
+<blockquote>
+  <p>详情见<a href="#项目架构">项目架构</a>中。</p>
+</blockquote>
+
+<blockquote>
+  <p><a href="#声明 Bean 的注解">Spring MVC 常用基本注解</a></p>
+</blockquote>
+
+<h5 id="mvc-设计模式">MVC 设计模式</h5>
+
+<p><code class="highlighter-rouge">Model 1</code> 时代：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">Model</code> 数据模型层：负责数据逻辑（业务规则）的处理和实现<strong>数据操作/存取</strong>。相当于JavaBean。</li>
+  <li><code class="highlighter-rouge">View</code> 视图层：负责<strong>用户交互</strong>（格式化数据展示给用户，并接受用户输入）、数据验证等功能。不进行任何业务逻辑处理。</li>
+  <li><code class="highlighter-rouge">Controller</code> 控制层：负责<strong>接受请求</strong>并调用相应的模型去<strong>处理请求</strong>，然后指定相应视图来显示处理结果。</li>
+</ol>
+
+<p><code class="highlighter-rouge">Model 2</code> 时代，早期 Java Web MVC 开发模式：</p>
+
+<ol>
+  <li>JavaBean + JSP；</li>
+  <li>JavaBean + JSP + Servlet
+    <ol>
+      <li>Java Bean（Model，即 dao 和 bean）</li>
+      <li>JSP（View）</li>
+      <li>Servlet（Controller，可在 JSP 中实现）</li>
+    </ol>
+  </li>
+</ol>
+
+<p><code class="highlighter-rouge">Spring MVC</code> 时代：</p>
+
+<ol>
+  <li>持久层（Dao 数据库操作 / Entity 实体类 / Model）：可整合 JdbcTemplate、Hibernate 和 MyBatis 等技术。</li>
+  <li>表现层（View）：提供与 Spring MVC、Struts2 框架的整合。</li>
+  <li>控制层（Controller）：</li>
+  <li>业务逻辑层（Service）：<code class="highlighter-rouge">service + serviceImpl</code> 。处理业务逻辑；处理请求和响应事件，“事件”包括<strong>用户的行为</strong>和<strong>数据的改变</strong>；管理事务和记录日志等。</li>
+</ol>
+
+<h5 id="spring-mvc-vs-struts2">Spring MVC VS Struts2</h5>
+
+<ol>
+  <li><code class="highlighter-rouge">Spring MVC</code> 基于方法开发，会将 URL 信息与 Controller 类的某个方法绑定并进行映射，请求参数作为该方法的形参，生成 Handler 对象，只包含一个 method 方法；<code class="highlighter-rouge">Struts2</code> 基于类开发，<strong>Action 类</strong>中所有方法的请求参数都是<strong>成员变量</strong>，方法越多，类越乱。</li>
+  <li><code class="highlighter-rouge">Spring MVC</code> 支持单例开发模式；而 <code class="highlighter-rouge">Struts2</code> 由于只能通过<strong>类的成员变量</strong>接受参数，无法用单例模式。</li>
+</ol>
+
+<p>不同：</p>
+
+<ol>
+  <li>入口不同：Struts2 为 filter 过滤器；SpringMVC 为一个 Servlet，即前端控制器；</li>
+  <li>开发方式不同：Struts2 基于类开发，传递参数通过类的属性，只能设置为多例；SpringMVC 基于方法开发（一个 url 对应一个方法），请求参数传递到方法形参，可为单例也可为多例（建议单例）；</li>
+  <li>请求方式不同：Struts2 值栈存储请求和响应的数据，通过OGNL存取数据；SpringMVC 通过参数解析器将 request 请求内容解析，给方法形参赋值，将数据和视图封装成 ModelAndView 对象，最后又将其中的模型数据通过 request 域传输到页面，jsp 视图解析器默认使用的是 jstl。</li>
+</ol>
+
+<h5 id="spring-mvc-的核心组件">Spring MVC 的核心组件</h5>
+
+<ol>
+  <li><strong><code class="highlighter-rouge">DispatcherServlet</code></strong>：<strong>核心的中央处理器</strong>、<strong>前端控制器</strong>/分发器/<strong>调度器</strong>，负责接收请求、分发，并给予客户端响应。</li>
+  <li><strong><code class="highlighter-rouge">HandlerMapping</code></strong>：<strong>处理器映射器</strong>，<strong>根据 URL 去匹配</strong>查找能处理的 <code class="highlighter-rouge">Handler</code> ，并会将请求涉及到的<strong>拦截器</strong>和 <code class="highlighter-rouge">Handler</code> 一起封装。</li>
+  <li><strong><code class="highlighter-rouge">HandlerAdapter</code></strong>：<strong>处理器适配器</strong>，根据 <code class="highlighter-rouge">HandlerMapping</code> 找到的 <code class="highlighter-rouge">Handler</code> ，<strong>适配执行</strong>对应的 <code class="highlighter-rouge">Handler</code>；</li>
+  <li><strong><code class="highlighter-rouge">Handler</code></strong>：<strong>请求处理器</strong>，处理实际请求的处理器。</li>
+  <li><strong><code class="highlighter-rouge">ViewResolver</code></strong>：<strong>视图解析器</strong>，根据 <code class="highlighter-rouge">Handler</code> 返回的逻辑视图 / 视图 / <strong><code class="highlighter-rouge">ModelAndView</code> 对象</strong>，解析并渲染真正的视图，并传递给 <code class="highlighter-rouge">DispatcherServlet</code> 响应客户端。</li>
+</ol>
+
+<h5 id="spring-mvc-工作原理流程说明">Spring MVC 工作原理/流程说明</h5>
+
+<p><img src="../assets/springmvc_work_flow.jpg" alt="img" style="zoom:100%;" /></p>
+
+<p>传统开发模式（JSP，Thymeleaf 等）的工作原理：</p>
+
+<ol>
+  <li>客户端（浏览器）发送请求到 <strong><code class="highlighter-rouge">Di'spatcherServlet</code> 前端控制器</strong>/分发器/<strong>调度器</strong>；</li>
+  <li><code class="highlighter-rouge">DispatcherServlet</code> （根据请求信息）查询 <code class="highlighter-rouge">HandlerMapping</code> 处理器映射；<code class="highlighter-rouge">HandlerMapping</code> 根据 URL 去匹配查找能处理的 <code class="highlighter-rouge">Handler</code>（也就是我们平常说的 <code class="highlighter-rouge">Controller</code> 控制器） ，并会将请求涉及到的拦截器和 <code class="highlighter-rouge">Handler</code> 一起封装。</li>
+  <li><del>返回 <code class="highlighter-rouge">Handler</code> 处理器对象；</del></li>
+  <li>调用 <code class="highlighter-rouge">HandlerA'dapter</code> 适配器，解析请求到对应的具体 Handler（即 <strong>Controller</strong>）；</li>
+  <li><code class="highlighter-rouge">HandlerAdapter</code> 适配器调用<strong>真正的处理器</strong> <code class="highlighter-rouge">Handler</code> 处理请求和相应的业务逻辑；Controller 调用 Service 业务逻辑层处理后返回结果；</li>
+  <li>处理器处理完业务后，会返回一个 <strong><code class="highlighter-rouge">ModelAndView</code> 对象</strong>（Model 是返回的数据对象，View 是逻辑上的 View）；</li>
+  <li><del>返回 <code class="highlighter-rouge">ModelAndView</code> 对象给前端控制器；</del></li>
+  <li>请求 <code class="highlighter-rouge">ViewResolver</code> 视图解析器解析视图，根据逻辑 View 查找实际的 View；</li>
+  <li><strong>视图渲染</strong>：<code class="highlighter-rouge">DispaterServlet</code> 把返回的 Model 传给 View；</li>
+  <li>JSP 渲染视图；</li>
+  <li>将 View 响应给浏览器。</li>
+</ol>
+
+<p>然而现在主流的开发方式是<strong>前后端分离</strong>，这种情况下 Spring MVC 的 <code class="highlighter-rouge">View</code> 概念发生了一些变化。</p>
+
+<p>由于 <code class="highlighter-rouge">View</code> 通常由前端框架（Vue, React 等）来处理，后端不再负责渲染页面，而是只负责提供数据，因此：</p>
+
+<ul>
+  <li>后端通常不再返回具体的视图，而是返回<strong>纯数据</strong>（通常是 JSON 格式），由前端负责渲染和展示。</li>
+  <li><code class="highlighter-rouge">View</code> 的部分往往不需要设置，Spring MVC 的控制器方法只需要返回数据，不再返回 <code class="highlighter-rouge">ModelAndView</code>，而是直接返回数据，Spring 会自动将其转换为 JSON 格式。相应的，<code class="highlighter-rouge">ViewResolver</code> 也将不再被使用。</li>
+</ul>
+
+<p>怎么做到呢？</p>
+
+<ul>
+  <li>使用 <code class="highlighter-rouge">@RestController</code> 注解代替传统的 <code class="highlighter-rouge">@Controller</code> 注解，这样所有方法默认会返回 JSON 格式的数据，而不是试图解析视图。</li>
+  <li>如果你使用的是 <code class="highlighter-rouge">@Controller</code>，可以结合 <code class="highlighter-rouge">@ResponseBody</code> 注解来返回 JSON。</li>
+</ul>
+
+<h3 id="springspring-mvcspring-boot">Spring、Spring MVC、Spring Boot</h3>
+
+<p>Spring，Spring MVC，Spring Boot 之间什么关系?</p>
+
+<ol>
+  <li><code class="highlighter-rouge">Spring</code>：是一个<strong>轻量级开源框架</strong>，用于简化 <del>Java EE</del> 企业级应用程序开发。核心是 IoC（<strong>控制反转</strong>）和 <strong>AOP</strong>（面向切面编程）。还提供了事务管理等功能。
+    <ul>
+      <li>可以用于构建<strong>任何类型</strong>的 Java 应用程序，包括 Web 应用程序、桌面应用程序、和批处理应用程序等。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">Spring MVC</code>：Spring MVC 是构建在 Spring 之上的 <strong>Web 框架</strong>，用于<strong>构建 Web 应用程序</strong>。提供了一个基于 Model、View、Controller 模式的 Web 框架，用于处理 Web 请求和响应。
+    <ul>
+      <li>通过将请求<strong>映射</strong>到相应的处理器方法，并使用<strong>视图</strong>来呈现响应，使得构建Web应用程序变得简单和灵活。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">Spring Boot</code>：是一个用于<strong>简化 Spring 应用程序开发</strong>的框架，用于快速构建基于 Spring 的 Web 应用程序。Spring Boot <strong>依赖于</strong> Spring 框架和 Spring MVC。提供了<strong>自动配置</strong>、开箱即用等功能。
+    <ul>
+      <li>内置了许多常用的<strong>第三方库和框架</strong>，简化了配置和部署过程。还提供了一组用于开发Web应用程序、RESTful 服务和微服务的起步<strong>依赖项</strong>。</li>
+    </ul>
+  </li>
+</ol>
+
+<h2 id="spring-整合-web">Spring 整合 Web</h2>
+
+<h4 id="java-web">Java Web</h4>
+
+<h5 id="服务器">服务器</h5>
+
+<p><strong>Web 服务器</strong>：指能为<strong>发出请求</strong>的浏览器（客户端）<strong>提供文档</strong>的程序。只需支持HTTP协议、HTML文档格式及URL。与客户端的网络浏览器配合。因为Web服务器主要支持的协议就是HTTP，所以通常情况下HTTP服务器和WEB服务器是相等的。</p>
+
+<ul>
+  <li><code class="highlighter-rouge">N’ginx</code>：轻量级的 Web （静态资源）服务器、反向代理服务器，内存占用少，启动极快，高并发能力强，在互联网项目中广泛应用。</li>
+  <li>Apache HTTP 服务器：用 C 语言实现的 HTTP Web 服务器。</li>
+</ul>
+
+<p><strong>应用程序服务器</strong>：Web服务器传送(serves)页面使浏览器可以浏览，而应用程序服务器提供的是客户端应用程序可以调用(call)的方法(methods)。</p>
+
+<ul>
+  <li><code class="highlighter-rouge">Tomcat</code>：是一个开源 <code class="highlighter-rouge">Servlet容器 / Web容器</code>，负责处理客户端请求，并返回响应。简单来说，Tomcat 主要实现了 2 个核心功能：
+    <ol>
+      <li>处理 <code class="highlighter-rouge">Socket</code> 连接，负责网络字节流、<code class="highlighter-rouge">Request</code> 和 <code class="highlighter-rouge">Response</code> 对象的<strong>转化</strong>。用来管理、运行、支持 Java Servlet、JSP（JavaServer Pages ）、Java 表达式语言、 Java WebSocket 技术 。</li>
+      <li>加载和管理 <code class="highlighter-rouge">Servlet</code>，及具体处理 <code class="highlighter-rouge">Request</code> 请求。</li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">Jetty</code>、<code class="highlighter-rouge">Undertow</code>：</li>
+</ul>
+
+<p><strong>Web 应用服务器</strong>：目前常用的混合软件解决方案。</p>
+
+<p>Servlet 容器（<strong>重点理解</strong>）：是一个（基于 Java）<strong>运行在服务器端</strong>的 Web 组件 / 接口，用于交互式的浏览和修改数据，生成动态 Web 内容。</p>
+
+<ul>
+  <li>按照 Servlet 规范编写的 Java 类，被编译为平台独立的字节码，可被动态地加载到支持 Java 的 Web 服务器中运行。</li>
+  <li>执行过程。</li>
+</ul>
+
+<h5 id="tomcat">Tomcat</h5>
+
+<p><img src="../assets/tomcat_server_response.png" alt="在这里插入图片描述" style="zoom: 50%;" /></p>
+
+<p>Tomcat 运行机制：Tomcat 服务器接受客户请求并做出响应的过程。</p>
+
+<h5 id="http-请求处理流程">HTTP 请求处理流程</h5>
+
+<ol>
+  <li><strong>客户端</strong>（通常都是浏览器）访问 <strong>Web 服务器</strong>，发送 HTTP 请求。
+    <ul>
+      <li>Web 服务器：也叫 HTTP 服务器、web容器，其需要提供web应用运行所需的环境，接收客户端的Http请求</li>
+    </ul>
+  </li>
+  <li>Web 服务器接收到请求后，传递给 <strong>Servlet 容器</strong>。
+    <ul>
+      <li>Servlet 容器：也称Servlet引擎，为Servlet的运行提供环境支持，可以理解为 <strong>Tomcat</strong> 或其他服务器。</li>
+    </ul>
+  </li>
+  <li><strong>Servlet 容器</strong>（根据 url 等路径决定）加载对应 Servlet 实例；调用 Servlet 的 <code class="highlighter-rouge">service()</code> 方法返回 response 对象，向其传递表示请求和响应的对象。
+    <ol>
+      <li>如果Serlvet没有被实例化，则创建该Servlet的一个实例（调用init方法）；</li>
+      <li>或从线程池中取出一个空闲线程（产生 Servlet 实例）；</li>
+    </ol>
+  </li>
+  <li>Servlet容器根据用户的HTTP请求，创建一个<strong><code class="highlighter-rouge">ServletRequest</code>请求对象</strong>（封装了 HTTP 请求信息）和一个可以对HTTP请求进行响应的<code class="highlighter-rouge">ServletResponse</code>对象（类似于寄信，并在信中说明回信的地址），</li>
+  <li>然后调用<code class="highlighter-rouge">HttpServlet</code>中重写的<strong><code class="highlighter-rouge">service(ServletRequest req, ServletResponse res)</code>方法</strong>，
+    <ol>
+      <li>并在这个方法中，将这两个对象<strong>向下转型</strong>，得到<strong><code class="highlighter-rouge">HttpServletRequest</code></strong>和<code class="highlighter-rouge">HttpServletResponse</code>两个对象，</li>
+      <li>然后将客户端的请求转发到<code class="highlighter-rouge">HttpServlet</code>中的<code class="highlighter-rouge">service(HttpServletRequest req, HttpServletResponse resp)</code>。</li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">HttpServletResponse</code>：服务端处理完Http的请求后，将处理结果作为<strong>Http响应</strong>返回给客户端。</li>
+</ol>
+
+<p>参考：<a href="https://blog.csdn.net/qq_41358574/article/details/120422160">HttpServletRequest和@Requestparam、@RequestBody、直接实体接收请求参数的区别与示例</a></p>
+
+<h4 id="获取-httpservletrequest-对象">获取 HttpServletRequest 对象</h4>
+
+<p>获取 request 对象的四种方法：</p>
+
+<ol>
+  <li>
+    <p>传参：Controller 中<strong>加参数</strong> <code class="highlighter-rouge">HttpServletRequest request</code> 来获取 request 对象；</p>
+
+    <ul>
+      <li>实现原理是，在Controller方法开始处理请求时，Spring会将request对象赋值到方法参数中。此时request对象相当于局部变量，毫无疑问是线程安全的。</li>
+      <li>缺点：冗余太多。</li>
+    </ul>
+  </li>
+  <li>
+    <p>IoC：<strong>自动注入</strong>（成员变量）来获取 request 对象；优点有：</p>
+
+    <ol>
+      <li>
+        <p>注入不局限于 Controller 中，还可以在任何Bean中注入，包括Service、Repository及普通的Bean。</p>
+      </li>
+      <li>
+        <p>注入的对象不限于request，还可以注入其他<code class="highlighter-rouge">scope</code>为<code class="highlighter-rouge">request</code>或<code class="highlighter-rouge">session</code>的对象，如<code class="highlighter-rouge">response</code>对象、<code class="highlighter-rouge">session</code>对象等；并保证线程安全。</p>
+      </li>
+      <li>
+        <p>大大减少了代码冗余。</p>
+
+        <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> @Autowire
+ HttpServletRequest request;
+        
+ //?
+ @Autowire
+ HttpSession session;
+</code></pre></div>        </div>
+      </li>
+    </ol>
+  </li>
+  <li>
+    <p><strong>基类</strong>中自动注入（推荐）；</p>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> public class BaseController {
+     @Autowired
+     protected HttpServletRequest request;     
+ }
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>通过 <code class="highlighter-rouge">RequestContextHolder</code> 的静态方法获取 request 对象及 response 等相关对象。</p>
+
+    <ul>
+      <li>优点：可以在非Bean中直接获取。</li>
+      <li><code class="highlighter-rouge">RequestContextHolder</code>：持有上下文的Request容器。</li>
+    </ul>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> //获取当前请求对象
+ ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+ HttpServletRequest request = attributes.getRequest();
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h4 id="http-请求中接收前端参数的方式">HTTP 请求中接收前端参数的方式</h4>
+
+<h5 id="三种常用的方式">三种常用的方式</h5>
+
+<ol>
+  <li><code class="highlighter-rouge">HttpServletRequest</code>：
+    <ul>
+      <li>后端用于响应的有<code class="highlighter-rouge">HttpServletResponse</code>。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">@RequestParam</code>：具体见下面 <a href="#REST 常用注解">REST 常用注解</a>。</li>
+  <li><code class="highlighter-rouge">@RequestBody</code>：具体见下面 <a href="#REST 常用注解">REST 常用注解</a>。</li>
+</ol>
+
+<p>取参类型区别：</p>
+
+<ul>
+  <li>
+    <p><code class="highlighter-rouge">@RequestParam</code> 和 <code class="highlighter-rouge">@RequestBody</code> 都是从 <code class="highlighter-rouge">HttpServletRequest request</code> 中取参的，而 <code class="highlighter-rouge">@PathVariable</code> 是映射 URI 请求参数中的<strong>占位符</strong>到目标方法的参数。</p>
+  </li>
+  <li><code class="highlighter-rouge">@RequestParam</code> 可以获取（Content-Type 的<strong>默认值</strong>） <code class="highlighter-rouge">application/x-www-form-urlencoded</code> 以及 <code class="highlighter-rouge">application/json</code> 这两种类型的参数，</li>
+  <li>但是 <code class="highlighter-rouge">@RequestBody</code> 是用来获取<strong>非默认类型</strong>的数据，比如 <code class="highlighter-rouge">application/json</code>、<code class="highlighter-rouge">application/xml</code> 等。</li>
+</ul>
+
+<h5 id="httpservletrequest">HttpServletRequest</h5>
+
+<p><code class="highlighter-rouge">HttpServletRequest</code> 接口可以获得的参数更多，它可以获得客户端的<strong>请求行和请求头、请求体</strong>信息。</p>
+
+<p>当访问Servlet时，会在请求消息的请求行中，包含请求方法、请求资源名、请求路径等信息，为了获取这些信息，定义了一系列用于获取请求行的方法。</p>
+
+<ol>
+  <li>获得请求行：<code class="highlighter-rouge">String getMethod()</code> GET/POST等。</li>
+  <li>获得请求头：<code class="highlighter-rouge">String getHeader(String name)</code>等。</li>
+  <li>获得请求体：<code class="highlighter-rouge">String getParameter(String name)</code>等。</li>
+  <li>获取 Session：<code class="highlighter-rouge">getSession()</code>。</li>
+</ol>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Public static void login(User user, HttpServletRequest request) {
+    HttpSession session = request.getSession();
+    Session.setAttribute(User, user);
+}
+</code></pre></div></div>
+
+<h5 id="httpservletresponse">HttpServletResponse</h5>
+
+<p><code class="highlighter-rouge">HttpServletResponse</code>：服务端处理完Http的请求后，根据HttpServletResponse对象将处理结果作为Http响应返回给客户端。</p>
+
+<h4 id="rest-常用注解">REST 常用注解</h4>
+
+<p>常用于 Spring MVC 的 <a href="#Controler控制层">Controller 层</a>。</p>
+
+<ul>
+  <li><code class="highlighter-rouge">REST</code>：代表着<strong>抽象状态转移</strong>，根据 HTTP 协议从客户端发送数据到服务端，如：服务端的一本书以 XML 或 JSON 格式传递到客户端；常用于 Controller 控制器。</li>
+  <li><code class="highlighter-rouge">REST API</code>：利用 HTTP 中 get、post、put/patch、delete 及其他 HTTP 方法构成 REST 中数据资源的增删改查操作。</li>
+</ul>
+
+<h5 id="requestmapping-vs-getmapping">@RequestMapping VS @GetMapping</h5>
+
+<p>都用于处理常见的 HTTP 请求类型：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">@RequestMapping(value = "/user", method = RequestMethod.GET, produces = "application/json; charset=utf-8")</code>：可标注在 Controller 控制器<strong>类上</strong>和方法上，用于映射 HTTP 请求。
+    <ol>
+      <li><code class="highlighter-rouge">produces</code>属性：指定返回值类型和字符编码；<code class="highlighter-rouge">consumes</code>属性：指定处理请求的提交内容类型（Content-Type），例如 <code class="highlighter-rouge">application/json, text/html, image/jpeg</code>。</li>
+      <li>标注在 Controller 控制器类上时：会应用到控制器的所有方法上；一般用于<strong>配置 URI 请求前缀</strong>，即该 Controller 下的所有请求都需加上此前缀，请求方式可用方法上的注解指定；</li>
+      <li>标注在请求方法上时：二者等价。</li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">@GetMapping("/user")/@PostMapping()@PutMapping()/@DeleteMapping()/@PatchMapping()</code>：仅可标注在方法上。</li>
+</ul>
+
+<h5 id="requestparam-vs-pathvariable">@RequestParam VS @PathVariable</h5>
+
+<p>都用于前后端传值：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">@RequestParam</code> ：用于从 URL <strong>获取查询参数</strong>。最适合 Web 应用程序。如果 URL 中不存在查询参数，则可指定默认值。（<code class="highlighter-rouge">/teachers?type=web</code>）
+    <ol>
+      <li><code class="highlighter-rouge">defaultValue </code>：如果本次请求没有携带这个参数，或参数为空，那么就会启用默认值；</li>
+      <li><code class="highlighter-rouge">name/value</code>：绑定本次参数的名称，要跟URL上面的一样；value 是name属性的一个别名:</li>
+      <li><code class="highlighter-rouge">required </code>：这个参数不是必须的，如果为 true，不传参数<strong>会报错</strong>。</li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">@PathVariable</code>：用于从 URI 中<strong>获取路径参数</strong>。最适合 RESTful Web 服务。可在一个方法中定义多个。（<code class="highlighter-rouge">/klasses/123456/</code>）
+    <ol>
+      <li><code class="highlighter-rouge">name/value</code>：绑定参数的名称，<strong>默认不传递时，绑定为同名的形参。</strong> 赋值但名称不一致时则报错；</li>
+      <li><code class="highlighter-rouge">required</code>：这个参数不是必须的，如果为 true，不传参数会报错。</li>
+      <li>使用时需要注意两点：参数接收类型使用基本类型；如果标明参数名称，则参数名称必须和URL中参数名称一致。</li>
+    </ol>
+  </li>
+</ul>
+
+<p>区别：</p>
+
+<ol>
+  <li>都用于提取方法参数；都用于 GET、POST请求；</li>
+  <li>获取参数值的方式不同，<code class="highlighter-rouge">@RequestParam</code> 从请求携带的<strong>参数</strong>中获取参数（<code class="highlighter-rouge">/teachers?type=web</code>），而 <code class="highlighter-rouge">@PathVariable</code> 从<strong>请求的 URI</strong> 中获取（<code class="highlighter-rouge">/klasses/123456/</code>）。</li>
+</ol>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 如果请求的 url 是：/klasses/123456/teachers?type=web
+// 则获取到的数据就是：klassId=123456, type=web
+@GetMapping("/klasses/{klassId}/teachers")
+public List&lt;Teacher&gt; getKlassRelatedTeachers(
+	@PathVariable("klassId") Long klassId,
+	@RequestParam(value = "type", defaultValue = "10000", required = false) String klassType ) {
+	...
+}
+</code></pre></div></div>
+
+<h5 id="requestbody">@RequestBody</h5>
+
+<p><code class="highlighter-rouge">@RequestBody</code>：将传入的 <strong>HTTP 请求体</strong>与注解的方法参数中的<strong>对象</strong>绑定， 要求传递一个 <code class="highlighter-rouge">JSON</code> 格式的字符串。响应体另见<a href="#@Controller">@ResponseBody</a>。</p>
+
+<ul>
+  <li>不能用于GET请求；</li>
+  <li>用于读取 Request 请求的 body 部分、<code class="highlighter-rouge">Content-Type</code> 为 <code class="highlighter-rouge">application/json</code> 格式的数据，接收到数据后会自动将数据<strong>绑定到 Java 对象</strong>上去。系统会将请求的 body 中的 json 字符串转换为 Java 对象。</li>
+</ul>
+
+<p>使用 @RequestBody 需要满足如下条件：</p>
+
+<ol>
+  <li>Content-Type 为 application/json，确保传递的是 JSON 数据；</li>
+  <li>参数转化的配置必须统一，否则无法接收数据，比如 json、request 混用等。</li>
+</ol>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@ApiOperation(value = "登录以后返回token")
+@RequestMapping(value = "/login", method = RequestMethod.POST)
+@ResponseBody
+public CommonResult login(@Validated @RequestBody UmsAdminLoginParam umsAdminLoginParam) {
+	String token = adminService.login(umsAdminLoginParam.getUsername(), umsAdminLoginParam.getPassword());
+	...
+}
+</code></pre></div></div>
+
+<h5 id="requestparam-vs-requestbody">@RequestParam VS @RequestBody</h5>
+
+<p>一个请求方法只可有一个 <code class="highlighter-rouge">@RequestBody</code>，在一个请求中只能用一次；但可有多个 <code class="highlighter-rouge">@RequestParam</code> 和 <code class="highlighter-rouge">@PathVariable</code>。</p>
+
+<p>前端在不明确指出 <code class="highlighter-rouge">Content-Type</code> 时，默认为 <code class="highlighter-rouge">application/x-www-form-urlencoded</code> 格式，在这种格式下，后端：</p>
+
+<ul>
+  <li>
+    <p>使用 <code class="highlighter-rouge">@RequestParam</code> 可以直接获取指定的参数，可以获取 默认以及 <code class="highlighter-rouge">application/json</code> 这两种类型的参数，但是一旦前端传递的是 JSON 数据，那么使用 @RequestParam 取不到值，还报错。</p>
+  </li>
+  <li>
+    <p>使用 <code class="highlighter-rouge">@RequestBody</code> 是用来获取<strong>非默认类型</strong>的数据，比如 <code class="highlighter-rouge">application/json</code>、<code class="highlighter-rouge">application/xml</code> 等。</p>
+  </li>
+</ul>
+
+<h5 id="requestxxx-系列">@RequestXxx 系列</h5>
+
+<ol>
+  <li><code class="highlighter-rouge">@RequestHeader</code>：用于获取有关 HTTP 请求头的详细信息。将此注解用作<strong>方法参数</strong>。注解的可选元素是<strong>名称，必填，值，defaultValue。</strong> 可在一种方法中多次使用。</li>
+  <li><code class="highlighter-rouge">@RequestAttribute</code>：将方法参数绑定到请求属性。提供了从控制器方法方便地访问请求属性的方法。可访问服务器端填充的对象。</li>
+</ol>
+
+<h5 id="required">@Required</h5>
+
+<p><code class="highlighter-rouge">@Required</code>：用于 Bean 设置方法。表示在配置时用<strong>必需的属性</strong>填充带注解的 Bean，否则将引发异常 <code class="highlighter-rouge">BeanInitilizationException</code> 。</p>
+
+<h5 id="crossorigin">@CrossOrigin</h5>
+
+<p>用于解决跨域问题。</p>
+
+<h5 id="modelattribute">@ModelAttribute</h5>
+
+<p>作用是将请求参数绑定到<strong>Model对象</strong>。</p>
+
+<ul>
+  <li>被@ModelAttribute注释的方法会在Controller每个方法执行前被执行（如果在一个Controller映射到多个URL时，要谨慎使用）。</li>
+</ul>
+
+<p>如，获取POST请求的FORM表单数据</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">&lt;!--jsp页面--&gt;</span>
+<span class="nt">&lt;form</span> <span class="na">action =</span><span class="s">"&lt;%=request.getContextPath()%&gt;/demo/addUser5"</span> <span class="na">method=</span><span class="s">"post"</span><span class="nt">&gt;</span>
+    用户名:<span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">name=</span><span class="s">"username"</span><span class="nt">/&gt;&lt;br/&gt;</span>
+    密码:<span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"password"</span> <span class="na">name=</span><span class="s">"password"</span><span class="nt">/&gt;&lt;br/&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"submit"</span> <span class="na">value=</span><span class="s">"提交"</span><span class="nt">/&gt;</span> <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"reset"</span> <span class="na">value=</span><span class="s">"重置"</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+</code></pre></div></div>
+
+<p>Controller 中：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+* 5、使用@ModelAttribute注解获取POST请求的FORM表单数据
+* @param user
+* @return
+*/</span>
+<span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span><span class="o">=</span><span class="s">"/addUser5"</span><span class="o">,</span> <span class="n">method</span><span class="o">=</span><span class="n">RequestMethod</span><span class="o">.</span><span class="na">POST</span><span class="o">)</span>
+<span class="kd">public</span> <span class="n">String</span> <span class="nf">addUser5</span><span class="o">(</span><span class="nd">@ModelAttribute</span><span class="o">(</span><span class="s">"user"</span><span class="o">)</span> <span class="n">UserModel</span> <span class="n">user</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"username is:"</span><span class="o">+</span><span class="n">user</span><span class="o">.</span><span class="na">getUsername</span><span class="o">());</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"password is:"</span><span class="o">+</span><span class="n">user</span><span class="o">.</span><span class="na">getPassword</span><span class="o">());</span>
+    <span class="k">return</span> <span class="s">"demo/index"</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h5 id="5-种常见的请求类型">5 种常见的请求类型</h5>
+
+<ol>
+  <li><code class="highlighter-rouge">GET</code>：请求从服务器获取特定资源，如 GET /users（获取所有学生）；</li>
+  <li><code class="highlighter-rouge">POST</code>：在服务器上创建一个新的资源，如 POST /users（创建学生）；</li>
+  <li><code class="highlighter-rouge">PUT</code>：更新服务器上的资源，如 PUT /users/12（更新编号为 12 的学生）；</li>
+  <li><code class="highlighter-rouge">DELETE</code>：从服务器删除指定的资源，如 DELETE /users/12（删除编号为 12 的学生）；</li>
+  <li><code class="highlighter-rouge">PATCH</code>：更新服务器上的资源（可看作是<strong>部分更新</strong>），较少用。</li>
+</ol>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@GetMapping("/users")
+//&lt;==&gt;@RequestMapping(value = "/users", method = RequestMethod.GET)
+public ResponseEntity&lt;List&lt;User&gt; &gt; getAllUsers() {
+	return userRepository.findAll();
+}
+
+@PostMapping("/users")
+public ResponseEntity&lt;User&gt; createUser(@Valid @RequestBody UserCreateRequest userCreateRequest) {
+	return userRespository.save(userCreateRequest);
+}
+
+@PutMapping("/users/{userId}")
+public ResponseEntity&lt;User&gt; updateUser(@PathVariable(value = "userId") Long userId, @Valid @RequestBody UserUpdateRequest userUpdateRequest) {
+  ......
+}
+
+@DeleteMapping("/users/{userId}")
+public ResponseEntity deleteUser(@PathVariable(value = "userId") Long userId){
+  ......
+}
+
+@PatchMapping("/profile")
+public ResponseEntity updateStudent(@RequestBody StudentUpdateRequest stuUpdateRequest) {
+	stuRepository.updateDetail(stuUpdateRequest);
+	return ResponseEntity.ok().build();
+}
+</code></pre></div></div>
+
+<h4 id="ajaxjson">AJAX、JSON</h4>
+
+<ol>
+  <li>
+    <p><code class="highlighter-rouge">@JsonIgnoreProperties({"userRoles"})</code>：作用在类上，用于过滤掉特定字段，不返回或不解析；</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">@JsonIgnore</code>：用于属性上，同上；</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">@JsonFormat</code>：用来格式化 JSON 数据。</p>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone="GMT")
+ private Date date;
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">@JsonUnwrapped</code>：扁平化对象。</p>
+  </li>
+</ol>
+
+<p>SpringMVC 中的转发和重定向：</p>
+
+<ul>
+  <li>
+    <p>转发： <code class="highlighter-rouge">return: "hello" </code></p>
+  </li>
+  <li>
+    <p>重定向 ：<code class="highlighter-rouge">return: "redirect:hello.jsp"</code></p>
+  </li>
+</ul>
+
+<p>通过 <strong>JackSon 框架</strong>把 Java 里的对象直接转换成 js 可识别的 JSON 对象，在接受 AJAX 方法里直接返回Object，List 等，方法前需要加上注解 @ResponseBody。</p>
+
+<h4 id="axios">Axios</h4>
+
+<p>前端 HTTP 框架</p>

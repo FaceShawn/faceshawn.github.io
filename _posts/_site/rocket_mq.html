@@ -1,0 +1,170 @@
+<blockquote>
+  <p>摘要：阿里开源的一个<strong>队列模型</strong>的消息中间件，有高性能、高吞吐量、高可靠、高实时、分布式的特点。</p>
+</blockquote>
+
+<!-- more -->
+
+<hr />
+
+<h3 id="目录">目录</h3>
+
+<p>[TOC]</p>
+
+<h3 id="rocketmq">RocketMQ</h3>
+
+<blockquote>
+  <p>Kafka 缺点：在低延迟和高可靠性方面的表现不能满足要求。</p>
+</blockquote>
+
+<p>阿里开源的一个<strong>队列模型</strong>的消息中间件，有高性能、高吞吐量、高可靠、高实时、分布式的特点。</p>
+
+<ul>
+  <li>包括了数据存储、高可用（主从同步）、RPC 通信、注册中心、配置中心等方面的知识与代码实现。</li>
+</ul>
+
+<h3 id="消息模型">消息模型</h3>
+
+<blockquote>
+  <p>RocketMQ 中的消息模型和 Kafaka 类似，把 Kafaka 中的分区换成了队列。不过虽然消息模型类似，但是实现方式还是有很大差别。</p>
+</blockquote>
+
+<p><code class="highlighter-rouge">RocketMQ</code> 通过在一个 <code class="highlighter-rouge">Topic</code> 中<strong>配置多个队列</strong>、且每个队列维护每个消费者组的<strong>消费位置</strong>，实现了<strong>主题模式/发布订阅模式</strong> 。</p>
+
+<ol>
+  <li><code class="highlighter-rouge">Producer</code>（生产者）： 代表某一类的生产者，如多个<strong>秒杀系统</strong>合在一起，一般生产相同的消息。生产消息后指定向主题中的某个队列发送消息。</li>
+  <li><code class="highlighter-rouge">Topic</code>（主题）： 代表一类消息，如订单消息，物流消息等。一个主题中需维护多个队列，提高并发能力。</li>
+  <li><code class="highlighter-rouge">Con'sumer Group</code>（消费者组）： 代表某一类的消费者，如多个<strong>短信系统</strong>合在一起，一般消费相同的消息。每个消费组在每个队列上维护一个<strong>消费位移</strong> 。</li>
+</ol>
+
+<p><img src="../assets/mq-rocketmq-pubsub.png" alt="mq" style="zoom:80%;" /></p>
+
+<h3 id="基本概念">基本概念</h3>
+
+<p>Apache RocketMQ 中的基本概念：</p>
+
+<ul>
+  <li>
+    <p>主题（<code class="highlighter-rouge">Topic</code>）：消息传输和存储的顶层容器，用于标识同一类业务逻辑的消息。主题通过TopicName来做唯一标识和区分。</p>
+  </li>
+  <li>消息类型（<code class="highlighter-rouge">MessageType</code>）：按照消息传输特性的不同而定义的分类，用于类型管理和安全校验。 支持的消息类型有普通消息、顺序消息、事务消息和定时/延时消息。
+    <ul>
+      <li>从5.0版本开始，支持强制校验消息类型，即每个主题Topic只允许发送一种消息类型的消息，这样可以更好的运维和管理生产系统，避免混乱。但同时保证向下兼容4.x版本行为，强制校验功能默认开启。</li>
+    </ul>
+  </li>
+  <li>
+    <p>消息队列（<code class="highlighter-rouge">MessageQueue</code>）：是消息存储和传输的实际容器，也是消息的最小存储单元。 主题都是由多个队列组成，以此实现队列数量的水平拆分和队列内部的流式存储。队列通过QueueId来做唯一标识和区分。</p>
+  </li>
+  <li>消息（<code class="highlighter-rouge">Message</code>）：是最小数据传输单元。生产者将业务数据的负载和拓展属性包装成消息发送到服务端，服务端按照相关语义将消息投递到消费端进行消费。
+    <ul>
+      <li>消息视图（<code class="highlighter-rouge">MessageView</code>）：面向开发视角提供的一种消息只读接口。通过消息视图可以读取消息内部的多个属性和负载信息，但是不能对消息本身做任何修改。</li>
+      <li>消息轨迹：在一条消息从生产者发出到消费者接收并处理过程中，由各个相关节点的时间、地点等数据汇聚而成的完整链路信息。通过消息轨迹，您能清晰定位消息从生产者发出，经由服务端，投递给消费者的完整链路，方便定位排查问题。</li>
+      <li>消息索引（<code class="highlighter-rouge">MessageKey</code>）：面向消息的索引属性。通过设置的消息索引可以快速查找到对应的消息内容。</li>
+    </ul>
+  </li>
+  <li>生产者（<code class="highlighter-rouge">Producer</code>）：用来构建并传输消息到服务端的运行实体。生产者通常被集成在业务系统中，将业务消息按照要求封装成消息并发送至服务端。
+    <ul>
+      <li>事务检查器（<code class="highlighter-rouge">TransactionChecker</code>）：生产者用来执行本地事务检查和异常事务恢复的监听器。事务检查器应该通过业务侧数据的状态来检查和判断事务消息的状态。</li>
+      <li>事务状态（<code class="highlighter-rouge">TransactionResolution</code>）：事务消息发送过程中，事务提交的状态标识，服务端通过事务状态控制事务消息是否应该提交和投递。事务状态包括事务提交、事务回滚和事务未决。</li>
+    </ul>
+  </li>
+  <li>消费者分组（<code class="highlighter-rouge">ConsumerGroup</code>）：承载多个消费行为一致的消费者的负载均衡分组。和消费者不同，消费者分组并不是运行实体，而是一个逻辑资源。通过消费者分组内初始化多个消费者实现消费性能的水平扩展以及高可用容灾。
+    <ul>
+      <li>消费者（<code class="highlighter-rouge">Consumer</code>）：用来接收并处理消息的运行实体。消费者通常被集成在业务系统中，从服务端获取消息，并将消息转化成业务可理解的信息，供业务逻辑处理。</li>
+      <li>消费结果（<code class="highlighter-rouge">ConsumeResult</code>）：PushConsumer消费监听器处理消息完成后返回的处理结果，用来标识本次消息是否正确处理。消费结果包含消费成功和消费失败。</li>
+    </ul>
+  </li>
+  <li>订阅关系：是消费者获取消息、处理消息的规则和状态配置。订阅关系由消费者分组动态注册到服务端系统，并在后续的消息传输中按照订阅关系定义的过滤规则进行消息匹配和消费进度维护。</li>
+</ul>
+
+<h3 id="功能特性">功能特性</h3>
+
+<ol>
+  <li>RocketMQ 提供的高级消息类型：
+    <ol>
+      <li>定时/延时消息：消息被发送至服务端后，在指定时间后才能被消费者消费。通过设置一定的定时时间可以实现分布式场景的延时调度触发效果。</li>
+      <li>顺序消息：支持消费者按照发送消息的先后顺序获取消息，从而实现业务场景中的顺序处理。</li>
+      <li>事务消息：支持在分布式场景下保障消息生产和本地事务的最终一致性。</li>
+    </ol>
+  </li>
+  <li>消息过滤：消费者可以通过<strong>订阅指定消息标签</strong>对消息进行过滤，确保最终只接收被过滤后的消息合集。过滤规则的计算和匹配在服务端完成。
+    <ol>
+      <li>消息标签（<code class="highlighter-rouge">MessageTag</code>）：细粒度消息分类属性，可以在主题层级之下做消息类型的细分。消费者通过订阅特定的标签来实现细粒度过滤。</li>
+    </ol>
+  </li>
+  <li>消费者负载均衡</li>
+  <li>消费进度管理：
+    <ul>
+      <li>消息位点（<code class="highlighter-rouge">MessageQueueOffset</code>）：消息是按到达服务端的先后顺序存储在指定主题的多个队列中，每条消息在队列中都有一个唯一的Long类型坐标，这个坐标被定义为消息位点。</li>
+      <li>消费位点（<code class="highlighter-rouge">ConsumerOffset</code>）：一条消息被某个消费者消费完成后不会立即从队列中删除，RocketMQ 会基于每个消费者分组记录消费过的最新一条消息的位点，即消费位点。</li>
+      <li>重置消费位点：以时间轴为坐标，在消息持久化存储的时间范围内，重新设置消费者分组对已订阅主题的消费进度，设置完成后消费者将接收设定时间点之后，由生产者发送到服务端的消息。</li>
+    </ul>
+  </li>
+  <li>消费重试</li>
+  <li>消息存储和清理机制
+    <ol>
+      <li>消息堆积：生产者已经将消息发送到服务端，但由于消费者的消费能力有限，未能在短时间内将所有消息正确消费掉，此时在服务端保存着未被消费的消息，该状态即消息堆积。</li>
+    </ol>
+  </li>
+</ol>
+
+<h3 id="技术架构四大角色">技术架构四大角色</h3>
+
+<p><img src="../assets/rocket_role.png" alt="img" style="zoom:60%;" /></p>
+
+<ol>
+  <li>
+    <p><code class="highlighter-rouge">Producer</code> 、<code class="highlighter-rouge">Consumer</code>。</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">Broker</code> <strong>消息队列服务器</strong>：主要负责消息的存储、投递和查询及服务高可用保证（用多个 <code class="highlighter-rouge">Broker</code> 来保证<strong>负载均衡</strong>）。</p>
+
+    <ol>
+      <li>即，生产者生产消息到 <code class="highlighter-rouge">Broker</code> ，消费者从 <code class="highlighter-rouge">Broker</code> 拉取消息并消费。</li>
+      <li>一个 <code class="highlighter-rouge">Topic</code> 分布在多个 <code class="highlighter-rouge">Broker</code>上，一个 <code class="highlighter-rouge">Broker</code> 可配置多个 <code class="highlighter-rouge">Topic</code> ，是多对多的关系。</li>
+    </ol>
+
+    <p><img src="../assets/rocketmq_broker.png" alt="img" style="zoom: 50%;" /></p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">NameServer</code> 注册中心：主要提供两个功能，Broker 管理和<strong>路由信息管理</strong> 。<code class="highlighter-rouge">Broker</code> 会将路由表注册到 <code class="highlighter-rouge">NameServer</code> 中，消费者和生产者就从中获取路由表、然后按照路由表的信息和对应的 <code class="highlighter-rouge">Broker</code> 进行通信。如<code class="highlighter-rouge">ZooKeeper</code> 和 <code class="highlighter-rouge">Spring Cloud</code> 中的 <code class="highlighter-rouge">Eu'reka</code> 。</p>
+  </li>
+</ol>
+
+<h3 id="存储机制">存储机制</h3>
+
+<blockquote>
+  <p>在 <code class="highlighter-rouge">Topic</code> 中的队列是以什么样的形式存在？</p>
+</blockquote>
+
+<h3 id="安装">安装</h3>
+
+<p>启动</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>start mqnamesrv.cmd
+start mqbroker.cmd <span class="nt">-n</span> 127.0.0.1:9876 <span class="nv">autoCreateTopicEnable</span><span class="o">=</span><span class="nb">true</span>
+</code></pre></div></div>
+
+<p>问题：</p>
+
+<ul>
+  <li>Please set the ROCKETMQ_HOME variable in your environment!</li>
+  <li>修改runserver.sh文件,将71行和76行的Xms和Xmx等改小一点</li>
+  <li>找不到或无法加载主类 org.apache.rocketmq.namesrv.namesrvstartup</li>
+  <li>修改broker的配置文件</li>
+</ul>
+
+<p>下载 rocketmq-dashboard 可视化控制台，并打包</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn clean package <span class="nt">-Dmaven</span>.test.skip<span class="o">=</span><span class="nb">true</span>
+<span class="c">#cmd进入项目target目录，执行</span>
+java <span class="nt">-jar</span> rocketmq-dashboard-2.1.0.jar <span class="nt">--server</span>.port<span class="o">=</span>8082
+<span class="c">#java -jar rocketmq-dashboard-2.1.0.jar --server.port=18001 --rocketmq.config.namsrvAddr=127.0.0.1:9876 &gt; dashboard.log 2&gt;&amp;1 &amp;</span>
+
+<span class="c">#idea maven npm Process exited with an error</span>
+
+netstat <span class="nt">-aon</span>|findstr <span class="s2">"8082"</span>  	<span class="c">#看端口是否被占用</span>
+taskkill <span class="nt">-pid</span> 8838 <span class="nt">-f</span>   // <span class="nt">-t</span><span class="o">(</span>结束该进程<span class="o">)</span> <span class="nt">-f</span><span class="o">(</span>强制结束该进程以及所有子进程<span class="o">)</span> 
+
+http://127.0.0.1:8082/dashboard/topic.query
+</code></pre></div></div>
+

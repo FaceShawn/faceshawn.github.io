@@ -1,0 +1,243 @@
+<blockquote>
+  <p>摘要：前端模版。</p>
+</blockquote>
+
+<!-- more -->
+
+<h2 id="目录">目录</h2>
+
+<p>[TOC]</p>
+
+<h2 id="vue">Vue</h2>
+
+<h3 id="vue-项目实例">Vue 项目实例</h3>
+
+<ol>
+  <li><code class="highlighter-rouge">src/view/ums/admin/index.vue</code>，获取模型并双向绑定到 <code class="highlighter-rouge">&lt;template&gt;</code> 中的 element-ui <code class="highlighter-rouge">:data="list"</code>；</li>
+  <li><code class="highlighter-rouge">src/api/login.js</code> api接口 request url；</li>
+  <li><code class="highlighter-rouge">src/utils/request.js</code> Axios接口拦截器拦截 request 请求；</li>
+</ol>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 1. src/view/ums/admin/index.vue
+&lt;template&gt;
+  &lt;div class="app-container"&gt;
+      &lt;div class="table-container"&gt;
+          &lt;el-table ref="adminTable"
+                    :data="list"
+                    style="width: 100%;"
+                    v-loading="listLoading" border&gt;
+            &lt;el-table-column label="编号" width="100" align="center"&gt;
+              &lt;template slot-scope="scope"&gt;&lt;/template&gt;
+            &lt;/el-table-column&gt;
+       &lt;/div&gt;
+       &lt;el-dialog
+      :title="isEdit?'编辑用户':'添加用户'"
+      :visible.sync="dialogVisible"&gt;
+      &lt;el-form :model="admin"
+               ref="adminForm"&gt;
+        &lt;el-form-item label="帐号："&gt;
+          &lt;el-input v-model="admin.username" style="width: 250px"&gt;&lt;/el-input&gt;
+        &lt;/el-form-item&gt;
+
+      &lt;/el-form&gt;
+      &lt;span slot="footer" class="dialog-footer"&gt;
+        &lt;el-button @click="dialogVisible = false" size="small"&gt;取 消&lt;/el-button&gt;
+        &lt;el-button type="primary" @click="handleDialogConfirm()" size="small"&gt;确 定&lt;/el-button&gt;
+      &lt;/span&gt;
+    &lt;/el-dialog&gt;
+   ...
+&lt;/template&gt;
+
+&lt;script&gt;
+export default {
+    name: 'adminList',
+    data() {
+      return {
+        listQuery: Object.assign({}, defaultListQuery),
+        list: null,
+        total: null,
+        dialogVisible: false,
+        admin: Object.assign({}, defaultAdmin),
+        isEdit: false,
+      }
+    },
+   methods: {
+     getList() {
+        this.listLoading = true;
+        fetchList(this.listQuery).then(response =&gt; {
+          this.listLoading = false;
+          this.list = response.data.list;
+          this.total = response.data.total;
+        });
+      }
+   }
+}
+&lt;/script&gt;
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 2. src/api/login.js api接口
+export function fetchList(params) {
+  return request({
+    url: '/admin/list',
+    method: 'get',
+    params: params
+  })
+}
+
+// 3. src/utils/request.js Axios接口拦截器拦截请求
+// 创建axios实例
+const service = axios.create({
+  baseURL: process.env.BASE_API, // api的base_url
+  timeout: 15000 // 请求超时时间
+})
+
+// request拦截器
+service.interceptors.request.use(config =&gt; {
+  if (store.getters.token) {
+    config.headers['Authorization'] = getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
+  }
+  return config
+}, error =&gt; {
+  // Do something with request error
+  console.log(error) // for debug
+  Promise.reject(error)
+})
+
+// respone拦截器
+service.interceptors.response.use(
+  response =&gt; {
+    const res = response.data
+    if (res.code !== 200) {
+      Message({
+        message: res.message,
+        type: 'error',
+        duration: 3 * 1000
+      })
+      return Promise.reject('error')
+    } else {
+      return response.data
+    }
+  },
+  error =&gt; {
+    console.log('err' + error)// for debug
+    Message({
+      message: error.message,
+      type: 'error',
+      duration: 3 * 1000
+    })
+    return Promise.reject(error)
+  }
+)
+</code></pre></div></div>
+
+<h3 id="项目结构">项目结构</h3>
+
+<ul>
+  <li>Vue 3 项目由多个文件和文件夹组成，核心文件包括 <code class="highlighter-rouge">index.html</code>、<code class="highlighter-rouge">main.js</code> 和 <code class="highlighter-rouge">App.vue</code>。</li>
+  <li>Vue 组件是应用的基本构建块，使用单文件组件（<code class="highlighter-rouge">.vue</code> 文件）定义。</li>
+  <li>Vue Router 用于管理路由，Vuex 用于状态管理。</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>my-vue-app/
+├── node_modules/       # 项目依赖的第三方库
+├── public/             # 静态资源文件夹
+│   ├── index.html      # 应用的 HTML 模板
+│   └── ...             # 其他静态资源（如图片、字体等）
+├── src/                # 项目源代码
+│   ├── assets/         # 静态资源（如图片、字体等）
+│   ├── components/     # 可复用的 Vue 组件
+│   ├── views/          # 页面级组件，存放视图组件，通常对应路由，每个视图都是一个独立的 .vue 文件。
+│   ├── App.vue         # 根组件，整个应用的入口组件。
+│   ├── main.js         # 项目/应用的入口文件，负责创建 Vue 实例并挂载到 DOM 上。
+│   ├── router.js       # 路由配置
+│   ├── store.js        # Vuex 状态管理配置
+│   └── ...             # 其他配置和资源
+├── package.json        # 项目配置和依赖管理
+├── package-lock.json   # 依赖的精确版本锁定文件
+└── README.md           # 项目说明文档
+</code></pre></div></div>
+
+<h3 id="vue-组件的基本结构">Vue 组件的基本结构</h3>
+
+<p>Vue 组件是 Vue 应用的核心构建块，每个组件都是一个独立的 <code class="highlighter-rouge">.vue</code> 文件。</p>
+
+<p>通常包含以下部分：</p>
+
+<ol>
+  <li>模板（<code class="highlighter-rouge">&lt;template&gt;</code>）：
+    <ul>
+      <li>使用 HTML 和 Vue 模板语法定义组件的 UI。</li>
+      <li>支持<strong>插值</strong>（``）、<strong>指令</strong>（如 <code class="highlighter-rouge">v-if</code>、<code class="highlighter-rouge">v-for</code>）和<strong>事件绑定</strong>（如 <code class="highlighter-rouge">@click</code>）。</li>
+    </ul>
+  </li>
+  <li>脚本（<code class="highlighter-rouge">&lt;script&gt;</code>）：
+    <ul>
+      <li>定义组件的逻辑，包括数据、方法、生命周期钩子等。</li>
+      <li>使用 <code class="highlighter-rouge">export default</code> 导出组件选项。</li>
+    </ul>
+  </li>
+  <li>样式（<code class="highlighter-rouge">&lt;style&gt;</code>）：
+    <ul>
+      <li>定义组件的样式。</li>
+      <li>使用 <code class="highlighter-rouge">scoped</code> 属性可以将样式限制在当前组件内。</li>
+    </ul>
+  </li>
+</ol>
+
+<h3 id="vite-构建工具">Vite 构建工具</h3>
+
+<p>Webpack 传统构建工具</p>
+
+<h3 id="模板语法">模板语法</h3>
+
+<p>Vue.js 为两个最为常用的指令提供了特别的缩写：</p>
+
+<ul>
+  <li>v-bind 缩写：指定HTML 属性中的值。</li>
+  <li>v-on 缩写：用于监听 <strong>DOM 事件</strong>。
+    <ul>
+      <li>修饰符是以半角句号 <strong>.</strong> 指明的特殊后缀，用于指出一个指令应该以特殊方式绑定。</li>
+      <li>如果事件是可取消的，则<code class="highlighter-rouge"> preventDefault()</code> 方法会取消该事件，这意味着属于该事件的默认操作将不会发生。举例，在以下情况下有用：
+        <ul>
+          <li>单击“提交”按钮，阻止其提交表单；</li>
+          <li>单击链接，防止链接跟随 URL。</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;!-- 完整语法 --&gt;
+&lt;a v-bind:href="url"&gt;&lt;/a&gt;
+&lt;!-- 缩写 --&gt;
+&lt;a :href="url"&gt;&lt;/a&gt;
+
+&lt;!-- 完整语法 --&gt;
+&lt;a v-on:click="doSomething"&gt;&lt;/a&gt;
+&lt;!-- 缩写 --&gt;
+&lt;a @click="doSomething"&gt;&lt;/a&gt;
+
+&lt;!-- 与 :id="id" 相同 --&gt;
+&lt;div :id&gt;&lt;/div&gt;
+
+&lt;!-- 这也同样有效 --&gt;
+&lt;div v-bind:id&gt;&lt;/div&gt;
+
+&lt;!-- 例如，.prevent 修饰符告诉 v-on 指令对于触发的事件调用 event.preventDefault() --&gt;
+&lt;form v-on:submit.prevent="onSubmit"&gt;&lt;/form&gt;
+</code></pre></div></div>
+
+<h3 id="声明响应式状态">声明响应式状态</h3>
+
+<p>Vue 在组件实例上暴露的内置 API 使用 <code class="highlighter-rouge">$</code> 作为前缀。它同时也为内部属性保留 <code class="highlighter-rouge">_</code> 前缀。</p>
+
+<h3 id="vue-router">Vue Router</h3>
+
+<p>将组件 (components) 映射到路由 (routes)，然后告诉 Vue Router 在哪里渲染它们。</p>
+
+<ul>
+  <li><a href="https://v3.router.vuejs.org/zh/guide/#html">Vue Router 手册</a></li>
+</ul>
+
+<h2 id="element-ui">Element-UI</h2>
+

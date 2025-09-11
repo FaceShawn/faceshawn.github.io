@@ -1,0 +1,46 @@
+<blockquote>
+  <p>摘要：PHP 语言。</p>
+</blockquote>
+
+<!-- more -->
+
+<h2 id="目录">目录</h2>
+
+<p>[TOC]</p>
+
+<h2 id="php">PHP</h2>
+
+<h4 id="include-和-require">include() 和 require()</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>区别</th>
+      <th>include()</th>
+      <th>require() ~ include_once()</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>性能</td>
+      <td>每次都读取一遍文件</td>
+      <td>只处理一次（本质是替换）</td>
+    </tr>
+    <tr>
+      <td>效率</td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>加载失败</td>
+      <td>warning 警告，但脚本继续执行（4.3.5 前）</td>
+      <td>fatal error 错误，脚本停止执行</td>
+    </tr>
+    <tr>
+      <td>位置</td>
+      <td> </td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+

@@ -1,0 +1,314 @@
+<h4 id="摘要"><span id="JumpToTop">摘要</span></h4>
+
+<blockquote>
+  <p>包括 C、C++ 学习总结。</p>
+</blockquote>
+
+<!-- more -->
+
+<h2 id="目录">目录</h2>
+
+<p>[TOC]</p>
+
+<h2 id="c">C</h2>
+
+<ul>
+  <li>（指向）数组（的）<strong>指针</strong>和（存储）指针（的）<strong>数组</strong>：
+    <ul>
+      <li>p++</li>
+      <li>优先级：() &gt; [] &gt; *</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 数组指针声明
+</span><span class="kt">int</span> <span class="p">(</span><span class="o">*</span><span class="n">p</span><span class="p">)[</span><span class="mi">5</span><span class="p">];</span>
+<span class="p">(</span><span class="kt">int</span>  <span class="o">*</span><span class="p">)[</span><span class="mi">5</span><span class="p">]</span> <span class="n">p</span><span class="p">;</span>	<span class="c1">//类型是(int  *)[5]
+</span>
+<span class="c1">// 指针数组声明
+</span><span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="p">)</span><span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
+<span class="p">(</span><span class="kt">int</span> <span class="o">*</span><span class="p">)(</span><span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">]);</span>
+<span class="kt">int</span> <span class="o">*</span><span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">};</span><span class="c1">//?
+</span></code></pre></div></div>
+
+<h2 id="保留关键字">保留关键字</h2>
+
+<h4 id="static-静态变量">static 静态变量</h4>
+
+<ol>
+  <li>静态存储区</li>
+  <li>默认初始化为0</li>
+  <li>作用域：函数体内的static局部变量，内存只分配一次，持久驻内存，下次调用保存原值</li>
+  <li>作用域：static全局变量和函数，隐藏在本文件内，extern</li>
+  <li>作用域：类中的static成员变量，属于类，所有实例共用</li>
+  <li>作用域：在类中的static成员函数，不接受this指针，只能访问类的static成员函数</li>
+</ol>
+
+<h4 id="const-常变量">const 常变量</h4>
+
+<ol>
+  <li>常变量</li>
+  <li>常指针</li>
+  <li>常函数</li>
+  <li>函数中输入变量</li>
+  <li>类的常成员函数，不能修改成员变量</li>
+</ol>
+
+<h2 id="c-和-c-的区别">C++ 和 C 的区别</h2>
+
+<h2 id="虚函数">虚函数</h2>
+
+<ul>
+  <li><a href="https://blog.csdn.net/ly_ysys629/article/details/76904129">虚函数</a>：
+    <ul>
+      <li>virtual 允许子类重写（重新定义）的成员函数</li>
+      <li>是多态的实现</li>
+      <li>编写的时候不能确定被调用的是基类还是派生类的函数，所以虚</li>
+      <li>父类指针指向子类对象</li>
+    </ul>
+  </li>
+  <li>纯虚函数：在基类中声明的函数</li>
+  <li>抽象类：
+    <ul>
+      <li>有纯虚函数的类</li>
+      <li>组织继承层次，为派生类提供公共根</li>
+    </ul>
+  </li>
+  <li>final 说明符禁用类派生（继承）、虚函数重载（override）</li>
+  <li>Lambda 表达式</li>
+  <li>指针 引用 区别</li>
+  <li>struct class 区别</li>
+</ul>
+
+<h2 id="编程">编程</h2>
+
+<h5 id="tips">Tips</h5>
+
+<p>没有好办法就暴力，没有好办法就模拟。</p>
+
+<h4 id="数组初始化">数组初始化</h4>
+
+<h5 id="int-数组">int 数组</h5>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>int a[10];		// 推荐 fill_n
+fill(a,a+10,20);//三个参数，前面两个是起始地址，最后一个是填充值
+fill_n(a,5,-3);	//三个参数，第一个是首地址，第二个是个数，最后一个是填充值
+memset(a, 0, sizeof(a)); 	//
+</code></pre></div></div>
+
+<h5 id="bool-数组">bool 数组</h5>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 1、初始化器
+bool boolArray[ARRAY_SIZE] = { 0 };		// 只可以初始化 0/-1
+// 2、函数
+#include &lt;cstring&gt;
+memset(boolArray, 0, sizeof(Array)); 
+</code></pre></div></div>
+
+<h4 id="一数学库函数"><strong>一、数学库函数</strong></h4>
+
+<p>数学库函数声明在 math.h 中，C++是cmath。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>符号</th>
+      <th>含义</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>abs(x)</td>
+      <td>求整型数x 的绝对值</td>
+    </tr>
+    <tr>
+      <td>cabs(struct complex znum)</td>
+      <td>返回复数znum的绝对值</td>
+    </tr>
+    <tr>
+      <td>cos(x)</td>
+      <td>x(弧度)的余弦</td>
+    </tr>
+    <tr>
+      <td>fabs(x)</td>
+      <td>求浮点数x 的绝对值</td>
+    </tr>
+    <tr>
+      <td>labs(long n)</td>
+      <td>返回长整型参数n的绝对值</td>
+    </tr>
+    <tr>
+      <td>ceil(x)</td>
+      <td>求不小于x 的最小整数</td>
+    </tr>
+    <tr>
+      <td>floor(x)</td>
+      <td>求不大于x 的最小整数</td>
+    </tr>
+    <tr>
+      <td>exp(double x)</td>
+      <td>返回指数函数e^x的值</td>
+    </tr>
+    <tr>
+      <td>log(x)</td>
+      <td>求x 的自然对数</td>
+    </tr>
+    <tr>
+      <td>log10(x)</td>
+      <td>求x 的对数(底为10)</td>
+    </tr>
+    <tr>
+      <td>pow(x, y)</td>
+      <td>求x 的y 次方</td>
+    </tr>
+    <tr>
+      <td>sin(x)</td>
+      <td>求x(弧度)的正弦</td>
+    </tr>
+    <tr>
+      <td>sqrt(x)</td>
+      <td>求x 的平方根</td>
+    </tr>
+    <tr>
+      <td>srand(unsigned seed)</td>
+      <td>初始化随机数发生器</td>
+    </tr>
+    <tr>
+      <td>int rand()</td>
+      <td>产生一个随机数并返回这个数</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="二字符串处理函数"><strong>二、字符串处理函数</strong></h4>
+
+<p>字符串处理函数在 ctype.h/ctype 中声明。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>符号</th>
+      <th>含义</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>int isdigit(int c)</td>
+      <td>判断c 是否是数字字符</td>
+    </tr>
+    <tr>
+      <td>int isalpha(int c)</td>
+      <td>判断c 是否是一个字母</td>
+    </tr>
+    <tr>
+      <td>int isalnum(int c)</td>
+      <td>判断c 是否是一个数字或字母</td>
+    </tr>
+    <tr>
+      <td>int islower(int c)</td>
+      <td>判断 c 是否是一个小写字母</td>
+    </tr>
+    <tr>
+      <td>int islower(int c)</td>
+      <td>判断 c 是否是一个小写字母</td>
+    </tr>
+    <tr>
+      <td>int isupper(int c)</td>
+      <td>判断 c 是否是一个大写字母</td>
+    </tr>
+    <tr>
+      <td>int toupper(int c)</td>
+      <td>如果 c 是一个小写字母，则返回其大写字母</td>
+    </tr>
+    <tr>
+      <td>int tolower (int c)</td>
+      <td>如果 c 是一个大写字母，则返回其小写字母</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="三字符串和内存操作函数"><strong>三、字符串和内存操作函数</strong></h4>
+
+<p>字符串和内存操作函数声明在 string.h/string中，在调用这些函数时，可以用字符串常量或字符数组名，以及char * 类型的变量，作为其 char * 类型的参数。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>函数格式</th>
+      <th>含义</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>char * strchr(char * s, int c)</td>
+      <td>如果s 中包含字符c, 则返回一个指向s 第一次出现的该字符的指针, 否则返回NULL</td>
+    </tr>
+    <tr>
+      <td>char * strstr(char * s1, char * s2)</td>
+      <td>如果s2 是s1 的一个子串，则返回一个指向s1 中首次出现s2 的位置的指针，否则返回NULL</td>
+    </tr>
+    <tr>
+      <td>char * strlwr(char * s)</td>
+      <td>将s 中的字母都变成小写</td>
+    </tr>
+    <tr>
+      <td>char * strupr( char * s)</td>
+      <td>将s 中的字母都变成大写</td>
+    </tr>
+    <tr>
+      <td>char * strcpy( char * s1, char * s2)</td>
+      <td>将字符串s2 的内容拷贝到s1 中去</td>
+    </tr>
+    <tr>
+      <td>char * strncpy( char * s1, char * s2, int n)</td>
+      <td>将字符串s2 的内容拷贝到s1 中去，但是最多拷贝n 个字节。如果拷贝字节数达到n，那么就不会往s1 中写入结尾的’\0’</td>
+    </tr>
+    <tr>
+      <td>char * strcat( char * s1, char * s2)</td>
+      <td>将字符串s2 添加到s2 末尾</td>
+    </tr>
+    <tr>
+      <td>int strcmp( char * s1, char * s2)</td>
+      <td>比较两个字符串，大小写相关。如果返回值小于0，则说明s1 按字典顺序在s2 前面；返回值等于0，则说明两个字符串一样；返回值大于0，则说明s1 按字典顺序在s2 后面。</td>
+    </tr>
+    <tr>
+      <td>int stricmp( char * s1, char * s2)</td>
+      <td>比较两个字符串，大小写无关。其他和strcmp 同。</td>
+    </tr>
+    <tr>
+      <td>int strlen(const char *string)</td>
+      <td>计算字符串的长度</td>
+    </tr>
+    <tr>
+      <td>char * strncat(char *strDestination, const char *strSource, size_t count)</td>
+      <td>将字符串strSource 中的前count 个字符添加到字符串strDestination 的末尾</td>
+    </tr>
+    <tr>
+      <td>int strncmp(const char *string1, const char *string2, size_t count)</td>
+      <td>分别取两个字符串的前count 个字符作为子字符串，比较它们的大小</td>
+    </tr>
+    <tr>
+      <td>char * strrev(char *string)</td>
+      <td>将字符串string 前后颠倒。</td>
+    </tr>
+    <tr>
+      <td>void * memcpy( void * s1, void * s2, int n)</td>
+      <td>将内存地址s2处的n 字节内容拷贝到内存地址s1</td>
+    </tr>
+    <tr>
+      <td>void * memset( void * s, int c, int n)</td>
+      <td>将内存地址s 开始的n 个字节全部置为c</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="参考">参考</h4>
+
+<ul>
+  <li>
+    <p><a href="https://blog.csdn.net/candyliuxj/article/details/6313191">C++ 标准库常用函数一览</a></p>
+  </li>
+  <li>
+    <p><a href="C/C++中的标准库函数总结">C/C++ 中的标准库函数总结</a></p>
+  </li>
+</ul>

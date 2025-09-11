@@ -1,0 +1,319 @@
+<blockquote>
+  <p>摘要：IDEA 集成开发环境、Linux 开发工具、Git 版本控制、项目管理/构建工具等。</p>
+</blockquote>
+
+<!-- more -->
+
+<hr />
+
+<h2 id="目录">目录</h2>
+
+<p>[TOC]</p>
+
+<h3 id="编辑器-ui界面">编辑器 UI界面</h3>
+
+<h3 id="快捷键">快捷键</h3>
+
+<ul>
+  <li><a href="https://github.com/judasn/IntelliJ-IDEA-Tutorial/blob/master/keymap-introduce.md">Keymap Windows copy 快捷键用法</a></li>
+</ul>
+
+<h5 id="ctrl">Ctrl</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">Ctrl + D</code>	复制光标所在行 或 选中的内容，并插入到光标后</li>
+  <li><code class="highlighter-rouge">Ctrl + E</code>	显示最近打开的文件列表</li>
+  <li><code class="highlighter-rouge">Ctrl + F </code>    查找使用此类的成员</li>
+  <li><code class="highlighter-rouge">Ctrl + J</code>	插入自定义动态代码模板</li>
+  <li><code class="highlighter-rouge">Ctrl + U</code>     实现类<strong>跳转到接口</strong>的方法</li>
+  <li><code class="highlighter-rouge">Ctrl + Y</code>	删除光标所在行 或 选中行</li>
+  <li><code class="highlighter-rouge">Ctrl + /</code> 、<code class="highlighter-rouge">Ctrl + Shift + /</code>：注释单行、多行</li>
+  <li><code class="highlighter-rouge">Ctrl + \</code>、<code class="highlighter-rouge">Ctrl + Alt + N/B</code>：<em>根据 URL 直接跳转到对应的方法定义</em></li>
+  <li><code class="highlighter-rouge">Ctrl + ;</code> 基础代码补全</li>
+  <li><code class="highlighter-rouge">Ctrl + .</code> 自动补全？</li>
+  <li><code class="highlighter-rouge">Ctrl + Home</code>：回退到类最前面</li>
+  <li><code class="highlighter-rouge">Ctrl + [</code>、<code class="highlighter-rouge">Ctrl + ]</code> 移动光标到花括号开始、结束位置</li>
+  <li><code class="highlighter-rouge">Ctrl + Shift + [</code>	选中从光标到中括号开始位置</li>
+  <li><code class="highlighter-rouge">Ctrl + =/-</code>   展开、折叠分
+    <ul>
+      <li><code class="highlighter-rouge">Ctrl + Shift + =/-</code> 全部展开、折叠</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">Ctrl + F12</code>    Structure面板
+    <ul>
+      <li><code class="highlighter-rouge">Alt + 7</code>    方法大纲</li>
+    </ul>
+  </li>
+</ul>
+
+<h5 id="alt">Alt</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">Alt + left</code>：回退到上一个操作位置</li>
+  <li><code class="highlighter-rouge">Alt +  </code>	显示版本控制菜单</li>
+  <li><del><code class="highlighter-rouge">Alt + F1</code> + <code class="highlighter-rouge">1</code>、 <code class="highlighter-rouge">Alt + 1</code> + <code class="highlighter-rouge">1</code>：定位当前文件所在 Project 窗口中的位置，已用<code class="highlighter-rouge">Always Select Opened File</code>设为自动定位</del></li>
+  <li><code class="highlighter-rouge">Alt + F3</code>    在当前文件查找</li>
+  <li><code class="highlighter-rouge">Alt + Home</code>	导航栏</li>
+  <li><code class="highlighter-rouge">Alt + Insert</code>	代码自动生成，如生成对象的 set / get 方法，构造函数，toString() 等</li>
+  <li><code class="highlighter-rouge">Alt + Enter</code>     查询控制台<code class="highlighter-rouge">Query Console</code>编辑器中，<strong>提示可执行的功能</strong>，如<code class="highlighter-rouge">SELECT *</code>语句选中<code class="highlighter-rouge">*</code>扩展成相关列、列添加别名前缀
+    <ul>
+      <li>Free MyBatis Plugin 直接生成新方法的xml实现</li>
+    </ul>
+  </li>
+  <li><del><code class="highlighter-rouge">Alt + F</code></del>      Find in file，在所有文件中查找字符串</li>
+  <li><del><code class="highlighter-rouge">Alt + F</code></del>     用 <code class="highlighter-rouge">Translate</code> 插件翻译选中内容，需联网；</li>
+  <li><code class="highlighter-rouge">Alt + F7</code>    Find Usage，查看在哪里用了。</li>
+</ul>
+
+<h5 id="shift">Shift</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">Shift + Shift</code>	随处搜索</li>
+</ul>
+
+<h5 id="ctrl--alt">Ctrl + Alt</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">Ctrl + Alt + S</code>	打开系统设置</li>
+  <li><code class="highlighter-rouge">Ctrl + Alt + 左方向键</code>	退回到上一个操作处/光标所在位置，与显卡调整屏幕方向的快捷键冲突</li>
+  <li><code class="highlighter-rouge">Ctrl + Alt + enter</code>	执行SonarLint 插件提供的修改建议</li>
+  <li><code class="highlighter-rouge">Ctrl + Alt + B/鼠标左键</code>    接口跳转到<strong>实现方法</strong>、<strong>XML 映射文件</strong></li>
+  <li><code class="highlighter-rouge">Ctrl + Alt + C</code>	重构-快速提取常量</li>
+  <li><code class="highlighter-rouge">Ctrl + Alt + F</code>	重构-快速提取成员变量</li>
+  <li><code class="highlighter-rouge">Ctrl + Alt + L</code>    自动格式化、格式化SQL语句；</li>
+  <li><code class="highlighter-rouge">Ctrl + Alt + M</code>	重构-快速提取方法、接口</li>
+  <li><code class="highlighter-rouge">Ctrl + Alt + P</code>	重构-快速提取参数</li>
+  <li><code class="highlighter-rouge">Ctrl + Alt + V</code>	重构-快速提取变量</li>
+</ul>
+
+<h5 id="ctrl--shift">Ctrl + Shift</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">Ctrl + Shift + +</code>	展开所有代码</li>
+  <li><code class="highlighter-rouge">Ctrl + Shift + Space</code>	智能代码提示</li>
+  <li><code class="highlighter-rouge">Ctrl + Shift + "</code>	    最大化工具窗口、控制台</li>
+  <li><code class="highlighter-rouge">Ctrl + Shift + F12</code>	    编辑器最大化</li>
+  <li><del><code class="highlighter-rouge">Ctrl + Shift + F</code>    Find by XPath expression</del></li>
+  <li><code class="highlighter-rouge">Ctrl + Shift + N</code>	转到文件</li>
+  <li><code class="highlighter-rouge">Ctrl + Shift + R</code>	替换</li>
+  <li><code class="highlighter-rouge">Ctrl + Shift + T</code>	重新打开关闭的选项卡、<del>对当前类生成单元测试类，如果已存在的单元测试类则可进行选择</del></li>
+  <li><code class="highlighter-rouge">Ctrl + Shift + U</code>    变量大小写切换；方法继承关系表Diagram</li>
+</ul>
+
+<h5 id="alt--shift">Alt + Shift</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">Alt + Shift + 上方向键</code>	上移光标所在行</li>
+</ul>
+
+<h5 id="智能补全">智能补全</h5>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//Press Enter to insert, Tab to replace
+//ctrl + . select first default，自动补全
+//psvm + ctrl+.
+public static void main(String[] args) {}
+
+//sout
+System.out.println();
+//soutm
+System.out.println("Main.main");
+//soutp
+System.out.println("args = " + Arrays.deepToString(args));
+//soutv
+System.out.println("args = " + args);
+
+//123.var
+int i = 123;
+//new File().var
+File file = new File();
+//[expression].if
+if (args.length &gt; 1) {}
+//[variable].nn
+if (args != null) {}
+
+//args.for
+for (String arg : args) {}
+//args.fori
+for (int i = 0; i &lt; args.length; i++) {}
+//args.forr
+for (int i = args.length - 1; i &gt;= 0; i--) {}
+
+//[statment].try
+//语句外层加try...catch
+
+//dep + Enter in pom.xml
+//生成依赖模板
+C:\Program Files\Java\jdk1.8.0_92
+D:\Develop\Java\jdk\jdk1.8.0_311\;D:\Develop\Java\jdk\jdk1.8.0_311\bin\;C:\Program Files\Common Files\Oracle\Java\javapath\
+</code></pre></div></div>
+
+<h3 id="常用插件">常用插件</h3>
+
+<ul>
+  <li><a href="https://github.com/judasn/IntelliJ-IDEA-Tutorial/blob/master/plugins-settings.md#插件推荐">插件推荐</a></li>
+  <li>IDE Eval Resetter：无限试用；</li>
+</ul>
+
+<h4 id="ui">UI</h4>
+
+<ol>
+  <li><code class="highlighter-rouge">Material Theme UI</code>：更改原始外观，提供多种主题配色方案；</li>
+  <li><code class="highlighter-rouge">Atom Material Icons</code>：自定义文件和 IDE 图标，用于改进视觉；是<a href="https://github.com/file-icons/atom">Atom File Icons</a>和<a href="https://github.com/ChrisRM/material-theme-jetbrains">Material Theme UI</a>插件图标的移植。</li>
+  <li><del><code class="highlighter-rouge">GoSense Color Scheme</code></del>：在 Material Deep Ocean 基础上对 Golang 配色；</li>
+  <li><code class="highlighter-rouge">HighlightBracketPair</code>：高亮括号对；</li>
+  <li><del><code class="highlighter-rouge">Rainbow Brackets</code></del>：彩色括号，与 <code class="highlighter-rouge">Material Theme UI</code> 冲突，需手动配置来兼容 <code class="highlighter-rouge">Solarized Themes</code> 日晒主题的配色方案；</li>
+  <li><code class="highlighter-rouge">Statistic</code>：通过顶部菜单中的 <code class="highlighter-rouge">View-&gt;Tool Windows-&gt;Statistic</code>按钮统计当前项目中代码的行数和大小；</li>
+  <li><code class="highlighter-rouge">Grep Console</code>：控制台所需的一切；分析控制台日志，对不同级别的日志进行不同颜色的高亮显示，按关键字搜索日志内容；</li>
+  <li><code class="highlighter-rouge">Ideolog</code>：日志级别的代码高亮；</li>
+</ol>
+
+<h4 id="便捷查看">便捷查看</h4>
+
+<ol>
+  <li><code class="highlighter-rouge">jclasslib ByteCode Viewer</code>：Java .class 类文件的字节码查看器；</li>
+  <li><code class="highlighter-rouge">Chinese (Simplified) Language Pack</code>：中文语言包；</li>
+  <li><code class="highlighter-rouge">Translate</code>：选中内容，点击右键或 <code class="highlighter-rouge">Alt + T</code> 翻译；</li>
+  <li><code class="highlighter-rouge">MetricsReloaded</code>：统计代码行数和文件计数指标及更多 Java 指标；</li>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td><code class="highlighter-rouge">Presentation Assistant</code>：显示调用的任何操作的名称和 Win/Mac 快捷方式（查看</td>
+          <td>外观</td>
+          <td>操作描述）；</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li><a href="https://plugins.jetbrains.com/plugin/4509-statistic">Statistic</a>：统计整体代码量。</li>
+</ol>
+
+<h4 id="基础编辑">基础编辑</h4>
+
+<ol>
+  <li><code class="highlighter-rouge">Key Promoter X</code>：提示应使用的键盘快捷键；</li>
+  <li><code class="highlighter-rouge">macOS Keymap</code>：macOS 键盘映射；</li>
+  <li><code class="highlighter-rouge">CamelCase</code>：切换各种变量命名格式（驼峰、下划线、<code class="highlighter-rouge">kebab-case, SNAKE_CASE, PascalCase, camelCase, snake_case or space case</code>）；使用 <code class="highlighter-rouge">⇧ + ⌥ + U / Shift + Alt + U</code> ；</li>
+  <li><code class="highlighter-rouge">String Manipulation</code>：字符串操作，大小写切换、排序、过滤、递增、与列对齐、grepping、转义、编码；</li>
+</ol>
+
+<h4 id="生成补全代码">生成、补全代码</h4>
+
+<ol>
+  <li><code class="highlighter-rouge">GitHub Copilot</code>：AI 自动写代码；</li>
+  <li><code class="highlighter-rouge">Tabnine AI Code Completion</code>：代码提示建议、预测、自动补全；</li>
+  <li><code class="highlighter-rouge">File Path Autocomplete</code>：自动完成文件路径；</li>
+  <li><code class="highlighter-rouge">Big Data Tools</code>：可方便地使用 Zeppelin 笔记本，提供智能导航、代码完成、检查、快速修复和重构；</li>
+  <li><code class="highlighter-rouge">Better Comments</code>：个性化注释；</li>
+  <li><code class="highlighter-rouge">GsonFormatPlus</code>：从 Json String 生成 Json 模型；</li>
+  <li><code class="highlighter-rouge">element</code>：支持元素框架，标签自动补全，使用前必须安装插件 <a href="https://github.com/JetBrains/intellij-plugins/tree/master/vuejs">vuejs</a>；</li>
+  <li><code class="highlighter-rouge">ptg</code>：快速生成 JavaBean、SQL、JVM 参数、Spring 配置；</li>
+</ol>
+
+<h4 id="sonar-代码检查">Sonar 代码检查</h4>
+
+<ol>
+  <li><code class="highlighter-rouge">Maven Helper</code>：快速分析、排除项目中的依赖冲突；通过 <code class="highlighter-rouge">pom.xml</code> 文件底部的<code class="highlighter-rouge">依赖分析</code>标签页查看当前项目中的所有依赖；</li>
+  <li><code class="highlighter-rouge">Alibaba Java Coding Guidelines</code>：实时检测代码中不符合阿里巴巴《Java 开发手册》规约的地方；</li>
+  <li><code class="highlighter-rouge">SonarLint</code>：拼写检查器，即时突出显示问题、错误、漏洞，并提供快速修复建议；</li>
+  <li><code class="highlighter-rouge">CheckStyle-IDEA</code>：提供对 Java 文件的实时和按需扫描；</li>
+</ol>
+
+<h4 id="格式化代码">格式化代码</h4>
+
+<ol>
+  <li><code class="highlighter-rouge">Jindent</code>：源代码格式化，转换任何外部 Java 源代码以满足首选的编码风格或任何常见的 Java 代码约定；按需格式化、生成和完成 Javadoc 注释；</li>
+  <li><code class="highlighter-rouge">Save Actions</code>：支持可配置的、类似 Eclipse 的保存操作，包括“优化导入”、“重新格式化代码”、“重新排列代码”、“编译文件”及一些针对 Java 的快速修复，如“添加/删除 ‘this’ 限定符”等。当文件在磁盘上同步（或保存）时执行配置的操作；</li>
+  <li><code class="highlighter-rouge">Properties to YAML Converter</code>：YAML 属性转换器；</li>
+</ol>
+
+<h4 id="实体类">实体类</h4>
+
+<ol>
+  <li><code class="highlighter-rouge">Lombok</code>：简化对象封装，通过为实体类添加 <code class="highlighter-rouge">@Getter</code> 和 <code class="highlighter-rouge">@Setter</code> 等注解，替换手写的 <code class="highlighter-rouge">Setter、Getter、toString、equals、hashCode</code> 及非空判断等；已捆绑，内置插件；</li>
+  <li><code class="highlighter-rouge">JPA Buddy</code>：高效地使用 <code class="highlighter-rouge">Hibernate、Spring Data JPA、Lombok</code> 等相关技术；实体的所有可视化设计器、Spring Data 存储库、SQL 和 Liquibase 变更日志；</li>
+  <li><code class="highlighter-rouge">MyBatisX</code>：可在 mapper 接口的方法和 xml 实现之间自由跳转、类似 JPA 的自动提示；<code class="highlighter-rouge">mybatis.xml, mapper.xml</code> 提示；集成 mybatis 生成器 Gui；</li>
+  <li><code class="highlighter-rouge">MyBatis Log Plugin</code>：把 Mybatis 输出的 SQL 日志还原成完整的 SQL 语句；付费；</li>
+  <li><del><code class="highlighter-rouge">GsonFormat</code></del>：在实体类名上右键 <code class="highlighter-rouge">Generate -&gt; GsonFormat</code>，可根据 JSON 格式的字符串创建实体类；</li>
+  <li><code class="highlighter-rouge">Screw</code>：生成数据表文档。</li>
+</ol>
+
+<h4 id="接口调试">接口调试</h4>
+
+<ol>
+  <li><code class="highlighter-rouge">HTTP Client</code>：简洁、轻量级的接口调用插件，通过创建 HTTP Request Client 文件并执行，来调试 RESTful Web 服务；<a href="https://bbs.huaweicloud.com/blogs/268840">参考</a>
+    <ul>
+      <li><code class="highlighter-rouge">Ctrl + J</code> 查看创建 HTTP 请求的所有快捷命令；</li>
+      <li>鉴权方式；</li>
+      <li>内置了 6 个 Live Template 模板：<code class="highlighter-rouge">gtr gtrp ptr ptrp fptr mptr</code></li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">RestfulToolkitX</code>：一套 Restful 服务开发工具包；
+    <ol>
+      <li>用于生成多种风格的代码生成器，如 SpringBoot + MyBatis-Plus、SpringBoot + JPA、JHipster 等；</li>
+      <li>输入 URL 直接导航/跳转到服务声明/方法定义（Ctrl + \ 或 Ctrl + Alt + N ）；</li>
+      <li>显示 Restful 服务树窗口结构；</li>
+      <li>内置简单的 HTTP 请求工具；</li>
+      <li>对请求方法做了一些增强功能，在请求方法上 Generate&amp;Copy（复制生成） URL、Query Param 方法参数；</li>
+      <li>将 Java 类转换成 JSON，格式化 json 数据（Ctrl + Enter）；</li>
+      <li>支持 Spring 体系（Spring Boot / Spring MVC）；</li>
+    </ol>
+  </li>
+  <li>右侧的 <code class="highlighter-rouge">RestServices</code> 按钮显示项目中接口的概览信息；
+    <ol>
+      <li>在接口方法上右键可生成查询参数、请求参数、请求 URL；</li>
+      <li>在实体类上右键可直接生成实体类对应的 JSON；</li>
+    </ol>
+  </li>
+</ol>
+
+<h4 id="debug">debug</h4>
+
+<h5 id="alibaba-arthas">Alibaba Arthas</h5>
+
+<p>基于IntelliJ IDEA开发的Alibaba Arthas 命令生成插件，支持Alibaba Arthas 官方常用的命令。</p>
+
+<p>是Alibaba开源的Java诊断工具，可以帮助开发者进行在线排查问题、动态跟踪Java代码、实时监控JVM状态等。</p>
+
+<ul>
+  <li>Arthas支持JDK 6+，支持Linux、Mac和Winodws系统，采用命令行交互模式，同时提供丰富的Tab自动补全功能，方便进行问题的定位和诊断。</li>
+  <li>其实Arthas最厉害的地方就在于，能够让你在<strong>线上环境</strong>没有日志的情况下进行调试程序，定位问题。</li>
+</ul>
+
+<p>当遇到以下类似问题而束手无策时，Arthas可以帮助你解决：</p>
+
+<ul>
+  <li>这个类从哪个jar包加载的？为什么会报各种类相关的Exception？</li>
+  <li>我改的代码为什么没有执行到？难道是我没commit？分支搞错了？</li>
+  <li>遇到问题无法在线上debug，难道只能通过加日志再重新发布吗？</li>
+  <li>线上遇到某个用户的数据处理有问题，但线上同样无法debug，线下无法重现！</li>
+  <li>是否有一个全局视角来查看系统的运行状况？</li>
+  <li>有什么办法可以监控到JVM的实时运行状态？</li>
+  <li>怎么快速定位应用的热点，生成<strong>火焰图</strong>？</li>
+  <li>怎样直接从JVM内查找某个类的实例？</li>
+</ul>
+
+<blockquote>
+  <p>官方的命令太复杂，此插件为了简化使用者的难度，提供了一些常用命令的支持</p>
+</blockquote>
+
+<ul>
+  <li>该插件支持Alibaba Arthas 常用命令,比如 watch、trace、ognl static、ognl bean method、field、monitor、stack 、tt等命令</li>
+  <li>
+    <p>支持设置static field、static final</p>
+  </li>
+  <li>
+    <p>watch:能方便的观察到指定方法的调用情况,返回值、抛出异常、入参(特殊值、异常没有捕获排查)</p>
+  </li>
+  <li>
+    <p>trace:方法内部调用路径，并输出方法路径上的每个节点上耗时(性能问题，调用链问题)</p>
+  </li>
+  <li>ognl:执行表达式(方便获取静态变量，方法，获取spring context 为所欲为)</li>
+  <li>monitor:方法执行监控(性能问题排查，一段时间内的性能指标)</li>
+  <li>stack:获取方法从哪里执行的调用栈(用途：源码学习调用堆栈，了解调用流程)</li>
+  <li>tt:方法执行数据的时空隧道，记录下指定方法每次调用的入参和返回信息，并能对这些不同的时间下调用进行观测(可以重新触发，周期触发，唯一缺点对于ThreadLocal 信息丢失[隐含参数]、引用对象数据变更无效)</li>
+  <li>支持获取选择中的spring 环境变量的值获取，获取spring 上下文所有的环境变量按照优先级打印出来,方便排查环境问题</li>
+  <li>logger:动态更新日志等级</li>
+  <li>Async Profiler. https://github.com/jvm-profiling-tools/async-profiler 火焰图命令支持</li>
+</ul>
+

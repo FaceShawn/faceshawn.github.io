@@ -1,0 +1,187 @@
+<blockquote>
+  <p>摘要：IDEA 集成开发环境、Linux 开发工具、Git 版本控制、项目管理/构建工具等。</p>
+</blockquote>
+
+<!-- more -->
+
+<hr />
+
+<h2 id="目录">目录</h2>
+
+<p>[TOC]</p>
+
+<h2 id="项目管理构建工具">项目管理/构建工具</h2>
+
+<h3 id="jar-包">jar 包</h3>
+
+<p>Spring Boot 提供了 Maven 插件 <a href="https://docs.spring.io/spring-boot/docs/current/reference/html/build-tool-plugins.html#build-tool-plugins-maven-plugin"><code class="highlighter-rouge">spring-boot-maven-plugin</code></a>，可以方便的将 Spring Boot 项目打成 <code class="highlighter-rouge">jar</code> 包或者 <code class="highlighter-rouge">war</code> 包。</p>
+
+<p>考虑到<strong>部署的便利性</strong>，绝大多数场景下，会选择打成 <code class="highlighter-rouge">jar</code> 包。这样，就无需在部署项目的服务器上，配置相应的 Tomcat、Jetty 等 Servlet 容器。</p>
+
+<p>Spring Boot <code class="highlighter-rouge">jar</code> 包的<strong>运行原理</strong>：<code class="highlighter-rouge">jar</code> 包是如何运行，并启动 Spring Boot 项目的呢？</p>
+
+<h4 id="jar-包的结构"><code class="highlighter-rouge">jar</code> 包的结构</h4>
+
+<p>共分成四部分：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">org</code> 目录：为 Spring Boot 提供的 <a href="https://github.com/spring-projects/spring-boot/blob/master/spring-boot-project/spring-boot-tools/spring-boot-loader/"><code class="highlighter-rouge">spring-boot-loader</code></a> 项目，很大的一个作用，就是<strong>解决 <code class="highlighter-rouge">jar</code> 包里嵌套 <code class="highlighter-rouge">jar</code> 的情况</strong>，如何加载到其中的类。
+    <ul>
+      <li>是 <code class="highlighter-rouge">java -jar</code> 启动 Spring Boot 项目的秘密所在，也是稍后将深入了解的部分。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">META-INF</code> 目录：通过 <code class="highlighter-rouge">MANIFEST.MF</code> 文件提供 <code class="highlighter-rouge">jar</code> 包的<strong>元数据</strong>，声明了 <code class="highlighter-rouge">jar</code> 的启动类。</li>
+  <li><code class="highlighter-rouge">BOOT-INF/lib</code> 目录：Spring Boot 项目中引入的<strong>依赖</strong>的 <code class="highlighter-rouge">jar</code> 包们。</li>
+  <li><code class="highlighter-rouge">BOOT-INF/classes</code> 目录：Spring Boot 项目中 Java 类所编译的 <code class="highlighter-rouge">.class</code>、配置文件等。</li>
+</ol>
+
+<p><img src="../assets/jar01.png" alt="Spring Boot  包" style="zoom: 50%;" /></p>
+
+<h4 id="运行原理">运行原理</h4>
+
+<p>先简单剧透下，<code class="highlighter-rouge">spring-boot-loader</code> 项目需要解决两个问题：</p>
+
+<ul>
+  <li>第一，如何<strong>引导执行</strong>我们创建的 Spring Boot 应用的启动类，例如上述图中的 Application 类。</li>
+  <li>第二，如何<strong>加载</strong> <code class="highlighter-rouge">BOOT-INF/class</code> 目录下的<strong>类</strong>，以及 <code class="highlighter-rouge">BOOT-INF/lib</code> 目录下内嵌的 <code class="highlighter-rouge">jar</code> 包中的类。</li>
+</ul>
+
+<p>Spring Boot <code class="highlighter-rouge">jar</code> 启动的原理是非常清晰的，整体如下图所示：</p>
+
+<p><img src="../assets/jar30.png" alt="Spring Boot  启动原理" style="zoom: 33%;" /></p>
+
+<p>通过 <a href="https://github.com/spring-projects/spring-boot/blob/master/spring-boot-project/spring-boot-tools/spring-boot-loader/src/main/java/org/springframework/boot/loader/Launcher.java">Launcher</a> 来完成引导和启动，通过 <code class="highlighter-rouge">MANIFEST.MF</code> 进行具体配置。具体为：</p>
+
+<p><strong>红色</strong>部分，解决 <code class="highlighter-rouge">jar</code> 包中的<strong>类加载</strong>问题：</p>
+
+<ol>
+  <li>创建 <a href="https://github.com/spring-projects/spring-boot/blob/master/spring-boot-project/spring-boot-tools/spring-boot-loader/src/main/java/org/springframework/boot/loader/archive/Archive.java">Archive</a>，实现 <code class="highlighter-rouge">jar</code> 包的<strong>遍历</strong>，将 <code class="highlighter-rouge">META-INF/classes</code> 目录和 <code class="highlighter-rouge">META-INF/lib</code> 的每一个内嵌的 <code class="highlighter-rouge">jar</code> 解析成一个 Archive 对象。</li>
+  <li>设置 <a href="https://github.com/spring-projects/spring-boot/blob/master/spring-boot-project/spring-boot-tools/spring-boot-loader/src/main/java/org/springframework/boot/loader/jar/Handler.java">Handler</a>，处理 <code class="highlighter-rouge">jar:</code> 协议的 URL 的资源<strong>读取</strong>，也就是读取了每个 Archive 里的内容。</li>
+  <li>通过 <a href="https://github.com/spring-projects/spring-boot/blob/master/spring-boot-project/spring-boot-tools/spring-boot-loader/src/main/java/org/springframework/boot/loader/LaunchedURLClassLoader.java">LaunchedURLClassLoader</a>，实现 <code class="highlighter-rouge">META-INF/classes</code> 目录下的类及其内嵌的 <code class="highlighter-rouge">jar</code> 包中的<strong>类的加载</strong>。具体的 URL 来源，是通过 Archive 提供；具体 URL 的读取，是通过 Handler 提供。</li>
+</ol>
+
+<p><strong>橘色</strong>部分，解决 Spring Boot 应用的<strong>启动</strong>问题：</p>
+
+<ul>
+  <li>通过 <a href="https://github.com/spring-projects/spring-boot/blob/master/spring-boot-project/spring-boot-tools/spring-boot-loader/src/main/java/org/springframework/boot/loader/MainMethodRunner.java">MainMethodRunner</a> ，实现 Spring Boot 应用的启动类的执行。</li>
+</ul>
+
+<h3 id="maven">Maven</h3>
+
+<p>标准化的 Java 项目管理和构建工具。</p>
+
+<p>Maven 的核心功能包括：</p>
+
+<ul>
+  <li><strong>项目构建</strong>（编译、测试、打包、部署）；</li>
+  <li><strong>依赖管理</strong>（自动下载和管理第三方库）；</li>
+  <li><strong>标准化项目结构</strong>（约定优于配置）；</li>
+  <li><strong>插件扩展</strong>（支持自定义构建流程）。</li>
+</ul>
+
+<h5 id="依赖管理">依赖管理</h5>
+
+<p><code class="highlighter-rouge">pom.xml</code>项目描述文件：</p>
+
+<ul>
+  <li>
+    <p>用 <code class="highlighter-rouge">&lt;dependency&gt;</code> 声明一个依赖后，Maven就会（从中央仓库、镜像仓库下载）自动下载依赖 jar 包及其父依赖、并缓存在本地（放到 classpath 中）。</p>
+  </li>
+  <li>
+    <p>插件：<code class="highlighter-rouge">&lt;plugins&gt;&lt;plugin&gt;</code></p>
+  </li>
+</ul>
+
+<h5 id="项目结构--标准目录结构">项目结构 / 标准目录结构</h5>
+
+<p>执行后生成的项目结构：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>my-first-app/
+├── pom.xml           # Maven 项目配置文件
+├── src/
+│   ├── main/         # 主代码目录
+│   │   └── java/     # Java 源代码
+│   │       └── com/example/App.java  # 自动生成的示例类
+│   └── test/        # 测试代码目录
+│       └── java/     # 测试类
+│           └── com/example/AppTest.java  # 自动生成的测试类
+</code></pre></div></div>
+
+<h5 id="构建流程">构建流程</h5>
+
+<p>标准化的构建流程，可自动化实现编译，打包，发布等。</p>
+
+<p>常用命令：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">mvn clean</code>：清理所有生成的class和jar；</li>
+  <li><code class="highlighter-rouge">mvn clean compile</code>：先清理，再执行到<code class="highlighter-rouge">compile</code>；</li>
+  <li><code class="highlighter-rouge">mvn clean test</code>：先清理，再执行<code class="highlighter-rouge">test</code>，因为执行<code class="highlighter-rouge">test</code>前必须执行<code class="highlighter-rouge">compile</code>，故不必指定<code class="highlighter-rouge">compile</code>；</li>
+  <li><code class="highlighter-rouge">mvn clean package</code>：先清理，再执行<code class="highlighter-rouge">package</code>。</li>
+</ul>
+
+<h5 id="模块管理">模块管理</h5>
+
+<p>抽取共用的<code class="highlighter-rouge">pom.xml</code>并继承，用<code class="highlighter-rouge">&lt;modules&gt;</code>编译多个模块。</p>
+
+<h5 id="快照">快照</h5>
+
+<p>maven中的仓库分为两种：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">SNAPSHOT </code>快照仓库用于保存开发过程中的不稳定版本，snapshot一般是开发过程中的迭代版本，snapshot更新后，引用的项目可以不修改版本号自动下载构建。</li>
+  <li><code class="highlighter-rouge">release </code>正式仓库则是用来保存稳定的发行版本。release版本不允许修改，每次进行release版本修改，发布必须提升版本号。</li>
+</ul>
+
+<h3 id="gradle">Gradle</h3>
+
+<blockquote>
+  <p>下载完 Gradle 工具之后，IDEA 就会使用它自动下载相关的依赖库。</p>
+</blockquote>
+
+<p>基于 JVM 的富有突破性构建工具。</p>
+
+<ul>
+  <li>
+    <p>特点：基于 Groovy/Kotlin DSL，构建脚本更灵活，性能更好；</p>
+  </li>
+  <li>
+    <p>适用场景：Android、Kotlin 项目，需要自定义构建流程</p>
+  </li>
+</ul>
+
+<h3 id="docker-容器">Docker 容器</h3>
+
+<p>Docker 应用容器引擎：是一个<strong>虚拟环境容器</strong>，可将开发环境、代码、配置文件等一并<strong>打包</strong>进去，并发布和应用到任意平台中。</p>
+
+<ul>
+  <li>一个轻量级、可移植、自给自足的软件环境，用于<strong>运行应用程序</strong>。</li>
+  <li>Docker 容器将应用程序及其所有依赖项（包括库、配置文件、系统工具等）封装在一个标准化的包中，使得应用能够在任何地方一致地运行。</li>
+  <li>容器是<strong>操作系统级别</strong>的虚拟化，不需要运行完整的操作系统，启动和运行更为高效。</li>
+  <li>Docker 是一个开源的应用容器引擎，让开发者可以打包应用以及依赖包到一个可移植的镜像中，然后发布到任何流行的 Linux或Windows机器上。</li>
+  <li>使用Docker可以更方便的打包、测试以及部署应用程序。</li>
+</ul>
+
+<p>主要用途：</p>
+
+<ul>
+  <li>提供一次性的环境。如，本地测试他人的软件、持续集成时提供单元测试和构建的环境。</li>
+  <li>提供弹性的云服务。因为 Docker 容器可随开随关，很适合动态扩容和缩容。</li>
+  <li>组建<strong>微服务架构</strong>。通过多个容器，一台机器可跑多个服务，在本机就可模拟出微服务架构。</li>
+</ul>
+
+<p>Docker 镜像：国内从 DockerHub 拉取镜像有时会遇到困难，此时可以配置镜像加速器。</p>
+
+<p>Docker容器和传统VM技术，在技术实现上有所不同。逻辑组成：</p>
+
+<ul>
+  <li>VM 虚拟机：使用Hypervisor提供虚拟机的运行平台，管理每个VM中操作系统的运行。每个VM都要有自己的操作系统、应用程序和必要的依赖文件等。</li>
+  <li>Docker 容器：使用Docker引擎进行调度和隔离，提高了资源利用率，在相同硬件能力下可以<strong>运行更多的容器实例</strong>；每个容器拥有自己的隔离化用户空间。</li>
+</ul>
+
+<p>容器编排技术：</p>
+
+<ul>
+  <li>Kubernetes</li>
+  <li>Swarm</li>
+</ul>

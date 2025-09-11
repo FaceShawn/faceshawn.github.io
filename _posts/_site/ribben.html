@@ -1,0 +1,396 @@
+<blockquote>
+  <p>摘要：。</p>
+</blockquote>
+
+<!-- more -->
+
+<hr />
+
+<h2 id="目录">目录</h2>
+
+<p>[TOC]</p>
+
+<h4 id="spring-cloud-ribbon"><del>Spring Cloud Ribbon</del></h4>
+
+<blockquote>
+  <p>在微服务架构中，很多服务都会部署多个，其他服务去调用该服务的时候，如何保证负载均衡是个不得不去考虑的问题。</p>
+
+  <p>负载均衡可以增加系统的可用性和扩展性，当使用<strong>RestTemplate</strong>来调用其他服务时，Ribbon可以很方便的实现负载均衡功能。</p>
+</blockquote>
+
+<p>Ribbon  是Spring Cloud Netflix 子项目的核心组件之一，主要（给<strong>服务间调用</strong>及API网关转发）提供<strong>负载均衡</strong>的功能。</p>
+
+<ul>
+  <li>
+    <p>比如 Fegin 和 OpenFegin 都是基于 Ribbon 实现的，就连 Nacos 中的负载均衡也使用了 Ribbon 框架。</p>
+  </li>
+  <li>
+    <p>Ribbon 框架的强大之处在于，不仅内置了 7 种负载均衡策略，同时还支持用户自定义负载均衡策略，所以其开放性和便利性也是它得以流行的主要原因。</p>
+  </li>
+</ul>
+
+<h5 id="resttemplate的使用">RestTemplate的使用</h5>
+
+<blockquote>
+  <p>RestTemplate是一个<strong>HTTP客户端</strong>，可以方便的调用HTTP接口，支持GET、POST、PUT、DELETE等方法。</p>
+</blockquote>
+
+<h6 id="get请求方法">GET请求方法</h6>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">T</span> <span class="nf">getForObject</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="n">Class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">responseType</span><span class="o">,</span> <span class="n">Object</span><span class="o">...</span> <span class="n">uriVariables</span><span class="o">);</span>
+<span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">T</span> <span class="nf">getForObject</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="n">Class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">responseType</span><span class="o">,</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="o">?&gt;</span> <span class="n">uriVariables</span><span class="o">);</span>
+<span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">T</span> <span class="nf">getForObject</span><span class="o">(</span><span class="n">URI</span> <span class="n">url</span><span class="o">,</span> <span class="n">Class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">responseType</span><span class="o">);</span>
+
+<span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">ResponseEntity</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="nf">getForEntity</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="n">Class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">responseType</span><span class="o">,</span> <span class="n">Object</span><span class="o">...</span> <span class="n">uriVariables</span><span class="o">);</span>
+<span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">ResponseEntity</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="nf">getForEntity</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="n">Class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">responseType</span><span class="o">,</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="o">?&gt;</span> <span class="n">uriVariables</span><span class="o">);</span>
+<span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">ResponseEntity</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="nf">getForEntity</span><span class="o">(</span><span class="n">URI</span> <span class="n">var1</span><span class="o">,</span> <span class="n">Class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">responseType</span><span class="o">);</span>
+</code></pre></div></div>
+
+<p>getForObject方法</p>
+
+<p>返回对象为响应体中数据转化成的对象，举例如下：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@GetMapping</span><span class="o">(</span><span class="s">"/{id}"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="n">CommonResult</span> <span class="nf">getUser</span><span class="o">(</span><span class="nd">@PathVariable</span> <span class="n">Long</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">restTemplate</span><span class="o">.</span><span class="na">getForObject</span><span class="o">(</span><span class="n">userServiceUrl</span> <span class="o">+</span> <span class="s">"/user/{1}"</span><span class="o">,</span> <span class="n">CommonResult</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">id</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>getForEntity方法</p>
+
+<p>返回对象为<strong>ResponseEntity对象</strong>，包含了响应中的一些重要信息，比如响应头、响应状态码、响应体等，举例如下：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@GetMapping</span><span class="o">(</span><span class="s">"/getEntityByUsername"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="n">CommonResult</span> <span class="nf">getEntityByUsername</span><span class="o">(</span><span class="nd">@RequestParam</span> <span class="n">String</span> <span class="n">username</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">ResponseEntity</span><span class="o">&lt;</span><span class="n">CommonResult</span><span class="o">&gt;</span> <span class="n">entity</span> <span class="o">=</span> <span class="n">restTemplate</span><span class="o">.</span><span class="na">getForEntity</span><span class="o">(</span><span class="n">userServiceUrl</span> <span class="o">+</span> <span class="s">"/user/getByUsername?username={1}"</span><span class="o">,</span> <span class="n">CommonResult</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">username</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">entity</span><span class="o">.</span><span class="na">getStatusCode</span><span class="o">().</span><span class="na">is2xxSuccessful</span><span class="o">())</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">entity</span><span class="o">.</span><span class="na">getBody</span><span class="o">();</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">CommonResult</span><span class="o">(</span><span class="s">"操作失败"</span><span class="o">,</span> <span class="mi">500</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h6 id="post请求方法">POST请求方法</h6>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">T</span> <span class="nf">postForObject</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="nd">@Nullable</span> <span class="n">Object</span> <span class="n">request</span><span class="o">,</span> <span class="n">Class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">responseType</span><span class="o">,</span> <span class="n">Object</span><span class="o">...</span> <span class="n">uriVariables</span><span class="o">);</span>
+<span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">T</span> <span class="nf">postForObject</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="nd">@Nullable</span> <span class="n">Object</span> <span class="n">request</span><span class="o">,</span> <span class="n">Class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">responseType</span><span class="o">,</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="o">?&gt;</span> <span class="n">uriVariables</span><span class="o">);</span>
+<span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">T</span> <span class="nf">postForObject</span><span class="o">(</span><span class="n">URI</span> <span class="n">url</span><span class="o">,</span> <span class="nd">@Nullable</span> <span class="n">Object</span> <span class="n">request</span><span class="o">,</span> <span class="n">Class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">responseType</span><span class="o">);</span>
+
+<span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">ResponseEntity</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="nf">postForEntity</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="nd">@Nullable</span> <span class="n">Object</span> <span class="n">request</span><span class="o">,</span> <span class="n">Class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">responseType</span><span class="o">,</span> <span class="n">Object</span><span class="o">...</span> <span class="n">uriVariables</span><span class="o">);</span>
+<span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">ResponseEntity</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="nf">postForEntity</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="nd">@Nullable</span> <span class="n">Object</span> <span class="n">request</span><span class="o">,</span> <span class="n">Class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">responseType</span><span class="o">,</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="o">?&gt;</span> <span class="n">uriVariables</span><span class="o">);</span>
+<span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">ResponseEntity</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="nf">postForEntity</span><span class="o">(</span><span class="n">URI</span> <span class="n">url</span><span class="o">,</span> <span class="nd">@Nullable</span> <span class="n">Object</span> <span class="n">request</span><span class="o">,</span> <span class="n">Class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">responseType</span><span class="o">);</span>
+</code></pre></div></div>
+
+<p>postForObject示例</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@PostMapping</span><span class="o">(</span><span class="s">"/create"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="n">CommonResult</span> <span class="nf">create</span><span class="o">(</span><span class="nd">@RequestBody</span> <span class="n">User</span> <span class="n">user</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">restTemplate</span><span class="o">.</span><span class="na">postForObject</span><span class="o">(</span><span class="n">userServiceUrl</span> <span class="o">+</span> <span class="s">"/user/create"</span><span class="o">,</span> <span class="n">user</span><span class="o">,</span> <span class="n">CommonResult</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>postForEntity示例</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@PostMapping</span><span class="o">(</span><span class="s">"/create"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="n">CommonResult</span> <span class="nf">create</span><span class="o">(</span><span class="nd">@RequestBody</span> <span class="n">User</span> <span class="n">user</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">restTemplate</span><span class="o">.</span><span class="na">postForEntity</span><span class="o">(</span><span class="n">userServiceUrl</span> <span class="o">+</span> <span class="s">"/user/create"</span><span class="o">,</span> <span class="n">user</span><span class="o">,</span> <span class="n">CommonResult</span><span class="o">.</span><span class="na">class</span><span class="o">).</span><span class="na">getBody</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h6 id="put请求方法">PUT请求方法</h6>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">put</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="nd">@Nullable</span> <span class="n">Object</span> <span class="n">request</span><span class="o">,</span> <span class="n">Object</span><span class="o">...</span> <span class="n">uriVariables</span><span class="o">);</span>
+<span class="kt">void</span> <span class="nf">put</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="nd">@Nullable</span> <span class="n">Object</span> <span class="n">request</span><span class="o">,</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="o">?&gt;</span> <span class="n">uriVariables</span><span class="o">);</span>
+<span class="kt">void</span> <span class="nf">put</span><span class="o">(</span><span class="n">URI</span> <span class="n">url</span><span class="o">,</span> <span class="nd">@Nullable</span> <span class="n">Object</span> <span class="n">request</span><span class="o">);</span>
+</code></pre></div></div>
+
+<p>PUT请求示例</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@PutMapping</span><span class="o">(</span><span class="s">"/update"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="n">CommonResult</span> <span class="nf">update</span><span class="o">(</span><span class="nd">@RequestBody</span> <span class="n">User</span> <span class="n">user</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">restTemplate</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">userServiceUrl</span> <span class="o">+</span> <span class="s">"/user/update"</span><span class="o">,</span> <span class="n">user</span><span class="o">);</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nf">CommonResult</span><span class="o">(</span><span class="s">"操作成功"</span><span class="o">,</span><span class="mi">200</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h6 id="delete请求方法">DELETE请求方法</h6>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">delete</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="n">Object</span><span class="o">...</span> <span class="n">uriVariables</span><span class="o">);</span>
+<span class="kt">void</span> <span class="nf">delete</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="o">?&gt;</span> <span class="n">uriVariables</span><span class="o">);</span>
+<span class="kt">void</span> <span class="nf">delete</span><span class="o">(</span><span class="n">URI</span> <span class="n">url</span><span class="o">);</span>
+</code></pre></div></div>
+
+<p>DELETE请求示例</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@DeleteMapping</span><span class="o">(</span><span class="s">"/delete/{id}"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="n">CommonResult</span> <span class="nf">delete</span><span class="o">(</span><span class="nd">@PathVariable</span> <span class="n">Long</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+   <span class="n">restTemplate</span><span class="o">.</span><span class="na">delete</span><span class="o">(</span><span class="n">userServiceUrl</span> <span class="o">+</span> <span class="s">"/user/delete/{1}"</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="n">id</span><span class="o">);</span>
+   <span class="k">return</span> <span class="k">new</span> <span class="nf">CommonResult</span><span class="o">(</span><span class="s">"操作成功"</span><span class="o">,</span><span class="mi">200</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h5 id="创建一个user-service模块">创建一个user-service模块</h5>
+
+<blockquote>
+  <p>首先创建一个user-service，用于给Ribbon提供服务调用。</p>
+</blockquote>
+
+<h6 id="在pomxml中添加相关依赖">在pom.xml中添加相关依赖</h6>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.springframework.cloud<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>spring-cloud-starter-netflix-eureka-client<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-web<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div></div>
+
+<h6 id="在applicationyml进行配置">在application.yml进行配置</h6>
+
+<blockquote>
+  <p>主要是配置了端口和<strong>注册中心</strong>地址。</p>
+</blockquote>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">server</span><span class="pi">:</span>
+  <span class="na">port</span><span class="pi">:</span> <span class="s">8201</span>
+<span class="na">spring</span><span class="pi">:</span>
+  <span class="na">application</span><span class="pi">:</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">user-service</span>
+<span class="na">eureka</span><span class="pi">:</span>
+  <span class="na">client</span><span class="pi">:</span>
+    <span class="na">register-with-eureka</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">fetch-registry</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">service-url</span><span class="pi">:</span>
+      <span class="na">defaultZone</span><span class="pi">:</span> <span class="s">http://localhost:8001/eureka/</span>
+</code></pre></div></div>
+
+<h6 id="添加usercontroller用于提供调用接口">添加UserController用于提供调用接口</h6>
+
+<blockquote>
+  <p>UserController类定义了对User对象常见的CRUD接口。</p>
+</blockquote>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@RestController</span>
+<span class="nd">@RequestMapping</span><span class="o">(</span><span class="s">"/user"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">UserController</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="n">Logger</span> <span class="n">LOGGER</span> <span class="o">=</span> <span class="n">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">getClass</span><span class="o">());</span>
+
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="n">UserService</span> <span class="n">userService</span><span class="o">;</span>
+
+    <span class="nd">@PostMapping</span><span class="o">(</span><span class="s">"/create"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">CommonResult</span> <span class="nf">create</span><span class="o">(</span><span class="nd">@RequestBody</span> <span class="n">User</span> <span class="n">user</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">userService</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">user</span><span class="o">);</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">CommonResult</span><span class="o">(</span><span class="s">"操作成功"</span><span class="o">,</span> <span class="mi">200</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@GetMapping</span><span class="o">(</span><span class="s">"/{id}"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">CommonResult</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span> <span class="nf">getUser</span><span class="o">(</span><span class="nd">@PathVariable</span> <span class="n">Long</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">User</span> <span class="n">user</span> <span class="o">=</span> <span class="n">userService</span><span class="o">.</span><span class="na">getUser</span><span class="o">(</span><span class="n">id</span><span class="o">);</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"根据id获取用户信息，用户名称为：{}"</span><span class="o">,</span><span class="n">user</span><span class="o">.</span><span class="na">getUsername</span><span class="o">());</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="n">CommonResult</span><span class="o">&lt;&gt;(</span><span class="n">user</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@GetMapping</span><span class="o">(</span><span class="s">"/getUserByIds"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">CommonResult</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;&gt;</span> <span class="nf">getUserByIds</span><span class="o">(</span><span class="nd">@RequestParam</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">&gt;</span> <span class="n">ids</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">List</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span> <span class="n">userList</span><span class="o">=</span> <span class="n">userService</span><span class="o">.</span><span class="na">getUserByIds</span><span class="o">(</span><span class="n">ids</span><span class="o">);</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"根据ids获取用户信息，用户列表为：{}"</span><span class="o">,</span><span class="n">userList</span><span class="o">);</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="n">CommonResult</span><span class="o">&lt;&gt;(</span><span class="n">userList</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@PostMapping</span><span class="o">(</span><span class="s">"/update"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">CommonResult</span> <span class="nf">update</span><span class="o">(</span><span class="nd">@RequestBody</span> <span class="n">User</span> <span class="n">user</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">userService</span><span class="o">.</span><span class="na">update</span><span class="o">(</span><span class="n">user</span><span class="o">);</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">CommonResult</span><span class="o">(</span><span class="s">"操作成功"</span><span class="o">,</span> <span class="mi">200</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h5 id="创建一个ribbon-service模块">创建一个ribbon-service模块</h5>
+
+<blockquote>
+  <p>创建一个ribbon-service模块来调用user-service模块，演示负载均衡的服务调用。</p>
+</blockquote>
+
+<h6 id="在pomxml中添加相关依赖-1">在pom.xml中添加相关依赖</h6>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-web<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.springframework.cloud<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>spring-cloud-starter-netflix-eureka-client<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.springframework.cloud<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>spring-cloud-starter-netflix-ribbon<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div></div>
+
+<h6 id="在applicationyml进行配置-1">在application.yml进行配置</h6>
+
+<blockquote>
+  <p>主要是配置了端口、注册中心地址及user-service的调用路径。</p>
+</blockquote>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">server</span><span class="pi">:</span>
+  <span class="na">port</span><span class="pi">:</span> <span class="s">8301</span>
+<span class="na">spring</span><span class="pi">:</span>
+  <span class="na">application</span><span class="pi">:</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">ribbon-service</span>
+<span class="na">eureka</span><span class="pi">:</span>
+  <span class="na">client</span><span class="pi">:</span>
+    <span class="na">register-with-eureka</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">fetch-registry</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">service-url</span><span class="pi">:</span>
+      <span class="na">defaultZone</span><span class="pi">:</span> <span class="s">http://localhost:8001/eureka/</span>
+<span class="na">service-url</span><span class="pi">:</span>
+  <span class="na">user-service</span><span class="pi">:</span> <span class="s">http://user-service</span>
+</code></pre></div></div>
+
+<h6 id="使用loadbalanced注解赋予resttemplate负载均衡的能力">使用@LoadBalanced注解赋予RestTemplate负载均衡的能力</h6>
+
+<blockquote>
+  <p>可以看出使用Ribbon的负载均衡功能非常简单，和直接使用RestTemplate没什么两样，</p>
+
+  <p>只需给RestTemplate添加一个@LoadBalanced即可。</p>
+</blockquote>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Configuration</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">RibbonConfig</span> <span class="o">{</span>
+
+    <span class="nd">@Bean</span>
+    <span class="nd">@LoadBalanced</span>
+    <span class="kd">public</span> <span class="n">RestTemplate</span> <span class="nf">restTemplate</span><span class="o">(){</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">RestTemplate</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+</code></pre></div></div>
+
+<h6 id="添加userribboncontroller类">添加UserRibbonController类</h6>
+
+<blockquote>
+  <p>注入RestTemplate，使用其调用user-service中提供的相关接口，这里对GET和POST调用进行了演示，其他方法调用均可参考。</p>
+</blockquote>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@RestController</span>
+<span class="nd">@RequestMapping</span><span class="o">(</span><span class="s">"/user"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">UserRibbonController</span> <span class="o">{</span>
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="n">RestTemplate</span> <span class="n">restTemplate</span><span class="o">;</span>
+    <span class="nd">@Value</span><span class="o">(</span><span class="s">"${service-url.user-service}"</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">userServiceUrl</span><span class="o">;</span>
+
+    <span class="nd">@GetMapping</span><span class="o">(</span><span class="s">"/{id}"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">CommonResult</span> <span class="nf">getUser</span><span class="o">(</span><span class="nd">@PathVariable</span> <span class="n">Long</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">restTemplate</span><span class="o">.</span><span class="na">getForObject</span><span class="o">(</span><span class="n">userServiceUrl</span> <span class="o">+</span> <span class="s">"/user/{1}"</span><span class="o">,</span> <span class="n">CommonResult</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">id</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@GetMapping</span><span class="o">(</span><span class="s">"/getByUsername"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">CommonResult</span> <span class="nf">getByUsername</span><span class="o">(</span><span class="nd">@RequestParam</span> <span class="n">String</span> <span class="n">username</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">restTemplate</span><span class="o">.</span><span class="na">getForObject</span><span class="o">(</span><span class="n">userServiceUrl</span> <span class="o">+</span> <span class="s">"/user/getByUsername?username={1}"</span><span class="o">,</span> <span class="n">CommonResult</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">username</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@GetMapping</span><span class="o">(</span><span class="s">"/getEntityByUsername"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">CommonResult</span> <span class="nf">getEntityByUsername</span><span class="o">(</span><span class="nd">@RequestParam</span> <span class="n">String</span> <span class="n">username</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">ResponseEntity</span><span class="o">&lt;</span><span class="n">CommonResult</span><span class="o">&gt;</span> <span class="n">entity</span> <span class="o">=</span> <span class="n">restTemplate</span><span class="o">.</span><span class="na">getForEntity</span><span class="o">(</span><span class="n">userServiceUrl</span> <span class="o">+</span> <span class="s">"/user/getByUsername?username={1}"</span><span class="o">,</span> <span class="n">CommonResult</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">username</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">entity</span><span class="o">.</span><span class="na">getStatusCode</span><span class="o">().</span><span class="na">is2xxSuccessful</span><span class="o">())</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">entity</span><span class="o">.</span><span class="na">getBody</span><span class="o">();</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="k">new</span> <span class="nf">CommonResult</span><span class="o">(</span><span class="s">"操作失败"</span><span class="o">,</span> <span class="mi">500</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="nd">@PostMapping</span><span class="o">(</span><span class="s">"/create"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">CommonResult</span> <span class="nf">create</span><span class="o">(</span><span class="nd">@RequestBody</span> <span class="n">User</span> <span class="n">user</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">restTemplate</span><span class="o">.</span><span class="na">postForObject</span><span class="o">(</span><span class="n">userServiceUrl</span> <span class="o">+</span> <span class="s">"/user/create"</span><span class="o">,</span> <span class="n">user</span><span class="o">,</span> <span class="n">CommonResult</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@PostMapping</span><span class="o">(</span><span class="s">"/update"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">CommonResult</span> <span class="nf">update</span><span class="o">(</span><span class="nd">@RequestBody</span> <span class="n">User</span> <span class="n">user</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">restTemplate</span><span class="o">.</span><span class="na">postForObject</span><span class="o">(</span><span class="n">userServiceUrl</span> <span class="o">+</span> <span class="s">"/user/update"</span><span class="o">,</span> <span class="n">user</span><span class="o">,</span> <span class="n">CommonResult</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@PostMapping</span><span class="o">(</span><span class="s">"/delete/{id}"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">CommonResult</span> <span class="nf">delete</span><span class="o">(</span><span class="nd">@PathVariable</span> <span class="n">Long</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">restTemplate</span><span class="o">.</span><span class="na">postForObject</span><span class="o">(</span><span class="n">userServiceUrl</span> <span class="o">+</span> <span class="s">"/user/delete/{1}"</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="n">CommonResult</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">id</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+</code></pre></div></div>
+
+<h5 id="负载均衡功能演示">负载均衡功能演示</h5>
+
+<ul>
+  <li>启动eureka-server于8001端口；</li>
+  <li>启动ribbon-service？</li>
+  <li>启动user-service于8201端口；</li>
+  <li>
+    <p>启动另一个user-service于8202端口，可以通过修改IDEA中的SpringBoot的启动配置实现；</p>
+  </li>
+  <li>此时运行中的服务如下：</li>
+</ul>
+
+<p><img src="../assets/springcloud_ribbon_02.png" alt="" /></p>
+
+<ul>
+  <li>调用接口进行测试：<a href="http://localhost:8301/user/1">http://localhost:8301/user/1</a></li>
+</ul>
+
+<p><img src="../assets/springcloud_ribbon_05.png" style="zoom: 67%;" /></p>
+
+<ul>
+  <li>可以发现运行在8201和8202的user-service控制台交替打印信息。</li>
+</ul>
+
+<h5 id="ribbon的常用配置">Ribbon的常用配置</h5>
+
+<h6 id="全局配置">全局配置</h6>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">ribbon</span><span class="pi">:</span>
+  <span class="na">ConnectTimeout</span><span class="pi">:</span> <span class="s">1000</span> <span class="c1">#服务请求连接超时时间（毫秒）</span>
+  <span class="na">ReadTimeout</span><span class="pi">:</span> <span class="s">3000</span> <span class="c1">#服务请求处理超时时间（毫秒）</span>
+  <span class="na">OkToRetryOnAllOperations</span><span class="pi">:</span> <span class="no">true</span> <span class="c1">#对超时请求启用重试机制</span>
+  <span class="na">MaxAutoRetriesNextServer</span><span class="pi">:</span> <span class="s">1</span> <span class="c1">#切换重试实例的最大个数</span>
+  <span class="na">MaxAutoRetries</span><span class="pi">:</span> <span class="s">1</span> <span class="c1"># 切换实例后重试最大次数</span>
+  <span class="na">NFLoadBalancerRuleClassName</span><span class="pi">:</span> <span class="s">com.netflix.loadbalancer.RandomRule</span> <span class="c1">#修改负载均衡算法</span>
+</code></pre></div></div>
+
+<h6 id="指定服务进行配置">指定服务进行配置</h6>
+
+<blockquote>
+  <p>与全局配置的区别就是ribbon节点挂在服务名称下面，如下是对ribbon-service调用user-service时的单独配置。</p>
+</blockquote>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">user-service</span><span class="pi">:</span>
+  <span class="na">ribbon</span><span class="pi">:</span>
+    <span class="na">ConnectTimeout</span><span class="pi">:</span> <span class="s">1000</span> <span class="c1">#服务请求连接超时时间（毫秒）</span>
+    <span class="na">ReadTimeout</span><span class="pi">:</span> <span class="s">3000</span> <span class="c1">#服务请求处理超时时间（毫秒）</span>
+    <span class="na">OkToRetryOnAllOperations</span><span class="pi">:</span> <span class="no">true</span> <span class="c1">#对超时请求启用重试机制</span>
+    <span class="na">MaxAutoRetriesNextServer</span><span class="pi">:</span> <span class="s">1</span> <span class="c1">#切换重试实例的最大个数</span>
+    <span class="na">MaxAutoRetries</span><span class="pi">:</span> <span class="s">1</span> <span class="c1"># 切换实例后重试最大次数</span>
+    <span class="na">NFLoadBalancerRuleClassName</span><span class="pi">:</span> <span class="s">com.netflix.loadbalancer.RandomRule</span> <span class="c1">#修改负载均衡算法</span>
+</code></pre></div></div>
+
+<h5 id="ribbon的负载均衡策略">Ribbon的负载均衡策略</h5>
+
+<blockquote>
+  <p>所谓的负载均衡策略，就是当A服务调用B服务时，此时B服务有多个实例，这时A服务以何种方式来选择调用的B实例，ribbon可以选择以下几种负载均衡策略。</p>
+</blockquote>
+
+<ol>
+  <li><code class="highlighter-rouge">com.netflix.loadbalancer.RandomRule</code>：从提供服务的实例中以<strong>随机</strong>的方式；</li>
+  <li><code class="highlighter-rouge">com.netflix.loadbalancer.RoundRobinRule</code>：以线性<strong>轮询</strong>的方式，就是维护一个计数器，从提供服务的实例中按顺序选取，第一次选第一个，第二次选第二个，以此类推，到最后一个以后再从头来过；</li>
+  <li><code class="highlighter-rouge">com.netflix.loadbalancer.RetryRule</code>：在RoundRobinRule的基础上添加<strong>重试</strong>机制，即在指定的重试时间内，反复使用线性轮询策略来选择可用实例；</li>
+  <li><code class="highlighter-rouge">com.netflix.loadbalancer.WeightedResponseTimeRule</code>：对RoundRobinRule的扩展，响应速度越快的实例选择<strong>权重</strong>越大，越容易被选择；</li>
+  <li><code class="highlighter-rouge">com.netflix.loadbalancer.BestAvailableRule</code>：选择<strong>并发</strong>较小的实例；</li>
+  <li><code class="highlighter-rouge">com.netflix.loadbalancer.AvailabilityFilteringRule</code>：先<strong>过滤</strong>掉故障实例，再选择并发较小的实例；</li>
+  <li><code class="highlighter-rouge">com.netflix.loadbalancer.ZoneAwareLoadBalancer</code>：采用<strong>双重过滤</strong>，同时过滤不是同一区域的实例和故障实例，选择并发较小的实例。</li>
+</ol>
+

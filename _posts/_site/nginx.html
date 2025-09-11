@@ -1,0 +1,483 @@
+<blockquote>
+  <p>摘要：。</p>
+</blockquote>
+
+<!-- more -->
+
+<hr />
+
+<h2 id="目录">目录</h2>
+
+<p>[TOC]</p>
+
+<h4 id="nginx-反向代理服务器">NginX 反向代理服务器</h4>
+
+<p>Nginx 是一款轻量级的 Web 服务器、<strong>反向代理服务器</strong>、及电子邮件（IMAP/POP3）代理服务器。</p>
+
+<ul>
+  <li>Nginx 作为整个架构的流量入口，可以理解为一个外部的网关，承担着请求的<strong>路由转发、负载均衡、动静分离、解决跨域</strong>等功能。</li>
+  <li>要采用多节点部署，同时通过keepalived来实现<strong>高可用</strong>，从而保障整个平台的高可用。</li>
+  <li>工作在七层<strong>应用层</strong>，默认<strong>80</strong>端口。</li>
+  <li>特点是占有内存少，<strong>并发</strong>能力强（能够经受高负载的考验，有报告表明能支持高达 50000 个并发连接数）。</li>
+</ul>
+
+<h5 id="正向代理反向代理">正向代理、反向代理</h5>
+
+<p>（正向）<strong>代理</strong>：即是<strong>客户端代理</strong>，代理客户端，服务端不知道实际发起请求的客户端。隐藏了真实的请求客户端。</p>
+
+<ol>
+  <li>访问原来无法访问的资源，如google；</li>
+  <li>可以做缓存，加速访问资源；</li>
+  <li>对客户端访问授权，上网进行认证；</li>
+  <li>代理可以记录用户访问记录（上网行为管理），对外隐藏用户信息。</li>
+</ol>
+
+<p><strong>反向代理</strong>：即是<strong>服务端代理</strong>，代理服务端（真实目标服务器），客户端不知道（访问的）实际提供服务的是哪台服务器。隐藏了真实的服务端。</p>
+
+<ul>
+  <li>原理：实际运行方式是，客户端只需将请求发送给反向代理服务器，由反向代理服务器去选择（内部网络上的）目标服务器，将请求转发并获取数据，再返回给客户端。</li>
+  <li>此时反向代理服务器和目标服务器对外就像是同一个服务器，对外暴露的是反向代理服务器地址，隐藏了真实服务器 IP 地址。</li>
+  <li>客户端不直接请求源服务器，因此源服务器不需要外部 IP 地址，而反向代理需要配置<strong>内部和外部两套 IP 地址</strong>。</li>
+</ul>
+
+<p>反向代理的作用：</p>
+
+<ol>
+  <li>作为公网访问地址，保证内网（Web服务器）的安全，阻止web攻击。</li>
+  <li>负载均衡：通过反向代理服务器来优化网站的负载。</li>
+  <li>可以用来进行缓存、日志记录等。</li>
+</ol>
+
+<p>缺点：所有请求和响应都需要经过反向代理服务器，可能会成为<strong>性能瓶颈</strong>。</p>
+
+<p><img src="../assets/1424359-20210315105323910-1721094187.png" alt="img" style="zoom: 80%;" /></p>
+
+<h5 id="常见命令配置文件">常见命令、配置文件</h5>
+
+<p>常用命令：</p>
+
+<ul>
+  <li>nginx -s reload：重启</li>
+  <li>nginx -s stop：关闭</li>
+</ul>
+
+<p>文件介绍：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">html/</code> 默认静态文件夹：里面一般会有一个<code class="highlighter-rouge">index.html</code>入口页和一个<code class="highlighter-rouge">50x.html</code>错误页，nginx默认配置会将<strong>80端口</strong>代理到入口页。</li>
+  <li><code class="highlighter-rouge">conf/nginx.conf</code> 配置文件可以看做是由三个部分组成，main、events 和 http。
+    <ol>
+      <li>main（全局设置）：设置的指令将影响其他所有设置；</li>
+      <li>server（主机设置）：主要用于指定主机和端口；</li>
+      <li>upstream（负载均衡服务器设置）：主要用于负载均衡，设置一系列的后端服务器；</li>
+      <li>location（URL匹配特定位置的设置）：用于匹配网页位置。</li>
+    </ol>
+  </li>
+</ul>
+
+<p><img src="../assets/1424359-20210704222646234-259382019.png" alt="img" style="zoom: 80%;" /></p>
+
+<h5 id="http-反向代理配置">http 反向代理配置</h5>
+
+<ol>
+  <li><code class="highlighter-rouge">proxy_pass</code>：适用于配置反向代理，让Nginx将请求转发给后端服务器。最后请求的路径：proxy_pass指定的<strong>后端服务</strong>URL。</li>
+  <li><code class="highlighter-rouge">root</code>：适用于指定请求的根目录。最后请求的路径：root指定的URL + location上的URL。</li>
+  <li><code class="highlighter-rouge">alias</code>：则适用于将URL路径映射到文件系统路径，方便访问资源。最后请求的路径：alias指定的<strong>静态资源</strong>URL。</li>
+</ol>
+
+<ul>
+  <li>更改 host：在 <code class="highlighter-rouge">C:\Windows\System32\drivers\etc</code> 目录下的 host 文件中添加一条 DNS 记录：</li>
+</ul>
+
+<pre><code class="language-basic">127.0.0.1 www.helloworld.com
+</code></pre>
+
+<p>配置文件：</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#工作模式及连接数上限
+</span><span class="k">events</span> <span class="p">{</span>
+    <span class="kn">worker_connections</span> <span class="mi">1024</span><span class="p">;</span>    <span class="c1">#单个后台worker process进程的最大并发链接数
+</span><span class="p">}</span>
+
+<span class="c1">#设定http服务器，利用它的反向代理功能提供负载均衡支持
+</span><span class="k">http</span> <span class="p">{</span>
+    <span class="c1">#类似 Kafka 中的零拷贝
+</span>    <span class="c1">#sendfile 指令指定 nginx 是否调用 zero copy 方式来输出文件，对于普通应用，必须设为 on；
+</span>    <span class="c1">#如果用来进行下载等应用磁盘IO重负载应用，可设置为 off，以平衡磁盘与网络I/O处理速度，降低系统的uptime.
+</span>    <span class="kn">sendfile</span>        <span class="no">on</span><span class="p">;</span>
+    <span class="c1">#tcp_nopush     on;
+</span>
+    <span class="c1">#连接超时时间
+</span>    <span class="kn">keepalive_timeout</span>  <span class="mi">120</span><span class="p">;</span>
+    <span class="kn">tcp_nodelay</span>        <span class="no">on</span><span class="p">;</span>
+
+    <span class="c1">#设定实际的服务器列表
+</span>    <span class="kn">upstream</span> <span class="s">zp_server1</span><span class="p">{</span>
+        <span class="kn">server</span> <span class="nf">127.0.0.1</span><span class="p">:</span><span class="mi">8089</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">#HTTP服务器
+</span>    <span class="kn">server</span> <span class="p">{</span>
+        <span class="c1">#监听80端口，80端口是知名端口号，用于HTTP协议
+</span>        <span class="kn">listen</span>       <span class="mi">80</span><span class="p">;</span>
+        <span class="c1">#定义使用www.xx.com访问
+</span>        <span class="kn">server_name</span>  <span class="s">www.helloworld.com</span><span class="p">;</span>
+        
+		<span class="c1">#首页
+</span>		<span class="kn">index</span> <span class="s">index.html</span>
+		<span class="c1">#指向webapp的目录
+</span>		<span class="s">root</span> <span class="s">D:</span><span class="err">\</span><span class="s">Project</span><span class="err">\</span><span class="s">spring-security</span><span class="err">\</span><span class="s">src</span><span class="err">\</span><span class="s">main</span><span class="err">\</span><span class="s">webapp</span><span class="p">;</span>
+ 
+        <span class="c1">#反向代理的路径（和upstream绑定），location 后面设置映射的路径
+</span>        <span class="kn">location</span> <span class="n">/</span> <span class="p">{</span>
+            <span class="kn">proxy_pass</span> <span class="s">http://zp_server1</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="c1">#静态文件，nginx自己处理，代理静态文件用`root`
+</span>        <span class="kn">location</span> <span class="p">~</span> <span class="sr">^/(images|javascript|js|css|flash|media|static)/</span> <span class="p">{</span>
+            <span class="kn">root</span> <span class="s">D:</span><span class="err">\</span><span class="s">Project</span><span class="err">\</span><span class="s">spring-security</span><span class="err">\</span><span class="s">src</span><span class="err">\</span><span class="s">main</span><span class="err">\</span><span class="s">webapp</span><span class="err">\</span><span class="s">views</span><span class="p">;</span>
+            <span class="c1">#30天过期，静态文件不怎么更新的话，可以设大一点，如果频繁更新，则可以设置得小一点
+</span>            <span class="kn">expires</span> <span class="s">30d</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="c1">#禁止访问 .htxxx 文件
+</span>        <span class="kn">location</span> <span class="p">~</span> <span class="sr">/\.ht</span> <span class="p">{</span>
+            <span class="kn">deny</span> <span class="s">all</span><span class="p">;</span>
+        <span class="p">}</span>
+
+		<span class="c1">#错误处理页面（可选择性配置）
+</span>		<span class="c1">#error_page   404              /404.html;
+</span>		<span class="c1">#error_page   500 502 503 504  /50x.html;
+</span>        <span class="c1">#location = /50x.html {
+</span>        <span class="c1">#    root   html;
+</span>        <span class="c1">#}
+</span>        
+        <span class="c1">#以下是一些反向代理的配置(可选择性配置)
+</span>        <span class="c1">#proxy_redirect off;
+</span>        <span class="kn">proxy_set_header</span> <span class="s">Host</span> <span class="nv">$host</span><span class="p">;</span>
+        <span class="kn">proxy_set_header</span> <span class="s">X-Real-IP</span> <span class="nv">$remote_addr</span><span class="p">;</span>
+        <span class="kn">proxy_connect_timeout</span> <span class="mi">90</span><span class="p">;</span> 	<span class="c1">#nginx跟后端服务器连接超时时间(代理连接超时)
+</span>        <span class="kn">proxy_send_timeout</span> <span class="mi">90</span><span class="p">;</span>     	<span class="c1">#后端服务器数据回传时间(代理发送超时)
+</span>        <span class="kn">proxy_read_timeout</span> <span class="mi">90</span><span class="p">;</span>      <span class="c1">#连接成功后，后端服务器响应时间(代理接收超时)
+</span>        
+        <span class="c1">#静态站点配置，前端项目的放置路径
+</span>        <span class="kn">location</span> <span class="n">/</span> <span class="p">{</span>
+			<span class="kn">root</span> <span class="s">html</span><span class="p">;</span>
+			<span class="kn">index</span> <span class="s">index.html</span><span class="p">;</span>
+			<span class="c1">#转发任何请求到 index.html
+</span>		<span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h6 id="proxy_pass-反向代理路径">proxy_pass 反向代理路径</h6>
+
+<p>proxy_pass配置代理路径时，直接替换整个代理路径，包括ip地址的端口等：</p>
+
+<ul>
+  <li>在匹配到location配置的URL路径后，转发请求到【proxy_pass】配置的URL。</li>
+</ul>
+
+<p>假如要将8080端口上的请求转发至3000端口。</p>
+
+<ul>
+  <li>前端请求为<code class="highlighter-rouge">http://localhost:8080/get/test</code>，暂且把<code class="highlighter-rouge">/get/test</code>称为请求部分。</li>
+</ul>
+
+<p><code class="highlighter-rouge">proxy_pass</code>路径后带斜杠 <code class="highlighter-rouge">/</code> 与不带的区别：</p>
+
+<ol>
+  <li>无斜杆：<code class="highlighter-rouge">http://localhost:3000</code>，proxy_pass路径会替代原本的ip和端口等，并拼接<strong>整个请求部分</strong><code class="highlighter-rouge">/get/test</code>（包括location地址在内的完整请求地址）。等于转发去<code class="highlighter-rouge">http://localhost:3000/get/test</code>。</li>
+  <li>有斜杆：<code class="highlighter-rouge">http://localhost:3000/</code>，则location路径<strong>只用于匹配</strong>、不附加上去，只附加未匹配到的部分。如：
+    <ol>
+      <li>location用<code class="highlighter-rouge">/get</code>则是<code class="highlighter-rouge">http://localhost:3000/</code>+(<code class="highlighter-rouge">{/get}/test</code>)，等于转发去<code class="highlighter-rouge">http://localhost:3000//test</code>，报错。</li>
+      <li>location用<code class="highlighter-rouge">/get/</code>则是<code class="highlighter-rouge">http://localhost:3000/</code>+(<code class="highlighter-rouge">{/get/}test</code>)。也就是要都加斜杠。</li>
+    </ol>
+  </li>
+</ol>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 转发 http://localhost:8080/get/test
+</span><span class="k">server</span> <span class="p">{</span>
+        <span class="kn">listen</span> <span class="mi">8080</span><span class="p">;</span>
+        <span class="kn">server_name</span> <span class="s">localhost</span><span class="p">;</span>
+    
+ 		<span class="kn">location</span> <span class="n">/get</span> <span class="p">{</span>
+            <span class="kn">proxy_pass</span> <span class="s">http://localhost:3000</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="c1">#或者
+</span>        <span class="kn">location</span> <span class="n">/get/</span> <span class="p">{</span>
+            <span class="kn">proxy_pass</span> <span class="s">http://localhost:3000</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="c1">#结果都是转发去http://localhost:3000/get/test
+</span>
+        <span class="kn">location</span> <span class="n">/get</span> <span class="p">{</span>
+            <span class="c1"># 结果是转发去http://localhost:3000//test，出错~
+</span>            <span class="kn">proxy_pass</span> <span class="s">http://localhost:3000/</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="c1">#或者
+</span>        <span class="kn">location</span> <span class="n">/get/</span> <span class="p">{</span>
+            <span class="c1"># 结果是转发去http://localhost:3000/test
+</span>            <span class="kn">proxy_pass</span> <span class="s">http://localhost:3000/</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre></div></div>
+
+<h6 id="root-和-alias-代理路径">root 和 alias 代理路径</h6>
+
+<p>root与alias主要区别在于nginx如何解释location后面的uri，这会使两者分别以不同的方式将请求映射到服务器文件上。</p>
+
+<ol>
+  <li><code class="highlighter-rouge">root</code>：是最上层目录的定义。处理结果是，<strong>root 路径 + location 路径</strong>（即<code class="highlighter-rouge">html/home</code>文件夹）找内容。</li>
+  <li><code class="highlighter-rouge">alias</code>：是一个目录别名的定义。使用<strong>alias路径</strong>替换location路径（匹配的部分）。处理结果是，<strong>alias 路径</strong>（即<code class="highlighter-rouge">html</code>文件夹）找内容。
+    <ul>
+      <li>alias后面必须要用“/”结束，否则会找不到文件。</li>
+    </ul>
+  </li>
+</ol>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 即 html/home
+</span><span class="k">location</span> <span class="n">/home</span> <span class="p">{</span>
+    <span class="kn">root</span> <span class="s">html</span><span class="p">;</span>
+    <span class="kn">index</span> <span class="s">index.html</span> <span class="s">index.htm</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1"># 即 html
+</span><span class="k">location</span> <span class="n">/home</span> <span class="p">{</span>
+    <span class="kn">alias</span> <span class="s">html</span><span class="p">;</span>
+    <span class="kn">index</span> <span class="s">index.html</span> <span class="s">index.htm</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h6 id="https-反向代理配置">https 反向代理配置</h6>
+
+<p>使用 nginx 配置 https 需要知道几点：</p>
+
+<ul>
+  <li>HTTPS 的固定端口号是 443，不同于 HTTP 的 80 端口；</li>
+  <li>SSL 标准需要引入安全证书，所以在 nginx.conf 中需要指定证书和对应的 key；</li>
+</ul>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#HTTPS服务器
+</span><span class="k">server</span> <span class="p">{</span>
+    <span class="c1">#监听443端口。443为知名端口号，主要用于HTTPS协议
+</span>    <span class="kn">listen</span>       <span class="mi">443</span> <span class="s">ssl</span><span class="p">;</span>
+
+    <span class="c1">#定义使用www.xx.com访问
+</span>    <span class="kn">server_name</span>  <span class="s">www.helloworld.com</span><span class="p">;</span>
+
+    <span class="c1">#ssl证书文件位置(常见证书文件格式为：crt/pem)
+</span>    <span class="kn">ssl_certificate</span>      <span class="s">cert.pem</span><span class="p">;</span>
+    <span class="c1">#ssl证书key位置
+</span>    <span class="kn">ssl_certificate_key</span>  <span class="s">cert.key</span><span class="p">;</span>
+
+    <span class="c1">#ssl配置参数（选择性配置）
+</span>    <span class="kn">ssl_session_cache</span>    <span class="s">shared:SSL:1m</span><span class="p">;</span>
+    <span class="kn">ssl_session_timeout</span>  <span class="mi">5m</span><span class="p">;</span>
+    <span class="c1">#数字签名，此处使用MD5
+</span>    <span class="kn">ssl_ciphers</span>  <span class="s">HIGH:!aNULL:!MD5</span><span class="p">;</span>
+    <span class="kn">ssl_prefer_server_ciphers</span>  <span class="no">on</span><span class="p">;</span>
+
+    <span class="kn">location</span> <span class="n">/</span> <span class="p">{</span>
+        <span class="kn">root</span>   <span class="n">/root</span><span class="p">;</span>
+        <span class="kn">index</span>  <span class="s">index.html</span> <span class="s">index.htm</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h5 id="负载均衡配置">负载均衡配置</h5>
+
+<p>Nginx 支持以下负载均衡算法：</p>
+
+<ol>
+  <li><strong>轮询</strong>：请求轮流发送给应用服务器；</li>
+  <li><strong>最少连接</strong>（权重）：请求被分配给具有最少数量活动连接的服务器；</li>
+  <li><strong>ip 哈希</strong>：使用哈希函数确定请求应该选择哪一个服务器（基于客户端的 IP 地址）；</li>
+</ol>
+
+<p>在（网站域名指向的）公网 IP 所在的服务器上部署 nginx，对所有请求做负载均衡处理。</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#nginx在监听`80`端口上的服务
+</span><span class="k">listen</span>	<span class="mi">80</span><span class="p">;</span>
+
+<span class="k">http</span> <span class="p">{</span>
+    <span class="kn">upstream</span> <span class="s">front_server</span><span class="p">{</span>
+		<span class="kn">server</span> <span class="nf">www.helloworld.com</span><span class="p">:</span><span class="mi">8081</span><span class="p">;</span>
+	<span class="p">}</span>
+    <span class="c1">#设定负载均衡的服务器列表
+</span>    <span class="kn">upstream</span> <span class="s">user_load_balance_server</span> <span class="p">{</span>
+        <span class="c1">#weigth参数表示权值，权值越高被分配到的几率越大
+</span>        <span class="kn">server</span> <span class="nf">192.168.1.11</span><span class="p">:</span><span class="mi">80</span>   <span class="s">weight=6</span><span class="p">;</span>
+        <span class="kn">server</span> <span class="nf">192.168.1.12</span><span class="p">:</span><span class="mi">80</span>   <span class="s">weight=5</span><span class="p">;</span>
+        <span class="kn">server</span> <span class="nf">192.168.1.13</span><span class="p">:</span><span class="mi">80</span>   <span class="s">weight=1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c1">#设定负载均衡的服务器列表
+</span>    <span class="kn">upstream</span> <span class="s">product_load_balance_server</span> <span class="p">{</span>
+        <span class="kn">server</span> <span class="nf">192.168.1.21</span><span class="p">:</span><span class="mi">81</span>   <span class="s">weight=6</span><span class="p">;</span>
+        <span class="kn">server</span> <span class="nf">192.168.1.21</span><span class="p">:</span><span class="mi">82</span>   <span class="s">weight=5</span><span class="p">;</span>
+        <span class="kn">server</span> <span class="nf">192.168.1.21</span><span class="p">:</span><span class="mi">83</span>   <span class="s">weight=1</span><span class="p">;</span>
+    <span class="p">}</span>
+
+   <span class="c1">#HTTP服务器
+</span>   <span class="kn">server</span> <span class="p">{</span>
+		<span class="c1"># 前端项目，默认index.html代理到了80端口
+</span>		<span class="kn">location</span> <span class="n">/</span> <span class="p">{</span>
+			<span class="kn">proxy_pass</span> <span class="s">http://front_server</span><span class="p">;</span>
+        	<span class="c1">#静态站点配置，前端项目的放置路径
+</span>			<span class="kn">root</span> <span class="nc">api/dist</span><span class="p">;</span>
+			<span class="kn">index</span> <span class="s">index.html</span><span class="p">;</span> <span class="c1">#转发任何请求到 index.html
+</span>		<span class="p">}</span>
+        <span class="c1">#1. 例如react打包的dist项目，静态文件是以`/`绝对路径的形式访问，需要单独给它们添加代理。
+</span>		<span class="c1">#2. 比如要把它们都放在html文件夹，那就用alias。
+</span>        <span class="kn">location</span> <span class="n">/test</span><span class="p">{</span>
+            <span class="kn">alias</span> <span class="s">html</span><span class="p">;</span>
+            <span class="kn">index</span> <span class="s">index.html</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="kn">location</span> <span class="p">~</span> <span class="sr">.*\.(js|css)?$</span> <span class="p">{</span>
+            <span class="kn">root</span> <span class="s">html</span><span class="p">;</span>
+        <span class="p">}</span>
+        
+        <span class="c1">#^~/api/表示匹配前缀是api的请求
+</span>        <span class="kn">location</span>  <span class="s">^~/api/</span> <span class="p">{</span>
+            <span class="kn">proxy_pass</span> <span class="s">http://tomcat_list/</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="c1">#对后端所有请求进行负载均衡请求
+</span>        <span class="kn">location</span> <span class="n">/api/user</span> <span class="p">{</span>
+            <span class="kn">proxy_pass</span>  <span class="s">http://user_load_balance_server</span><span class="p">;</span> <span class="c1">#请求转向服务器列表
+</span>            <span class="c1">#root        /root;                 #定义服务器的默认网站根目录位置
+</span>            <span class="c1">#index       index.html index.htm;  #定义首页索引文件的名称
+</span>        <span class="p">}</span>
+        <span class="c1">#对后端所有请求进行负载均衡请求
+</span>        <span class="kn">location</span> <span class="n">/api/product</span> <span class="p">{</span>
+            <span class="kn">proxy_pass</span>  <span class="s">http://product_load_balance_server</span><span class="p">;</span> <span class="c1">#请求转向服务器列表
+</span>            <span class="c1">#root        /root;                 #定义服务器的默认网站根目录位置
+</span>            <span class="c1">#index       index.html index.htm;  #定义首页索引文件的名称
+</span>        <span class="p">}</span>
+        
+        <span class="c1">#后端的Web服务器可以通过X-Forwarded-For获取用户真实IP
+</span>        <span class="kn">proxy_set_header</span> <span class="s">X-Forwarded-For</span> <span class="nv">$remote_addr</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h6 id="解决跨域问题">解决跨域问题</h6>
+
+<blockquote>
+  <p>见计算机网络文档中。</p>
+</blockquote>
+
+<p>跨域问题：</p>
+
+<ol>
+  <li>如果在一台服务器上同时启动多个 webapp 应用，不能都用 80 端口，需要分别绑定不同的端口号。</li>
+  <li>前后端分离模式下，前端和后端分别是独立的 web 应用程序，前后端在交互时势必存在<strong>跨域问题</strong>。</li>
+</ol>
+
+<p>可以通过反向代理将<strong>端口转发</strong>到默认端口。</p>
+
+<ul>
+  <li>Nginx 代理前端到根目录，代理 <code class="highlighter-rouge">/api</code> 到后端服务器、并进行负载均衡；</li>
+  <li><del>实现不同端口间的转发：HTTP 默认的端口号是80，Tomcat 服务器默认配置端口是 8080，想直接访问网址而不加端口来访问 Tomcat 下部署的项目时，必须进行端口转发。（即要达到这样一个效果：直接访问www.baidu.com访问的是8080端口，而不是其80端口）</del></li>
+</ul>
+
+<p><del>首先，在 enable-cors.conf 文件中设置 cors ：</del></p>
+
+<p>配置说明：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">Access-Control-Allow-Origin</code>：允许跨域的域名，<code class="highlighter-rouge">*</code> 表示允许所有域名。</li>
+  <li><code class="highlighter-rouge">Access-Control-Allow-Methods</code>：允许的 HTTP 方法（如 <code class="highlighter-rouge">GET</code>、<code class="highlighter-rouge">POST</code> 等）。</li>
+  <li><code class="highlighter-rouge">Access-Control-Allow-Headers</code>：允许的请求头。</li>
+  <li><code class="highlighter-rouge">Access-Control-Expose-Headers</code>：允许客户端访问的响应头。</li>
+  <li><code class="highlighter-rouge">Access-Control-Max-Age</code>：预检请求的缓存时间（单位：秒）。</li>
+  <li><code class="highlighter-rouge">OPTIONS</code> 请求：用于处理浏览器的预检请求（Preflight Request）。</li>
+</ul>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># ----------------------------------------------------
+# 此文件为项目 nginx 配置片段
+# 可以直接在 nginx config 中 include（推荐）
+# 或者 copy 到现有 nginx 中，自行配置
+# www.helloworld.com 域名需配合 dns hosts 进行配置
+# 其中，api 开启了 cors，需配合本目录下另一份配置文件
+# ----------------------------------------------------
+</span>
+<span class="c1"># 定义允许的域名
+</span><span class="k">map</span> <span class="nv">$http_origin</span> <span class="nv">$cors_origin</span> <span class="p">{</span>
+    <span class="kn">default</span> <span class="s">""</span><span class="p">;</span>
+    <span class="kn">"~^https://example.com</span>$<span class="s">"</span> <span class="nv">$http_origin</span><span class="p">;</span>
+    <span class="kn">"~^https://another.com</span>$<span class="s">"</span> <span class="nv">$http_origin</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">upstream</span> <span class="s">front_server</span><span class="p">{</span>
+  <span class="kn">server</span> <span class="nf">www.helloworld.com</span><span class="p">:</span><span class="mi">9000</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">upstream</span> <span class="s">backend_api_server</span><span class="p">{</span>
+  <span class="kn">server</span> <span class="nf">www.helloworld.com</span><span class="p">:</span><span class="mi">8080</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">server</span> <span class="p">{</span>
+  <span class="kn">listen</span>       <span class="mi">80</span><span class="p">;</span>
+  <span class="kn">server_name</span>  <span class="s">www.helloworld.com</span><span class="p">;</span>
+
+  <span class="kn">location</span> <span class="p">~</span> <span class="sr">^/api/</span> <span class="p">{</span>
+        <span class="c1"># 动态设置允许的域名
+</span>        <span class="kn">add_header</span> <span class="s">'Access-Control-Allow-Origin'</span> <span class="nv">$cors_origin</span><span class="p">;</span>
+        <span class="kn">add_header</span> <span class="s">'Access-Control-Allow-Methods'</span> <span class="s">'GET,</span> <span class="s">POST,</span> <span class="s">OPTIONS'</span><span class="p">;</span>
+        <span class="kn">add_header</span> <span class="s">'Access-Control-Allow-Headers'</span> <span class="s">'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range'</span><span class="p">;</span>
+        <span class="kn">add_header</span> <span class="s">'Access-Control-Expose-Headers'</span> <span class="s">'Content-Length,Content-Range'</span><span class="p">;</span>
+		<span class="kn">add_header</span> <span class="s">'Access-Control-Allow-Credentials'</span> <span class="s">'true'</span><span class="p">;</span>
+
+        <span class="c1"># 处理 OPTIONS 预检请求
+</span>        <span class="kn">if</span> <span class="s">(</span><span class="nv">$request_method</span> <span class="p">=</span> <span class="s">'OPTIONS')</span> <span class="p">{</span>
+            <span class="kn">add_header</span> <span class="s">'Access-Control-Max-Age'</span> <span class="mi">1728000</span><span class="p">;</span>
+            <span class="kn">add_header</span> <span class="s">'Content-Type'</span> <span class="s">'text/plain</span><span class="p">;</span> <span class="kn">charset=utf-8'</span><span class="p">;</span>
+            <span class="kn">add_header</span> <span class="s">'Content-Length'</span> <span class="mi">0</span><span class="p">;</span>
+            <span class="kn">return</span> <span class="mi">204</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="c1"># 其他配置
+</span>        <span class="kn">proxy_pass</span> <span class="s">http://backend_api_server</span><span class="p">;</span>
+        <span class="c1">#rewrite "^/api/(.*)$" /$1 break;
+</span>  <span class="p">}</span>
+
+    <span class="c1"># 前端
+</span>  	<span class="kn">location</span> <span class="p">~</span> <span class="sr">^/</span> <span class="p">{</span>
+    	<span class="kn">proxy_pass</span> <span class="s">http://front_server</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h5 id="动静分离">动静分离</h5>
+
+<p>动静分离：简单来说就是把动态请求和静态请求分开、动态文件与静态文件的分离。</p>
+
+<ul>
+  <li>静态请求直接就可以通过 Nginx 处理，动态请求转发到后台交由 Tomcat 进行处理。</li>
+  <li>可以提高用户访问静态代码的速度，降低对后台应用访问，减轻服务器的压力。</li>
+</ul>
+
+<p><img src="../assets/1424359-20210703164458075-1516620523.png" alt="img" style="zoom: 44%;" /></p>
+
+<h6 id="静态站点配置">静态站点配置</h6>
+
+<p>举例来说：如果所有的静态资源都放在了 <code class="highlighter-rouge">/app/dist</code> 目录下，只需要指定首页以及这个站点的 host 即可。</p>
+
+<ul>
+  <li>添加 HOST：<code class="highlighter-rouge">127.0.0.1 static.zp.cn</code></li>
+</ul>
+
+<p>此时，在本地浏览器访问 static.zp.cn ，就可以访问静态站点了。</p>
+
+<h6 id="搭建文件服务器">搭建文件服务器</h6>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">autoindex</span> <span class="no">on</span><span class="p">;</span> <span class="c1"># 开启可以显示目录，默认不开启
+</span><span class="k">autoindex_exact_size</span> <span class="no">on</span><span class="p">;</span><span class="c1"># 显示文件大小
+</span><span class="k">autoindex_localtime</span> <span class="no">on</span><span class="p">;</span>	<span class="c1"># 显示文件的修改时间
+</span>
+<span class="k">server</span> <span class="p">{</span>
+    <span class="kn">charset</span>      <span class="s">utf-8,gbk</span><span class="p">;</span> <span class="c1"># windows 服务器下设置后，依然乱码，暂时无解
+</span>    <span class="kn">listen</span>       <span class="mi">9050</span> <span class="s">default_server</span><span class="p">;</span>
+    <span class="kn">listen</span>       <span class="s">[::]:9050</span> <span class="s">default_server</span><span class="p">;</span>
+    <span class="kn">server_name</span>  <span class="s">_</span><span class="p">;</span>
+    <span class="kn">root</span>         <span class="n">/share/fs</span><span class="p">;</span> <span class="c1"># 用来设置开放为文件服务的根路径
+</span><span class="p">}</span>
+
+</code></pre></div></div>

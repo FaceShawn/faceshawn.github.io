@@ -1,0 +1,1010 @@
+<blockquote>
+  <p>摘要：Spring 框架包括 IoC 和 AOP，事务，设计模式等。</p>
+</blockquote>
+
+<!-- more -->
+
+<h2 id="目录">目录</h2>
+
+<p>[TOC]</p>
+
+<h2 id="spring">Spring</h2>
+
+<h3 id="spring-概述">Spring 概述</h3>
+
+<p>Spring 是<strong>轻量</strong>级的开源 J2EE（容器）框架和中间层框架（万能胶）。</p>
+
+<p>在 SSM 中作用：Bean 工厂，用来管理 Bean 的生命周期和框架集成。</p>
+
+<p>两大核心：IoC/DI（控制反转/依赖注入）和AOP（面向切面编程）。</p>
+
+<h5 id="优点">优点</h5>
+
+<ol>
+  <li>轻量：Spring 是轻量的，基本的版本大约 2MB；</li>
+  <li><strong>IoC 容器</strong>：
+    <ol>
+      <li>通过 IoC 实现与代码<strong>松耦合</strong>：（IoC 解耦）用 <strong>IoC 容器</strong>管理对象的生命周期和配置；<del>对象发生改变，只需在配置文件中修改，而无须修改 Java 代码；</del></li>
+      <li><strong>非侵入式</strong>：对象可不依赖于 Spring 的 API；（不改变现有的类结构，就能增强 Java Bean 的功能，Struts2 等传统框架常要实现特定接口、继承特定类才能增强功能，改变了 Java 类的结构）。</li>
+    </ol>
+  </li>
+  <li>支持<strong>AOP</strong>：面向切面编程，把应用业务逻辑和系统服务分开；</li>
+  <li><strong>异常处理</strong>：提供了方便的 API 把具体技术相关的异常（如由 JDBC、Hibernate、JDO 抛出的）转化为一致的 <strong>unchecked 异常</strong>。<del>Spring 的 JDBC 抽象层提供了一个异常层次结构，简化了错误处理策略。</del></li>
+  <li>事务管理：提供了一个持续的事务管理接口，可扩展到上至本地事务下至全局事务（JTA）；
+    <ul>
+      <li><strong>支持声明式事务</strong>：只通过配置就可完成事务管理，无须手动编程。</li>
+    </ul>
+  </li>
+  <li>方便集成各种<strong>框架</strong>：
+    <ol>
+      <li>支持 WEB 框架：<a href="#MVC 设计模式">MVC 设计模式</a>；</li>
+      <li>支持 Struts2、Hibernate、MyBatis 等；</li>
+      <li>为 JavaEE 开发中一些 API（JDBC、JavaMail、远程调用等）提供了封装。</li>
+    </ol>
+  </li>
+  <li>对<strong>单元测试</strong>支持比较好：框架中包含测试环境；支持 JUnit4，可用注解方便地测试。</li>
+</ol>
+
+<h5 id="spring-framework-八大模块">Spring Framework 八大模块</h5>
+
+<p><img src="../assets/spring-overview.png" alt="img" style="zoom:60%;" /></p>
+
+<ol>
+  <li><code class="highlighter-rouge">Core Container</code> 核心容器：Spring Framework 的核心；
+    <ol>
+      <li><strong><code class="highlighter-rouge">Beans</code> 模块</strong>：包括 IoC 和 DI，<code class="highlighter-rouge">BeanFactory</code> 接口，<a href="IoC 容器">IoC 容器的实现</a></li>
+      <li>Core 模块</li>
+      <li><strong><code class="highlighter-rouge">Context</code> 上下文模块</strong>：<code class="highlighter-rouge">ApplicationContext</code> 接口，<a href="IoC 容器">IoC 容器的实现</a></li>
+      <li>SpEL（Spring Express Language）<strong>表达式</strong></li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">Data Access/Integration</code> 数据访问/集成：提供与数据库交互的支持；
+    <ol>
+      <li><strong><code class="highlighter-rouge">JDBC</code></strong>：Spring使用的是<code class="highlighter-rouge">javax.sql.DataSource</code>接口获取数据库连接，DataSource代表一个数据源（获取数据库工厂），相较于直接通过<code class="highlighter-rouge">java.sql.Driver</code>获取数据库连接（通常是通过<code class="highlighter-rouge">DriverManager</code>查找并调用匹配的Driver创建连接），DataSource最大的优势就是可以实现连接池。</li>
+      <li><strong><code class="highlighter-rouge">ORM</code></strong>：提供对象-关系映射框架的集成 API，包括 JPA、JDO、Hibernate 和 MyBatis 等。</li>
+      <li><del>OXM</del>：提供了一个支持 Object/XML 映射的抽象层实现（Java 对象和 XML 数据间的映射），如 JAXB、Castor、XMLBeans、JiBX 和 XStream。</li>
+      <li><code class="highlighter-rouge">JMS</code>：Java 消息服务。</li>
+      <li><code class="highlighter-rouge">Transactions</code> <strong>事务</strong>。</li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">Web</code>：提供了创建 Web 应用程序的支持；
+    <ol>
+      <li>WebSocket</li>
+      <li><strong><code class="highlighter-rouge">Servlet</code></strong></li>
+      <li>Web</li>
+      <li>Portlet</li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">AOP</code> 面向切面编程</li>
+  <li><code class="highlighter-rouge">Aspects</code>：支持 AspectJ 的集成</li>
+  <li><del>Instrumentation</del>：为类检测和类加载器的实现提供支持；</li>
+  <li><del>Messaging</del></li>
+  <li><code class="highlighter-rouge">Test</code>：支持 Junit 和 TestNG 测试框架，模拟 Http 请求的功能。</li>
+</ol>
+
+<h4 id="spring-启动过程分哪些步骤">Spring 启动过程？分哪些步骤</h4>
+
+<blockquote>
+  <p>https://www.cnblogs.com/lgx211/p/18535984</p>
+</blockquote>
+
+<h3 id="ioc-设计思想">IoC 设计思想</h3>
+
+<h4 id="ioc-设计思想-1">IoC 设计思想</h4>
+
+<h5 id="ioc-和-di">IoC 和 DI</h5>
+
+<p>在传统的 Java 应用中，一个类（调用者）想要调用（依赖）另一个类（被调用者）的成员变量或成员方法，通常会先通过 <code class="highlighter-rouge">new Object()</code> 创建对象。</p>
+
+<ol>
+  <li>IoC（<code class="highlighter-rouge">Inversion of Control</code>，控制反转）：new/创建对象的<strong>控制权</strong>，由开发者手动创建<strong>转移</strong>（反转）给（第三方） <code class="highlighter-rouge">IoC</code> 容器管理。</li>
+  <li>DI（<code class="highlighter-rouge">Dependency Injection</code>，依赖注入）：通过 <code class="highlighter-rouge">IoC</code> 容器<strong>管理对象间的依赖</strong>，容器在创建对象时，（根据依赖关系）将它依赖的对象<strong>自动注入</strong>当前对象。</li>
+</ol>
+
+<p>二者含义相同，是从两个角度描述的同一概念。如，把 Dao 依赖注入到 Service 层，Service 层反转给 Controller 层，Spring 顶层容器为 BeanFactory。</p>
+
+<p>优点：</p>
+
+<ol>
+  <li>把应用的代码量降到最低；</li>
+  <li>使应用容易测试，单元测试不再需要单例和 JNDI 查找机制；</li>
+  <li>最小的代价和最小的侵入性可实现<strong>松散耦合</strong>；</li>
+  <li>IOC 容器支持加载服务时的<strong>饿汉式</strong>初始化和<strong>懒加载</strong>。</li>
+</ol>
+
+<h5 id="ioc-容器">IoC 容器</h5>
+
+<p>IoC 容器：管理（Bean）对象（从创建到销毁的）整个生命周期，管理<strong>对象间的依赖</strong>及注入。</p>
+
+<p>IoC 容器的<strong>两种实现</strong>：</p>
+
+<ol>
+  <li>
+    <p><code class="highlighter-rouge">BeanFactory</code> 接口：Spring 内部用；<strong>懒加载</strong>（获取对象时才创建对象）；简单，占内存少，启动快。最常用 <strong><code class="highlighter-rouge">XmlBeanFactory</code> 类</strong>实现接口。</p>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> import  org.springframework.beans.factory.BeanFactory;
+      
+ Resource res = new ClassPathResource("appContext.xml"); 
+ BeanFactory fact = new XmlBeanFactory(res); 
+      
+ Student stu = (Student) fact.getBean("student");
+ stu.getMsg();
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">ApplicationContext</code> 接口：面向<strong>开发者</strong>，用的更多；<strong>继承</strong>并扩展 <code class="highlighter-rouge">BeanFactory</code>，功能更完整；<strong>即时加载</strong>（加载配置文件时创建并初始化<strong>所有对象</strong>）；不管用没用到，<strong>容器启动</strong>时<strong>一次性</strong>创建所有 Bean ；</p>
+
+    <ol>
+      <li><code class="highlighter-rouge">ClassPathXmlApplicationContext</code>：从 <code class="highlighter-rouge">classpath</code> <strong>加载配置文件</strong>，更常用；</li>
+      <li><code class="highlighter-rouge">FileSystemXmlApplicationContext</code>：从指定位置加载配置文件，不常用；</li>
+      <li><code class="highlighter-rouge">XmlWebApplicationContext</code>：从Web系统中的 XML 文件加载配置文件。</li>
+    </ol>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  BeanFactory beanFactory = new ClassPathXmlApplicationContext("beans.xml");
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<p>二者都是通过 <strong>XML 配置文件</strong>加载 Bean 的，通常用后者，只有在系统资源较少时，才考虑用 <code class="highlighter-rouge">BeanFactory</code>。</p>
+
+<p>区别是 <code class="highlighter-rouge">BeanFactory</code> 是懒加载，<code class="highlighter-rouge">ApplicationContext</code> 是一次性加载所有 Bean。</p>
+
+<p>主要区别在于 Bean 的某一属性<strong>没有注入</strong>时：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">BeanFacotry</code> 加载后，第一次调用 <code class="highlighter-rouge">getBean()</code> 会<strong>抛出异常</strong>；</li>
+  <li><code class="highlighter-rouge">ApplicationContext</code> 在初始化时就自动检测所依赖的属性是否注入。</li>
+</ol>
+
+<h5 id="ioc-工作原理">IoC 工作原理</h5>
+
+<p>IoC 底层通过工厂模式、XML 解析、Java 的反射机制等技术，降低代码<strong>耦合度</strong>，主要步骤有：</p>
+
+<ol>
+  <li><a href="#Spring 框架中的设计模式">工厂模式</a>：可把 <strong>IoC 容器</strong>当做一个工厂，产品就是 Spring Bean；
+    <ul>
+      <li><a href="#IoC 容器">IoC 容器的两种实现</a>：通过 <code class="highlighter-rouge">BeanFactory</code>、<code class="highlighter-rouge">ApplicationContext</code> 接口创建 Bean 对象。</li>
+    </ul>
+  </li>
+  <li>XML 解析：在配置文件（如 Bean.xml）中，配置各个对象及对象间的依赖关系，容器启动时会加载并<strong>解析</strong>；
+    <ul>
+      <li>与代码<strong>松耦合</strong>、IoC 解耦原理：对象发生改变，只需在配置文件中修改，而无须修改 Java 代码。</li>
+    </ul>
+  </li>
+  <li>IoC 利用 <strong>Java 的反射机制</strong>：根据类名生成相应的对象，并根据<strong>依赖关系</strong>将此对象注入到依赖它的对象中。</li>
+</ol>
+
+<p>工厂方法：分为无参和有参，静态工厂和实例工厂。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 用静态工厂方法创建Bean
+class UserFactory {
+    public static UserDao getDao() {
+        // xml解析
+        String className = class属性值;
+        // 通过反射创建对象
+        Class clazz = Class.forName(className);
+        return (UserDao)clazz.newInstance();
+        // return new UserDao();
+    }
+}
+UserDao dao = UserFactory.getDao();
+</code></pre></div></div>
+
+<h5 id="循环依赖">循环依赖</h5>
+
+<p>循环依赖：是指 Bean 对象<strong>循环引用</strong>，是两个或多个 Bean 之间相互持有对方的引用，</p>
+
+<ul>
+  <li>例如 DependencyA → DependencyB → DependencyA。</li>
+  <li>单个对象的自我依赖也会出现循环依赖。</li>
+</ul>
+
+<p>如何解决<strong>循环依赖</strong>：</p>
+
+<ol>
+  <li>构造器的：直接抛出 <code class="highlighter-rouge">BeanCurrentlylnCreationException</code> 异常。</li>
+  <li>单例模式下的 <code class="highlighter-rouge">setter</code>（默认的单例 Bean 中，属性互相引用）：通过<strong>三级缓存</strong>处理。</li>
+  <li>非单例的 bean 和<code class="highlighter-rouge">@Async</code>注解的 bean 无法支持循环依赖：无法处理。</li>
+</ol>
+
+<p>Spring 如何解决三级缓存：</p>
+
+<ul>
+  <li>
+    <p>如果发生循环依赖的话，就去<strong>三级缓存 <code class="highlighter-rouge">singletonFactories</code></strong> 中拿到<strong>三级缓存中</strong>存储的 <code class="highlighter-rouge">ObjectFactory</code> ，并调用它的 <code class="highlighter-rouge">getObject()</code> 方法，来获取这个循环依赖对象的<strong>前期暴露对象</strong>（虽然还没<strong>初始化</strong>完成，但是可以拿到该对象在堆中的存储地址了），并且将这个前期暴露对象放到<strong>二级缓存</strong>中，这样在循环依赖时，就不会重复初始化了！</p>
+  </li>
+  <li>
+    <p>缺点：比如增加了内存开销（需要维护三级缓存，也就是三个 Map），降低了性能（需要进行多次检查和转换）。</p>
+  </li>
+</ul>
+
+<p>SpringBoot 允许循环依赖发生么？</p>
+
+<ul>
+  <li>SpringBoot 2.6.x 以前是默认允许循环依赖的，也就是说代码出现了循环依赖问题，一般情况下也不会报错。</li>
+  <li>SpringBoot 2.6.x 以后官方<strong>不再推荐编写</strong>存在循环依赖的代码。</li>
+</ul>
+
+<p>SpringBoot 2.6.x 以后，如果不想重构循环依赖的代码的话，也可以采用下面这些方法：</p>
+
+<ul>
+  <li>在全局配置文件中设置允许循环依赖存在：<code class="highlighter-rouge">spring.main.allow-circular-references=true</code>。最简单粗暴的方式，不太推荐。</li>
+  <li>在导致循环依赖的 Bean 上添加 <strong><code class="highlighter-rouge">@Lazy</code> 注解</strong>，比较推荐。<code class="highlighter-rouge">@Lazy</code> 用来标识类是否需要懒加载/延迟加载，可以作用在类上、方法上、构造器上、方法参数上、成员变量中。</li>
+</ul>
+
+<h5 id="依赖注入的方式">依赖注入的方式</h5>
+
+<p>依赖注入本质上是 Spring Bean 属性注入的一种，只不过这个属性是一个对象。</p>
+
+<h4 id="spring-配置">Spring 配置</h4>
+
+<blockquote>
+  <p>见 Spring Boot 中。</p>
+</blockquote>
+
+<h4 id="spring-bean-定义">Spring Bean 定义</h4>
+
+<p>Bean：由 IoC 容器创建并管理的对象。</p>
+
+<h5 id="bean-属性注入的方式">Bean 属性注入的方式</h5>
+
+<ol>
+  <li>构造器注入：XML 配置文件中，用 <code class="highlighter-rouge">&lt;constructor-arg&gt;</code> 标签给构造方法的<strong>参数</strong>赋值；
+    <ul>
+      <li>缺点：没有部分注入；任意修改都会创建一个新实例。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">setter()</code> 方法注入：通过调用<strong>默认无参</strong>构造器或无参 static 工厂方法，实例化 Bean 对象，然后调用 setXxx() 设置<code class="highlighter-rouge">&lt;property&gt;</code>属性；
+    <ul>
+      <li>缺点：会覆盖 setter 属性；适用于设置少量属性。</li>
+    </ul>
+  </li>
+  <li>接口注入/工厂方法；静态工厂注入、实例工厂；</li>
+  <li>短命名空间注入：
+    <ol>
+      <li>c：<code class="highlighter-rouge">&lt;bean&gt;</code> 中嵌套的 <code class="highlighter-rouge">&lt;contructor&gt;</code> 元素，构造器注入的优化；</li>
+      <li>p：<code class="highlighter-rouge">&lt;bean&gt;</code> 中嵌套的 <code class="highlighter-rouge">&lt;property&gt;</code> 元素，setter() 注入的优化；</li>
+    </ol>
+  </li>
+  <li>泛型注入</li>
+  <li><del>基于Groovy DSL 配置（很少见）</del></li>
+</ol>
+
+<h5 id="基于-xml-配置文件的属性注入">基于 XML 配置文件的属性注入</h5>
+
+<p>配置文件：描述<strong>如何创建对象</strong>和哪些组件需要哪些服务。用于定义 Bean 的属性值、作用域、依赖关系。</p>
+
+<p>格式有：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">Properties</code> 配置文件：key-value 形式，只能赋值，不能进行其他操作；用于简单的属性配置。</li>
+  <li><code class="highlighter-rouge">XML</code> 配置文件：树形结构清晰灵活，内容繁琐，用于大型复杂的项目。
+    <ul>
+      <li><code class="highlighter-rouge">&lt;bean&gt;</code>的常用属性：见下；
+        <ul>
+          <li><code class="highlighter-rouge">ref</code>：用于注入已定义好的 Bean；</li>
+          <li><code class="highlighter-rouge">autowire</code> 属性：设置<a href="#自动装配的五种规则">自动装配的规则</a>；</li>
+        </ul>
+      </li>
+      <li><code class="highlighter-rouge">&lt;bean&gt;</code>的其它属性：
+        <ul>
+          <li><code class="highlighter-rouge">parent</code> 属性：指定继承的父 Bean。</li>
+          <li>指定 <code class="highlighter-rouge">abstarct="true"</code> 而不指定 class 属性，表示为 Bean 定义模板（抽象类？），只能被继承，不能被实例化。</li>
+          <li><code class="highlighter-rouge">value</code>：用于注入基本数据类型及字符串类型的值；</li>
+          <li><code class="highlighter-rouge">type</code>：用来指定对应的构造函数；</li>
+          <li><code class="highlighter-rouge">index</code>：指定参数位置；</li>
+        </ul>
+      </li>
+      <li><code class="highlighter-rouge">&lt;property&gt;</code>：给属性注入值，name 的名称取决于 setXxx() 后的参数；</li>
+    </ul>
+  </li>
+</ol>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Beans.xml
+&lt;beans&gt;
+    // bean 标签: 要创建的对象，默认执行无参构造器
+    // id: Bean 的唯一标识符
+    // class: Bean的实现类，指定从 package 到 class name 的完全限定名
+    // name: 
+    // scope: Bean 的作用域
+    &lt;bean id="user" class="com.spring5.User" name="" scope=""&gt;
+        &lt;--! 1. 用（有参）构造器注入属性--&gt;
+        &lt;constructor-arg name="oname" index=0 type="" value="China"&gt;
+        &lt;/constructor-arg&gt;
+        
+        &lt;--! 2. 用set方法注入属性，通过property标签实现属性注入--&gt;
+        // 注入8大基本数据类类 + String
+        &lt;property name="bname" value="java"&gt;&lt;/property&gt;
+        // 注入外部bean属性
+        &lt;property name="userDao" ref="userDaoImpl"&gt;&lt;/property&gt;
+        // 注入集合，创建类，定义数组、List、Set、Map属性，生成set方法
+        &lt;property name="courses"&gt;
+            // 注入数组类型属性
+            // 注入List集合属性
+            &lt;list&gt;
+                &lt;value&gt;java&lt;/value&gt;
+            &lt;/list&gt;
+            // 注入Map属性
+            // 在集合里设置对象类型的值
+        &lt;/property&gt;
+    &lt;/bean&gt;
+&lt;/beans&gt;
+
+// 类中
+public Orders(String oname) {
+    this.oname = oname;
+}
+</code></pre></div></div>
+
+<h5 id="bean-作用域">Bean 作用域</h5>
+
+<p>Bean 作用域：指 Spring IoC 容器<strong>创建</strong>的 Bean 对象相对于其他 Bean 的<strong>请求可见范围</strong>。在装配 Bean 时就必须指明，可通过 XML 或注解方式配置。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. XML 方式：
+&lt;bean id="" class="" scope="singleton"&gt;&lt;/bean&gt;
+
+2. 注解方式：
+@Bean
+//@Scope("singleton")
+@Scope(value = Con'figurableBeanFactory.SCOPE_PROTO'TYPE)
+public Person personPrototype() {
+    return new Person();
+}
+</code></pre></div></div>
+
+<p><strong>基本作用域</strong>：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">'singleton</code>：单例模式，<strong>默认值</strong>，在整个Spring IoC 容器中<strong>只有一个共享的</strong> Bean 实例，由 <code class="highlighter-rouge">BeanFactory</code> 维护。一旦创建成功，<strong>可重复使用</strong>。存储在<strong>高速缓存</strong>中，用于<strong>无会话状态</strong>的 Bean（如 DAO 层、Service 层）。</li>
+  <li><code class="highlighter-rouge">prototype</code>：原型模式，每次获取 Bean 时，容器都会<strong>创建一个新的</strong> Bean 实例；创建成功后<strong>不再跟踪和维护</strong> Bean 实例的状态。用于<strong>需保持会话状态</strong>的 Bean（如 Struts2 的 Action 类）。</li>
+</ol>
+
+<p>Spring 框架并没有对单例 Bean 进行任何多线程的封装处理。大部分的 Spring bean 并没有可变的状态（如 Service 类和 DAO 类)，所以在某种程度上说 Spring 的单例 bean 是<strong>线程安全</strong>的。如果 bean 有多种状态的话，就需自行保证线程安全。最浅显的解决办法就是将多态 bean 的作用域由 <code class="highlighter-rouge">singleton</code> 变更为 <code class="highlighter-rouge">prototype</code>。</p>
+
+<p><strong>Web 作用域</strong>：只能在 Web 环境（<code class="highlighter-rouge">XmlWebApplicationContext</code>）下用，如果用 <code class="highlighter-rouge">ClassPathXmlApplicationContext</code> 加载这些作用域中的任意一个的 Bean，会抛出异常。</p>
+
+<ol>
+  <li><code class="highlighter-rouge">request</code>：每次 <strong>HTTP request 请求</strong>都会产生一个新的（不同的）Bean 实例，仅在当前 request 内有效（在请求完成后，Bean 会被 <strong>GC</strong> 回收）。</li>
+  <li><code class="highlighter-rouge">session</code>：每个 <strong>HTTP Session</strong> 会产生一个新的 Bean，仅在当前 session 内有效。同一个 Session 共享一个 Bean 实例。</li>
+  <li><del><code class="highlighter-rouge">global-session</code></del>：每个全局的 HTTP Session、用 session 定义的 Bean 都将产生一个新实例。典型情况下，仅在用 portlet context 时有效。</li>
+  <li><code class="highlighter-rouge">application</code>：类似于 singleton，同一个 <strong>Web 应用</strong>（可能有多个 IoC 容器）<strong>共享</strong>一个 Bean 实例。</li>
+  <li><del><code class="highlighter-rouge">websocket</code></del>：作用域是 WebSocket。</li>
+</ol>
+
+<h5 id="bean-生命周期">Bean 生命周期</h5>
+
+<p><img src="../assets/bean_life_cycle.png" alt="img" style="zoom: 60%;" /></p>
+
+<p>spring bean 在初始化和销毁时可触发自定义回调操作。</p>
+
+<ol>
+  <li>实例化 Bean 对象（3步）；</li>
+  <li>初始化 Bean 对象（4步），自定义处理；
+    <ol>
+      <li><del>初始化顺序：类构造器 &gt; <code class="highlighter-rouge">@PostConstruct</code> &gt; <code class="highlighter-rouge">InitializingBean</code> &gt; <code class="highlighter-rouge">init-method</code></del></li>
+      <li><del>初始化时实现的方法：</del>
+        <ol>
+          <li>通过 Java 提供的 <code class="highlighter-rouge">@PostConstruct</code> 注解；</li>
+          <li>通过实现 Spring 提供的 <code class="highlighter-rouge">InitializingBean</code> 接口，并重写其 <code class="highlighter-rouge">afterPropertiesSet()</code> 方法；</li>
+          <li>通过 Spring 的 xml bean 配置或 bean 注解指定初始化方法，如自定义 <code class="highlighter-rouge">initMethod</code>方法通过 <code class="highlighter-rouge">@Bean</code> 注解指定。</li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+  <li>销毁 Bean 对象（4步）；
+    <ol>
+      <li><del>销毁顺序：<code class="highlighter-rouge">@PreDestroy</code> &gt; <code class="highlighter-rouge">DisposableBean</code> 接口&gt; <code class="highlighter-rouge">destroyMethod</code></del></li>
+      <li><del>销毁时实现的方法：</del>
+        <ol>
+          <li>通过 Java 提供的 <code class="highlighter-rouge">@PreDestroy</code> 注释；</li>
+          <li>通过实现 spring 提供的 <code class="highlighter-rouge">DisposableBean</code> 接口，并重写其 <code class="highlighter-rouge">destroy</code> 方法；</li>
+          <li>通过 spring 的 xml bean 配置或 bean 注解指定销毁方法，如下面实例的 <code class="highlighter-rouge">destroyMethod</code> 方法通过 <code class="highlighter-rouge">@bean</code> 注解指定。</li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+</ol>
+
+<h5 id="同名-bean-的优先级">同名 Bean 的优先级</h5>
+
+<ol>
+  <li>同一个配置文件内，以最早定义的为准；</li>
+  <li>不同配置文件中，<strong>后解析</strong>的配置文件会覆盖先解析的；</li>
+  <li>同文件中 <code class="highlighter-rouge">@Bean</code>的优先级（最先注册）&gt; <code class="highlighter-rouge">@ComponentScan</code>；</li>
+</ol>
+
+<h4 id="bean-自动装配">Bean 自动装配</h4>
+
+<p>Bean 装配/依赖注入（<strong>装配方式即依赖注入方式</strong>）：在 IoC 容器中，Bean 与 Bean 间建立依赖关系。</p>
+
+<h5 id="装配方式">装配方式</h5>
+
+<ol>
+  <li><a href="#基于 XML 配置文件的属性注入">手动装配 Bean</a>：XML 配置文件中，通过 <code class="highlighter-rouge">&lt;constructor-arg&gt;</code>和 <code class="highlighter-rouge">&lt;property&gt;</code> 中的 <code class="highlighter-rouge">ref</code> 属性，手动维护 Bean 间的依赖关系。</li>
+  <li><strong>自动装配 Bean</strong>：Spring 容器依据规则，为指定的 Bean 从<strong>应用的上下文</strong>（<code class="highlighter-rouge">AppplicationContext</code> 容器）中<strong>查找</strong>所依赖的 Bean，并<strong>自动建立</strong> Bean 间的依赖关系。<del>对象无需自己查找或创建与其关联的其他对象，由<strong>容器</strong>负责把（需相互协作的）对象引用赋予各个对象。</del>
+    <ol>
+      <li>基于 XML 配置文件自动装配 Bean；</li>
+      <li>基于注解装配 Bean：最常用 <code class="highlighter-rouge">@Autowire</code>；</li>
+    </ol>
+  </li>
+</ol>
+
+<h5 id="自动装配的五种规则">自动装配的五种规则</h5>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;!-- 通过 autowire 属性设置自动装配的规则--&gt;
+&lt;bean id="employee" class="net.bian.Employee" autowire="byName" ref=""&gt;
+</code></pre></div></div>
+
+<ol>
+  <li><code class="highlighter-rouge">no</code>：默认设置，表示不用自动装配，必须通过 <code class="highlighter-rouge">ref</code> 属性<strong>手动设置</strong>依赖的 Bean；</li>
+  <li><code class="highlighter-rouge">byName</code>：根据 Bean 中 <code class="highlighter-rouge">&lt;Property&gt;</code> 的 <code class="highlighter-rouge">name</code> 属性（查找对应的 Bean）自动装配/注入对象依赖；</li>
+  <li><code class="highlighter-rouge">byType</code>：根据 Property 兼容的<strong>数据类型</strong>自动装配；</li>
+  <li><code class="highlighter-rouge">constructor</code>：类似 byType，根据<strong>构造方法参数</strong>的数据类型，进行 <code class="highlighter-rouge">byType</code> 模式的自动装配；</li>
+  <li><code class="highlighter-rouge">autodetect</code>：自动探测，如果 Bean 中<strong>有默认</strong>的构造方法，则用 <code class="highlighter-rouge">constructor</code> 模式，否则用 <code class="highlighter-rouge">byType</code> 模式。</li>
+</ol>
+
+<h5 id="基于-xml-自动装配-bean">基于 XML 自动装配 Bean</h5>
+
+<p><code class="highlighter-rouge">applicationContext.xml</code> 配置文件</p>
+
+<ol>
+  <li>根据名字装配；</li>
+  <li>根据类型装配；</li>
+</ol>
+
+<p>局限：</p>
+
+<ol>
+  <li>用 <code class="highlighter-rouge">&lt;constructor-arg&gt;</code> 和 <code class="highlighter-rouge">&lt;property&gt;</code> 设置指定依赖项，将<strong>覆盖</strong>自动装配；</li>
+  <li>基本<strong>元数据</strong>类型（简单属性，如原数据类型、字符串和类）无法自动装配；</li>
+  <li>不精确。</li>
+</ol>
+
+<h5 id="声明注册-bean-的注解">声明/注册 Bean 的注解</h5>
+
+<p>Spring Boot 彻底抛弃了 XML 配置，推荐基于 Java API 配置 Bean，在 Java 类中用注解设置依赖关系。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Spring 配置文件（xml或properties）中启用注解装配
+&lt;beans&gt;
+	&lt;context:annotation-config/&gt;
+&lt;/beans&gt;
+</code></pre></div></div>
+
+<p>常用注册 Bean 的注解：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">@Component</code>：通用的注解，可标注<strong>任意类</strong>为 <code class="highlighter-rouge">Spring</code> 组件（Java Bean 对象），并添加到容器中。用于<strong>不知道属于哪层</strong>的 Bean，如用于切面类等。同 <code class="highlighter-rouge">@Name</code>，较少用。</li>
+  <li><code class="highlighter-rouge">@Bean</code>：替代 <code class="highlighter-rouge">&lt;bean /&gt;</code> 元素；将该<strong>方法</strong>返回的 <strong>Bean 对象</strong>加载到 Spring 容器，如 <code class="highlighter-rouge">Config</code> 类等。可用 name 属性自定义，默认为方法名。
+    <ul>
+      <li><code class="highlighter-rouge">@Order</code> （或者接口Ordered）的作用是定义Spring IOC容器中Bean的执行顺序的<strong>优先级</strong>，而不是定义Bean、类的加载顺序。参数值越小优先级越高。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">@Repository</code>：用于 Dao（数据持久化）层，数据库相关操作。仅仅是一个标识，表明为仓库接口类，方便 Spring 自动扫描识别。JPA 具体的注解有 <a href="#JPA 各层常用注解">@CrudRepository、@PagingAndSortingRepository、@JpaRepository</a>；</li>
+  <li><code class="highlighter-rouge">@Service</code>： 用于 Service（业务逻辑）层，主要涉及一些复杂的逻辑。</li>
+  <li><code class="highlighter-rouge">@Controller</code>：用于控制层，接收并转发用户请求、流程控制等。</li>
+  <li><code class="highlighter-rouge">@Aspect</code>：用于切面。</li>
+</ol>
+
+<p><code class="highlighter-rouge">@Component</code> VS <code class="highlighter-rouge">@Bean</code></p>
+
+<ol>
+  <li><strong>位置</strong>：<code class="highlighter-rouge">@Component</code> 注解作用于<strong>类</strong>，而 <code class="highlighter-rouge">@Bean</code> 作用于<strong>方法</strong>。</li>
+  <li><strong>作用对象</strong>：<code class="highlighter-rouge">@Component</code> （常通过<strong>类路径扫描</strong>来）自动装配<strong>当前类的对象</strong>到容器；<code class="highlighter-rouge">@Bean</code> 将该方法返回的对象加载到 Spring 容器。</li>
+  <li><code class="highlighter-rouge">@Bean</code> <strong>自定义性</strong>更强，多处只能用 @Bean 来注册 Bean。如引用<strong>第三方库中的类</strong>需装配到 Spring 容器时。</li>
+</ol>
+
+<h5 id="基于注解装配注入-bean">基于注解装配/注入 Bean</h5>
+
+<p>注入 Bean 的注解：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">@Autowired</code>：用于 setter()、构造函数或<strong>字段</strong>上。步骤：
+    <ol>
+      <li><strong>默认</strong>用 <code class="highlighter-rouge">byType</code> 的方式（根据对象属性所属的<strong>类型</strong>）自动注入 Bean 到（同样被 Spring 容器管理的）当前 Bean 中（即自动导入对象到类中），如：<strong>Service 对象</strong>作为属性注入到当前 Controller 类中；</li>
+      <li>同一个实体类<strong>有多个实现类</strong>（配置多个 Bean）时<strong>类型相同</strong>，IoC 不知该注入哪个实现类，这时改为 <code class="highlighter-rouge">byName</code> 的方式注入；默认根据标注的<strong>成员变量名</strong>作为 id，查找 Bean、进行装配；</li>
+      <li>仍失败，则通过 <code class="highlighter-rouge">@Qualifier</code> <strong>手动指定</strong>目标 Bean 的 id（变量名）；</li>
+      <li>检查属性是否正常装配（设置），无法找到匹配的 Bean 装配会抛出异常；设置 <code class="highlighter-rouge">required=false</code> 允许属性不被设置，则不抛出异常。</li>
+      <li><a href="https://blog.csdn.net/weixin_44296929/article/details/109527112">@Autowired注解使用的自动装配方式</a></li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">@Resource</code>：<strong>默认</strong>（指定值）是 <code class="highlighter-rouge">byName</code>，找不到与名称匹配的 Bean（或该属性为空、不指定值）时用 <code class="highlighter-rouge">byType</code>，自动用标注处的变量或方法名作为 Bean 名；相同类型在 IoC 容器中<strong>只能有一个</strong>。</li>
+  <li><code class="highlighter-rouge">@Autowired</code> 加载的 Bean 相同类型可能有多个，通过 <code class="highlighter-rouge">ByName</code> 加载并区分； <code class="highlighter-rouge">@Resource</code> 加载的 Bean 相同类型在 IoC 容器中<strong>只能有一个</strong>。</li>
+  <li><code class="highlighter-rouge">@Qualifier("userDAO")</code>：限定要自动注入的 Bean 的 id，一般和 <code class="highlighter-rouge">@Autowired</code> 联用，指定 Bean的名称。</li>
+</ol>
+
+<h5 id="controller">@Controller</h5>
+
+<p>用于控制器类上。</p>
+
+<p><code class="highlighter-rouge">@Controller</code> VS <code class="highlighter-rouge">@ResposeBody</code> VS <code class="highlighter-rouge">@RestController</code></p>
+
+<ol>
+  <li><code class="highlighter-rouge">@Controller</code>：常用于 Controller 控制器<strong>类上</strong>，作用见 <a href="#Controler 控制层">Controler 控制层</a>。单独使用时（不加 <code class="highlighter-rouge">@ResponseBody</code>）返回一个<strong>视图/页面</strong>，用于（传统 Spring MVC）前后端不分离的情况。
+    <ul>
+      <li>若扫描该类下有 <code class="highlighter-rouge">@RequestMapping</code> 方法，根据注解信息生成对应的处理器对象。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">@ResponseBody</code>：常用于 Controller <strong>方法上</strong>，返回具体数据类型而非跳转；将返回的对象转换为指定格式，并填充到 HTTP （响应对象的）响应 body 中，常用于<strong>构建 RESTful 的 api</strong>，返回 <code class="highlighter-rouge">JSON</code> 或 XML 数据。请求体另见<a href="#@RequestBody">@RequestBody</a>。</li>
+  <li><code class="highlighter-rouge">@RestController</code> = <code class="highlighter-rouge">@Controller</code> + <code class="highlighter-rouge">@ResponseBody</code>：表示 <a href="#REST 常用注解">REST 风格</a>的控制器 Bean。Springboot 会把这个类当成 controller 进行处理，把所有返回的参数放到 ResponseBody 中。返回 JSON 或 XML 格式（由客户端的 <code class="highlighter-rouge">ACCEPT</code> 请求头决定）的对象数据，并直接写入 HTTP 响应体中。属于 <code class="highlighter-rouge">RESTful Web/API</code> 服务，最常用的<strong>前后端分离</strong>框架的情况。</li>
+</ol>
+
+<h3 id="aop">AOP</h3>
+
+<p>AOP（面向切面编程）：将与<strong>业务无关</strong>却被业务模块<strong>所共同调用</strong>的（交叉业务）逻辑封装成切面。</p>
+
+<p>主要作用是：</p>
+
+<ul>
+  <li>通过不修改源码的方式、将非核心功能代码<strong>织入</strong>来实现对方法的增强。</li>
+  <li>通过<strong>预编译</strong>方式和运行期<strong>动态代理</strong>实现程序功能的<strong>统一维护</strong>。可对业务逻辑的各部分进行隔离，从而<strong>降低耦合度</strong>，提高程序的可重用性。</li>
+</ul>
+
+<p>应用场景：<strong>异常处理</strong>、<strong>事务</strong>处理、<strong>日志记录</strong>、性能统计、安全控制，<strong>统一参数验证、统一返回对象</strong>等。</p>
+
+<p><img src="../assets/f599114dd06c6a14afe9f64a5396f9de.png" alt="img" style="zoom:50%;" /></p>
+
+<h5 id="aop-实现原理">AOP 实现原理</h5>
+
+<p>基于<strong>代理</strong>模式，主要分为两种方式：</p>
+
+<ol>
+  <li>Eclipse AspectJ 基于<strong>静态代理</strong>/编译时增强；
+    <ol>
+      <li>用 Java 编程语言的扩展实现；基于字节码操作；</li>
+      <li>可以在<strong>所有域对象</strong>上实现。像final的方法和静态方法，无法通过动态代理来改变，所以Spring AOP无法支持；</li>
+      <li>因为织入方式的区别，两者所支持的 Joinpoint 也是不同的；支持<strong>所有切入点</strong>；</li>
+      <li>AspectJ是直接在运行前织入实际的代码，所以<strong>功能会强大</strong>很多。</li>
+      <li>依赖 <code class="highlighter-rouge">org.aspectj</code>。</li>
+    </ol>
+  </li>
+  <li>Spring AOP 基于 <strong>动态代理</strong>/运行时增强；对于接口使用 JDK Proxy 动态代理，而继承的使用 CGLIB 动态代理。
+    <ol>
+      <li>使用<strong>纯Java代码</strong>实现；</li>
+      <li>要依赖<strong>IOC容器</strong>来管理，并且只能作用于Spring容器；</li>
+      <li>仅支持<strong>方法</strong>执行切入点；</li>
+      <li>在容器启动时需要生成代理实例，在方法调用上也会增加栈的深度，使得<strong>性能</strong>不如AspectJ的那么好。</li>
+      <li>依赖 <code class="highlighter-rouge">spring-boot-starter-aop</code> 和 <code class="highlighter-rouge">org.aspectj</code>。在springAOP的实现中，借用了AspectJ的一些功能，比如<code class="highlighter-rouge">@AspectJ、@Before、@PonitCut</code>这些注解，都是AspectJ中的注解。在使用springAOP的时候需要引入AspectJ的依赖。</li>
+    </ol>
+  </li>
+</ol>
+
+<p><a href="https://www.cnblogs.com/xuwc/p/13889490.html">AOP 实现原理代码示例</a></p>
+
+<h5 id="声明式-aspectj">声明式 AspectJ</h5>
+
+<ol>
+  <li>
+    <p>基于 XML 的<strong>声明式</strong> AspectJ / 开发AOP：指通过 <strong>Spring 配置文件</strong>定义切面、切入点及通知，都必须定义在 <code class="highlighter-rouge">&lt;aop:config&gt;</code> 元素（将定义好的 Bean 转换为切面 Bean）中。</p>
+
+    <ul>
+      <li>在 XML 文件中添加<code class="highlighter-rouge">&lt;aop:aspectj-autoproxy&gt;</code> 启用 <code class="highlighter-rouge">@AspectJ</code>。</li>
+    </ul>
+  </li>
+  <li>
+    <p>基于注解的<strong>声明式</strong> AspectJ：启用 <code class="highlighter-rouge">@AspectJ</code> 注解有以下两种方法：</p>
+
+    <ol>
+      <li>
+        <p>用 <code class="highlighter-rouge">@Configuration</code> 和 <code class="highlighter-rouge">@EnableAspectJAutoProxy</code> 注解；</p>
+
+        <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> @Configuration
+ @EnableAspectJAutoProxy
+ public class Appconfig {}
+</code></pre></div>        </div>
+      </li>
+      <li>
+        <p><code class="highlighter-rouge">@EnableAspectJAutoProxy</code> 注解也不是必须的，如果引入了 <code class="highlighter-rouge">spring-boot-starter-web</code> <strong>依赖</strong>则会自动启用AOP。</p>
+      </li>
+    </ol>
+  </li>
+</ol>
+
+<h5 id="代理工厂静态方法">代理工厂（静态方法）</h5>
+
+<ol>
+  <li>把 AOP 加入 IoC 容器中；</li>
+  <li>把 UserDao 放入容器中；</li>
+  <li>在配置文件中<strong>开启注解扫描</strong>，用静态工厂方法来创建代理类对象。</li>
+</ol>
+
+<h4 id="通知">通知</h4>
+
+<p><img src="../assets/aspect_flow.awebp" alt="img" style="zoom:70%;" /></p>
+
+<p><code class="highlighter-rouge">@Aspect</code>：用于定义<strong>切面</strong>；切面是通知和切点的结合，分别定义了<strong>何时、何处</strong>应用通知功能。</p>
+
+<ul>
+  <li>
+    <p>Aspect切面类必须使用<code class="highlighter-rouge">@Component</code>和<code class="highlighter-rouge">@Aspect</code>注解才有效。</p>
+  </li>
+  <li>
+    <p>通知（Advice）：描述了切面<strong>要完成的工作</strong>及<strong>何时</strong>执行。如，<strong>日志切面</strong>需在接口<strong>调用前后</strong>分别记录当前时间，取差值计算调用时长。</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">@Pointcut</code> 切点：是对<strong>连接点</strong>（被拦截的 Target 方法）进行拦截的<strong>条件定义</strong>。作用是提供<strong>切点表达式</strong>来匹配连接点，给<strong>满足条件</strong>的连接点添加通知，定义了在<strong>何处做</strong>。</p>
+
+    <ul>
+      <li>如，日志切面的应用范围是所有 Controller 层的接口方法。格式：</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    // execution(方法修饰符 返回类型 方法所属的包.类名.方法名称(方法参数)
+    @Pointcut("execution(public * com.macro.mall.controller.*.*(..)) || execution(public * com.macro.mall.*.controller.*.*(..))")
+    public void webLog() {
+    }
+</code></pre></div></div>
+
+<ul>
+  <li>
+    <p>连接点（JoinPoint）：通知功能被应用的时机（方法被拦截的时机）。如，接口方法被调用时就是日志切面的连接点。</p>
+
+    <ul>
+      <li><code class="highlighter-rouge">JoinPoint</code> 类：返回目标对象，即被代理的对象。</li>
+      <li><code class="highlighter-rouge">ProceedingJoinPoint</code> 类：继承了 JoinPoint。是在JoinPoint的基础上暴露出 <code class="highlighter-rouge">proceed()</code> 方法（用于启动目标方法执行的）。是aop代理链执行的方法。是环绕通知独有的， 能决定是否走<strong>代理链</strong>还是走自己拦截的其他逻辑。</li>
+    </ul>
+  </li>
+  <li>
+    <p><del>引入（Introduction）</del>：用来声明<strong>额外的</strong>方法和属性，可以给目标对象引入新的接口及其实现，在无需修改现有类的情况下，向现有类添加新方法或属性。</p>
+  </li>
+  <li>
+    <p>织入（Weaving）：是把切面应用到目标对象、并<strong>创建新的代理对象</strong>的过程。<strong>切面</strong>在指定的<strong>连接点</strong>被<strong>织入</strong>到目标对象中。</p>
+
+    <ul>
+      <li>织入可以在编译期、类加载期和运行期完成，在编译期进行织入就是<strong>静态代理</strong>，而在运行期进行织入则是<strong>动态代理</strong>。</li>
+    </ul>
+  </li>
+</ul>
+
+<h5 id="常见的通知类型">常见的通知类型</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">@Around</code>：环绕通知，通知<strong>包裹</strong>了目标方法，在目标方法<strong>调用前和调用后</strong>执行。通知方法会将目标方法封装起来。</li>
+  <li><code class="highlighter-rouge">@Before("webLog()")</code>：前置通知，通知方法会在目标方法<strong>调用前</strong>执行。</li>
+  <li><code class="highlighter-rouge">@After</code>：后置通知，通知方法会在目标方法返回或抛出异常<strong>后</strong>执行；
+    <ol>
+      <li><code class="highlighter-rouge">@AfterReturning</code>：<strong>返回通知</strong>，通知方法会在目标方法<strong>返回后</strong>执行；</li>
+      <li><code class="highlighter-rouge">@AfterThrowing</code>：异常通知，通知方法会在目标方法<strong>抛出异常后</strong>执行。</li>
+    </ol>
+  </li>
+</ul>
+
+<h5 id="aspectj-切入点语法">AspectJ 切入点语法</h5>
+
+<p>切入点指示符：用来指示切入点表达式目的，在Spring AOP中目前只有<strong>执行方法</strong>这一个连接点。</p>
+
+<p>Spring AOP支持的AspectJ切入点指示符：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">execution</code>：用于匹配方法切入点；
+    <ul>
+      <li><code class="highlighter-rouge">@annotation</code>：匹配方法带有指定注解。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">within</code>：用于匹配<strong>指定类</strong>的任意方法，不能匹配接口；
+    <ul>
+      <li><code class="highlighter-rouge">@within</code><strong>：</strong>匹配类中带有指定注解。当定义类时使用了注解，该类的方法会被匹配，但在接口上使用注解不匹配。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">this</code>：用于匹配当前AOP<strong>代理对象实例的类型</strong>的执行方法；匹配在运行时对象的类型。</li>
+  <li><code class="highlighter-rouge">target</code>：用于匹配当前目标对象类型的执行方法，匹配 AOP 被代理对象的类型；注意是目标对象的类型匹配，这样就不包括引入接口也类型匹配；
+    <ul>
+      <li><code class="highlighter-rouge">@target</code><strong>：</strong>用于匹配目标对象实例的类型是否含有注解。当运行时对象实例的类型使用了注解，该类的方法会被匹配，在接口上使用注解不匹配。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">args</code>：用于匹配（当前执行的）方法传入的参数为指定类型的执行方法；
+    <ul>
+      <li><code class="highlighter-rouge">@args</code>：匹配方法参数类型是否含有注解。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">bean</code>：通过 bean 的 id 或名称匹配，支持 <code class="highlighter-rouge">*</code> 通配符。Spring AOP扩展的，AspectJ没有对于指示符，用于匹配特定名称的Bean对象的执行方法；</li>
+</ol>
+
+<p>AspectJ切入点支持的切入点指示符还有：<code class="highlighter-rouge"> call、get、set、preinitialization、staticinitialization、initialization、handler、adviceexecution、withincode、cflow、cflowbelow、if、@this、@withincode</code>；</p>
+
+<p>但Spring AOP目前不支持这些指示符，使用这些指示符将抛出<code class="highlighter-rouge">IllegalArgumentException</code>异常。这些指示符Spring AOP可能会在以后进行扩展。</p>
+
+<p>AspectJ类型匹配的通配符：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">*</code>：匹配任何数量字符；</li>
+  <li><code class="highlighter-rouge"> ..</code>：匹配任何数量字符的重复，如在类型模式中匹配任何数量子包；而在方法参数模式中匹配任何数量参数。</li>
+  <li><code class="highlighter-rouge"> +</code>：匹配指定类型的子类型；仅能作为后缀放在类型模式后边。</li>
+</ol>
+
+<h4 id="创建切面的步骤">创建切面的步骤</h4>
+
+<ol>
+  <li>添加<strong>日志信息封装类</strong> <code class="highlighter-rouge">WebLog</code>（POJO）：用于封装需记录的日志信息，包括操作的描述、时间、消耗时间、URL、请求参数和返回结果等信息。</li>
+  <li>添加<strong>切面类</strong> <code class="highlighter-rouge">WebLogAspect</code>：定义了一个日志切面，在<strong>环绕通知</strong>中获取日志需要的信息，并应用到 Controller 层中所有的 public 方法中。</li>
+</ol>
+
+<h3 id="异常">异常</h3>
+
+<h4 id="常见-web-请求和参数异常">常见 web 请求和参数异常</h4>
+
+<ol>
+  <li><code class="highlighter-rouge">MethodArgumentNotValidException</code>：参数校验异常；</li>
+  <li><code class="highlighter-rouge">MethodArgumentTypeMismatchException, HttpMessageNotReadableException</code>：参数格式有误；</li>
+  <li><code class="highlighter-rouge">MissingServletRequestParameterException</code>：缺少参数；</li>
+  <li><code class="highlighter-rouge">HttpClientErrorException</code></li>
+  <li><code class="highlighter-rouge">HttpRequestMethodNotSupportedException</code>：不支持的请求类型；</li>
+  <li><code class="highlighter-rouge">HttpMessageNotReadableException</code>：请求体格式错误；</li>
+  <li><code class="highlighter-rouge">ConstraintViolationException</code>：约束异常；</li>
+  <li><code class="highlighter-rouge">JsonMappingException</code>：JSON格式错误；</li>
+  <li><code class="highlighter-rouge">ServiceEx</code>：业务层异常；</li>
+</ol>
+
+<h4 id="异常捕获和统一异常处理">异常捕获和统一异常处理</h4>
+
+<p>当前端传来不合规范的数据时，Controller 就会报错，并显示对应的错误信息。</p>
+
+<p>异常捕获：可定义一个全局异常的捕获类（<code class="highlighter-rouge">GlobalExceptionHandler.java</code>），当出现某种异常时就捕获，对（错误信息）数据进行封装，返回到前端页面显示。</p>
+
+<p>注解：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">@ControllerAdvice</code> ：定义全局异常处理类；Spring3.2中新增的注解，Controller增强器，作用是给Controller控制器添加统一的操作或处理。用在类上。比较熟知的用法是结合@ExceptionHandler用于全局异常的处理.</li>
+  <li><code class="highlighter-rouge">@ExceptionHandler</code> ：声明异常处理方法；</li>
+</ol>
+
+<p>这种异常处理方式下，会给所有或者指定的 <code class="highlighter-rouge">Controller</code> <strong>织入</strong>异常处理 AOP，当 <code class="highlighter-rouge">Controller</code> 中的方法<strong>抛出异常</strong>时，由被<code class="highlighter-rouge">@ExceptionHandler</code> 注解修饰的方法进行处理。</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">com</span><span class="p">.</span><span class="n">macro</span><span class="p">.</span><span class="n">mall</span><span class="p">.</span><span class="n">common</span><span class="p">.</span><span class="n">api</span><span class="p">;</span>
+
+<span class="p">/**</span>
+ <span class="p">*</span> <span class="err">常用</span><span class="n">API</span><span class="err">返回对象接口</span>
+ <span class="p">*/</span>
+<span class="k">public</span> <span class="n">interface</span> <span class="n">IErrorCode</span> <span class="p">{</span>
+    <span class="p">/**</span>
+     <span class="p">*</span> <span class="err">返回码</span>
+     <span class="p">*/</span>
+    <span class="n">long</span> <span class="n">getCode</span><span class="p">();</span>
+
+    <span class="p">/**</span>
+     <span class="p">*</span> <span class="err">返回信息</span>
+     <span class="p">*/</span>
+    <span class="k">String</span> <span class="n">getMessage</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="k">package</span> <span class="n">com</span><span class="p">.</span><span class="n">macro</span><span class="p">.</span><span class="n">mall</span><span class="p">.</span><span class="n">common</span><span class="p">.</span><span class="n">exception</span><span class="p">;</span>
+<span class="n">import</span> <span class="n">com</span><span class="p">.</span><span class="n">macro</span><span class="p">.</span><span class="n">mall</span><span class="p">.</span><span class="n">common</span><span class="p">.</span><span class="n">api</span><span class="p">.</span><span class="n">IErrorCode</span><span class="p">;</span>
+
+<span class="p">/**</span>
+ <span class="p">*</span> <span class="err">自定义</span><span class="n">API</span><span class="err">异常</span>
+ <span class="p">*/</span>
+<span class="k">public</span> <span class="n">class</span> <span class="n">ApiException</span> <span class="n">extends</span> <span class="n">RuntimeException</span> <span class="p">{</span>
+    <span class="n">private</span> <span class="n">IErrorCode</span> <span class="n">errorCode</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="n">ApiException</span><span class="p">(</span><span class="n">IErrorCode</span> <span class="n">errorCode</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">super</span><span class="p">(</span><span class="n">errorCode</span><span class="p">.</span><span class="n">getMessage</span><span class="p">());</span>
+        <span class="n">this</span><span class="p">.</span><span class="n">errorCode</span> <span class="p">=</span> <span class="n">errorCode</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="n">ApiException</span><span class="p">(</span><span class="k">String</span> <span class="n">message</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">super</span><span class="p">(</span><span class="n">message</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="n">ApiException</span><span class="p">(</span><span class="n">Throwable</span> <span class="n">cause</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">super</span><span class="p">(</span><span class="n">cause</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="n">ApiException</span><span class="p">(</span><span class="k">String</span> <span class="n">message</span><span class="p">,</span> <span class="n">Throwable</span> <span class="n">cause</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">super</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">cause</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="n">IErrorCode</span> <span class="n">getErrorCode</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">return</span> <span class="n">errorCode</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">package</span> <span class="n">com</span><span class="p">.</span><span class="n">macro</span><span class="p">.</span><span class="n">mall</span><span class="p">.</span><span class="n">common</span><span class="p">.</span><span class="n">exception</span><span class="p">;</span>
+<span class="p">/**</span>
+ <span class="p">*</span> <span class="err">全局异常处理</span>
+ <span class="p">*/</span>
+<span class="p">@</span><span class="n">ControllerAdvice</span>
+<span class="k">public</span> <span class="n">class</span> <span class="n">GlobalExceptionHandler</span> <span class="p">{</span>
+
+    <span class="p">@</span><span class="n">ResponseBody</span>
+    <span class="p">@</span><span class="n">ExceptionHandler</span><span class="p">(</span><span class="n">value</span> <span class="p">=</span> <span class="n">ApiException</span><span class="p">.</span><span class="n">class</span><span class="p">)</span>
+    <span class="k">public</span> <span class="n">CommonResult</span> <span class="n">handle</span><span class="p">(</span><span class="n">ApiException</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">getErrorCode</span><span class="p">()</span> <span class="c1">!= null) {
+</span>            <span class="n">return</span> <span class="n">CommonResult</span><span class="p">.</span><span class="n">failed</span><span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">getErrorCode</span><span class="p">());</span>
+        <span class="p">}</span>
+        <span class="n">return</span> <span class="n">CommonResult</span><span class="p">.</span><span class="n">failed</span><span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">getMessage</span><span class="p">());</span>
+    <span class="p">}</span>
+
+    <span class="p">@</span><span class="n">ResponseBody</span>
+    <span class="p">@</span><span class="n">ExceptionHandler</span><span class="p">(</span><span class="n">value</span> <span class="p">=</span> <span class="n">MethodArgumentNotValidException</span><span class="p">.</span><span class="n">class</span><span class="p">)</span>
+    <span class="k">public</span> <span class="n">CommonResult</span> <span class="n">handleValidException</span><span class="p">(</span><span class="n">MethodArgumentNotValidException</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">BindingResult</span> <span class="n">bindingResult</span> <span class="p">=</span> <span class="n">e</span><span class="p">.</span><span class="n">getBindingResult</span><span class="p">();</span>
+        <span class="k">String</span> <span class="n">message</span> <span class="p">=</span> <span class="n">null</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">bindingResult</span><span class="p">.</span><span class="n">hasErrors</span><span class="p">())</span> <span class="p">{</span>
+            <span class="n">FieldError</span> <span class="n">fieldError</span> <span class="p">=</span> <span class="n">bindingResult</span><span class="p">.</span><span class="n">getFieldError</span><span class="p">();</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">fieldError</span> <span class="c1">!= null) {
+</span>                <span class="n">message</span> <span class="p">=</span> <span class="n">fieldError</span><span class="p">.</span><span class="n">getField</span><span class="p">()+</span><span class="n">fieldError</span><span class="p">.</span><span class="n">getDefaultMessage</span><span class="p">();</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="n">return</span> <span class="n">CommonResult</span><span class="p">.</span><span class="n">validateFailed</span><span class="p">(</span><span class="n">message</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="p">@</span><span class="n">ResponseBody</span>
+    <span class="p">@</span><span class="n">ExceptionHandler</span><span class="p">(</span><span class="n">value</span> <span class="p">=</span> <span class="n">BindException</span><span class="p">.</span><span class="n">class</span><span class="p">)</span>
+    <span class="k">public</span> <span class="n">CommonResult</span> <span class="n">handleValidException</span><span class="p">(</span><span class="n">BindException</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">BindingResult</span> <span class="n">bindingResult</span> <span class="p">=</span> <span class="n">e</span><span class="p">.</span><span class="n">getBindingResult</span><span class="p">();</span>
+        <span class="k">String</span> <span class="n">message</span> <span class="p">=</span> <span class="n">null</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">bindingResult</span><span class="p">.</span><span class="n">hasErrors</span><span class="p">())</span> <span class="p">{</span>
+            <span class="n">FieldError</span> <span class="n">fieldError</span> <span class="p">=</span> <span class="n">bindingResult</span><span class="p">.</span><span class="n">getFieldError</span><span class="p">();</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">fieldError</span> <span class="c1">!= null) {
+</span>                <span class="n">message</span> <span class="p">=</span> <span class="n">fieldError</span><span class="p">.</span><span class="n">getField</span><span class="p">()+</span><span class="n">fieldError</span><span class="p">.</span><span class="n">getDefaultMessage</span><span class="p">();</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="n">return</span> <span class="n">CommonResult</span><span class="p">.</span><span class="n">validateFailed</span><span class="p">(</span><span class="n">message</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h4 id="filter-过滤器">Filter 过滤器</h4>
+
+<blockquote>
+  <p>结合项目说下，是怎么用 AOP，通过拦截器拦截非法请求。</p>
+</blockquote>
+
+<p>Filter 过滤器（<strong>重点理解</strong>）：主要用来过滤用户请求，允许对用户请求进行<strong>前置和后置</strong>处理，如实现 URL 级别的权限控制、过滤非法请求等。</p>
+
+<ul>
+  <li>是<strong>面向切面编程（AOP）</strong>的具体实现。</li>
+  <li>依赖于 Servlet 容器，属于 Servlet 规范的一部分。</li>
+</ul>
+
+<h4 id="listener-监听器">Listener 监听器</h4>
+
+<blockquote>
+  <p>（简单过一下）</p>
+</blockquote>
+
+<p>监听器：是 Servlet 规范中定义的一种特殊类。用于监听 <code class="highlighter-rouge">servletContext、servletRequest、HttpSession</code> 等域对象的创建和销毁事件、属性发生修改的事件。</p>
+
+<ul>
+  <li>Spring Boot 里的监听器实际上底层就是 Spring 和 Spring MVC 相关的东西，再下面就是 Servlet；</li>
+  <li>用 <code class="highlighter-rouge">@Configuration</code> 创建配置类。</li>
+  <li><code class="highlighter-rouge">@RabbitListener(queues = "mall.order.cancel")</code></li>
+</ul>
+
+<p>用于在事件发生前、后做一些必要的处理。主要用于：</p>
+
+<ol>
+  <li>系统启动时加载初始化信息；</li>
+  <li>统计在线人数和用户；</li>
+  <li>统计网站访问量；</li>
+  <li>记录用户访问路径。</li>
+</ol>
+
+<p>事件的发布与监听属于<strong>观察者模式</strong>；和 MQ 相比，偏向于处理“体系内”的某些逻辑。</p>
+
+<p><del>步骤：</del></p>
+
+<ol>
+  <li>自定义事件；</li>
+  <li>通过 <code class="highlighter-rouge">@EventListener</code> 自定义（用于处理某种事件的）监听器类；</li>
+  <li>通过 <code class="highlighter-rouge">@Component</code> 注册监听器类；</li>
+  <li>发布事件（监听到该事件的监听器自动进行相关逻辑处理）。</li>
+</ol>
+
+<p><img src="../assets/listener_example.png" alt="在这里插入图片描述" style="zoom:50%;" /></p>
+
+<h3 id="spring-事务">Spring 事务</h3>
+
+<p>事务管理：按照给定的<strong>事务规则</strong>来执行提交或回滚操作。</p>
+
+<blockquote>
+  <p>见数据库文档中的事务。</p>
+</blockquote>
+
+<h4 id="事务实现">事务实现</h4>
+
+<blockquote>
+  <p>AOP</p>
+</blockquote>
+
+<h4 id="事务分类">事务分类</h4>
+
+<ol>
+  <li>编程式事务：使用 <code class="highlighter-rouge">TransactionTemplate</code> 编写代码（硬编码）实现管理事务，有极大灵活性，难维护；</li>
+  <li><strong>声明式事务</strong>：分离事务管理和业务逻辑代码，本质是通过 <strong>AOP</strong>，对方法前后进行拦截，将事务处理（开启、提交或回滚操作）的功能<strong>编织</strong>到拦截的方法中（即在目标方法开始前加入一个事务，在执行完方法后根据执行情况提交或回滚事务）。不需编程，只需通过在 XML 文件中配置、或直接<strong>基于注解</strong>实现。实现声明式事务的方式：
+    <ol>
+      <li>基于 XML（<code class="highlighter-rouge">&lt;tx&gt;</code> 和 <code class="highlighter-rouge">&lt;aop&gt;</code> 命名空间）的声明式事务管理：推荐，最大特点是与 Spring AOP 结合紧密，可充分利用切点表达式的强大支持，更灵活。</li>
+      <li>基于 <code class="highlighter-rouge">@Transactional</code> 的全注解方式的：简化，使用最多。
+        <ol>
+          <li>作用于类：表示该类所有的 <strong>public 方法</strong>都配置相同的事务属性信息；</li>
+          <li>只能作用于 <code class="highlighter-rouge">public</code> 方法：方法的事务会覆盖类的事务配置信息。如 <code class="highlighter-rouge">Service </code>层方法。</li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+</ol>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public interface PmsProductService {
+    /**
+     * 创建商品
+     */
+    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = {Exception.class, 其它异常})
+    int create(PmsProductParam productParam);
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">@Transactional</code> 的可选属性有：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">propagation</code>：</li>
+  <li><code class="highlighter-rouge">isolation</code>：</li>
+  <li><code class="highlighter-rouge">rollbackFor</code>：需要回滚的异常类。默认情况下，遇到 <code class="highlighter-rouge">RuntimeException</code> 时会<strong>回滚</strong>，遇到<strong>受检查的异常</strong>不会回滚。
+    <ul>
+      <li>要想所有异常都回滚，要加上 <code class="highlighter-rouge">@Transactional(rollbackFor = {Exception.class, 其它异常}) </code>。</li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="../assets/image-20221009222037746.png" alt="image-20221009222037746" style="zoom:70%;" /></p>
+
+<h4 id="事务传播行为规则属性">事务传播行为/规则/属性</h4>
+
+<p>Spring 事务的传播行为：当多个事务同时存在时，Spring 如何处理这些事务的行为。</p>
+
+<p>在<code class="highlighter-rouge">enum Propagation</code> 中，枚举取值有：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">REQUIRED</code>：支持<strong>当前</strong>事务，如果当前没有事务，<strong>新建</strong>一个事务。<strong>最常见</strong>，默认的方式；</li>
+  <li><code class="highlighter-rouge">SUPPORTS</code>：支持<strong>当前</strong>事务，如果当前没有事务，以<strong>非事务方式</strong>执行；事务将不会发生<strong>回滚</strong>；</li>
+  <li><code class="highlighter-rouge">'MANDATORY</code>：支持<strong>当前</strong>事务，如果当前没有事务，抛出异常；</li>
+  <li><code class="highlighter-rouge">REQUIRES_NEW</code>：新建事务，如果当前存在事务，把当前事务<strong>挂起</strong>；</li>
+  <li><code class="highlighter-rouge">NOT_SUPPORTED</code>：以<strong>非事务方式</strong>执行操作，如果当前存在事务，把当前事务<strong>挂起</strong>；事务将不会发生<strong>回滚</strong>；</li>
+  <li><code class="highlighter-rouge">NEVER</code>：以<strong>非事务方式</strong>执行，如果当前存在事务，抛出异常；事务将不会发生<strong>回滚</strong>；</li>
+  <li><del><code class="highlighter-rouge">NESTED</code></del>：如果当前存在事务，则在<strong>嵌套</strong>事务内执行。如果当前没有事务，进行与 <code class="highlighter-rouge">REQUIRED</code>类似的操作。</li>
+</ol>
+
+<h4 id="事务隔离级别">事务隔离级别</h4>
+
+<p>见数据库 MySQL 中。</p>
+
+<p><img src="../assets/MySQL并发事务的问题及隔离级别.png" style="zoom:33%;" /></p>
+
+<p>在 <code class="highlighter-rouge">enum Isolation</code> 中，枚举值有：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>DEFAULT(-1), // 采用数据库默认隔离级别
+READ_UNCOMMITTED(1),
+READ_COMMITTED(2),
+REPEATABLE_READ(4),
+SERIALIZABLE(8);
+</code></pre></div></div>
+
+<ol>
+  <li>
+    <p><code class="highlighter-rouge">ISOLATION_DEFAULT</code>：<strong>默认</strong>的隔离级别，使用<strong>数据库默认</strong>的事务隔离级别。MYSQL 默认为 <code class="highlighter-rouge">REPEATABLE_READ</code>，SQLSERVER、Oracle 默认为 <code class="highlighter-rouge">READ_COMMITTED</code>。</p>
+  </li>
+  <li><code class="highlighter-rouge">ISOLATION_READ_UNCOMMITTED</code>：读未提交，允许另外一个事务可看到这个事务<strong>未提交的数据</strong>；最低级别，可能有<strong>脏读、不可重复读、幻读</strong>；</li>
+  <li><code class="highlighter-rouge">ISOLATION_READ_COMMITTED</code>：读已提交，保证一个事务修改的数据<strong>提交后</strong>才能被另一事务读取，而且能看到该事务<strong>对已有记录的更新</strong>；新解决了<strong>脏读</strong>；</li>
+  <li><code class="highlighter-rouge">ISOLATION_REPEATABLE_READ</code>：可重复读，保证一个事务修改的数据<strong>提交后</strong>才能被另一事务读取，但不能看到该事务<strong>对已有记录的更新</strong>；新解决了<strong>不可重复读</strong>；</li>
+  <li><code class="highlighter-rouge">ISOLATION_SERIALIZABLE</code>：一个事务在执行的过程中<strong>完全看不到</strong>其他事务对数据库所做的更新。新解决<strong>幻读</strong>。</li>
+</ol>
+
+<h3 id="spring-框架中的设计模式">Spring 框架中的设计模式</h3>
+
+<ol>
+  <li><strong>工厂模式</strong>：<a href="#IoC 容器">IoC 容器的两种实现</a>：通过 <code class="highlighter-rouge">BeanFactory</code>、<code class="highlighter-rouge">ApplicationContext</code> 接口创建 Bean 对象。</li>
+  <li><strong>单例模式</strong>：Bean 默认为单例模式，只有一个实例；Spring 中 Bean 的默认作用域就是 singleton。Spring 可通过 XML 或注解方式<a href="#Bean 作用域">配置 Bean 的作用域</a>来实现单例。Spring 通过 <code class="highlighter-rouge">ConcurrentHashMap</code> （线程安全）实现<strong>单例注册表</strong>的特殊方式实现单例模式。
+    <ol>
+      <li>xml : <code class="highlighter-rouge">&lt;bean id="userService" class="top.UserService" scope="singleton"/&gt;</code></li>
+      <li>注解：<code class="highlighter-rouge">@Scope(value = "singleton")</code></li>
+    </ol>
+  </li>
+  <li><strong>代理模式</strong>：<strong>AOP 的实现</strong>用到 <strong>JDK 动态代理</strong>和 CGLIB 字节码生成技术；</li>
+  <li><strong>模板模式</strong>：用来解决代码重复的问题。如 <code class="highlighter-rouge">RestTemplate, JmsTemplate, JpaTemplate、jdbcTemplate、hibernateTemplate</code> 等以 Template 结尾的对数据库操作的类。</li>
+  <li>包装器（Wrapper）模式 : 可根据需求<strong>动态切换</strong>不同的数据源，使接口不兼容的类一起工作。项目需要连接多个数据库，而且不同的客户在每次访问中根据需要会去访问不同的数据库。</li>
+  <li>适配器模式 : 如 Spring AOP 的通知（Advice），spring MVC 中也是用到了适配器模式适配 <code class="highlighter-rouge">Controller</code>。</li>
+  <li>装饰者模式：</li>
+  <li>观察者模式：定义对象间的依赖关系，一个对象发生改变时，所有依赖它的对象都会被动更新。
+    <ul>
+      <li>如，<strong>事件驱动模型</strong>，每次添加商品时都需重新更新索引，Spring 中 listener 的实现 <code class="highlighter-rouge">ApplicationListener</code>。</li>
+    </ul>
+  </li>
+</ol>

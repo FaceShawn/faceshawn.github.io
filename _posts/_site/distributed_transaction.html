@@ -1,0 +1,71 @@
+<blockquote>
+  <p>摘要：用于解决分库分表带来的问题。本质上，目的就是为了保证（分布式系统中）不同数据库的数据一致性。</p>
+</blockquote>
+
+<!-- more -->
+
+<hr />
+
+<h2 id="目录">目录</h2>
+
+<p>[TOC]</p>
+
+<h2 id="分布式事务">分布式事务</h2>
+
+<p>分布式事务：指事务的参与者、支持事务的服务器、资源服务器、事务管理器分别位于不同的分布式系统的不同节点上。</p>
+
+<ul>
+  <li>分布式事务是相对本地事务而言的：
+    <ol>
+      <li>对于本地事务，利用数据库本身的事务机制，就可以保证事务的ACID特性。</li>
+      <li>分布式事务其实就是将对同一库事务的概念扩大到了对多个库的事务。</li>
+    </ol>
+  </li>
+  <li>简单的说，就是一次大的操作由不同的<strong>小操作</strong>组成，分布在不同的服务器上，且属于不同的应用。分布式事务需保证这些小操作要么全部成功，要么全部失败。</li>
+  <li>本质上，目的就是为了保证（分布式系统中）不同数据库的数据一致性。</li>
+  <li>用于解决分库分表带来的问题。</li>
+</ul>
+
+<h3 id="jta">JTA</h3>
+
+<blockquote>
+
+</blockquote>
+
+<h3 id="常见实现方案">常见实现方案</h3>
+
+<ol>
+  <li></li>
+  <li><strong>2PC</strong> 两阶段提交：思路可以概括为，参与者将操作成败通知协调者，再由协调者根据所有参与者的反馈情况决定各参与者是否要提交操作还是回滚操作。</li>
+  <li><strong>3PC</strong> 三阶段提交：是 <code class="highlighter-rouge">2PC</code> 的一种改进版本 ，为解决两阶段提交协议的单点故障和同步阻塞问题。<code class="highlighter-rouge">3PC</code> 有三个阶段：<code class="highlighter-rouge">CanCommit</code>，<code class="highlighter-rouge">PreCommit</code>，<code class="highlighter-rouge">DoCommit</code>三个阶段。</li>
+  <li>AT 方案：Seata</li>
+  <li><strong>TCC</strong>（<code class="highlighter-rouge">Try Confirm Cancel</code>）模式、补偿事务：是两阶段提交的一个变种，针对每个操作，都需要有一个其对应的确认和取消操作，当操作成功时调用确认操作，当操作失败时调用取消操作，类似于二阶段提交，只不过是这里的提交和回滚是针对业务上的，所以基于TCC实现的分布式事务也可以看做是对业务的一种补偿机制。
+    <ol>
+      <li>tcc-transaction</li>
+      <li>ByteTcc</li>
+      <li>EasyTransaction</li>
+      <li>Seata</li>
+    </ol>
+  </li>
+  <li>SEGA 模式
+    <ol>
+      <li><strong>SEAGA事务</strong> ：设计目标是对业务无侵入，因此它是从业务无侵入的两阶段提交（全局事务）着手，在传统的两阶段上进行改进，他把一个分布式事务理解成一个包含了若干分支事务的全局事务。而全局事务的职责是协调它管理的分支事务达成一致性，要么一起成功提交，要么一起失败回滚。也就是一荣俱荣一损俱损~</li>
+      <li>ServiceComb</li>
+    </ol>
+  </li>
+  <li>XA 模式：</li>
+  <li>LCN 模式：tx-lcn</li>
+  <li><strong>本地消息表</strong>：核心思想是将分布式事务拆分成本地事务进行处理。</li>
+  <li><strong>MQ消息事务</strong>：原理是将两个事务通过<strong>消息队列</strong>进行异步解耦。</li>
+  <li><strong>最大努力通知</strong>：适用于一些对最终一致性实时性要求没那么高的业务，比如支付通知，短信通知。</li>
+</ol>
+
+<p>详细方案及示意图参考：<a href="https://mp.weixin.qq.com/s/nLwHEmVGtl-2FDugMqYs3A?poc_token=HMnhnWijFwwTVIChiqnBJATa4Btx4vn1lb4ski9F">分布式八股文（背诵版）</a></p>
+
+<h4 id="seata">Seata</h4>
+
+<p>Seata 是一款开源的分布式事务解决方案，致力于提供高性能和简单易用的分布式事务服务。</p>
+
+<ul>
+  <li>Seata 将为用户提供了 AT、TCC、SAGA 和 XA 事务模式，为用户打造一站式的分布式解决方案。</li>
+</ul>

@@ -1,0 +1,658 @@
+<blockquote>
+  <p>摘要：Java高级之集合框架/容器类，包括List、Queue、Set、Map。</p>
+</blockquote>
+
+<!-- more -->
+
+<h3 id="目录">目录</h3>
+
+<p>[TOC]</p>
+
+<blockquote>
+  <p>集合框架（容器类）</p>
+</blockquote>
+
+<p>所有集合类都位于 <code class="highlighter-rouge">java.util</code> 包下，用于表示和操作对象集合，包含大量集合接口及其实现类和操作算法。</p>
+
+<p>集合类 VS 数组：</p>
+
+<ul>
+  <li>数组元素既可是基本类型的值，也可是对象的引用；</li>
+  <li>而集合只能保存对象的引用，对象本身存放在堆或方法区。基本数据类型在栈上分配内存，随时被回收，通过自动装箱可把基本类型转为包装类，存放在集合中。</li>
+</ul>
+
+<h3 id="集合容器继承关系图">集合容器继承关系图</h3>
+
+<p><img src="../assets/1362965-20190118094735724-2129767713.png" alt="img" style="zoom: 88%;" /></p>
+
+<p><img src="../assets/1362965-20190118095106326-273814633.png" alt="img" style="zoom:80%;" /></p>
+
+<h3 id="listqueueset-vs-map-接口">List、Queue、Set VS Map 接口</h3>
+
+<p>List、Queue、Set 接口继承自 Collection 接口：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public interface List&lt;E&gt; extends Collection&lt;E&gt; {}
+</code></pre></div></div>
+
+<ol>
+  <li><code class="highlighter-rouge">List</code>：有序、可重复，允许多个 <code class="highlighter-rouge">null</code> 元素；可用 <code class="highlighter-rouge">iterator</code> 遍历或 <code class="highlighter-rouge">get(index)</code> 随机访问特定元素；</li>
+  <li><code class="highlighter-rouge">Queue</code>：有序、可重复，允许多个 <code class="highlighter-rouge">null</code> 元素；<strong>先进先出</strong>，用于排队；</li>
+  <li><code class="highlighter-rouge">Set</code>：无序、不可重复，最多只能有一个 <code class="highlighter-rouge">null</code> 元素；只可用 <code class="highlighter-rouge">iterator</code> 遍历；</li>
+  <li><code class="highlighter-rouge">Map</code>：无序、<code class="highlighter-rouge">key</code> 不可重复 <code class="highlighter-rouge">value</code> 可重复，允许一个 <code class="highlighter-rouge">key</code> 和多个 <code class="highlighter-rouge">value</code> 为 <code class="highlighter-rouge">null</code>。</li>
+</ol>
+
+<p><img src="../assets/collection-impl.gif" alt="collection-impl" style="zoom: 88%;" /></p>
+
+<h3 id="collection-接口及分类">Collection 接口及分类</h3>
+
+<blockquote>
+  <p>各种实现类的底层实现原理、实现类的优缺点。</p>
+</blockquote>
+
+<p>重写<code class="highlighter-rouge">toString()</code>来打印内容，否则默认打印地址。</p>
+
+<h4 id="一list-接口">一、List 接口</h4>
+
+<ol>
+  <li><code class="highlighter-rouge">ArrayList</code> 类
+    <ul>
+      <li><code class="highlighter-rouge">CopyOnWrite（COW）</code>并发容器
+        <ul>
+          <li><code class="highlighter-rouge">CopyOnWriteArrayList</code>：绝对线程安全，在读多写少的场合性能非常好，远远好于 <code class="highlighter-rouge">Vector</code>；</li>
+          <li><code class="highlighter-rouge">CopyOnWriteArraySet</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">LinkedList</code> 类</li>
+  <li><code class="highlighter-rouge">Vector</code> 类
+    <ul>
+      <li><code class="highlighter-rouge">Stack</code> 类：如 <code class="highlighter-rouge">Stack&lt;Integer&gt; stack = new Stack&lt;&gt;()</code> 但一般用 <code class="highlighter-rouge">Deque&lt;Integer&gt; stack = new ArrayDeque&lt;&gt;()</code> 来实现，效率更高。</li>
+    </ul>
+  </li>
+</ol>
+
+<h4 id="二queue-接口">二、Queue 接口</h4>
+
+<ol>
+  <li><code class="highlighter-rouge">Deque</code> <strong>双端队列</strong>接口：同时实现了栈和队列的功能；
+    <ul>
+      <li><code class="highlighter-rouge">LinkedList</code> 类</li>
+      <li><code class="highlighter-rouge">ArrayQueue</code> 类：Object[] 数组 + 双指针；</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">Pri'orityQueue</code> 类，<strong>优先级队列</strong>、非阻塞式：用 Object[] 数组实现<strong>二叉堆</strong>；</li>
+  <li><code class="highlighter-rouge">BlockingQueue</code> <strong>阻塞队列</strong>：非常适合用于作为数据共享的通道；
+    <ol>
+      <li>广泛用在生产者-消费者模式：提供了可阻塞的插入和移除方法。当队列容器已满，生产者线程会被阻塞，直到队列未满；当队列容器为空时，消费者线程会被阻塞，直至队列非空时为止。</li>
+      <li>作为 <code class="highlighter-rouge">workqueue</code> 参数传入构造器 <code class="highlighter-rouge">ThreadPoolExecutor()</code> 创建线程池；</li>
+      <li>实现：
+        <ol>
+          <li><code class="highlighter-rouge">ArrayBlockingDeque</code> 类</li>
+          <li><code class="highlighter-rouge">LinkedBlockingDeque</code> 类：同时实现了 Deque；</li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">ConcurrentLinkedQueue</code> : 高效的并发队列，是非阻塞队列，用链表实现。可看做线程安全的 <code class="highlighter-rouge">LinkedList</code>。</li>
+</ol>
+
+<h4 id="三set-接口">三、Set 接口</h4>
+
+<ol>
+  <li><code class="highlighter-rouge">HashSet</code> 类：实现了 <code class="highlighter-rouge">Set</code> 接口，存储对象；底层基于 <strong>HashMap</strong>、但有键无值；元素不可重复，最多只能有一个null元素；用 <code class="highlighter-rouge">add()</code> 添加元素、<code class="highlighter-rouge">contains()</code>；
+    <ul>
+      <li><code class="highlighter-rouge">LinkedHashSet</code> 类：（基于LinkHashMap、但有键无值，）有序（能按元素的添加顺序遍历）；</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">TreeSet</code> 类：实现了 <code class="highlighter-rouge">Set</code> 和 <code class="highlighter-rouge">SortedSet</code> 接口；底层基于 TreeMap、但有键无值。</li>
+</ol>
+
+<h4 id="四map-接口">四、Map 接口</h4>
+
+<ol>
+  <li><code class="highlighter-rouge">HashMap</code> 类：实现了Map接口，存储键值对；底层是 <strong>数组和链表</strong>（链表散列/<strong>链表数组</strong>，用于解决哈希冲突）；键不可重复、值可重复，允许一个 key 和多个 value 为null；用 <code class="highlighter-rouge">put()</code> 添加元素、<code class="highlighter-rouge">containsKey()</code>；比 HashSet 快（因为是使用唯一的键来获取对象）；非线程安全；
+    <ol>
+      <li><code class="highlighter-rouge">LinkedHashMap</code> 类：JDK1.8 后在解决哈希冲突时先进行<strong>数组扩容</strong>；</li>
+      <li><strong><code class="highlighter-rouge">ConcurrentHashMap</code> 类</strong>：<strong>线程安全</strong>的 HashMap，JDK1.8底层采用<strong>数组+链表/红黑二叉树</strong>实现。用 <strong>CAS</strong> 添加新节点，用 <strong>synchronized</strong> 锁定链表或红黑树的首节点。唯一区别是其中的核心数据如 value 及链表都是 <code class="highlighter-rouge">volatile</code>（窝le滔）修饰的，保证了获取时的可见性；key 和 value 都<strong>不允许为 null</strong>。</li>
+      <li><code class="highlighter-rouge">ConcurrentSkipListMap</code> : <strong>跳表</strong>的实现。是一个 Map，用跳表的数据结构进行快速查找。</li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">HashTable</code> 类：<strong>基本淘汰不用</strong>；<strong>线程安全</strong>，内部的方法基本都经过 synchronized 修饰；数组+链表组成；key 和 value 都<strong>不允许为 null</strong>，否则抛出 NPE；</li>
+  <li><code class="highlighter-rouge">TreeMap</code> 类：实现 <code class="highlighter-rouge">SortMap</code> 接口；基于红黑树（自平衡的排序二叉树）<code class="highlighter-rouge">=&gt;</code> 对8个包装类、String <strong>根据 Key</strong> 自动升序（默认从大到小）排序，可定制排序方式；</li>
+</ol>
+
+<table>
+  <thead>
+    <tr>
+      <th>集合类</th>
+      <th>Key</th>
+      <th>Value</th>
+      <th>Super</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1. HashMap</td>
+      <td><strong>允许一个为null</strong></td>
+      <td><strong>允许为null</strong></td>
+      <td>AbstractMap</td>
+      <td>线程不安全</td>
+    </tr>
+    <tr>
+      <td>1.2 ConcurrentHashMap</td>
+      <td>不允许为null</td>
+      <td>不允许为null</td>
+      <td>AbstractMap</td>
+      <td><strong>分段锁技术</strong></td>
+    </tr>
+    <tr>
+      <td>2. Hashtable</td>
+      <td>不允许为null</td>
+      <td>不允许为null</td>
+      <td><strong>Dictionary</strong></td>
+      <td><strong>线程安全</strong></td>
+    </tr>
+    <tr>
+      <td>3. TreeMap</td>
+      <td>不允许为null</td>
+      <td><strong>允许为null</strong></td>
+      <td>AbstractMap</td>
+      <td>线程不安全</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>List中没有而ArrayList中独有的方法不能被List对象使用，即<strong>多态</strong>。</p>
+
+<p>用多态方式调用方法时：先检查父类中是否有该方法，</p>
+
+<ul>
+  <li>如果没有，则编译错误；</li>
+  <li>如果有，再去调用子类的同名方法。</li>
+</ul>
+
+<h4 id="线程不安全的集合">线程不安全的集合</h4>
+
+<p>注意，以下都是<strong>线程不安全</strong>的：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">ArrayList, LinkedList</code></li>
+  <li><code class="highlighter-rouge">HashSet, TreeSet</code></li>
+  <li><code class="highlighter-rouge">HashMap, TreeMap</code></li>
+</ol>
+
+<h3 id="list">List</h3>
+
+<h5 id="arraylist-vs-linkedlist">ArrayList VS LinkedList</h5>
+
+<p>二者都不是线程安全的</p>
+
+<ol>
+  <li><strong>底层实现方式</strong>：ArrayList 基于<strong>动态</strong>数组；LinkedList 基于<strong>双向链表</strong>（通过 <code class="highlighter-rouge">getLast()</code> 源码可见为双向）。</li>
+  <li><strong>按位查找</strong>：ArrayList 用 <code class="highlighter-rouge">get(index)</code> 随机访问，快；LinkedList 指定位置 index 查找，效率为O(n)，顺序访问。</li>
+  <li><strong>插入和删除</strong>：ArrayList 效率受元素位置影响，对尾部增删O(1)，指定位置 i 增删为O(n) ；LinkedList先查再增删，增删效率不受元素位置影响，均O(1)。</li>
+  <li><strong>扩容机制</strong>：ArrayList 为新建数组并<strong>拷贝</strong>原数组；LinkedList 基于双向链表，不需要扩容。</li>
+  <li><strong>内存空间</strong>：从单个元素说，LinkedList 空间开销大，需要保存前后节点的指针。</li>
+</ol>
+
+<h5 id="arraylist-常用方法">ArrayList 常用方法</h5>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import java.util.ArrayList;
+
+// 经典代码，ArrayList几乎实现了List的所有接口
+List&lt;String&gt; list = new ArrayList&lt;&gt;();
+List&lt;String&gt; list = ["A", "B", "C"];
+
+List&lt;String&gt; list = new ArrayList&lt;String&gt;() ;
+
+list.add("hello");
+list.remove(0);
+list.set(1, "world");
+list.get(2);
+list.size();
+
+List&lt;String&gt; list = new ArrayList&lt;&gt;(2);
+list.add("guan");
+list.add("bao");
+String[] array = list.toArray([arr]); // 集合转数组, arr为用于存储元素的数组，如new String[0]
+// 直接使用 toArray 无参方法，返回值只能是 Object[]类，若强转其它类型数组将出现 ClassCastException
+// 使用 toArray 带参方法，数组空间大小的 length == 0时，动态创建与 size 相同的数组，性能最好
+
+// 初始化一个包含元素 1, 3, 5 的 ArrayList nums
+ArrayList&lt;Integer&gt; nums = new ArrayList&lt;&gt;(Arrays.asList(1, 3, 5));
+
+工具类 Arrays.asList() 把数组转换成集合时，不能用其修改集合的方法， add/remove/clear，一般只用来遍历
+
+import java.util.Collections;
+
+int n = 10;
+// 初始化 ArrayList，大小为 10，元素值都为 0
+ArrayList&lt;Integer&gt; nums = new ArrayList&lt;&gt;(Collections.nCopies(n, 0));
+</code></pre></div></div>
+
+<h5 id="linkedlist-常用方法">LinkedList 常用方法</h5>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import java.util.Arrays;
+import java.util.LinkedList;
+
+// 初始化链表
+LinkedList&lt;Integer&gt; lst = new LinkedList&lt;&gt;(Arrays.asList(1, 2, 3, 4, 5));
+
+lst.isEmpty());
+// 获取链表的大小
+lst.size()
+
+void addFirst(E e)/addLast(e)
+E getFirst()/getLast()
+E removeFirst()/removeLast()
+// 在链表中插入元素
+// 移动到第三个位置
+lst.add(2, 99);
+// 删除链表中某个元素
+lst.remove(1);
+
+// 遍历链表
+// 输出：1 99 3 4 5
+for(int val : lst) {
+	System.out.print(val + " ");
+}
+//-------
+
+// 队列
+List&lt;String&gt; queue = new LinkedList&lt;&gt;();
+queue.addLast("hello");
+queue.removeFirst();
+
+// 栈
+LinkedList&lt;Integer&gt; stack = new LinkedList&lt;&gt;();
+stack.push("hello"); // top index=0
+stack.pop();
+stack.peek();
+
+stack.addFirst("world");
+stack.removeFirst();
+int top = stack.getFirst(); // top index=0
+</code></pre></div></div>
+
+<h3 id="queue">Queue</h3>
+
+<ul>
+  <li>
+    <p><code class="highlighter-rouge">offer()/add()</code>：一些队列有大小限制，在满的队列中加入新元素，调用 add() 抛出 unchecked 异常，调用 offer() 返回 false。</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">poll()/remove()</code>：都是从队列中删除第一个元素。用空集合调用时，remove()会抛出异常， poll() 只是返回 null，更适合易出现异常的情况。</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">peek()/element()</code>：都用于在队列的头部查询元素。在队列为空时， element() 抛出一个异常，而 peek() 返回 null。</p>
+  </li>
+</ul>
+
+<h5 id="deque-双端队列">Deque 双端队列</h5>
+
+<p><code class="highlighter-rouge">Deque</code> 是一个比 <code class="highlighter-rouge">Stack</code> 和 <code class="highlighter-rouge">Queue</code> 功能更强大的接口，同时实现了栈和队列的功能。<code class="highlighter-rouge">ArrayDeque</code> 和 <code class="highlighter-rouge">LinkedList</code> 实现了 <code class="highlighter-rouge">Deque</code> 接口。</p>
+
+<p><img src="../assets/deque_method.png" alt="img" style="zoom:100%;" /></p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import java.util.Queue;
+import java.util.Deque;
+import java.util.LinkedList;
+
+public interface Deque&lt;E&gt; extends Queue&lt;E&gt; {
+    // *** Deque methods ***
+    // 在头部插入元素，队列满返回false；用于Deque实现类为有限容量时
+    boolean offerFirst(E e);
+    boolean offerLast(E e);
+    E pollFirst();
+    E pollLast();
+    E peekFirst();
+    E peekLast();
+
+    // void addFirst(E e); // 在头部插入元素，队列满返回异常
+    // void addLast(E e);
+    // E removeFirst();
+    // E removeLast();
+    // E getFirst();
+    // E getLast();
+    
+    // 返回true表示元素存在于队列，且删除成功；返回false表示元素不存在于队列中，且队列没有改变。
+    boolean removeFirstOccurrence(Object o);
+    boolean removeLastOccurrence(Object o);
+    
+    // *** Queue methods ***
+    boolean offer(E e);
+    E poll();
+    E peek();
+    // boolean add(E e);
+    // E remove();  
+    // E element();
+    
+    // *** Stack methods ***
+    void push(E e);
+    E pop();
+
+    // *** Collection methods ***
+    // 在Deque接口下没有，但Deque继承了Collections接口，因此方法有定义，使用不会报错
+    boolean remove(Object o);
+    boolean contains(Object o);
+    int size();
+    bool isEmpty();
+    Iterator&lt;E&gt; iterator();
+    Iterator&lt;E&gt; descendingIterator();
+}
+</code></pre></div></div>
+
+<h3 id="hashcode-vs-equals">hashCode() VS equals()</h3>
+
+<p><code class="highlighter-rouge">hashCode()</code>：用于确定本对象在哈希表中的索引位置（如内存地址 =&gt; 整数），大大减少 <code class="highlighter-rouge">equals()</code> 的调用次数，从而提高效率。如 <code class="highlighter-rouge">HashSet、HashMap 及 HashTable</code> 等散列集合。</p>
+
+<ul>
+  <li>定义在 <code class="highlighter-rouge">Object</code> 类中，意味着任何类（包括数组）都实现了此方法；</li>
+  <li>是本地方法，即用 c/c++ 实现。</li>
+</ul>
+
+<p><code class="highlighter-rouge">hashCode()</code> VS <code class="highlighter-rouge">equals()</code>：</p>
+
+<p><strong>两个对象相等</strong>（引用指向同一个对象，对象的内存地址相等）：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">&lt;=&gt;</code> <code class="highlighter-rouge">A.equals(B)</code> 返回 true，默认比较内存地址；</li>
+  <li><code class="highlighter-rouge">=&gt;</code> 两个对象 hashcode 相同：
+    <ol>
+      <li>两个对象 hashcode 相同 <code class="highlighter-rouge">=&gt;</code> <code class="highlighter-rouge">A.equals(B)</code> 不一定返true <code class="highlighter-rouge">=&gt;</code> 对象不一定相等（哈希算法，散列，冲突）；</li>
+      <li>但两个对象 hashcode 不同 <code class="highlighter-rouge">=&gt;</code> 两对象一定不相等。</li>
+    </ol>
+  </li>
+</ul>
+
+<p>重写 equals() 时必须重写 hashCode()：</p>
+
+<ul>
+  <li>equals() 默认比较地址，<code class="highlighter-rouge">A.equals(B)</code> 返回 true表示二者地址相同，此时二者 hashcode 需相等（A、B 的 hashCode() 要返回相同的值）；</li>
+  <li>hashcode 根据地址计算而来，equals() 重写后（一般不比较地址而比较内容）hashcode() 也需要重写；</li>
+  <li>如果没有重写，两个对象 hashcode 不同 <code class="highlighter-rouge">=&gt;</code> 两对象一定不相等（即使它们指向相同的数据）。</li>
+</ul>
+
+<h3 id="set">Set</h3>
+
+<p>两元素相等：判断标准和HashMap相同，两个元素的hashCode相等并且通过equals()方法返回true。</p>
+
+<p>Set为何无序：基于哈希表存储，数组 + 链表 + <strong>红黑树</strong> + 哈希算法（链址法：CRUD性能都很好）</p>
+
+<p>TreeSet 引用类型排序：</p>
+
+<ol>
+  <li>类重写比较器规则接口 Comparable；重写 compareTo() 或 compare()；</li>
+  <li>直接为集合设置比较器 Comparable 对象，重写比较方法，二者都有时用集合。</li>
+</ol>
+
+<h5 id="set-如何去重">Set 如何去重</h5>
+
+<blockquote>
+  <p>Set 通过重写 hashCode 和 equals 实现去重。</p>
+</blockquote>
+
+<p>调用 <code class="highlighter-rouge">add()</code> 添加元素时（用 HashMap 的 <code class="highlighter-rouge">put()</code> 实现，判断返回值为 true 以确保不重复），判断是否已有此对象？</p>
+
+<ul>
+  <li>Set 用元素（HashMap 用 key）的内存地址计算 hashcode 值，判断 hashCode 是否已存在？
+    <ul>
+      <li>如不存在，则没有重复元素、直接插入；</li>
+      <li>若已存在，则用 equals() 判断两对象是否相等，比较地址（是否为同一对象？）：
+        <ul>
+          <li>若二者不等则通过<strong>拉链法</strong>（附到<strong>链表数组</strong>的对应链表中）解决<strong>哈希冲突</strong>，插入成功，返回 true；</li>
+          <li>若相等则 Set 加入失败，返回 false（HashMap 直接覆盖，返回旧的 value 值）。</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h5 id="hashmap-vs-hashset">HashMap VS HashSet</h5>
+
+<p>HashMap比HashSet快，因为是使用唯一的键来获取对象</p>
+
+<h5 id="常用方法">常用方法</h5>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import java.util.hashset; // 引入 HashSet 类
+
+HashSet sites = new HashSet&lt;&gt;(); // 经典代码
+sites.add("Google");
+sites.remove("Taobao");
+sites.contains("Taobao")
+sites.size();
+sites.clear();  
+for (String i : sites) {
+    System.out.println(i);
+}
+
+// 1. 重写 compareTo()
+class Employee implements Comparatable&lt;Employee&gt;
+{
+  @Override
+  publicint compareTo(Employee o) {
+    if (this.age &gt; o.age) {
+      return 1;
+    } else if(this.age &lt; o.age) {
+      return -1;
+    } else {
+      return 0;
+    }
+    //return this.age - o.age; // 差序算法
+  }
+}
+TreeSet&lt;String&gt; sets = new TreeSet&lt;&gt;();
+
+// 2. 重写 compare()
+Set&lt;Employee&gt; e1 = new TreeSet&lt;&gt;(new Comparator&lt;Employee&gt;() {
+  @Override
+  public int compare(Employee o1, Employee o2) {
+    return o1.getAge() - o2.getAge();
+  }
+});
+</code></pre></div></div>
+
+<h3 id="map">Map</h3>
+
+<h5 id="hashmap-vs-hashtable">HashMap VS HashTable</h5>
+
+<ol>
+  <li><code class="highlighter-rouge">null</code>：HashMap 允许一个key和多个value为null；HashTable 键值均不允许为 null，否则会抛出 <code class="highlighter-rouge">NullPointerException</code>；</li>
+  <li>线程安全：HashMap 是非线程安全的；HashTable 是线程安全的。</li>
+</ol>
+
+<h5 id="hashmap-vs-hashtree">HashMap VS HashTree</h5>
+
+<h5 id="hashmap-源码分析">HashMap 源码分析</h5>
+
+<h5 id="map-常用api">Map 常用API</h5>
+
+<pre><code class="language-Java">import java.util.HashMap;
+import java.util.Map;
+
+Map&lt;String, Integer&gt; maps = new HashMap&lt;&gt;();
+
+//
+maps.put("Java", 12);
+maps.put(null, null);
+Integer v = maps.get("Java");
+maps.remove("Java");
+
+maps.clear();
+
+maps.isEmpty()
+maps.size();
+maps.containsKey("Java");
+maps.containsValue(10);
+
+//
+Set&lt;String&gt; keys = maps.keySet();
+for(String key : keys) {
+  System.out.println(key);
+}
+
+Collection&lt;Integer&gt; values = maps.values();
+
+maps.putAll(maps2);
+
+bool b = Double.compare(d1,d2);
+</code></pre>
+
+<h3 id="遍历集合">遍历集合</h3>
+
+<pre><code class="language-Java">// 1. For-Each 循环语句: JDK1.5 后推出，专门为集合**遍历（获取元素）**设计；效率最高
+for (char ch : str.toCharArray()) {
+}
+
+ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();
+for (String item : list) {
+    System.out.println(item);
+    // 不要在 foreach 循环里进行元素 remove/add 操作。
+    // remove 元素请用 iterator 方式，如果并发操作，需对 iterator 对象加锁。
+}
+
+for (char ch : t.toCharArray()) { // not keysSet, need.keySet()
+    // 遍历T，初始化需要的字符及数量
+    int value = need.getOrDefault(ch, 0);
+    need.put(ch, value + 1); // t = “aba”
+}       
+        
+// for-each 实现原理：通过迭代器 Iterator + has.next()
+// 反编译后，对应.class文件
+ArrayList&lt;String&gt; list = new ArrayList();
+Iterator var2 = list.iterator();
+while (var2.hasNext()) {
+    String item = (String)var2.next();
+    System.out.println(item);
+}
+
+// e.g. keySet() 打印key集合
+for (String key : map.keySet()) { // map.values() 打印值集合
+    System.out.println(key + " : "+ maps.get(key));
+}
+
+// e.g. entrySet 集合迭代
+// 键值对整体作为Map.Entry&lt;String, String&gt;实体类型，Map转为Set集合
+Set&lt;Map.Entry&lt;String, String&gt; &gt; entries = map.entrySet();
+for (Map.Entry&lt;String, String&gt; entry : entries) {
+	String key = entry.getKey();
+	String value = entry.getValue();
+}
+
+// 2. 迭代器
+// 定义：提供一种方法访问容器对象各个元素，而又不需暴露对象的内部细节。实质是实现了用于遍历容器的hasNext()和next()方法
+// map不同于set和list，不是继承自Collection接口，没有实现Collection的Iterator 方法，自身没有迭代器来遍历元素。
+Collection objs = new HashSet&lt;String&gt;();
+// 获取集合对应的迭代器
+Iterator&lt;String&gt; it = objs.iterator();
+while (it.hasNext()) {
+    // it.next()方法返回的数据类型是Object，因此需强制类型转换
+    String obj = (String) it.next();
+    System.out.println(obj);
+    if (obj.equals("C语言")) {
+        // 从集合中删除上一次next()返回的元素
+        it.remove();
+    }
+    // 对book变量赋值，不会改变集合元素本身
+    obj = "C语言";
+}
+System.out.println(objs);
+        
+// 3. lambda 表达式 JDK1.8后
+objs.forEach(s -&gt; {
+  System.out.println(s);
+});
+
+maps.forEach((K, V) -&gt; {
+  System.out.println(k + "=&gt;" + v);
+});
+</code></pre>
+
+<ul>
+  <li>continue 语句只能用在 while 语句、for 语句或 foreach 语句的循环体中</li>
+</ul>
+
+<h4 id="fail-fast-机制">fail-fast 机制</h4>
+
+<blockquote>
+  <p>如 ArrayList、HashMap 中。</p>
+</blockquote>
+
+<p>区别：定义、原因</p>
+
+<p><strong>fail-fast（快速失败）</strong>机制：是 Java 集合的一种错误检查机制。当多个线程对集合进行结构上的改变的操作时，有可能会产生 fail-fast 机制。</p>
+
+<ul>
+  <li>原因：就在于程序在对 collection 进行<strong>迭代</strong>时，某个线程对该 collection 在结构上对其做了修改（而不是简单的修改集合元素的内容），这时迭代器就会抛出 <code class="highlighter-rouge">ConcurrentModificationException</code> 异常信息，从而产生 fail-fast。</li>
+  <li><strong>java.util 包下的</strong>集合类都是快速失败的，不能在多线程下发生并发修改（迭代过程中被修改）。</li>
+</ul>
+
+<p><strong>fail-safe（安全失败）</strong>机制：在遍历时不是直接在集合内容上访问的，而是<strong>先复制原有集合内容</strong>，在拷贝的集合上进行遍历，因此不会抛出<code class="highlighter-rouge">java.util.ConcurrentModificationException</code>异常。</p>
+
+<ul>
+  <li><strong>java.util.concurrent 包下的</strong>集合都是 fail-safe 的，可以在多线程下并发使用，并发修改。</li>
+  <li>有两个问题：
+    <ol>
+      <li>需要复制集合，产生大量的无效对象，开销大。</li>
+      <li>无法保证读取到的数据是目前原始结构中的数据。</li>
+    </ol>
+  </li>
+</ul>
+
+<h5 id="解决方法">解决方法</h5>
+
+<p>有两种解决方案：</p>
+
+<ol>
+  <li>在遍历过程中所有涉及到（改变 modCount 值的地方）全部加上<code class="highlighter-rouge">synchronized </code>或者直接使用 <code class="highlighter-rouge">Collection synchronizedList</code>。但是<strong>不推荐</strong>，因为增删造成的<strong>同步锁</strong>可能会阻塞遍历操作。</li>
+  <li>fail-safe 机制：使用<code class="highlighter-rouge">CopyOnWriteArrayList</code> 替换 ArrayLIst。<strong>推荐</strong>使用该方案。
+    <ol>
+      <li>CopyOnWriteArrayList 是 ArrayList 的一个线程安全的变体，绝对线程安全，其中所有可变操作（add、set 等）都是通过对底层数组进行一次新的复制来实现的。</li>
+      <li>该类产生的开销比较大，但是遇到两种情况，非常适合使用来替代 ArrayList。
+        <ol>
+          <li>在不能或不想进行同步遍历，但又需要从并发线程中排除冲突时。</li>
+          <li>当遍历操作的数量大大超过可变操作的数量时。</li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+</ol>
+
+<h3 id="collections工具类">Collections工具类</h3>
+
+<p>都是静态方法</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import java.util.Collections;
+
+//常用方法:
+List&lt;String&gt; names = new ArrayList&lt;&gt;();
+
+Collections.addAll(names, "Tom")
+Collections.sort(names); //对 List排序
+Collections.singletonList();//创建不可变的单元素列表
+
+//排序：
+void reverse(List list)//反转
+void shuffle(List list)//随机排序
+void sort(List list)//按自然排序的升序排序
+void sort(List list, Comparator c)//定制排序，由Comparator控制排序逻辑
+void swap(List list, int i , int j)//交换两个索引位置的元素
+void rotate(List list, int distance)//旋转。当distance为正数时，将list后distance个元素整体移到前面。当d为负数时，将 list的前d个元素整体移到后面
+
+//查找,替换
+int binarySearch(List list, Object key)//对List进行二分查找，返回索引，注意List必须有序
+boolean replaceAll(List list, Object oldVal, Object newVal)//用新元素替换旧元素
+
+int max(Collection coll, [Comparator c])//返回最大元素，排序规则由Comparatator类控制。
+int min(Collection coll, [Comparator c])
+int min = (int) Collections.min(Arrays.asList(numbers));
+
+void fill(List list, Object obj)//用指定元素代替list中的所有元素
+int n = 10;
+Collections.nCopies(n, 0);
+int frequency(Collection c, Object o)//统计元素出现次数
+int indexOfSubList(List list, List target)//统计target在list中第一次出现的索引，找不到则返回-1，类比int lastIndexOfSubList(List source, list target)
+</code></pre></div></div>
+
