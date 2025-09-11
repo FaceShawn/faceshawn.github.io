@@ -1,0 +1,200 @@
+<blockquote>
+  <p>摘要：CAP 定理和 BASE 理论，Paxos 算法和 Raft 算法。</p>
+</blockquote>
+
+<!-- more -->
+
+<hr />
+
+<h3 id="目录">目录</h3>
+
+<p>[TOC]</p>
+
+<h2 id="cap-定理和-base-理论">CAP 定理和 BASE 理论</h2>
+
+<blockquote>
+  <p>分布式系统的最大难点，就是各个节点的状态如何同步。CAP 定理是这方面的基本定理，也是理解分布式系统的起点。</p>
+
+  <p>CAP 是分布式系统设计基本定理，BASE 是 CAP 理论中 AP 方案的延伸。</p>
+
+  <p>另外，ACID 是数据库事务完整性的理论。</p>
+</blockquote>
+
+<h4 id="cap-定理">CAP 定理</h4>
+
+<p>CAP 定理：对于一个分布式系统来说，当设计读写操作时，只能同时满足CAP中的两个。</p>
+
+<ol>
+  <li><code class="highlighter-rouge">Consistency</code>（<strong>一致性</strong>）：数据在多个副本之间能够保持一致。所有节点访问同一份最新的<strong>数据副本</strong>。</li>
+  <li><code class="highlighter-rouge">Availability</code>（<strong>可用性</strong>）：每次请求（非故障的节点）在合理的时间内返回<strong>非错</strong>（不是错误或超时）<strong>的响应</strong>。</li>
+  <li><code class="highlighter-rouge">Partition Tolerance</code>（<strong>分区容错性</strong>）：分布式系统出现<strong>网络分区</strong>故障时，仍能对外提供（满足一致性和可用性的）服务，除非整个网络环境都发生了故障。</li>
+</ol>
+
+<p><img src="../assets/cap.webp" alt="图片" style="zoom: 40%;" /></p>
+
+<h4 id="ca-架构">CA 架构</h4>
+
+<p>网络分区：分布式系统中，因故障（某些网络节点间不再连通），整个网络分成几块孤立区域。</p>
+
+<ul>
+  <li>（绝大部分时候），没有网络分区（网络分区是正常的），<strong>CA 模型</strong>：即不需保证 P 时，C 和 A 能同时保证。如，集群数据库、xFS文件系统。</li>
+  <li>对于<strong>分布式系统</strong>，分区是必然存在的。当发生<strong>网络分区</strong>时，如果要继续对外提供服务，一定要满足<strong>分区容错性 P</strong>，那么强一致性（<code class="highlighter-rouge">Consistency</code>）和可用性（<code class="highlighter-rouge">Availability</code>）只能 2 选 1、只能满足其中一个。如，某个节点在进行写操作：
+    <ol>
+      <li>为了保证一致性 C， 必须要禁止其他节点的<strong>读写操作</strong>，这和可用性 A 冲突。</li>
+      <li>为了保证可用性 A，其他节点的<strong>读写操作</strong>正常的话，和一致性 C 冲突。</li>
+    </ol>
+  </li>
+</ul>
+
+<h4 id="cp-架构和-ap-架构">CP 架构和 AP 架构</h4>
+
+<ol>
+  <li>一致性 C（<strong>CP 架构</strong>，放弃 A 可用性，如 <code class="highlighter-rouge">ZooKeeper</code>、<code class="highlighter-rouge">HBase</code>），用于需确保强一致性的场景，如银行。
+    <ul>
+      <li>常见应用：分布式数据库、分布式锁。</li>
+      <li>任何时刻对 <code class="highlighter-rouge">ZooKeeper</code> 注册中心的<strong>读请求</strong>都能得到一致性的结果，但不保证每次请求的可用性，如在 Leader 选举过程中或半数以上的机器不可用时，服务就是不可用的。</li>
+    </ul>
+  </li>
+  <li>可用性 A（<strong>AP 架构</strong>，放弃 C 一致性，如<code class="highlighter-rouge">Cassandra</code>、<code class="highlighter-rouge">Eureka</code>尤瑞卡）。
+    <ul>
+      <li>常见应用：Web缓存、DNS。</li>
+      <li><code class="highlighter-rouge">Eureka</code> 注册中心中不存在 Leader 节点，<strong>每个节点都是一样的</strong>、平等的。保证即使大部分节点挂掉也不会影响正常提供服务，只要有一个节点可用就行，不过这个节点上的数据可能并<strong>不是最新的</strong>（不保证一致性 C）。</li>
+      <li>扩展出 BASE 理论。</li>
+    </ul>
+  </li>
+</ol>
+
+<p>注意：</p>
+
+<ul>
+  <li>注册中心 <code class="highlighter-rouge">Nacos </code>同时支持 CP 和 AP 架构 。</li>
+</ul>
+
+<h4 id="base-理论">BASE 理论</h4>
+
+<blockquote>
+  <p>分布式事务？</p>
+</blockquote>
+
+<p><strong>BASE 核心思想</strong>：即使无法做到强一致性，但每个应用都可根据自身业务特点，采用适当的方式来使系统达到<strong>最终一致性 E</strong>。</p>
+
+<ul>
+  <li>即，牺牲数据的一致性（<code class="highlighter-rouge">Consistency</code>）来满足系统的<strong>高可用性</strong>（<code class="highlighter-rouge">Availability</code>），系统中一部分数据不可用或不一致时，仍需保持系统整体“主要可用”。</li>
+  <li>本质上是对 <strong>AP 方案</strong>的延伸和补充：AP 方案只是在系统发生分区时放弃一致性，而不是永远放弃一致性。在<strong>分区故障</strong>恢复后，系统应达到最终一致性。</li>
+</ul>
+
+<p>BASE：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">Basically Available</code>（<strong>BA 基本可用</strong>） ：指分布式系统在出现不可预知故障时，<strong>允许损失部分可用性</strong>。
+    <ul>
+      <li><strong>响应时间</strong>上的损失：正常情况下，处理用户请求需 0.5s 返回结果，但由于系统出现故障，变为 3 s。</li>
+      <li><strong>系统功能</strong>上的降级：正常情况下，用户可用系统的全部功能，但由于系统访问量剧增，系统的部分<strong>非核心功能</strong>无法使用。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">Soft-state</code>（<strong>S 软状态</strong>） ：允许系统中的数据存在<strong>中间状态</strong>（CAP 理论中的数据不一致），且不会影响系统的整体可用性，即允许系统在不同节点的数据副本间进行数据同步的过程<strong>存在延时</strong>。</li>
+  <li><code class="highlighter-rouge">Eventually Consistent</code>（<strong>E 最终一致性</strong>）：强调的是系统中所有的数据副本、在<strong>经过一段时间的同步后</strong>，最终能达到一致的状态。本质是保证最终数据能达到一致，而不需实时保证。</li>
+</ol>
+
+<p><strong>最终一致性</strong>的具体方式是：</p>
+
+<ol>
+  <li><strong>读时修复</strong> : 在读取数据时，检测数据的不一致，进行修复。如 Cassandra 的 Read Repair 实现，具体来说，在向 Cassandra 系统查询数据时，如果检测到不同节点的副本数据不一致，系统就自动修复数据。</li>
+  <li><strong>写时修复</strong> : 在写入数据，检测数据的不一致时，进行修复。如 Cassandra 的 Hinted Handoff 实现。具体来说，Cassandra 集群的节点间远程写数据的时候，<strong>如果写失败</strong>就将数据缓存下来，然后定时重传，修复数据的不一致性。推荐，对性能消耗较低。</li>
+  <li><strong>异步修复</strong> : 最常用的方式，通过定时对账检测副本数据的一致性，并修复。</li>
+</ol>
+
+<h2 id="paxos-算法和-raft-算法">Paxos 算法和 Raft 算法</h2>
+
+<blockquote>
+  <p>分布式算法。</p>
+</blockquote>
+
+<h4 id="basic-paxos-算法">Basic Paxos 算法</h4>
+
+<p>Paxos 算法：<strong>基于消息传递</strong> 且具有 <strong>高效容错特性</strong> 的一致性算法，目前公认的解决 <strong>分布式一致性问题</strong> 最有效的经典算法之一。</p>
+
+<ul>
+  <li>
+    <p>但非常难理解和实现。不是一致性算法、而是<strong>共识算法</strong>。</p>
+  </li>
+  <li>
+    <p>描述的是多节点间如何就某个值（提案 Value）达成共识。</p>
+  </li>
+</ul>
+
+<p>Paxos 算法存在 3 个重要的角色：</p>
+
+<ol>
+  <li><strong>提议者（Proposer）</strong>：也叫协调者（coordinator），提议者提出提案，用于投票表决。
+    <ul>
+      <li>负责接受<strong>客户端</strong>发起的提议，然后尝试让接受者接受（<strong>达成共识</strong>），同时保证即使多个提议间产生了冲突，算法也能进行下去。</li>
+    </ul>
+  </li>
+  <li><strong>接受者（Acceptor）</strong>：也叫投票员（voter），负责对提议者的提议投票，并接受达成共识的提案。
+    <ul>
+      <li>同时需记住自己的投票历史；向学习者<strong>通知结果</strong>。</li>
+    </ul>
+  </li>
+  <li><strong>学习者（Learner）</strong>：被告知投票的结果，接受达成共识的提案。
+    <ul>
+      <li>如果有超过半数接受者就某个提议达成了共识，那么学习者就需接受这个提议，<strong>处理请求</strong>，作出运算、并将结果返回给客户端。</li>
+    </ul>
+  </li>
+</ol>
+
+<p><img src="../assets/Basic_Paxos" alt="img" style="zoom: 67%;" /></p>
+
+<p>缺点：假如有多个提议者互不相让，那么就可能导致整个提议的过程进入了<strong>死循环</strong>。</p>
+
+<p>因此，引入了 Multi Paxos 的算法思想。</p>
+
+<h4 id="multi-paxos-思想">Multi-Paxos 思想</h4>
+
+<p>Multi-Paxos <strong>思想</strong>： 在多个提议者的情况下，选出一个Leader（领导者），由领导者作为唯一的提议者，这样就可以解决提议者冲突的问题。核心是通过多个 Basic Paxos 实例，就一系列值达成共识。</p>
+
+<ol>
+  <li>
+    <p>针对没有恶意节点的情况，<strong>Raft 算法</strong>、ZAB 协议、 Fast Paxos 算法都是基于 Paxos 算法改进而来；</p>
+
+    <ul>
+      <li><strong>Raft 算法</strong>是更易理解和实现的分布式一致性算法，是Multi-Paxos的变种。</li>
+    </ul>
+  </li>
+  <li>
+    <p>针对存在恶意节点的情况，一般用工作量证明（POW，<code class="highlighter-rouge">Proof-of-Work</code>）、权益证明（PoS，<code class="highlighter-rouge">Proof-of-Stake </code>）等<strong>共识算法</strong>。</p>
+
+    <ul>
+      <li>
+        <p>共识是可容错系统中的一个基本问题：即使面对故障，服务器也可在共享状态上达成一致。</p>
+      </li>
+      <li><strong>共识算法</strong>：允许一组节点像整体一样一起工作，即使其中的一些节点出现故障也能继续工作下去。其正确性主要是源于<strong>复制状态机的性质</strong>：一组<code class="highlighter-rouge">Server</code>的状态机计算相同状态的副本，即使有一部分的<code class="highlighter-rouge">Server</code>宕机了仍能继续运行。</li>
+      <li>最典型应用就是区块链，需解决的核心问题是 <strong>拜占庭将军问题</strong>。</li>
+    </ul>
+  </li>
+</ol>
+
+<h4 id="raft-算法">Raft 算法</h4>
+
+<p><code class="highlighter-rouge">Raft</code> 是一个 <strong>易于理解的一致性算法</strong>。过程如同选举一样，<strong>参选者</strong> 需要说服 <strong>大多数选民</strong> (Server) 投票给他，一旦选定后就跟随其操作。</p>
+
+<ul>
+  <li>和 <code class="highlighter-rouge">Paxos</code> 目标相同，都是为了实现 <strong>一致性</strong> 产生的。<code class="highlighter-rouge">Paxos</code> 和 <code class="highlighter-rouge">Raft</code> 的区别在于选举的 <strong>具体过程</strong> 不同。</li>
+</ul>
+
+<p><code class="highlighter-rouge">Raft</code> 协议将 <code class="highlighter-rouge">Server</code> 进程分为三种角色：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">Leader</code>（领导者）：领导者由跟随者投票选出。</li>
+  <li><code class="highlighter-rouge">Follower</code>（跟随者）：刚开始没有 <strong>领导者</strong>，所有集群中的 <strong>参与者</strong> 都是 <strong>跟随者</strong>。</li>
+  <li><code class="highlighter-rouge">Candidate</code>（候选人）</li>
+</ol>
+
+<p>Raft算法的工作流程：</p>
+
+<ol>
+  <li>首先开启一轮大选。在大选期间 <strong>所有跟随者</strong> 都能参与竞选，这时所有跟随者的角色就变成了 <strong>候选人</strong>，民主投票选出领袖后就开始了这届领袖的任期；</li>
+  <li>然后选举结束，所有除 <strong>领导者</strong> 的 <strong>候选人</strong> 又变回 <strong>跟随者</strong> 服从领导者领导。</li>
+</ol>
+
+<p>参考：<a href="https://github.com/Snailclimb/JavaGuide/blob/main/docs/distributed-system/theorem&amp;algorithm&amp;protocol/raft-algorithm.md">Raft 算法解读</a></p>

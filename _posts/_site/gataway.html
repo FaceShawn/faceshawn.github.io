@@ -1,0 +1,614 @@
+<blockquote>
+  <p>摘要：位于微服务的前端、应用架构的边缘，充当系统的<strong>单一入口</strong>。</p>
+</blockquote>
+
+<!-- more -->
+
+<hr />
+
+<h2 id="目录">目录</h2>
+
+<p>[TOC]</p>
+
+<h2 id="api-网关">API 网关</h2>
+
+<p><del><strong>网关</strong>（<code class="highlighter-rouge">Gateway</code>）、网间连接器、协议转换器</del>：是一个网络连接到另一个网络的“关口”。在传输层上以实现网络互连，是最复杂的网络互连设备，仅用于两个高层协议不同的网络互连。</p>
+
+<p><strong>API 网关</strong>：位于微服务的前端、应用架构的边缘，充当系统的<strong>单一入口</strong>。主要作用是接受来自<strong>客户端</strong>的 API 请求，（根据定义的策略处理请求），将请求路由（分配）给相应的后端服务处理，然后<strong>聚合结果</strong>并响应给请求者。</p>
+
+<ul>
+  <li>为什么 API 网关要在 Nginx 反向代理后面：</li>
+</ul>
+
+<p><del>服务网关：而服务网关主要用于内部服务间的交互，更多地嵌入在服务架构内部，处理微服务间的通信。</del></p>
+
+<ul>
+  <li>将非功能性需求的实现卸载到<strong>基础设施层</strong>，并帮助开发人员专注于核心业务逻辑，从而加快应用程序的发布速度。</li>
+</ul>
+
+<h4 id="为什么需要网关">为什么需要网关？</h4>
+
+<p>传统的单体架构中只有一个服务开放给客户端调用，但是微服务架构中是将一个系统拆分成多个微服务，作为客户端去调用这些微服务，如果没有网关的存在，只能在本地记录每个微服务的调用地址。这种架构存在以下问题：</p>
+
+<ol>
+  <li>客户端多次请求不同的微服务：增加客户端代码或配置编写的复杂性。</li>
+  <li>认证复杂：每个服务都需要独立认证。</li>
+  <li>存在跨域请求：在一定场景下处理相对复杂。</li>
+</ol>
+
+<h3 id="基本功能">基本功能</h3>
+
+<p>网关是所有微服务的门户，功能包括：<del>统一入口，统一校验，统一分发</del></p>
+
+<ol>
+  <li>路由转发：接收到 Nginx 转发的 HTTP 请求。根据请求的路径和参数，将请求转发到相应的微服务实例。</li>
+  <li>请求统一认证、鉴权：统一在网关层面认证鉴权，微服务只专注于自身的业务，代码<strong>耦合性</strong>低。如，整合 Spring Cloud Gateway + Spring Cloud Security 统一认证鉴权。</li>
+  <li>请求校验、过滤 、拦截：网关对请求进行校验，如验证请求头、请求参数是否合法，是否包含必要的身份认证信息（如 Token ）。过滤掉非法的、无资格的、低优先级的<strong>恶意流量</strong>（比如黑客攻击、恶意爬虫、黄牛、秒杀器等），不进行后面真正的业务逻辑处理，减轻系统的并发压力。</li>
+  <li>流量控制：为了保护后端微服务，网关可以配置 <strong>限流 和 熔断</strong>策略，防止请求过载导致服务崩溃。</li>
+  <li>协议转换、数据缓存</li>
+  <li>日志记录、监控：网关可以记录请求的日志信息，包括请求时间、请求路径、请求参数、响应状态等，以便于后续分析和监控。</li>
+</ol>
+
+<h3 id="认证和鉴权">认证和鉴权</h3>
+
+<p>大致的认证鉴权流程，架构如下图：</p>
+
+<p><img src="../assets/f2d86ee8a77a418e93bac7db1d1371f6~tplv-k3u1fbpfcp-zoom-1.image" alt="img" style="zoom: 67%;" /></p>
+
+<p>大致分为四个角色及对应服务，如下：</p>
+
+<ol>
+  <li>客户端：需要访问微服务资源</li>
+  <li><strong>网关</strong>服务：负责转发、认证、鉴权，<code class="highlighter-rouge">oauth2-cloud-gateway</code></li>
+  <li><strong>OAuth2.0 认证授权服务</strong>：负责认证授权<strong>颁发令牌</strong>，<code class="highlighter-rouge">oauth2-cloud-auth-server</code></li>
+  <li>微服务集合：提供资源的一系列服务。<code class="highlighter-rouge">oauth2-cloud-order-service</code></li>
+</ol>
+
+<p>大致流程如下：</p>
+
+<p>1、客户端发出请求给网关，获取令牌</p>
+
+<p>2、网关收到请求，直接转发给授权服务</p>
+
+<p>3、授权服务验证用户名、密码等一系列身份，通过则颁发令牌给客户端</p>
+
+<p>4、客户端携带令牌请求资源，请求直接到了网关层</p>
+
+<p>5、网关对令牌进行校验（<strong>验签</strong>、<strong>过期时间校验</strong>….）、鉴权（对当前令牌携带的权限）和访问资源所需的权限进行比对，如果权限有交集则通过校验，直接转发给微服务</p>
+
+<p>6、微服务进行逻辑处理</p>
+
+<p>针对上述架构需要新建三个服务，案例源码目录如下：</p>
+
+<p><img src="../assets/981a462ee187460f989f6e4376f965e1~tplv-k3u1fbpfcp-zoom-1.image" alt="img" /></p>
+
+<h3 id="常见的网关系统">常见的网关系统</h3>
+
+<ol>
+  <li><strong>Spring Cloud Gateway</strong>：<strong>推荐</strong>。</li>
+  <li><strong>Zuul</strong>：主要通过过滤器（类似于 AOP）来过滤请求。成熟、简单。</li>
+  <li><del><code class="highlighter-rouge">Kong </code></del>：基于 Nginx 与 Lua 的高性能 Web 平台，内部集成了大量精良的 Lua 库、第三方模块以及大多数的依赖项。高性能（能处理超高并发）、扩展性极高。</li>
+  <li><del>Nginx</del>：稳定可靠、低内存，偏运维、门槛高。</li>
+  <li>美团<a href="https://tech.meituan.com/2021/05/20/shepherd-api-gateway.html">百亿规模API网关服务Shepherd的设计与实现</a></li>
+</ol>
+
+<p>比较分析：</p>
+
+<ol>
+  <li>性能：Spring Cloud Gateway基于Spring WebFlux实现，采用<strong>异步非阻塞</strong>模型，性能优于Zuul。</li>
+  <li>功能：Gateway提供了更丰富的<strong>路由规则和过滤器功能</strong>，如动态路由、权重路由等。</li>
+  <li>易用性：Zuul的配置相对简单，易于上手；而 Gateway 的配置更加灵活，但学习成本相对较高。</li>
+  <li>社区支持：Gateway作为Spring Cloud生态的一部分，得到了更广泛的社区支持。</li>
+</ol>
+
+<p>综上所述，Spring Cloud Gateway在性能、功能和社区支持方面优于Zuul，但在易用性方面略逊一筹。在实际项目中，可以根据项目需求和团队技术栈选择合适的微服务网关方案。</p>
+
+<h3 id="spring-cloud-zuul">Spring Cloud Zuul</h3>
+
+<p>Zuul提供基于配置的API表层。</p>
+
+<p>作为网关，以便记录输入和输出日志，并可以根据各种参数来实现安全性或重定向请求。</p>
+
+<ul>
+  <li>
+    <p>支持自动路由映射到在<code class="highlighter-rouge">Eureka Server</code>上注册的服务。使用注解<code class="highlighter-rouge">@EnableZuulProxy</code>来启用路由代理。</p>
+  </li>
+  <li>允许重定向REST请求以执行各种类型的过滤器。</li>
+  <li>Spring Cloud Security通过Spring Cloud Zuul解决了许多安全问题。</li>
+</ul>
+
+<h3 id="spring-cloud-gateway">Spring Cloud Gateway</h3>
+
+<p>Spring Cloud Gateway是Spring Cloud的新一代API网关，基于WebFlux框架实现，旨在为微服务架构提供一种简单而有效的统一的API路由管理方式。</p>
+
+<ul>
+  <li>作为Spring Cloud生态系统中的网关，目标是替代Netflix ZUUL，具有更好的性能、更强的扩展性、以及更丰富的功能特性，其不仅提供统一的路由方式，并且基于<strong>Filter链</strong>的方式提供了网关基本的功能，例如:安全，监控/埋点，限流等。</li>
+</ul>
+
+<h4 id="功能">功能</h4>
+
+<p>Spring Cloud Gateway 提供了丰富的功能，包括但不限于：</p>
+
+<ol>
+  <li><strong>动态路由</strong>： 能够匹配任何请求属性，根据配置动态地将请求路由到不同的微服务实例</li>
+  <li><strong>过滤器</strong>： 实现对请求和响应的各种操作，例如认证、授权、请求转发、限流等</li>
+  <li>集成Hystrix<strong>断路器</strong>： 处理微服务中的故障和延迟，防止故障扩散</li>
+  <li>集成Spring Cloud DiscoveryClient 服务发现功能</li>
+  <li>集成负载均衡： 将请求分发到多个服务实例，提高系统的性能和可用性</li>
+  <li><strong>统一认证和授权</strong>： 通过集成 <strong>Spring Security</strong> 等机制，实现对微服务的统一认证和授权管理</li>
+  <li>监控和日志： 提供监控和日志功能，帮助理解网关的运行状况，分析请求流量</li>
+</ol>
+
+<h4 id="工作流程">工作流程</h4>
+
+<ol>
+  <li>客户端向<code class="highlighter-rouge">Spring Cloud Gateway</code>发出请求，</li>
+  <li>然后在<code class="highlighter-rouge">Gateway Handler Mapping</code>中找到与请求相匹配的<strong>路由</strong>，将其发送到<code class="highlighter-rouge">Gateway Web Handler</code>。</li>
+  <li>Handler再通过指定的过滤器链来对请求进行过滤处理，</li>
+  <li>最后发送到我们实际的服务执行业务逻辑，然后返回。</li>
+</ol>
+
+<p><img src="../assets/8f72d0c84bd9b9423ca3508d6501b8f8.jpeg" alt="在这里插入图片描述" style="zoom:80%;" /></p>
+
+<p><img src="../assets/5ef31595e5315f6381b4698c3d5a80b7.png" alt="img" style="zoom: 33%;" /></p>
+
+<h4 id="网关服务搭建">网关服务搭建</h4>
+
+<p>参考：</p>
+
+<ul>
+  <li><a href="https://www.cnblogs.com/cbvlog/p/15718705.html">实战干货！Spring Cloud Gateway 整合 OAuth2.0 实现分布式统一认证授权！</a></li>
+  <li><a href="https://juejin.cn/post/6915319597348421646">Spring Security 与 Oauth2.0 复杂的依赖</a></li>
+</ul>
+
+<p>网关服务搭建过程如下：</p>
+
+<p>代码逻辑如下：</p>
+
+<ol>
+  <li>检查是否是白名单，白名单直接放行</li>
+  <li>检验令牌是否存在</li>
+  <li>解析令牌中的用户信息</li>
+  <li>封装用户信息到JSON数据中</li>
+  <li>加密JSON数据</li>
+  <li>将加密后的JSON数据放入到请求头中</li>
+</ol>
+
+<p>新建一个<strong>oauth2-cloud-gateway</strong>模块，目录如下图：</p>
+
+<p><img src="../assets/2c3d396bce3f4c37900747fd973b9ed5~tplv-k3u1fbpfcp-zoom-1.image" alt="img" style="zoom: 67%;" /></p>
+
+<h4 id="applicationyml-配置">application.yml 配置</h4>
+
+<p>添加 nacos 与 网关的相关配置如下：</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">server</span><span class="pi">:</span>
+  <span class="na">port</span><span class="pi">:</span> <span class="s">10001</span>
+<span class="na">spring</span><span class="pi">:</span>
+  <span class="na">application</span><span class="pi">:</span>
+    <span class="c1">## 指定服务名称，在nacos中的名字</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">cloud-gateway</span>
+  <span class="na">cloud</span><span class="pi">:</span>
+    <span class="na">nacos</span><span class="pi">:</span>
+      <span class="na">discovery</span><span class="pi">:</span>
+        <span class="na">server-addr</span><span class="pi">:</span> <span class="s">localhost:8848</span>   <span class="c1"># nacos的服务地址，nacos-server中IP地址:端口号</span>
+    <span class="na">gateway</span><span class="pi">:</span>
+      <span class="na">routes</span><span class="pi">:</span> <span class="err">	</span><span class="c1"># 网关路由配置</span>
+        <span class="pi">-</span> <span class="na">id</span><span class="pi">:</span> <span class="s">user-service </span><span class="err">		</span><span class="s"># 路由id，自定义，只要唯一即可</span>
+          <span class="c1"># uri: http://localhost:8081 	# 路由的目标地址 http就是固定地址</span>
+          <span class="na">uri</span><span class="pi">:</span> <span class="s">lb://user-service </span><span class="err">		</span><span class="s"># 路由的目标地址 lb就是负载均衡，后面跟服务名称，从注册中心获取uri</span>
+          <span class="na">predicates</span><span class="pi">:</span> <span class="err">			</span><span class="c1"># 路由断言，也就是判断请求是否符合路由规则的条件</span>
+            <span class="c1">## Path Route Predicate Factory断言，满足/user-service/**这个请求路径的都会被路由到http://localhost:8081这个uri中</span>
+            <span class="pi">-</span> <span class="s">Path=/user-service/** </span><span class="err">	</span><span class="s"># 这个是按照路径匹配，只要以/user/开头就符合要求</span>
+          <span class="na">filters</span><span class="pi">:</span> <span class="c1">## 配置过滤器（局部）</span>
+            <span class="pi">-</span> <span class="s">AddResponseHeader=X-Response-Foo, Bar</span>  <span class="c1"># 浏览器请求响应头中已经有了`X-Response-Foo=Bar`这个键值对。</span>
+            <span class="c1">## AuthorizeGatewayFilterFactory自定义过滤器配置，值为true需要验证授权，false不需要。</span>
+            <span class="pi">-</span> <span class="s">Authorize=true</span>
+            <span class="c1"># 使用 RewritePath 过滤器来去除请求路径中的 /user-service 前缀</span>
+            <span class="pi">-</span> <span class="s">RewritePath=/user-service/(?&lt;path&gt;.*), /$\{path}</span>
+
+        <span class="pi">-</span> <span class="na">id</span><span class="pi">:</span> <span class="s">order-service-1</span>
+          <span class="na">uri</span><span class="pi">:</span> <span class="s">lb://order-service</span>
+          <span class="na">predicates</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s">Path=/order/**</span>
+            <span class="c1">## Weight Route Predicate Factory，同一分组按照权重进行分配流量，这里分配了80%</span>
+            <span class="pi">-</span> <span class="s">Weight=group1, 8</span>  <span class="c1"># 第一个group1是分组名，第二个参数是权重</span>
+
+        <span class="pi">-</span> <span class="na">id</span><span class="pi">:</span> <span class="s">order-service-2</span>
+          <span class="na">uri</span><span class="pi">:</span> <span class="s">lb://order-service</span>
+          <span class="na">predicates</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s">Path=/order/**</span>
+            <span class="pi">-</span> <span class="s">Weight=group1, 2</span>
+</code></pre></div></div>
+
+<h4 id="三大核心概念">三大核心概念</h4>
+
+<ol>
+  <li><strong><code class="highlighter-rouge">routes</code>（路由）</strong>：路由是网关最基础的部分，路由信息由一个ID、一个目标URI、一组断言和过滤器组成。路由断言Predicate用于匹配请求，过滤器Filter用于修改请求和响应。如果断言为true，则说明请求URI和配置匹配，则执行路由。</li>
+  <li><strong><code class="highlighter-rouge">predicates</code>（断言）</strong>：满足断言的请求（则执行该路由）都会被路由到uri中。参考Java8中的断言Predicate，用于实现请求匹配逻辑，例如匹配路径、请求头、请求参数等。可以配置多个。</li>
+  <li><strong><code class="highlighter-rouge">filter</code>（过滤器）</strong>：可以在返回请求之前或之后修改请求和响应的内容。从作用范围可分为GatewayFilter（局部过滤器）和 GlobalFilter（全局过滤器）</li>
+</ol>
+
+<h5 id="routes路由">routes（路由）</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">id</code>：路由的唯一id，名称任意</li>
+  <li><code class="highlighter-rouge">uri</code>：路由转发的目标地址，
+    <ol>
+      <li><code class="highlighter-rouge">http://localhost:8081</code> 就是固定地址</li>
+      <li><code class="highlighter-rouge">lb://service-name</code>：
+        <ul>
+          <li><code class="highlighter-rouge">lb</code>：指从nacos中按照名称获取微服务，并遵循<strong>负载均衡</strong>策略</li>
+          <li><code class="highlighter-rouge">service-name</code>：nacos注册中心中的<strong>服务名称</strong>，这里并不是IP地址形式的</li>
+        </ul>
+      </li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">predicates</code>：</li>
+  <li><code class="highlighter-rouge">filter</code>：</li>
+</ul>
+
+<h5 id="predicates断言">predicates（断言）</h5>
+
+<p>断言（Predicate ）属于 Java8 语言中的 Predicate 函数，参数为 ServerWebExchange 对象。可以让开发者（通过请求头、或请求参数）匹配到任意的 HTTP 请求。</p>
+
+<ul>
+  <li>
+    <p>简单理解的话，就是一个条件判断工具。</p>
+  </li>
+  <li>
+    <p>可以用于<strong>接口请求参数校验</strong>：</p>
+    <ol>
+      <li>如果符合当前配置的规则则通过验证，进而使得服务网关将该请求路由到微服务中。</li>
+      <li>如果不符合当前配置的规则，就无法通过验证，返回错误信息。</li>
+    </ol>
+  </li>
+</ul>
+
+<blockquote>
+  <p>Predicate接受输入参数，返回一个布尔值结果。该接口包含多种默认方法来将Predicate组合成其他复杂的逻辑（比如：与，或，非）。</p>
+</blockquote>
+
+<h6 id="内置predicate-factory">内置<code class="highlighter-rouge">Predicate Factory</code></h6>
+
+<p>在Gateway中，有一些的内置<code class="highlighter-rouge">Predicate Factory</code>，有了这些，在运行时，Gateway会 自动根据需要创建其对应的Pridicate对象测试路由条件。</p>
+
+<p><strong>Path 路由断言 Factory：</strong> 根据请求路径匹配的路由条件工厂</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">predicates</span><span class="pi">:</span>
+<span class="c1"># 如果可以匹配的PathPattern有多个，则每个路径模式以，分开</span>
+<span class="pi">-</span> <span class="s">Path=/red/{segment},/blue/{segment}</span>
+</code></pre></div></div>
+
+<p><strong>Weight 路由断言 Factory：</strong> 请求按照权重分组到不同的路由</p>
+
+<p>默认的路由转发如果路由到了两个，则是按照配置先后顺序转发，</p>
+
+<ol>
+  <li>如果没有配置权重，则肯定是转发到 uri。</li>
+  <li>如果配置了权重并且相同的分组，则按照权重比例进行分配流量。</li>
+</ol>
+
+<p><strong>datetime 路由断言 Factory：</strong> 在指定日期时间（After、Before、Between）发生的请求都将被匹配</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">predicates</span><span class="pi">:</span>
+<span class="pi">-</span> <span class="s">After=2017-01-20T17:42:47.789-07:00[America/Denver]</span>
+</code></pre></div></div>
+
+<p><strong>Cookie 路由断言 Factory：</strong> 有两个参数，cookie名称和正则表达式。请求包含此cookie名称且正则表达式为真的将会被匹配。</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">predicates</span><span class="pi">:</span>
+<span class="pi">-</span> <span class="s">Cookie=chocolate, ch.p</span>
+</code></pre></div></div>
+
+<p><strong>Header 路由断言 Factory：</strong> 有两个参数，header名称和正则表达式。请求包含此header名称且正则表达式为真的将会被匹配。</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">predicates</span><span class="pi">:</span>
+<span class="pi">-</span> <span class="s">Header=X-Request-Id, \d+</span>
+</code></pre></div></div>
+
+<p><strong>Host 路由断言 Factory：</strong> 包括一个参数：host name列表。使用Ant路径匹配规则， . 作为分隔符。</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">predicates</span><span class="pi">:</span>
+<span class="pi">-</span> <span class="s">Host=**.somehost.org,**.anotherhost.org</span>
+</code></pre></div></div>
+
+<p><strong>Method 路由断言 Factory：</strong>只包含一个参数：需要匹配的HTTP请求方式</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">predicates</span><span class="pi">:</span>
+<span class="pi">-</span> <span class="s">Method=GET</span>
+</code></pre></div></div>
+
+<p><strong>QueryParam 路由断言 Factory：</strong></p>
+
+<p><strong>RemoteAddr 路由断言 Factory：</strong></p>
+
+<p><img src="../assets/gateway_predicate.png" alt="image-20250902161217293" style="zoom: 80%;" /></p>
+
+<h6 id="自定义predicate">自定义Predicate</h6>
+
+<p>可以自定义Predicate来实现复杂的路由匹配规则。</p>
+
+<p>Spring Cloud Gateway中的断言命名都是有规范的，格式：<code class="highlighter-rouge">xxxRoutePredicateFactory</code>。</p>
+
+<ul>
+  <li>比如权重的断言：<code class="highlighter-rouge">WeightRoutePredicateFactory</code>，那么配置时直接取前面的<code class="highlighter-rouge">Weight</code>。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 实现自定义 Predicate 工厂</span>
+<span class="c1">// 通过HostRoutePredicateFactory创建Predicate进行路由判断</span>
+<span class="nd">@Component</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyHostRoutePredicateFactory</span> <span class="kd">extends</span> <span class="n">AbstractRoutePredicateFactory</span><span class="o">&lt;</span><span class="n">MyHostRoutePredicateFactory</span><span class="o">.</span><span class="na">Config</span><span class="o">&gt;</span> <span class="o">{</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h5 id="filter过滤器">filter（过滤器）</h5>
+
+<p><img src="../assets/8f72d0c84bd9b9423ca3508d6501b8f8.jpeg" alt="在这里插入图片描述" style="zoom:80%;" /></p>
+
+<p>名称只需要写前缀，过滤器命名必须是<code class="highlighter-rouge">xxxGatewayFilterFactory</code>（包括自定义），如<code class="highlighter-rouge">AddResponseHeaderGatewayFilterFactory</code>，为原始响应添加Header。</p>
+
+<p>从生命周期可分为：</p>
+
+<ul>
+  <li><strong>PRE</strong> 过滤器：在请求被路由之前调用。可实现<strong>身份验证</strong>、在集群中选择请求的微服务、记录调试信息等。</li>
+  <li><strong>POST</strong> 过滤器：在路由到微服务以后执行。可用来为响应添加标准的 HTTP Header、收集统计信息和指标、将响应从微服务发送给客户端等。</li>
+</ul>
+
+<p>从作用范围可分为两种:</p>
+
+<ul>
+  <li><strong>GatewayFilter</strong>（局部过滤器）：应用到单个路由或者一个分组的路由上。需要在指定路由配置才能生效。</li>
+  <li><strong>GlobalFilter</strong>（全局过滤器）：应用到所有的路由上。无需配置，全局生效。</li>
+</ul>
+
+<h6 id="gatewayfilter局部">GatewayFilter（局部）</h6>
+
+<p>Spring Cloud Gateway内置了多种过滤器,例如:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">AddRequestHeader GatewayFilter</code>：在请求头中添加参数</li>
+  <li><code class="highlighter-rouge">PrefixPath GatewayFilter</code>：请求路径前缀</li>
+  <li><code class="highlighter-rouge">Hystrix GatewayFilter</code>：断路器</li>
+  <li><code class="highlighter-rouge">RateLimit GatewayFilter</code>：限流</li>
+  <li><code class="highlighter-rouge">Retry GatewayFilter</code>：重试</li>
+</ul>
+
+<p>Spring Cloud Gateway中内置了许多的局部过滤器，如下图：</p>
+
+<p>模拟一个授权验证的过程，如果请求头或者请求参数中携带<code class="highlighter-rouge">token</code>则放行，否则直接拦截返回<strong>401</strong>：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">AuthorizeGatewayFilterFactory</code>只是涉及到了过滤器的前置处理，后置处理是在<code class="highlighter-rouge">chain.filter().then()</code>中的<code class="highlighter-rouge">then()</code>方法中完成的，具体可以看下项目源码中的<code class="highlighter-rouge">TimeGatewayFilterFactory</code>。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+ * 名称必须是xxxGatewayFilterFactory形式
+ * todo：模拟授权的验证，具体逻辑根据业务完善
+ */</span>
+<span class="nd">@Component</span>
+<span class="nd">@Slf4j</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">AuthorizeGatewayFilterFactory</span> <span class="kd">extends</span> <span class="n">AbstractGatewayFilterFactory</span><span class="o">&lt;</span><span class="n">AuthorizeGatewayFilterFactory</span><span class="o">.</span><span class="na">Config</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">AUTHORIZE_TOKEN</span> <span class="o">=</span> <span class="s">"token"</span><span class="o">;</span>
+
+    <span class="c1">//构造函数，加载Config</span>
+    <span class="kd">public</span> <span class="nf">AuthorizeGatewayFilterFactory</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">//固定写法</span>
+        <span class="kd">super</span><span class="o">(</span><span class="n">AuthorizeGatewayFilterFactory</span><span class="o">.</span><span class="na">Config</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+        <span class="n">log</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"Loaded GatewayFilterFactory [Authorize]"</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="c1">//读取配置文件中的参数 赋值到 配置类中</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="nf">shortcutFieldOrder</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">//Config.enabled</span>
+        <span class="k">return</span> <span class="n">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span><span class="s">"enabled"</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">GatewayFilter</span> <span class="nf">apply</span><span class="o">(</span><span class="n">AuthorizeGatewayFilterFactory</span><span class="o">.</span><span class="na">Config</span> <span class="n">config</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="o">(</span><span class="n">exchange</span><span class="o">,</span> <span class="n">chain</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="o">{</span>
+            <span class="c1">//判断是否开启授权验证</span>
+            <span class="k">if</span> <span class="o">(!</span><span class="n">config</span><span class="o">.</span><span class="na">isEnabled</span><span class="o">())</span> <span class="o">{</span>
+                <span class="k">return</span> <span class="n">chain</span><span class="o">.</span><span class="na">filter</span><span class="o">(</span><span class="n">exchange</span><span class="o">);</span>
+            <span class="o">}</span>
+
+            <span class="n">ServerHttpRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="n">exchange</span><span class="o">.</span><span class="na">getRequest</span><span class="o">();</span>
+            <span class="n">HttpHeaders</span> <span class="n">headers</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="na">getHeaders</span><span class="o">();</span>
+            <span class="c1">//从请求头中获取token</span>
+            <span class="n">String</span> <span class="n">token</span> <span class="o">=</span> <span class="n">headers</span><span class="o">.</span><span class="na">getFirst</span><span class="o">(</span><span class="n">AUTHORIZE_TOKEN</span><span class="o">);</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">token</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="c1">//从请求头参数中获取token</span>
+                <span class="n">token</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="na">getQueryParams</span><span class="o">().</span><span class="na">getFirst</span><span class="o">(</span><span class="n">AUTHORIZE_TOKEN</span><span class="o">);</span>
+            <span class="o">}</span>
+
+            <span class="n">ServerHttpResponse</span> <span class="n">response</span> <span class="o">=</span> <span class="n">exchange</span><span class="o">.</span><span class="na">getResponse</span><span class="o">();</span>
+            <span class="c1">//如果token为空，直接返回401，未授权</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">StringUtils</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">(</span><span class="n">token</span><span class="o">))</span> <span class="o">{</span>
+                <span class="n">response</span><span class="o">.</span><span class="na">setStatusCode</span><span class="o">(</span><span class="n">HttpStatus</span><span class="o">.</span><span class="na">UNAUTHORIZED</span><span class="o">);</span>
+                <span class="c1">//处理完成，直接拦截，不再进行下去</span>
+                <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="na">setComplete</span><span class="o">();</span>
+            <span class="o">}</span>
+            <span class="cm">/**
+             * todo chain.filter(exchange) 之前的都是过滤器的前置处理
+             *
+             * chain.filter().then(
+             *  过滤器的后置处理...........
+             * )
+             */</span>
+            <span class="c1">//授权正常，继续下一个过滤器链的调用</span>
+            <span class="k">return</span> <span class="n">chain</span><span class="o">.</span><span class="na">filter</span><span class="o">(</span><span class="n">exchange</span><span class="o">);</span>
+        <span class="o">};</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Data</span>
+    <span class="nd">@AllArgsConstructor</span>
+    <span class="nd">@NoArgsConstructor</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">Config</span> <span class="o">{</span>
+        <span class="c1">// 控制是否开启认证</span>
+        <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">enabled</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h6 id="globalfilter全局">GlobalFilter（全局）</h6>
+
+<p>全局过滤器应用到全部路由上，不必在路由上配置，注入到IOC容器中即可全局生效。</p>
+
+<p>功能其实和<code class="highlighter-rouge">GatewayFilter</code>是相同的，只是作用域是所有的路由配置，而不是绑定在指定的路由配置上。</p>
+
+<ul>
+  <li>多个<code class="highlighter-rouge">GlobalFilter</code>可以通过<code class="highlighter-rouge">@Order</code>或者<code class="highlighter-rouge">getOrder()</code>方法指定执行顺序，order值越小，执行的优先级越高。</li>
+  <li>注意：由于过滤器有pre和post两种类型，
+    <ol>
+      <li>pre类型过滤器如果order值越小，那么它就应该在pre过滤器链的<strong>顶层</strong>，最先执行。</li>
+      <li>post类型过滤器如果order值越小，那么它就应该在pre过滤器链的<strong>底层</strong>。最后执行。</li>
+    </ol>
+  </li>
+</ul>
+
+<p><img src="../assets/pre_post.webp" style="zoom: 50%;" /></p>
+
+<p>Spring Cloud Gateway也内置了一些全局过滤器，如下图：</p>
+
+<p><img src="../assets/globalfilter" alt="图片" /></p>
+
+<h6 id="自定义过滤器">自定义过滤器</h6>
+
+<p>场景：模拟Nginx的Access Log 功能，记录每次请求的相关信息。</p>
+
+<h4 id="集成注册中心动态路由">集成注册中心、动态路由</h4>
+
+<p>网关接收外部请求，按照一定的规则，将请求转发给其他服务或者应用。如果站在服务调用的角度，网关就扮演着服务消费者的角色。</p>
+
+<p>此时，如果再来看看服务调用的目标URI配置，就会很自然的发现一个问题，服务提供者调用的地址是写死的（每次路由配置都是指定固定的服务uri），即网关<strong>没有动态的发现服务</strong>，缺点：</p>
+
+<ul>
+  <li>服务的IP的地址一旦修改了，路由配置中的uri必须修改</li>
+  <li>服务集群中无法实现负载均衡</li>
+</ul>
+
+<p>这就涉及到了服务的<strong>自动发现</strong>问题，以及发现服务后，所涉及到的服务调用的<strong>负载均衡</strong>的问题。</p>
+
+<p>此时就需要集成注册中心（如 Nacos），使得网关能够从注册中心自动获取uri（负载均衡）。</p>
+
+<ul>
+  <li>可以通过Nacos或者Eureka注册中心动态发现服务，通过Ribbon进行服务调用的负载均衡。</li>
+  <li>同样，Gateway也可以整合Nacos或者Eureka，Ribbon从而实现动态路由的功能。</li>
+</ul>
+
+<p>想要使用动态路由的功能，首先要整合注册中心，这里以Nacos为例</p>
+
+<p>例如 Eureka：</p>
+
+<p>在 Spring Boot 主类上添加 <code class="highlighter-rouge">@EnableDiscoveryClient</code> 注解，以启用服务发现功能。</p>
+
+<h4 id="集成配置中心">集成配置中心</h4>
+
+<p>将网关的一系列配置写到项目的配置文件中，一旦路由发生改变必须要重新配置项目，这样维护成本很高。</p>
+
+<p>其实可以将网关的配置存放到配置中心中，这样由配置中心统一管理，一旦路由发生改变，只需要在配置中心修改，这样便能达到<strong>一处修改，多出生效</strong>的目的。</p>
+
+<p>这里当然要使用Nacos作为配置中心了。</p>
+
+<p>在<code class="highlighter-rouge">bootstrap.yml</code>文件中指定Nacos作为配置中心的一些相关配置：</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spring</span><span class="pi">:</span>
+  <span class="na">application</span><span class="pi">:</span>
+    <span class="c1">## 指定服务名称，在nacos中的名字</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">cloud-gateway</span>
+  <span class="na">cloud</span><span class="pi">:</span>
+    <span class="na">nacos</span><span class="pi">:</span>
+      <span class="c1">## todo 此处作为演示，仅仅配置了后缀，其他分组，命名空间根据需要自己配置</span>
+      <span class="na">config</span><span class="pi">:</span>
+        <span class="na">server-addr</span><span class="pi">:</span> <span class="s">127.0.0.1:8848</span>
+        <span class="c1">## 指定文件后缀为yaml</span>
+        <span class="na">file-extension</span><span class="pi">:</span> <span class="s">yaml</span>
+</code></pre></div></div>
+
+<p>在nacos中的public命名空间中创建<code class="highlighter-rouge">dataId</code>为<code class="highlighter-rouge">cloud-gateway.yaml</code>的配置（未指定环境），配置内容如下：</p>
+
+<p><img src="../assets/global_config.webp" style="zoom:80%;" /></p>
+
+<h4 id="自定义全局异常处理">自定义全局异常处理</h4>
+
+<p>通过前面的测试可以看到一个现象：一旦路由的微服务下线或者失联了，Spring Cloud Gateway直接返回了一个错误页面，Whitelabel Error Page。</p>
+
+<ul>
+  <li>显然这种异常信息不友好，前后端分离架构中必须定制返回的异常信息。</li>
+</ul>
+
+<p>传统的Spring Boot 服务中都是使用<code class="highlighter-rouge">@ControllerAdvice</code>来包装全局异常处理的，但是由于服务下线，请求并没有到达。</p>
+
+<p>因此必须在网关中也要定制一层全局异常处理，这样才能更加友好的和客户端交互。</p>
+
+<p>Spring Cloud Gateway提供了多种全局处理的方式，今天只介绍其中一种方式，实现还算比较优雅。</p>
+
+<p>直接创建一个类<code class="highlighter-rouge">GlobalErrorExceptionHandler</code>，实现<code class="highlighter-rouge">ErrorWebExceptionHandler</code>，重写其中的<code class="highlighter-rouge">handle</code>方法，返回JSON数据。代码如下：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+ * 用于网关的全局异常处理
+ * @Order(-1)：优先级一定要比ResponseStatusExceptionHandler低
+ */</span>
+<span class="nd">@Slf4j</span>
+<span class="nd">@Order</span><span class="o">(-</span><span class="mi">1</span><span class="o">)</span>
+<span class="nd">@Component</span>
+<span class="nd">@RequiredArgsConstructor</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">GlobalErrorExceptionHandler</span> <span class="kd">implements</span> <span class="n">ErrorWebExceptionHandler</span> <span class="o">{</span>
+
+     <span class="kd">private</span> <span class="kd">final</span> <span class="n">ObjectMapper</span> <span class="n">objectMapper</span><span class="o">;</span>
+
+     <span class="nd">@SuppressWarnings</span><span class="o">({</span><span class="s">"rawtypes"</span><span class="o">,</span> <span class="s">"unchecked"</span><span class="o">,</span> <span class="s">"NullableProblems"</span><span class="o">})</span>
+     <span class="nd">@Override</span>
+     <span class="kd">public</span> <span class="n">Mono</span><span class="o">&lt;</span><span class="n">Void</span><span class="o">&gt;</span> <span class="nf">handle</span><span class="o">(</span><span class="n">ServerWebExchange</span> <span class="n">exchange</span><span class="o">,</span> <span class="n">Throwable</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">ServerHttpResponse</span> <span class="n">response</span> <span class="o">=</span> <span class="n">exchange</span><span class="o">.</span><span class="na">getResponse</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">isCommitted</span><span class="o">())</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">Mono</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="n">ex</span><span class="o">);</span>
+        <span class="o">}</span>
+
+         <span class="c1">// JOSN格式返回</span>
+         <span class="n">response</span><span class="o">.</span><span class="na">getHeaders</span><span class="o">().</span><span class="na">setContentType</span><span class="o">(</span><span class="n">MediaType</span><span class="o">.</span><span class="na">APPLICATION_JSON</span><span class="o">);</span>
+         <span class="k">if</span> <span class="o">(</span><span class="n">ex</span> <span class="k">instanceof</span> <span class="n">ResponseStatusException</span><span class="o">)</span> <span class="o">{</span>
+             <span class="n">response</span><span class="o">.</span><span class="na">setStatusCode</span><span class="o">(((</span><span class="n">ResponseStatusException</span><span class="o">)</span> <span class="n">ex</span><span class="o">).</span><span class="na">getStatus</span><span class="o">());</span>
+         <span class="o">}</span>
+
+        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="na">writeWith</span><span class="o">(</span><span class="n">Mono</span><span class="o">.</span><span class="na">fromSupplier</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="o">{</span>
+            <span class="n">DataBufferFactory</span> <span class="n">bufferFactory</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="na">bufferFactory</span><span class="o">();</span>
+            <span class="k">try</span> <span class="o">{</span>
+                <span class="c1">//todo 返回响应结果，根据业务需求，自己定制</span>
+                <span class="n">CommonResponse</span> <span class="n">resultMsg</span> <span class="o">=</span> <span class="k">new</span> <span class="n">CommonResponse</span><span class="o">(</span><span class="s">"500"</span><span class="o">,</span><span class="n">ex</span><span class="o">.</span><span class="na">getMessage</span><span class="o">(),</span><span class="kc">null</span><span class="o">);</span>
+                <span class="k">return</span> <span class="n">bufferFactory</span><span class="o">.</span><span class="na">wrap</span><span class="o">(</span><span class="n">objectMapper</span><span class="o">.</span><span class="na">writeValueAsBytes</span><span class="o">(</span><span class="n">resultMsg</span><span class="o">));</span>
+            <span class="o">}</span>
+            <span class="k">catch</span> <span class="o">(</span><span class="n">JsonProcessingException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">log</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="s">"Error writing response"</span><span class="o">,</span> <span class="n">ex</span><span class="o">);</span>
+                <span class="k">return</span> <span class="n">bufferFactory</span><span class="o">.</span><span class="na">wrap</span><span class="o">(</span><span class="k">new</span> <span class="kt">byte</span><span class="o">[</span><span class="mi">0</span><span class="o">]);</span>
+            <span class="o">}</span>
+        <span class="o">}));</span>
+ 	<span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="oauth20-认证和授权服务搭建">OAuth2.0 认证和授权服务搭建</h3>
+
+<p>很多企业是将认证授权服务直接集成到网关中，这么做耦合性太高了，这里直接将认证授权服务抽离出来。</p>
+
+<p>认证服务的搭建这里就不再细说了，上一篇文章中已经介绍的很清楚了：<a href="https://mp.weixin.qq.com/s?__biz=MzU3MDAzNDg1MA==&amp;mid=2247502801&amp;idx=1&amp;sn=56b1af09bfa25d5e44193a7d75dfa623&amp;chksm=fcf7141ccb809d0a1b0b2d7f6d9893c7d3e560dd8996296276f0274d2578236ee87e9124810d&amp;token=278610351&amp;lang=zh_CN#rd">OAuth2.0实战！使用JWT令牌认证！</a></p>
+
+<h3 id="接口测试">接口测试</h3>
+
+<p><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/4/8/169fb98af598c40c~tplv-t2oaga2asx-jj-mark:3024:0:0:0:q75.png" alt="img" /></p>
+
+<h3 id="knife4j-api-文档生成工具">Knife4j API 文档生成工具</h3>
+
+<h3 id="请求过滤"><del>请求过滤</del></h3>
+
+<p>请求过滤的方法：</p>
+
+<ol>
+  <li>封禁攻击者来源 IP</li>
+  <li>拒绝带有非法参数的请求</li>
+  <li>按来源 IP <strong><a href="#限流">限流</a></strong></li>
+  <li>按用户 ID 限流等</li>
+</ol>
