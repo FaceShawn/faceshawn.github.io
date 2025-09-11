@@ -515,11 +515,12 @@ leancloud_visitors:
   app_id: Y63qj1ziDgxjD6JioJybdlTy-gzGzoHsz #<app_id>
   app_key: s96WSb4zwTy2sHYvXrQpWuMA #<app_key>
 
+# 人数统计
 # Show PV/UV of the website/page with busuanzi.
 # Get more information on http://ibruce.info/2015/04/04/busuanzi/
 busuanzi_count:
   # count values only if the other configs are false
-  enable: true
+  enable: false
   # total_visitors: true
   # total_visitors_icon:
   # custom uv span for the whole site
