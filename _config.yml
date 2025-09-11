@@ -29,6 +29,7 @@ permalink: pretty
 #   rep: hex    # 进制：dec(default) and hex
 
 # Pagination
+# 分页页数
 paginate: 30
 #paginate_path: "/page:num/"
 #archive:
