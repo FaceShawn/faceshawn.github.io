@@ -1154,19 +1154,19 @@ int e = pq.poll(); // 删除/弹出堆顶元素
       <li>
         <p>常规思路：实现最大堆，弹出第 K 个元素；</p>
 
-        <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> // 默认创建最小堆，设置大小为k
- PriorityQueue&lt;ListNode&gt; pq = new PriorityQueue&lt;&gt;(k, (a, b) -&gt; {
-    return a.val - b.val;
- });
- // 改造为最大堆
- PriorityQueue&lt;Integer&gt; pq = new PriorityQueue&lt;&gt;(k, (a, b) -&gt; (b - a));
+        <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c1">// 默认创建最小堆，设置大小为k</span>
+ <span class="n">PriorityQueue</span><span class="o">&lt;</span><span class="n">ListNode</span><span class="o">&gt;</span> <span class="n">pq</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PriorityQueue</span><span class="o">&lt;&gt;(</span><span class="n">k</span><span class="o">,</span> <span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">b</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">a</span><span class="o">.</span><span class="na">val</span> <span class="o">-</span> <span class="n">b</span><span class="o">.</span><span class="na">val</span><span class="o">;</span>
+ <span class="o">});</span>
+ <span class="c1">// 改造为最大堆</span>
+ <span class="n">PriorityQueue</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">pq</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PriorityQueue</span><span class="o">&lt;&gt;(</span><span class="n">k</span><span class="o">,</span> <span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">b</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="o">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="o">));</span>
    
- PriorityQueue&lt;Integer&gt; pq = new PriorityQueue&lt;&gt;(new Comparator&lt;Integer&gt;() {
-    @Override
-    public int compare(Integer a, Integer b) {
-  	    return map.get(a) - map.get(b);
-    }
- });
+ <span class="n">PriorityQueue</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">pq</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PriorityQueue</span><span class="o">&lt;&gt;(</span><span class="k">new</span> <span class="n">Comparator</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">compare</span><span class="o">(</span><span class="n">Integer</span> <span class="n">a</span><span class="o">,</span> <span class="n">Integer</span> <span class="n">b</span><span class="o">)</span> <span class="o">{</span>
+  	    <span class="k">return</span> <span class="n">map</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">a</span><span class="o">)</span> <span class="o">-</span> <span class="n">map</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">b</span><span class="o">);</span>
+    <span class="o">}</span>
+ <span class="o">});</span>
 </code></pre></div>        </div>
       </li>
     </ul>
@@ -1192,7 +1192,7 @@ int e = pq.poll(); // 删除/弹出堆顶元素
       <li><code class="highlighter-rouge">pq</code> 中的元素个数最多是 <code class="highlighter-rouge">k</code>，一次 <code class="highlighter-rouge">poll</code> 或 <code class="highlighter-rouge">add</code> 方法的时间复杂度是 <code class="highlighter-rouge">logk</code>；所有节点都会被加入和弹出 <code class="highlighter-rouge">pq</code>，整体是 <code class="highlighter-rouge">Nlogk</code>，其中<code class="highlighter-rouge">N</code> 是所有链表的节点总数。</li>
     </ul>
 
-    <p><img src="https://blog-1257126549.cos.ap-guangzhou.myqcloud.com/blog/iuxmh.gif" alt="img" style="zoom:40%;" /></p>
+    <p><img src="../assets/90896.gif" alt="img" style="zoom:43%;" /></p>
   </li>
 </ol>
 

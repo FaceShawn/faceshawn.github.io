@@ -1,0 +1,814 @@
+---
+title: Spring Security
+categories:
+  - SSM框架
+tags:
+  - 微服务
+  - 分布式
+  - API网关
+  - Spring-Security
+  - 认证
+  - 授权
+location:
+  - 黄金时代
+abbrlink: 'spring_security'
+permalink: 'spring_security'
+date: 2025-06-12 13:42:12
+updated: 2025-06-12 13:42:12
+---
+
+> 摘要：Spring Security 认证（前后端分离）、授权，SSO 单点登录，SAML2，OAuth2，加密机制、漏洞防护/安全。
+
+<!-- more -->
+
+## 目录
+
+[TOC]
+
+## 入门简介
+
+Spring Security：是一种强大的**安全框架**，基于 Spring IOC/DI 和 AOP 功能，为系统提供了**声明式安全访问控制**功能，减少了为系统安全而编写大量重复代码的工作。
+
+- Spring Security （简称SS） 用于解决Java应用中的安全管理控制问题，这其中包含两个关键环节：
+    1. 认证
+    2. 授权
+- 简单来说：认证解决“你是谁”的问题，授权解决“你能做什么”的问题
+- 提供了多种身份验证、授权、加密和防止攻击等功能，可以根据用户的需求来选择适合自己应用场景的功能。
+- 可以帮助用户保护Web应用程序和REST API的安全性。
+- 可以提高应用程序的安全性，从而保护用户的敏感信息和数据。
+- 通过使用标准的 **Servlet Filter** 与 **Servlet 容器**集成。
+    - 这意味着它适用于任何在 Servlet 容器中运行的应用程序。
+    - 更具体地说，不需要在基于 Servlet 的应用程序中使用 Spring 来利用 Spring Security。
+
+### 主要功能
+
+> **核心功能**：认证和授权。Spring Security 围绕两个过程提供了基本的技术框架。
+
+Spring Security 的主要功能包括：
+
+1. **认证**（`Authenti’cation`）：验证用户的身份（例如用户名/用户 ID 和密码），通过这个凭据，系统得以知道**你是谁**。被称为**身份/用户验证**。
+    - 认证的含义是对动作主体进行标识的过程，其结果是认证成功或者不成功。
+        - 认证成功后，动作主体就可以继续以经过认证的安全主体身份发起对安全对象的操作。否则，将不可能继续后续操作。
+    - Spring Security 提供了多种**身份验证机制**，如**基于表单的**身份验证、HTTP基本身份验证、LDAP身份验证等。
+2. **授权**（`Authorization`）：发生在 **认证** 之后，主要掌管**系统权限控制**、**你有权限干什么**。比如有些特定资源只能具有特定权限的人才能访问、删除、添加、更新，比如 admin。
+    1. 授权是在**安全主体**对安全对象进行**操作前**的**权限检查**过程。只有通过该检查，安全主体才能够成功操作安全对象。
+    2. Spring Security 提供了 **RBAC 基于角色的权限访问控制**。
+    3. 权限（`Permission`）：通常指对**特定资源**的操作能力，如读取、写入或删除。
+    4. 角色（`Role`）：一组权限的集合。例如，管理员角色可能具有所有权限，而普通用户角色可能只有读取权限。
+3. **漏洞防护、安全**：
+    1. **加密**：提供了多种**加密算法**的支持，如`MD5、SHA、BCrypt`等。可以用加密API来对用户密码等敏感信息进行加密。
+    2. **防护机制**：提供了多种防止攻击的机制，如 **CSRF保护**、**XSS防护**、**会话管理**、防止会话劫持等。
+4. **单点登录**：提供了单点登录（SSO）的支持，可以帮助用户在**多个应用程序之间**实现单点登录。用户只需要进行一次登录，就可以**自动登录**到其他应用程序中，从而提高用户的使用体验。
+5. **集成其他框架**：可以与其他框架集成，如`Spring Boot、Spring MVC、Spring Cloud`等。用户可以在不改变现有框架架构的情况下，使用Spring Security来提高应用程序的安全性。
+
+### 常见的**认证和授权**方式
+
+> 认证和授权一般在系统中结合在一起使用，目的就是为了保护系统的安全性。
+
+在 Java 生态中，目前有 [Spring Security](https://spring.io/projects/spring-security) 和 [Apache Shiro](https://shiro.apache.org/) 两个安全框架，可以完成认证和授权的功能。
+
+1. Apache **Shiro** 权限管理框架：强大易用的 Java 安全框架，提供了认证、授权、加密和会话管理功能。
+2. Spring Security：
+    1. Session 和 Cookie 方案；
+    2. Token
+        1. JWT；
+        2. SSO 单点登录；（第三方）
+    3. OAuth2（开放授权）：强大的可高度定制的**认证和授权框架**，是一套 Web 安全标准。
+
+参考：[spring security 超详细使用教程（接入springboot、前后端分离）](https://www.cnblogs.com/xxctx/p/18441536)
+
+## 架构
+
+### Filter（过滤器）回顾
+
+> 见 SSM、Spring MVC 文档 Web 服务器部分，统一异常处理文档。
+
+### Security Filter
+
+> 见 SSM 整合 Spring Security 权限文档中的 添加配置类【自定义的 Spring Security 安全配置类  `SecurityConfig`】
+
+<img src="../assets/8fdccbc24a2225db315a8800cdfe1c09.png" alt="img" style="zoom:80%;" />
+
+### 基本概念和逻辑
+
+用代码来反映这句话的意思如下：
+
+```java
+Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+if (principal instanceof UserDetails) {
+    String username = ((UserDetails)principal).getUsername();
+} else {
+    String username = principal.toString();
+}
+```
+
+- `UserDetailsService` 仅有一个接口方法：
+
+```java
+UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
+```
+
+**认证的逻辑**基本如下：
+
+1. 用户提交用户名和密码，将请求信息封装为`Authenticaiton`。
+2. 认证 `authenticaiton`：
+    1. `UserDetailsService`（通过 `loadUserByUsername()` 方法获取用户信息）提供`UserDetails`接口。
+        - `UserDetails` 可以看作是**SS**与（应用业务中）**安全主体对象**衔接的适配器，应用也往往会将`UserDetails`转型为业务领域中的对应对象。
+    2. 通过 `PasswordEncode` 对比 `UserDetails` 中的密码与 `Authentication` 中的密码是否一致，
+    3. SS（通过**认证该信息后**）将其封装为`Authenticaiton`。SS使用`Au'thentication`对象，封装了对**安全主体**的表示。
+3. `Authenticaiton` 会放在安全控制上下文对象中（`SecurityConext`），并由`SecurityContextHolder`进行管理，以便应用中可以在一次用户级会话处理过程中随时可以使用安全上下文。
+    - `Security Context`：存储**已认证用户**的详细信息，应用程序中可以访问。作为SS为应用提供安全管理控制的上下文基础。
+4. 认证完毕后续的环节如果需要认证信息的话，就直接从`SecurityContextHolder`中取用即可。
+
+在**授权环节**：
+
+1. 授权环节的基础是`SecurityContextHolder`中的的`Authentication`，除了包含主体信息外，还会包含其关联的权限信息。
+2. 这些权限信息通常也都是通过`UserDetailsService`加载而来的。
+3. 使用`authentication.getAuthorities()`得到主体现有权限，匹配安全对象所需的访问权限，若满足则给予授权放行，反之与之拒绝。
+
+#### SecurityFrameworkUtils
+
+> 安全服务工具类
+
+- getAuthentication()
+- getLoginUserId()：从上下文中，获得当前用户的编号。常用于**其他模块**。
+
+```java
+// SecurityFrameworkUtils.java
+
+package cn..framework.security.core.util;
+
+/**
+ * 安全服务工具类
+ */
+public class SecurityFrameworkUtils {
+
+    /**
+     * HEADER 认证头 value 的前缀
+     */
+    public static final String AUTHORIZATION_BEARER = "Bearer";
+
+    public static final String LOGIN_USER_HEADER = "login-user";
+
+    private SecurityFrameworkUtils() {}
+
+    /**
+     * 从请求中，获得认证 Token
+     * @param request 请求
+     * @param headerName 认证 Token 对应的 Header 名字
+     * @param parameterName 认证 Token 对应的 Parameter 名字
+     * @return 认证 Token
+     */
+    public static String obtainAuthorization(HttpServletRequest request,
+                                             String headerName, String parameterName) {
+        // 1. 获得 Token。优先级：Header > Parameter
+        String token = request.getHeader(headerName);
+        if (StrUtil.isEmpty(token)) {
+            token = request.getParameter(parameterName);
+        }
+        if (!StringUtils.hasText(token)) {
+            return null;
+        }
+        // 2. 去除 Token 中带的 Bearer
+        int index = token.indexOf(AUTHORIZATION_BEARER + " ");
+        return index >= 0 ? token.substring(index + 7).trim() : token;
+    }
+
+    /**
+     * 获得当前认证信息
+     */
+    public static Authentication getAuthentication() {
+        SecurityContext context = SecurityContextHolder.getContext();
+        if (context == null) {
+            return null;
+        }
+        return context.getAuthentication();
+    }
+
+    /**
+     * 获取当前用户
+     */
+    @Nullable
+    public static LoginUser getLoginUser() {
+        Authentication authentication = getAuthentication();
+        if (authentication == null) {
+            return null;
+        }
+        return authentication.getPrincipal() instanceof LoginUser ? (LoginUser) authentication.getPrincipal() : null;
+    }
+
+    /**
+     * 获得当前用户的编号，从上下文中
+     */
+    @Nullable
+    public static Long getLoginUserId() {
+        LoginUser loginUser = getLoginUser();
+        return loginUser != null ? loginUser.getId() : null;
+    }
+
+    /**
+     * 获得当前用户的昵称，从上下文中
+     */
+    @Nullable
+    public static String getLoginUserNickname() {
+        LoginUser loginUser = getLoginUser();
+        return loginUser != null ? MapUtil.getStr(loginUser.getInfo(), LoginUser.INFO_KEY_NICKNAME) : null;
+    }
+
+    /**
+     * 设置当前用户
+     * @param loginUser 登录用户
+     * @param request 请求
+     */
+    public static void setLoginUser(LoginUser loginUser, HttpServletRequest request) {
+        // 创建 Authentication，并设置到上下文
+        Authentication authentication = buildAuthentication(loginUser, request);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // 额外设置到 request 中，用于 ApiAccessLogFilter 可以获取到用户编号；
+        // 原因是，Spring Security 的 Filter 在 ApiAccessLogFilter 后面，在它记录访问日志时，线上上下文已经没有用户编号等信息
+        if (request != null) {
+            WebFrameworkUtils.setLoginUserId(request, loginUser.getId());
+            WebFrameworkUtils.setLoginUserType(request, loginUser.getUserType());
+        }
+    }
+
+    private static Authentication buildAuthentication(LoginUser loginUser, HttpServletRequest request) {
+        // 创建 UsernamePasswordAuthenticationToken 对象
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                loginUser, null, Collections.emptyList());
+        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        return authenticationToken;
+    }
+
+    /**
+     * 是否条件跳过权限校验，包括数据权限、功能权限
+     */
+    public static boolean skipPermissionCheck() {
+        LoginUser loginUser = getLoginUser();
+        if (loginUser == null) {
+            return false;
+        }
+        if (loginUser.getVisitTenantId() == null) {
+            return false;
+        }
+        // 重点：跨租户访问时，无法进行权限校验
+        return ObjUtil.notEqual(loginUser.getVisitTenantId(), loginUser.getTenantId());
+    }
+}
+```
+
+
+
+### 基本应用方法
+
+SS为**安全管理**过程中的（关键环节中的）关键概念都进行了抽象定义，具体如何运用它，需要了解以下几个方面：
+
+1. SS面向Java应用领域，提供安全管理；
+2. SS以**AOP**的方法来实施安全管理；
+3. 由于SS解决的问题性质，它更多地体现为**一种设计框架**，而不是可以在其上可以直接构建业务的应用开发框架。使用SS需要对其一定程度的了解，复用的更多是其**设计结构**而不是代码黑箱。
+
+这里主要说明在Java应用中进行安全管理的问题。
+
+- 从技术上来讲，Java领域中的可基于AOP进行有效安全访问控制的安全对象可以分为两种：“**方法调用**”和“**Web请求调用**”。
+- 而SS正是以 “around advice” 对 **web request** （servlet filter baseed）和 **方法调用** （spring aop or aspectj based）来进行安全管理控制的。
+
+这样以来对SS的应用方法就比较容易理解了：
+
+- 当**构建Java Web应用**时，通常都会对Web Request进行安全控制。这时应该**在servlet filter层面**就应该着手来实施应用SS提供的各种部件了。在这么干的同时，也可以继续在业务层面上比如Servlet或者什么框架的action、service中继续进行方法对象的管理控制。
+- 如果不是Web应用场景，不需要而且也没机会去布置servlet filter层面的安全控制部件。直接在方法层面布置实施即可（当然，这里的java方法并不一定就直接是业务方法，通常应该是控制器引导方法之类的东西）。
+
+### Web Filters
+
+> 使用SS提供的Web Filters。
+>
+> 围绕Java Web应用继续详细说明SS的应用过程。
+
+构建Java Web应用时，使用SS进行Web资源访问控制，应该在servlet filter层面进行相关布置。
+
+- 具体就是在web应用描述符文件中配置一个DelegatingFilterProxy，并且在在spring context中配置SS提供的FilterChainProxy。
+
+- 如此一来SS就可介入servlet filter链过程，开始干活。而具体干活的就是其中的一串串的filters了。
+    - 那么这些filters都可以有哪些，顺序如何，都是干什么的？
+
+核心Filter：以下几个filter为必须使用的：
+
+1. SecurityContextPersistenceFilter
+2. [authentication processing filter] etc. UsernamePasswordAuthenticationFilter
+3. ExceptionTranslationFilter
+4. FilterSecurityInterceptor
+
+## 认证
+
+认证（identification）：指根据声明者所特有的识别信息，确认声明者的身份。
+
+最常见的认证实现方式是通过用户名和密码，但认证方式不限于此。下面都是当前常见到的认证技术，
+
+- 身份证
+- 用户名和密码
+- 用户手机：手机短信、手机二维码扫描、手势密码
+- 用户的电子邮箱
+- [基于时间序列和用户相关的一次性口令](https://tools.ietf.org/html/rfc6238)
+- 用户的生物学特征：指纹、语音、眼睛虹膜
+- 用户的大数据识别等
+
+为了确认用户的身份，防止伪造，在安全要求高的场合，经常会使用**组合认证**（或者叫多因素认证），也就是同时使用多个认证方式对用户的身份进行校验。
+
+#### 凭证（Credentials）
+
+- 实现认证和授权的前提是需要一种媒介（证书）来标记访问者的身份。
+    - 在互联网应用中，当用户登录成功后，服务器会给该用户使用的浏览器颁发一个**令牌**（token），用来表明你的身份，每次浏览器发送请求时会带上这个令牌，就可以使用游客模式下无法使用的功能。
+
+### ~~用户名、密码~~
+
+> 通过 PasswodEncoder 接口加密。
+
+### ~~持久化~~
+
+### ~~记住我的身份验证~~
+
+##### 基于哈希简单令牌法
+
+##### 持久化令牌法
+
+##### Remember-Me 的接口和实现
+
+### 会话管理
+
+会话管理：指在Java应用程序中管理用户会话状态的过程。
+
+- 在Spring框架中，可以使用Spring Session来实现会话管理。
+- Spring Session提供了一种机制，用于在不同的会话存储后端（例如内存、数据库、Redis等）中存储和管理会话数据。
+    - 提供了简单的API，用于创建、读取、更新和删除会话数据。可以使用Spring的依赖注入机制将Spring Session集成到应用程序中，并根据需要配置会话存储后端。
+
+例如：查看在线用户、踢人下线、账号只允许单人登录（包括两种限制策略：后来者顶掉前者、前者注销后才允许后来者登录）。
+
+### Cookie、Session、Token、JWT
+
+> 见 Cookie、Session、Token、JWT 文档。
+
+#### 无状态登录
+
+### 前后端分离的用户认证流程
+
+另参考：[前后端分离 SpringBoot + SpringSecurity + JWT + RBAC 实现用户无状态请求验证](https://www.iocoder.cn/Fight/Separate-SpringBoot-SpringSecurity-JWT-RBAC-from-front-and-rear-to-achieve-user-stateless-request-authentication/)
+
+#### 1. 用户登录
+
+- **前端**：
+    - 登录表单：用户在登录界面输入用户名和密码。
+    - 前端将这些凭证以 JSON 格式发送到后端的登录 API（例如 `POST /api/login`）。
+- **后端**：
+    - Spring Security 接收请求，使用 `AuthenticationManager` 进行身份验证。
+    - 如果认证成功，后端生成一个 `JWT` 或其他认证令牌，并将其返回给前端。
+
+#### 2. 使用 JWT 进行用户认证
+
+##### 2.1 前端存储 JWT
+
+- 前端收到 JWT 后，可以将其存储在 `localStorage` 或 `sessionStorage` 中，以便后续请求使用。
+
+##### 2.2 发送受保护请求
+
+- 在发送需要认证的请求时，前端将 JWT 添加到请求头中：
+
+```javascript
+fetch('/api/protected-endpoint', {
+    method: 'GET',
+    headers: {
+        'Authorization': `Bearer ${token}`
+    }
+});
+```
+
+##### 2.3 后端解析 JWT
+
+- Spring Security 通过**过滤器**来解析和验证 JWT。可以自定义一个 `JwtAuthenticationTokenFilter`类（继承并实现 `OncePerRequestFilter`）以**拦截请求**，提取 JWT，并验证其有效性。
+- `OncePerRequestFilter`：是实现自定义过滤器的基础，通常用于对请求进行**预处理**或后处理。是 Spring Security 提供的一个抽象类，确保在每个请求中只执行一次特定的过滤逻辑。
+    - 通过继承该类，可以轻松实现**自定义过滤器**适合用于**记录日志、身份验证、权限检查**等场景。
+
+#### 3. 退出登录
+
+由于 JWT 是**无状态**的，后端不需要记录会话状态。用户可以通过**前端操作**（例如，删除存储的 JWT）来退出登录。可以实现一个**注销接口**，用于前端执行相关逻辑。
+
+#### 4. 保护敏感信息
+
+1. 确保 HTTPS：在前后端通信中使用 HTTPS，确保传输中的数据安全。
+2. **令牌过期**：设置 JWT 的有效期，过期后需要用户重新登录。
+3. **刷新令牌**：可以实现刷新令牌的机制，以提高用户体验。
+
+
+
+## 授权
+
+简单来说，授权一般是指获取用户的委派权限。在英文中对应于authorization这个单词。
+
+在信息安全领域，授权是指资源所有者委派执行者，赋予执行者指定范围的资源操作权限，以便执行者代理执行对资源的相关操作。这里面包含有如下四个重要概念，
+
+- 资源所有者，拥有资源的所有权利，一般就是资源的拥有者。
+- 资源执行者，被委派去执行资源的相关操作。
+- 操作权限，可以对资源进行的某种操作。
+- 资源，有价值的信息或数据等，受到安全保护。
+
+需要说明的是，资源所有者和执行者可以是自然人，就是普通用户，但不限于自然人。在信息安全领域，资源所有者和执行者，很多时候是应用程序或者机器。比如用户在浏览器上登录一个网站，那么这个浏览器就成为一个执行者，它在用户登录后获取了用户的授权，代表着用户执行各种指令，进行购物、下单、付钱、转账等等操作。
+
+![img](https://static.iocoder.cn/d3027423247936b6e1aaf3e071fcc8f1)
+
+同时，资源所有者和执行者可以是分开的不同实体，也可以是同一个。若是分开的两者，则资源执行者是以资源所有者的代理形式而存在。
+
+授权的实现方式非常多也很广泛，我们常见的银行卡、门禁卡、钥匙、公证书，这些都是现实生活中授权的实现方式。其实现方式主要通过一个共信的媒介完成，这个媒介不可被篡改，不可随意伪造，很多时候需要受保护，防止被窃取。
+
+在互联网应用开发领域，授权所用到的授信媒介主要包括如下几种，
+
+- 通过web服务器的session机制，一个访问会话保持着用户的授权信息
+- 通过web浏览器的cookie机制，一个网站的cookie保持着用户的授权信息
+- 颁发授权令牌（token），一个合法有效的令牌中保持着用户的授权信息
+
+前面两者常见于web开发，需要有浏览器的支持。
+
+### 访问控制
+
+目前业界主流的**权限模型**有两种：
+
+- 基于**角色**的权限访问控制（RBAC）
+- 基于**属性**的权限访问控制（ABAC）
+
+#### RBAC
+
+基于角色的权限访问控制（`Role-Based Access Control`，**RBAC**）：指的是通过用户的**角色**授权其相关权限，实现了灵活的访问控制，相比直接授予用户权限，要更加简单、高效、可扩展。
+
+- 这是一种通过角色关联权限，角色同时又关联用户的授权的方式。
+
+- 简单地说：一个用户可以**拥有**若干角色，每一个角色又可以被分配若干**权限、菜单**，这样就构造成“**用户-角色-权限**” 的授权模型。用户与角色、角色与权限之间构成了**多对多**的关系。
+
+<img src="../assets/rbac.png" alt="" style="zoom:100%;" />
+
+在 RBAC 权限模型中，权限与角色相关联，用户通过成为（包含特定角色的）成员而得到这些角色的权限，这就极大地**简化了权限的管理**。
+
+为了实现 RBAC 权限模型，数据库表的常见设计如下（一共 5 张表，2 张建立表之间的联系）：
+
+1. 用户详情表
+2. 用户角色联系表
+3. **角色详情表**
+4. 角色权限联系表
+5. **权限详情表**
+6. 角色菜单联系表
+7. 菜单详情表
+
+通过这个权限模型，可以创建不同的角色、并为不同的角色分配不同的**权限范围（菜单）**。
+
+<img src="../assets/数据库设计-权限.png" alt="" style="zoom:100%;" />
+
+<img src="../assets/rbac02.png" alt="权限模型" style="zoom: 67%;" />
+
+![](../assets/books权限管理模块.png)
+
+#### ABAC
+
+基于**属性**的访问控制（`Attribute-Based Access Control`，**ABAC**）：原理是通过各种属性来**动态判断**一个操作是否可以被允许。
+
+- 是一种比 `RBAC模型` 更加灵活的授权模型。在云系统中使用的比较多，比如 AWS，阿里云等。
+
+考虑下面这些场景的权限控制：
+
+1. 授权某个人具体某本书的编辑权限
+2. 当一个文档的所属部门跟用户的部门相同时，用户可以访问这个文档
+3. 当用户是一个文档的拥有者并且文档的状态是草稿，用户可以编辑这个文档
+4. 早上九点前禁止 A 部门的人访问 B 系统
+5. 在除了上海以外的地方禁止以管理员身份访问 A 系统
+6. 用户对 2022-06-07 之前创建的订单有操作权限
+
+可以发现上述的场景通过 `RBAC模型` 很难去实现，因为 `RBAC模型` 仅仅描述了用户可以做什么操作，但是**操作的条件，以及操作的数据**，`RBAC模型` 本身是没有这些限制的。
+
+但这恰恰是 `ABAC模型` 的长处，`ABAC模型` 的思想是基于**用户、访问的数据的属性**、以及**各种环境因素**去**动态计算**用户是否有权限进行操作。
+
+ABAC 模型的**原理**：
+
+在 `ABAC模型` 中，一个操作是否被允许是基于**对象、资源、操作和环境信息**共同**动态计算**决定的。
+
+- **对象**：是当前请求访问资源的用户。用户的属性包括 ID，个人资源，角色，部门和组织成员身份等
+- **资源**：是当前用户要访问的资产或对象，例如文件，数据，服务器，甚至 API
+- **操作**：是用户试图对资源进行的操作。常见的操作包括“读取”，“写入”，“编辑”，“复制”和“删除”
+- **环境**：是每个访问请求的上下文。环境属性包含访问的时间和位置，对象的设备，通信协议和加密强度等
+
+在 `ABAC模型` 的决策语句的执行过程中，决策引擎会根据定义好的决策语句，结合对象、资源、操作、环境等因素动态计算出决策结果。
+
+- 每当发生访问请求时，`ABAC模型` 决策系统都会分析属性值是否与已建立的策略匹配。
+- 如果有匹配的策略，访问请求就会被通过。
+
+### 请求访问权限方法
+
+> 控制请求访问权限的方法。
+
+- `permitAll()`：无条件允许任何形式访问，不管登录还是没有登录。
+- `au'thenticated()`：只允许**已认证的**用户访问。
+    - `fullyAuthenticated()`：只允许**已经登录**或者通过 remember-me 登录的用户访问。
+- `anonymous()`：允许**匿名访问**，也就是没有登录才可以访问。
+- `denyAll()`：无条件**拒绝任何形式**的访问。
+- `hasRole(String)` : 只允许**指定的角色**访问。
+    - `hasAnyRole(String)` : 指定一个或者多个角色，满足其一的用户即可访问。
+- `hasAuthority(String)`：只允许具有**指定权限**的用户访问。
+    - `hasAnyAuthority(String)`：指定一个或者多个权限，满足其一的用户即可访问。
+- `hasIpAddress(String)` : 只允许指定 ip 的用户访问。
+
+### ~~授权服务器~~
+
+### ~~授权 HTTP 请求~~
+
+## 鉴权
+
+鉴权是指对于一个声明者所声明的身份权利，对其所声明的真实性进行鉴别确认的过程。在英文中对应于authentication这个单词。
+
+鉴权主要是对声明者所声明的真实性进行校验。若从授权出发，则会更加容易理解鉴权。授权和鉴权是两个上下游相匹配的关系，先授权，后鉴权。授权和鉴权两个词中的“权”，是同一个概念，就是所委派的权利，在实现上即为授信媒介的表达形式。
+
+因此，鉴权的实现方式是和授权方式有一一对应关系。对授权所颁发授信媒介进行解析，确认其真实性。下面是鉴权的一些实现方式，
+
+- 门禁卡：通过门禁卡识别器
+- 钥匙：通过相匹配的锁
+- 银行卡：通过银行卡识别器
+- 互联网web开发领域的session/cookie/token：校验session/cookie/token的合法性和有效性
+
+鉴权是一个承上启下的一个环节，上游它接受授权的输出，校验其真实性后，然后获取权限（permission），这个将会为下一步的权限控制做好准备。
+
+[![img](https://static.iocoder.cn/debef2d1a45c643d54f5f00aea144889)](https://static.iocoder.cn/debef2d1a45c643d54f5f00aea144889)
+
+## 权限控制
+
+权限控制是指对可执行的各种操作组合配置为权限列表，然后根据执行者的权限，若其操作在权限范围内，则允许执行，否则禁止。权限控制在英文中对应于access/permission control。
+
+对于权限控制，可以分为两部分进行理解：一个是权限，另一个是控制。权限是抽象的逻辑概念，而控制是具体的实现方式。
+
+先看权限（Permission），这是一个抽象的概念，一般预先定义和配置好，以便控制的具体实现。权限的定义，若简单点，可以直接对应于一个可执行的操作集合。而一般情况下，会有基于角色的方式来定义权限，由角色来封装可执行的操作集合。
+
+若以门禁卡的权限实现为例，上述两种定义方式则可以各自表达为，
+
+- 这是一个门禁卡，拥有开公司所有的门的权限
+- 这是一个门禁卡，拥有管理员角色的权限，因而可以开公司所有的门
+
+可以看到，权限作为一个抽象的概念，将执行者和可具体执行的操作相分离。
+
+在上文的讨论中，鉴权的输出是权限（Permission）。一旦有了权限，便知道了可执行的操作，接下来就是控制的事情了。
+
+对于控制，是根据执行者的权限，对其所执行的操作进行判断，决定允许或禁止当前操作的执行。现实生活中控制的实现方式，多种多样，
+
+- 门禁：控制门的开关
+- 自行车锁：控制车轮
+- 互联网web后端服务：控制接口访问，允许或拒绝访问请求
+
+## 认证、授权、鉴权、权限控制的关系
+
+认证、授权、鉴权和权限控制这四个环节是一个前后依次发生、上下游的关系，
+
+认证-->授权-->鉴权-->权限控制
+
+需要说明的是，这四个环节在有些时候会同时发生。 例如在下面的几个场景，
+
+- 使用门禁卡开门：认证、授权、鉴权、权限控制四个环节一气呵成，在瞬间同时发生
+- 用户的网站登录：用户在使用用户名和密码进行登录时，认证和授权两个环节一同完成，而鉴权和权限控制则发生在后续的请求访问中，比如在选购物品或支付时。
+
+无论怎样，若从时间顺序方面来看，这四个环节是按时间前后、依次相继发生的关系。
+
+### 认证和鉴权的关系
+
+这两个概念在很多时候是被混淆最多的概念。被混淆的主要原因，如上文所述，很多时候认证、授权、鉴权和权限控制一同发生，以至于被误解为，认证就是鉴权，鉴权就是认证。
+
+其实两者是不一样的概念，两者都有对身份的确认过程，但是两者的主要区别在于，
+
+- 认证是确认声明者的本身身份，其作为授权的上游衔接而存在
+- 鉴权是对声明者所声明的真实性进行确认的过程，其作为授权的下游衔接而存在
+
+### 小结
+
+用一个表格进行小结
+
+| 四个概念 | 定义                                                         | 英文                      | 实现方式                                                     |
+| :------- | :----------------------------------------------------------- | :------------------------ | :----------------------------------------------------------- |
+| 认证     | 确认声明者的身份                                             | identification            | 根据声明者独特的识别信息                                     |
+| 授权     | 获取用户的委派权限                                           | authorization             | 颁发一个授信媒介，不可被篡改，不可伪造，受保护               |
+| 鉴权     | 对所声明的权限真实性进行鉴别的过程权限是一个抽象的逻辑概念，定义和配置可执行的操作，而控制是具体的实现方式，通过一定的方式控制操作的允许和禁止 | authentication            | 鉴权和授权是一一对应关系，解析授信媒介，确认其合法性、有效性 |
+| 权限控制 | 权限是一个抽象的逻辑概念，定义和配置可执行的操作，而控制是具体的实现方式，通过一定的方式控制操作的允许和禁止 | access/permission control | 实现方式多样，根据具体情况来实现。                           |
+
+## SSO 单点登录
+
+单点登录（SSO，`Single Sign On`）：让用户通过**一次身份验证**登录多个应用程序和网站。一旦验证身份，用户就可以访问所有受密码保护的资源，而无需**重复登录**。
+
+- ~~用户登陆多个**子系统**的其中一个就有权访问与其相关的其他系统。~~
+
+好处：
+
+- 用户角度：用户能够做到一次登录多次使用，无需记录多套用户名和密码，省心。
+- 系统管理员角度：管理员只需维护好一个统一的账号中心就可以了，方便。
+- 新系统开发角度：新系统开发时只需直接对接统一的账号中心即可，简化开发流程，省时。
+
+### 工作原理
+
+SSO 流程如下：
+
+1. 当用户登录应用程序时，应用程序会**生成 SSO 令牌**并向 SSO 服务发送身份验证请求。 
+2. 该服务会检查用户之前是否在系统中进行了身份验证。
+    1. 如果是，它会向应用程序发送一个身份验证确认响应，以授予用户访问权限。 
+    2. 如果用户没有经过验证的凭证，SSO 服务会将用户**重定向**到中央登录系统，并提示用户提交用户名和密码。
+        - 提交后，服务会验证用户凭证，并将肯定响应发送到应用程序。 
+        - 否则，用户会收到错误消息并且必须重新输入凭证。多次尝试登录失败可能会导致服务阻止用户在固定的时间段内进行更多尝试。 
+
+### ~~用户登录/登录校验~~
+
+### ~~跨域登录、登出~~
+
+### 类型
+
+SSO 解决方案使用不同的标准和协议来对用户凭证进行验证和身份验证。
+
+1. **SAML**（安全断言标记语言）：是应用程序用来与 SSO 服务**交换身份验证信息**的协议或规则集。使用 XML 来交换用户标识数据。
+
+    - 基于 SAML 的 SSO 服务提供更好的安全性和灵活性，因为应用程序不需要在其系统上存储用户凭证。
+
+2. **OAuth**（开放授权）：是一种开放标准，允许应用程序安全地**从其他网站**获取用户信息，而无需提供密码。
+
+    - 应用程序不是请求用户密码，而是使用 OAuth 来获得用户访问受密码保护的数据的**权限**。
+
+    - OAuth 通过 API 建立应用程序之间的信任，允许应用程序在已建立的框架中发送和响应身份验证请求。
+
+3. **OIDC、OpenID**：使用一组用户凭证访问多个站点的方法。允许**服务提供商**承担验证用户凭证的角色。Web 应用程序不是将身份验证令牌传递给第三方身份提供商，而是使用 OIDC 来请求附加信息并验证用户的真实性。
+
+4. **Kerberos**：一种基于**票证**的身份验证系统，可让两方或多方在网络上相互验证其身份。使用**安全密码学**来防止未经授权访问在服务器、客户端和密钥分发中心之间传输的标识信息。
+
+## ~~SAML2~~
+
+## OAuth2
+
+> 见 OAuth2 文档。
+
+## 加密机制
+
+### PasswordEncoder 接口
+
+Spring Security 提供了多种**加密算法**的实现，开箱即用，非常方便。
+
+这些加密算法实现类的接口是 `PasswordEncoder` ，一共就 3 个必须实现的方法，用于定义密码的**加密和验证**方法。
+
+0. 配置 `PasswordEncoder`，在 Spring Security 的**配置类**中定义 `PasswordEncoder` bean；
+    - 官方推荐基于 `BCryptPasswordEncoder()` **强哈希函数**的加密算法实现类。
+1. `encode()` 方法：在注册用户或更新密码时，用于**加密密码**；
+2. `matches()` 方法：在用户登录时，用于**验证**输入的密码与存储的加密密码是否匹配。
+3. `upgradeEncoding()`：如果解析的密码能够**再次进行解析**、且达到更安全的结果，则返回true，否则返回false。默认返回false。
+    1. 如，有些加密算法需要经过多次迭代加密。
+    2. 如，`BCryptPasswordEncoder`类的实现（`strength`属性越大，需要做更多的工作来加密密码，默认值为`10`）。
+
+```java
+public interface PasswordEncoder {
+    // 加密，即对原始密码进行编码
+    String encode(CharSequence var1);
+    // 比对原始密码和数据库中保存的密码
+    boolean matches(CharSequence var1, String var2);
+    // 判断加密密码是否需要再次进行加密，默认返回 false
+    default boolean upgradeEncoding(String encodedPassword) {
+        return false;
+    }
+}
+```
+
+### 加密算法
+
+加密算法：通常指的是可以将明文转换为密文，并且能够通过某种方式（如密钥）再将密文还原为明文的算法。
+
+- 是一种用数学方法对数据进行变换的技术，目的是保护数据的安全，防止被未经授权的人读取或修改。
+
+日常开发中常见的场景：
+
+1. 密码。
+2. 数据库中的敏感数据（比如银行卡号、身份号）需要使用**对称加密算法**（比如 AES）保存。
+3. **网络传输**的敏感数据（比如银行卡号、身份号）需要用 HTTPS + 非对称加密算法（如 RSA）来保证传输数据的安全性。
+
+加密算法可以分为三大类：
+
+1. **哈希算法**：将任意长度的数据（输入信息）转换成一个**固定长度**的、看似随机的**唯一标识**（哈希值）。可以用来验证数据的**完整性和一致性**，常见的哈希算法有 `MD、SHA、MAC` 等。
+    - 是一种单向过程，这个过程是**不可逆**的，即，不能从哈希值还原出原始信息。
+2. **对称加密算法**：是一种加密和解密使用**同一个密钥**的算法，可以用来保护数据的安全性和保密性，常见的对称加密算法有 `DES、3DES、AES` 等。
+3. **非对称加密算法**：是一种加密和解密使用**不同的密钥**的算法，可以用来实现数据的安全传输和身份认证，常见的非对称加密算法有 `RSA、DSA、ECC` 等。
+
+#### 哈希算法
+
+哈希算法（散列函数、摘要算法）：作用是对任意长度的数据生成一个固定长度的唯一标识，也叫哈希值、散列值、消息摘要。
+
+- 是一种从任何一种数据中创建小的数字“指纹”的方法。
+- 哈希算法将数据重新打乱混合，重新创建一个哈希值。
+
+<img src="../assets/hash-function-effect-demonstration.png" alt="哈希算法效果演示" style="zoom: 80%;" />
+
+哈希算法的是**不可逆**的，无法通过哈希之后的值再得到原值。
+
+哈希值的作用是可以用来验证数据的**完整性和一致性**。
+
+- 主要用来保障数据真实性(即完整性)，即发信人将原始消息和哈希值一起发送，收信人通过相同的哈希函数来校验原始数据是否真实。
+
+举两个实际的例子：
+
+- 保存密码到数据库时使用哈希算法进行加密，可以通过比较用户**输入密码的哈希值**和数据库保存的哈希值是否一致，来判断密码是否正确。
+- 下载一个文件时，可以通过比较**文件的哈希值**和官方提供的哈希值是否一致，来判断文件是否被篡改或损坏；
+
+##### 分类
+
+哈希算法可以简单分为两类：
+
+1. **加密哈希算法**：安全性相对较高，可以提供一定的数据完整性保护和数据防篡改能力，能够抵御一定的攻击手段，但**性能较差**，适用于**对安全性要求较高**的场景。例如 `SHA2、SHA3、SM3、RIPEMD-160、BLAKE2、SipHash` 等等。
+2. **非加密哈希算法**：安全性相对较低，易受到暴力破解、冲突攻击等攻击手段的影响，但**性能较高**，适用于对安全性没有要求的业务场景。例如 `CRC32、MurMurHash3、SipHash` 等。
+3. 除了这两种之外，还有一些特殊的哈希算法，例如安全性更高的**慢哈希算法**。
+
+##### 常见的哈希算法
+
+1. ~~**MD**~~（Message Digest，消息摘要算法）：MD2、MD4、MD5 等，已经不被推荐使用。
+2. **SHA**（Secure Hash Algorithm，安全哈希算法）：SHA-1 系列安全性低，SHA2，SHA3 系列安全性较高。
+3. **Bcrypt**（密码哈希算法）：基于 Blowfish 加密算法的密码哈希算法，专门为**密码加密**而设计，安全性高，属于**慢哈希算法**。
+4. 需要**密钥**：哈希算法一般是不需要密钥的，但也存在部分特殊哈希算法需要密钥。例如，MAC 和 SipHash ，在哈希算法的基础上增加了一个密钥，使得只有知道密钥的人才能验证数据的完整性和来源。
+    1. **MAC**（`Message Authentication Code`，消息认证码算法）：HMAC 是一种基于哈希的 MAC，可以与任何安全的哈希算法结合使用，例如 SHA-256。
+    2. **SipHash**：加密哈希算法，设计目的是在速度和安全性之间达到一个平衡，用于防御**哈希泛洪 DoS 攻击**。Rust 默认使用 SipHash 作为哈希算法，从 Redis4.0 开始，哈希算法被替换为 SipHash。
+5. **国密算法**：例如 SM2、SM3、SM4，其中 SM2 为**非对称加密算法**，SM3 为**哈希算法**（安全性及效率和 SHA-256 相当，但更适合国内的应用环境），SM4 为**对称加密算法**。
+6. **CRC**（Cyclic Redundancy Check，循环冗余校验）：CRC32 是一种 CRC 算法，特点是生成 32 位的校验值，通常用于**数据完整性校验**、文件校验等场景。
+7. **MurMurHash**：经典快速的**非加密哈希算法**，目前最新的版本是 MurMurHash3，可以生成 32 位或者 128 位哈希值。
+
+##### SHA
+
+##### Bcrypt
+
+Java 应用程序的安全框架 Spring Security 支持多种密码编码器，其中 `BCryptPasswordEncoder` 是官方推荐的一种，使用 BCrypt 算法对用户的密码进行加密存储。
+
+```java
+@Bean
+public PasswordEncoder passwordEncoder(){
+    return new BCryptPasswordEncoder();
+}
+```
+
+##### MAC
+
+#### 对称加密
+
+对称加密算法：是指加密和解密使用**同一个密钥**的算法，也叫**共享密钥**加密算法。
+
+![对称加密](../assets/symmetric-encryption.png)
+
+常见的对称加密算法有 DES、3DES、AES 等。
+
+##### DES 和 3DES
+
+DES（`Data Encryption Standard`）使用 64 位的密钥（有效秘钥长度为 56 位,8 位奇偶校验位）和 64 位的明文进行加密。
+
+这是一个经典的对称加密算法，但也有明显的缺陷：即 **56 位的密钥**安全性不足，已被证实可以在短时间内破解。
+
+> 为了提高 DES 算法的安全性，人们提出了一些变种或者替代方案，例如 3DES（Triple DES）。
+
+3DES（Triple DES）是 DES 向 AES 过渡的加密算法，使用 2 个或者 3 个 56 位的密钥对数据进行**三次加密**。3DES 相当于是对每个数据块应用三次 DES 的对称加密算法。
+
+##### AES
+
+AES（`Advanced Encryption Standard`）算法：是一种更先进的对称密钥加密算法，使用 **128 位、192 位或 256 位的密钥**对数据进行加密或解密，密钥越长，安全性越高。
+
+#### 非对称加密
+
+非对称加密算法（公开密钥加密算法）：是指加密和解密使用**不同的密钥**的算法。
+
+- 这两个密钥互不相同，一个称为公钥，另一个称为私钥。公钥可以公开给任何人使用，私钥则要保密。
+- 如果用公钥加密数据，只能用对应的私钥解密（加密）；
+- 如果用私钥加密数据，只能用对应的公钥解密（签名）。这样就可以实现数据的安全传输和身份认证。
+
+![非对称加密](../assets/asymmetric-encryption.png)
+
+常见的非对称加密算法有 RSA、DSA、ECC 等。
+
+##### RSA
+
+RSA（`Rivest–Shamir–Adleman algorithm`）算法：是一种**基于大数分解**的（困难性的）非对称加密算法，需要选择两个**大素数**作为私钥的一部分，然后计算出**它们的乘积**作为公钥的一部分（寻求两个大素数比较简单，而将它们的乘积进行**因式分解**却极其困难）。
+
+RSA 算法的优点是**简单易用**，可以用于数据加密和数字签名；缺点是运算**速度慢**，不适合大量数据的加密。
+
+RSA 算法是是目前应用最广泛的非对称加密算法，像 **SSL/TLS、SSH 等协议**中就用到了 RSA 算法。
+
+##### DSA
+
+DSA（`Digital Signature Algorithm`）算法：是一种**基于离散对数**的（困难性的）非对称加密算法。
+
+- 需要选择一个素数 q 和其倍数 p 作为私钥的一部分，然后计算出一个模 p 的原根 g 和一个模 q 的整数 y 作为公钥的一部分。
+
+- DSA 算法的安全性依赖于**离散对数的难度**，目前已经有 1024 位的 DSA 公钥被成功破解，因此建议使用 2048 位或以上的密钥长度。
+
+- DSA 算法的优点是**数字签名速度快**，适合生成数字证书；缺点是不能用于**数据加密**，且签名过程需要随机数。
+
+## 漏洞防护/安全
+
+### CSRF
+
+> 见攻击技术和漏洞防护文档。
+
+### ~~HTTP 安全响应头~~
+
+
+
+### ~~HTTP 防火墙~~
+
+
+
+### 数据脱敏、敏感词过滤
+
+> 见数据脱敏文档。
+

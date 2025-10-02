@@ -1,0 +1,451 @@
+<blockquote>
+  <p>摘要：<strong>开放授权</strong>（<code class="highlighter-rouge">OAuth</code>）：是一个行业的标准授权协议，主要用来<strong>授权第三方应用</strong>获取有限的权限。重点是 OAuth2 的四种角色和客户端的四种授权模式。</p>
+</blockquote>
+
+<!-- more -->
+
+<h2 id="目录">目录</h2>
+
+<p>[TOC]</p>
+
+<h2 id="oauth2">OAuth2</h2>
+
+<p><strong>开放授权</strong>（<code class="highlighter-rouge">OAuth</code>）：是一个行业的标准授权协议，主要用来<strong>授权第三方应用</strong>获取有限的权限。</p>
+
+<ul>
+  <li>最终目的是：为<strong>第三方应用</strong>颁发一个<strong>有时效性</strong>的令牌 Token，使得第三方应用能够（通过该令牌）获取相关的资源，如该用户在某一网站上存储的私密资源（如照片）。</li>
+  <li>OAuth 允许用户提供一个<strong>令牌（access token）</strong>，而不是<strong>用户名和密码</strong>来访问（存放在特定服务提供者的）数据。</li>
+  <li>而 OAuth 2.0 是对 OAuth 1.0 的完全重新设计，更快、更容易实现，OAuth 1.0 已经被废弃。</li>
+</ul>
+
+<p>OAuth 2.0 常用场景：</p>
+
+<ul>
+  <li>比较常用的场景就是<strong>第三方登录</strong>；</li>
+  <li>另外，也常见于<strong>支付场景</strong>（微信支付、支付宝支付）和开发平台（微信开放平台、阿里开放平台等）。</li>
+</ul>
+
+<p>参考：</p>
+
+<p>阮一峰提供了几篇关于 OAuth2.0 非常不错的文章，推荐胖友去从瞅瞅。</p>
+
+<p>同时，本文也会直接引用它的内容，方便胖友统一理解。</p>
+
+<ul>
+  <li><a href="http://www.iocoder.cn/Fight/ruanyifeng-oauth_2_0/?self">《理解 OAuth2.0》</a></li>
+  <li><a href="http://www.iocoder.cn/Fight/ruanyifeng-oauth_design/?self">《OAuth2.0 的一个简单解释》</a></li>
+  <li><a href="http://www.iocoder.cn/Fight/ruanyifeng-oauth-grant-types/?self">《OAuth2.0 的四种方式》</a></li>
+  <li>
+    <p><a href="http://www.iocoder.cn/Fight/ruanyifeng-github-oauth/?self">《GitHub OAuth 第三方登录示例教程》</a></p>
+  </li>
+  <li><a href="做微服务绕不过的 OAuth2，松哥也来和大家扯一扯">https://mp.weixin.qq.com/s?__biz=MzI1NDY0MTkzNQ==&amp;mid=2247488209&amp;idx=2&amp;sn=19b1e44fbb1f4c1210f0fa92a618d871&amp;scene=21#wechat_redirect</a>，四种认证流程举例</li>
+</ul>
+
+<h4 id="角色">角色</h4>
+
+<p>在 OAuth2.0 中，有如下角色：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">Resource Owner</code>：资源所有者。最终用户，他有访问资源的<strong>账号</strong>与<strong>密码</strong>。
+    <ul>
+      <li>可以简单理解成<strong>人</strong>，她在使用 Client 访问资源。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">User Agent</code>：用户代理，<strong>Client 客户端</strong>。它请求资源服务器时，会带上<strong>访问令牌</strong>，从而成功访问资源。
+    <ul>
+      <li>可以是浏览器、客户端，也可以是内部服务。第三方登录时的<strong>当前 APP</strong>。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">Authorization server</code>：<strong>认证（授权）服务器</strong>，用于认证用户。如果客户端认证通过，则发放访问资源服务器的<strong>令牌</strong>。
+    <ul>
+      <li>第三方登录时的<strong>第三方 服务器</strong>。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">Resource server</code>：<strong>资源服务器</strong>，，拥有受保护资源。如果请求包含正确的<strong>访问令牌</strong>，则可以访问资源。
+    <ul>
+      <li>提供管理后台、客户端 API 的服务，都可以认为是 Resource Server。</li>
+      <li>与认证服务器，可以是同一台服务器，也可以是不同的。</li>
+      <li>第三方登录时的<strong>第三方 服务器</strong>。这个时候的资源，主要指的是三方开放平台的<strong>用户资料</strong>等。</li>
+    </ul>
+  </li>
+</ol>
+
+<p>OAuth 2.0 <strong>第三方登录</strong>，授权码模式的认证流程：</p>
+
+<p><img src="../assets/20210615151716340.png" style="zoom:80%;" /></p>
+
+<h2 id="客户端的四种授权模式">客户端的四种授权模式</h2>
+
+<p>客户端必须得到用户的授权（authorization grant），才能获得令牌（access token）。</p>
+
+<p>OAuth 2.0定义了四种授权方式：</p>
+
+<ol>
+  <li><strong>密码模式</strong>（resource owner password credentials）：用户向<strong>客户端</strong>（原生 APP）提供自己的用户名和密码。客户端使用这些信息，向<strong>授权服务器</strong>索要授权、<strong>申请令牌（token）</strong>。</li>
+  <li><strong>授权码模式</strong>（authorization code）：通过客户端的<strong>后台服务器</strong>（作为代理客户端），与服务提供商的<strong>认证服务器</strong>进行互动。功能最完整、流程最严密。如常见的<strong>第三方平台登录</strong>功能。
+    <ul>
+      <li>一般情况下，<strong>在有客户端</strong>的情况下，我们与第三方平台常常采用这种方式。</li>
+    </ul>
+  </li>
+  <li><strong>简化模式</strong>（implicit）：不通过第三方应用程序的服务器，直接在浏览器中向<strong>认证服务器</strong>申请令牌，跳过了”<strong>授权码</strong>“这个步骤。
+    <ul>
+      <li>所有步骤<strong>在浏览器中</strong>完成，令牌<strong>对访问者</strong>是可见的，且客户端不需要<strong>认证</strong>。</li>
+      <li>一般用于网站是纯静态页面。</li>
+    </ul>
+  </li>
+  <li><strong>客户端模式</strong>（client credentials）：指客户端<strong>以自己的名义</strong>，而不是以用户的名义，向<strong>授权服务器</strong>进行认证。
+    <ul>
+      <li>在这种模式中，用户直接向客户端注册，客户端以自己的名义要求授权服务器提供服务，其实不存在授权问题。</li>
+      <li>如，对接微信公众号时。<strong>后端服务器</strong>就扮演“<strong>客户端</strong>”的角色，与微信公众号的<strong>后端服务器</strong>进行交互。</li>
+    </ul>
+  </li>
+  <li>refresh_token：？</li>
+</ol>
+
+<p>其中，<strong>密码模式</strong>和<strong>授权码模式</strong>比较常用。</p>
+
+<p>如何选择：FROM <a href="https://portal.qiniu.com/bucket/blog/resource">《深度剖析 OAuth2 和微服务安全架构》</a></p>
+
+<p><img src="../assets/oauth215.png" alt="授权类型选择" style="zoom: 36%;" /></p>
+
+<p>当然，对于<strong>黄框</strong>部分，对于笔者还是比较困惑的。笔者认为，第三方的单页应用 SPA ，也是适合采用 Authorization Code Grant 授权模式的。例如，<a href="https://mp.weixin.qq.com/wiki?t=resource/res_main&amp;id=mp1421140842">《微信网页授权》</a> ：</p>
+
+<blockquote>
+  <p>具体而言，网页授权流程分为四步：</p>
+
+  <ul>
+    <li>1、引导用户进入授权页面同意授权，获取 code</li>
+    <li>2、通过 code 换取网页授权 access_token（与基础支持中的 access_toke n不同）</li>
+    <li>3、如果需要，开发者可以刷新网页授权 access_token，避免过期</li>
+    <li>4、通过网页授权 access_token 和 openid 获取用户基本信息（支持 UnionID 机制）</li>
+  </ul>
+</blockquote>
+
+<p>所以，艿艿猜测，之所以图中画的是 Implicit Grant 的原因是，受 Google 的 <a href="https://developers.google.com/identity/protocols/OAuth2UserAgent">《OAuth 2.0 for Client-side Web Applications》</a> 一文中，推荐使用了 Implicit Grant 。</p>
+
+<ul>
+  <li>当然，具体使用 Implicit Grant 还是 Authorization Code Grant 授权模式，没有定论。</li>
+  <li>笔者，偏向于使用 <strong>Authorization Code Grant</strong>，对于第三方客户端的场景。</li>
+</ul>
+
+<h3 id="密码模式">密码模式</h3>
+
+<p>认证流程：</p>
+
+<ul>
+  <li>（A）用户向客户端提供<strong>用户名和密码</strong>。</li>
+  <li>（B）客户端将其发给<strong>授权服务器</strong>，向后者<strong>请求令牌</strong>。</li>
+  <li>（C）<strong>授权服务器</strong>确认无误后，向客户端提供访问令牌。</li>
+</ul>
+
+<p><img src="../assets/1e7d96e9ed5ab025afd37c1ca97d1b39.jpg" alt="密码模式" style="zoom: 67%;" /></p>
+
+<p>认证及验证：</p>
+
+<p><img src="../assets/flow.png" alt="img" style="zoom: 67%;" /></p>
+
+<h4 id="搭建授权服务器">搭建授权服务器</h4>
+
+<h5 id="securityconfig">SecurityConfig</h5>
+
+<p>通过 <strong>Spring Security 提供认证功能</strong></p>
+
+<h5 id="oauth2authorizationserverconfig">OAuth2AuthorizationServerConfig</h5>
+
+<p>创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-68-spring-security-oauth/lab-68-demo02-authorization-server-with-resource-owner-password-credentials/src/main/java/cn/iocoder/springboot/lab68/authorizationserverdemo/config/OAuth2AuthorizationServerConfig.java">OAuth2AuthorizationServerConfig</a> 配置类，进行<strong>授权</strong>服务器。</p>
+
+<ul>
+  <li>
+    <p>在类上添加 <a href="https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/config/annotation/web/configuration/EnableAuthorizationServer.java"><code class="highlighter-rouge">@EnableAuthorizationServer</code></a> 注解，声明开启 OAuth <strong>授权</strong>服务器的功能。</p>
+  </li>
+  <li>
+    <p>同时，继承 <a href="https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/config/annotation/web/configuration/AuthorizationServerConfigurerAdapter.java">AuthorizationServerConfigurerAdapter</a> 类，进行 OAuth <strong>授权</strong>服务器的配置。</p>
+  </li>
+</ul>
+
+<p>其中，<code class="highlighter-rouge">/oauth/check_token</code> 端点对应 <a href="https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/endpoint/CheckTokenEndpoint.java">CheckTokenEndpoint</a> 类，用于校验访问令牌的有效性。</p>
+
+<ul>
+  <li>在客户端访问资源服务器时，会在请求中带上<strong>访问令牌</strong>。</li>
+  <li>在资源服务器收到客户端的请求时，会使用请求中的<strong>访问令牌</strong>，找授权服务器确认该<strong>访问令牌</strong>的有效性。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Configuration</span>
+<span class="nd">@EnableAuthorizationServer</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">OAuth2AuthorizationServerConfig</span> <span class="kd">extends</span> <span class="n">AuthorizationServerConfigurerAdapter</span> <span class="o">{</span>
+
+    <span class="cm">/**
+     * 用户认证 Manager
+     */</span>
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="n">AuthenticationManager</span> <span class="n">authenticationManager</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">(</span><span class="n">AuthorizationServerEndpointsConfigurer</span> <span class="n">endpoints</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+        <span class="n">endpoints</span><span class="o">.</span><span class="na">authenticationManager</span><span class="o">(</span><span class="n">authenticationManager</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">(</span><span class="n">AuthorizationServerSecurityConfigurer</span> <span class="n">oauthServer</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+        <span class="n">oauthServer</span><span class="o">.</span><span class="na">checkTokenAccess</span><span class="o">(</span><span class="s">"isAuthenticated()"</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">(</span><span class="n">ClientDetailsServiceConfigurer</span> <span class="n">clients</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+        <span class="n">clients</span><span class="o">.</span><span class="na">inMemory</span><span class="o">()</span> <span class="c1">// &lt;4.1&gt;</span>
+                <span class="o">.</span><span class="na">withClient</span><span class="o">(</span><span class="s">"clientapp"</span><span class="o">).</span><span class="na">secret</span><span class="o">(</span><span class="s">"112233"</span><span class="o">)</span> <span class="c1">// &lt;4.2&gt; Client 账号、密码。</span>
+                <span class="o">.</span><span class="na">authorizedGrantTypes</span><span class="o">(</span><span class="s">"password"</span><span class="o">)</span> <span class="c1">// &lt;4.2&gt; 密码模式</span>
+                <span class="o">.</span><span class="na">scopes</span><span class="o">(</span><span class="s">"read_userinfo"</span><span class="o">,</span> <span class="s">"read_contacts"</span><span class="o">)</span> <span class="c1">// &lt;4.2&gt; 可授权的 Scope</span>
+<span class="c1">//                .and().withClient() // &lt;4.3&gt; 可以继续配置新的 Client</span>
+                <span class="o">;</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h5 id="简单测试">简单测试</h5>
+
+<p>执行 AuthorizationServerApplication 启动授权服务器。下面，使用 <strong>Postman 模拟一个 Client</strong>。</p>
+
+<h6 id="basic-auth">Basic Auth</h6>
+
+<p>① <code class="highlighter-rouge">POST</code> 请求 http://localhost:8080/oauth/token 地址，使用密码模式进行<strong>授权</strong>。</p>
+
+<p><img src="../assets/oauth05.png" alt=" +  进行 Client 认证" style="zoom: 33%;" /></p>
+
+<p><img src="../assets/oauth06.png" alt="密码模式的认证" /></p>
+
+<p>请求说明：</p>
+
+<ul>
+  <li>通过 <a href="https://en.wikipedia.org/wiki/Basic_access_authentication">Basic Auth</a> 的方式，填写 <code class="highlighter-rouge">client-id</code> + <code class="highlighter-rouge">client-secret</code> 作为用户名与密码，实现 Client 客户端有效性的认证。</li>
+  <li>请求参数 <code class="highlighter-rouge">grant_type</code> 为 <code class="highlighter-rouge">"password"</code>，表示使用<strong>密码模式</strong>。</li>
+  <li>请求参数 <code class="highlighter-rouge">username</code> 和 <code class="highlighter-rouge">password</code>，表示<strong>用户</strong>的用户名与密码。</li>
+</ul>
+
+<p>响应说明：</p>
+
+<ul>
+  <li>响应字段 <code class="highlighter-rouge">access_token</code> 为<strong>访问令牌</strong>，后续客户端在访问资源服务器时，通过它作为身份的标识。</li>
+  <li>响应字段 <code class="highlighter-rouge">token_type</code> 为<strong>令牌类型</strong>，一般是 <code class="highlighter-rouge">bearer</code> 或是 <code class="highlighter-rouge">mac</code> 类型。</li>
+  <li>响应字段 <code class="highlighter-rouge">expires_in</code> 为访问令牌的<strong>过期时间</strong>，单位为秒。</li>
+  <li>响应字段 <code class="highlighter-rouge">scope</code> 为<strong>权限范围</strong>。</li>
+</ul>
+
+<blockquote>
+  <p>友情提示：<code class="highlighter-rouge">/oauth/token</code> 对应 <a href="https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/endpoint/TokenEndpoint.java">TokenEndpoint</a> 端点，提供 OAuth2.0 的四种授权模式。感兴趣的胖友，可以后续去撸撸。</p>
+</blockquote>
+
+<h6 id="check-token">check token</h6>
+
+<p>② <code class="highlighter-rouge">POST</code> 请求 http://localhost:8080/oauth/check_token 地址，校验访问令牌的有效性。如下图所示：</p>
+
+<p><img src="../assets/oauth07.png" alt=" +  进行 Client 认证" /></p>
+
+<p><img src="../assets/oauth08.png" alt="密码模式的认证" style="zoom: 40%;" /></p>
+
+<h4 id="搭建资源服务器">搭建资源服务器</h4>
+
+<h5 id="配置文件">配置文件</h5>
+
+<p>创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-68-spring-security-oauth/lab-68-demo02-resource-server/src/main/resources/application.yml"><code class="highlighter-rouge">application.yml</code></a> 配置文件，添加 Spring Security OAuth 相关配置。</p>
+
+<ul>
+  <li>
+    <p>① <code class="highlighter-rouge">security.oauth2.client</code> 配置项，OAuth2 Client 配置，对应 <a href="https://github.com/spring-projects/spring-boot/blob/master/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/security/oauth2/client/OAuth2ClientProperties.java">OAuth2ClientProperties</a> 类。在这个配置项中，我们添加了客户端的 <code class="highlighter-rouge">client-id</code> 和 <code class="highlighter-rouge">client-secret</code>。</p>
+
+    <ul>
+      <li>为什么要添加这个配置项呢？因为资源服务器会调用授权服务器的 <code class="highlighter-rouge">/oauth/check_token</code> 接口，而考虑到安全性，配置了该接口需要进过<strong>客户端认证</strong>。</li>
+    </ul>
+
+    <blockquote>
+      <p>友情提示：这里艿艿偷懒了，其实<strong>单独</strong>给资源服务器配置一个 Client 的 <code class="highlighter-rouge">client-id</code> 和 <code class="highlighter-rouge">client-secret</code>。我们可以把资源服务器理解成授权服务器的<strong>一个特殊的客户端</strong>。</p>
+    </blockquote>
+  </li>
+  <li>
+    <p>② <code class="highlighter-rouge">security.oauth2.resource</code> 配置项，OAuth2 Resource 配置，对应 <a href="https://github.com/spring-projects/spring-security-oauth2-boot/blob/master/spring-security-oauth2-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/security/oauth2/resource/ResourceServerProperties.java">ResourceServerProperties</a> 类。</p>
+
+    <p>这里，通过 <code class="highlighter-rouge">token-info-uri</code> 配置项，设置使用授权服务器的 <code class="highlighter-rouge">/oauth/check_token</code> 接口，校验访问令牌的有效性。</p>
+  </li>
+  <li>
+    <p>③ <code class="highlighter-rouge">security.access-token-uri</code> 配置项，是<strong>我们自定义</strong>的，设置授权服务器的 <code class="highlighter-rouge">oauth/token</code> 接口，获取访问令牌。因为稍后我们将在 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-68-spring-security-oauth/lab-68-demo02-resource-server/src/main/java/cn/iocoder/springboot/lab68/resourceserverdemo/controller/LoginController.java">LoginController</a> 中，实现一个 <code class="highlighter-rouge">/login</code> 登录接口。</p>
+  </li>
+</ul>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">server</span><span class="pi">:</span>
+  <span class="na">port</span><span class="pi">:</span> <span class="s">9090</span>
+
+<span class="na">security</span><span class="pi">:</span>
+  <span class="na">oauth2</span><span class="pi">:</span>
+    <span class="c1"># OAuth2 Client 配置，对应 OAuth2ClientProperties 类</span>
+    <span class="na">client</span><span class="pi">:</span>
+      <span class="na">client-id</span><span class="pi">:</span> <span class="s">clientapp</span>
+      <span class="na">client-secret</span><span class="pi">:</span> <span class="s">112233</span>
+    <span class="c1"># OAuth2 Resource 配置，对应 ResourceServerProperties 类</span>
+    <span class="na">resource</span><span class="pi">:</span>
+      <span class="na">token-info-uri</span><span class="pi">:</span> <span class="s">http://127.0.0.1:8080/oauth/check_token</span> <span class="c1"># 获得 Token 信息的 URL</span>
+    <span class="c1"># 访问令牌获取 URL，自定义的</span>
+    <span class="na">access-token-uri</span><span class="pi">:</span> <span class="s">http://127.0.0.1:8080/oauth/token</span>
+</code></pre></div></div>
+
+<h5 id="oauth2resourceserverconfig">OAuth2ResourceServerConfig</h5>
+
+<p>创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-68-spring-security-oauth/lab-68-demo02-resource-server/src/main/java/cn/iocoder/springboot/lab68/resourceserverdemo/config/OAuth2ResourceServerConfig.java">OAuth2ResourceServerConfig</a> 类，进行<strong>资源</strong>服务器。</p>
+
+<ul>
+  <li>① 在类上添加 <a href="https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/config/annotation/web/configuration/EnableResourceServer.java"><code class="highlighter-rouge">@EnableResourceServer</code></a> 注解，声明开启 OAuth <strong>资源</strong>服务器的功能。
+    <ul>
+      <li>同时，继承 <a href="https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/config/annotation/web/configuration/ResourceServerConfigurerAdapter.java">ResourceServerConfigurerAdapter</a> 类，进行 OAuth <strong>资源</strong>服务器的配置。</li>
+    </ul>
+  </li>
+  <li>② <code class="highlighter-rouge">#configure(HttpSecurity http)</code> 方法，设置 HTTP 权限。这里，我们设置 <code class="highlighter-rouge">/login</code> 接口<strong>无需</strong>权限访问，其它接口<strong>认证</strong>后可访问。
+    <ul>
+      <li>这样，客户端在访问资源服务器时，其请求中的<strong>访问令牌</strong>会被<strong>资源</strong>服务器调用<strong>授权</strong>服务器的 <code class="highlighter-rouge">/oauth/check_token</code> 接口，进行校验访问令牌的正确性。</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Configuration</span>
+<span class="nd">@EnableResourceServer</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">OAuth2ResourceServerConfig</span> <span class="kd">extends</span> <span class="n">ResourceServerConfigurerAdapter</span> <span class="o">{</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">(</span><span class="n">HttpSecurity</span> <span class="n">http</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+        <span class="n">http</span><span class="o">.</span><span class="na">authorizeRequests</span><span class="o">()</span>
+            <span class="c1">// 设置 /login 无需权限访问</span>
+            <span class="o">.</span><span class="na">antMatchers</span><span class="o">(</span><span class="s">"/login"</span><span class="o">).</span><span class="na">permitAll</span><span class="o">()</span>
+            <span class="c1">// 设置其它请求，需要认证后访问</span>
+            <span class="o">.</span><span class="na">anyRequest</span><span class="o">().</span><span class="na">authenticated</span><span class="o">()</span>
+            <span class="o">;</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="授权码模式">授权码模式</h3>
+
+<p>授权码模式的认证流程：</p>
+
+<p>（A）用户打开客户端以后，客户端跳转到到<strong>授权</strong>服务器，要求用户给予授权。</p>
+
+<p><strong>（B）</strong>用户同意给予客户端授权。（授权服务器将跳转到客户端事先指定的”重定向 URI”（Redirection URI），同时附上一个<strong>授权码</strong>）</p>
+
+<p>（C）客户端使用上一步获得的授权，向<strong>认证服务器</strong>申请令牌。（这一步是在客户端的<strong>后台的服务器上</strong>完成的，对用户不可见）</p>
+
+<p>（D）认证服务器对客户端进行认证以后，确认无误，<strong>同意发放令牌</strong>。</p>
+
+<p>（E）客户端使用令牌，向资源服务器申请获取资源。</p>
+
+<p>（F）资源服务器<strong>确认令牌</strong>无误，同意向客户端开放资源。</p>
+
+<p>下图是 Slack OAuth 2.0 <strong>第三方登录</strong>的示意图：</p>
+
+<p><img src="../assets/20210615151716340.png" style="zoom:80%;" /></p>
+
+<p>另一种步骤：</p>
+
+<ul>
+  <li>（A）用户访问客户端，后者将前者跳转到到<strong>授权</strong>服务器。</li>
+  <li>（B）用户选择是否给予客户端授权。</li>
+  <li>（C）假设用户给予授权，授权服务器将跳转到客户端事先指定的”重定向 URI”（Redirection URI），同时附上一个<strong>授权码</strong>。</li>
+  <li>（D）客户端收到授权码，附上早先的”重定向 URI”，向认证服务器申请<strong>令牌</strong>。这一步是在客户端的后台的服务器上完成的，对用户不可见。</li>
+  <li>（E）认证服务器核对了<strong>授权码</strong>和<strong>重定向 URI</strong>，确认无误后，向客户端发送<strong>访问令牌</strong>。</li>
+</ul>
+
+<p><img src="../assets/8a16a81fbba3d6ba1002921bf6b4feff.jpg" alt="授权码模式" style="zoom:67%;" /></p>
+
+<h3 id="简化模式">简化模式</h3>
+
+<p>步骤：</p>
+
+<ul>
+  <li>（A）用户访问客户端，后者将前者跳转到到<strong>授权</strong>服务器。</li>
+  <li>（B）用户选择是否给予客户端授权。</li>
+  <li>（C）假设用户给予授权，授权服务器将用户导向客户端指定的”重定向URI”，并在 URI 的 <strong>Hash 部分</strong>包含了<strong>访问令牌</strong>。</li>
+  <li>（D）浏览器向<strong>资源服务器</strong>发出请求，其中不包括上一步收到的 Hash 值。</li>
+  <li>（E）资源服务器返回一个网页，（其中包含的代码）可以获取 Hash 值中的<strong>令牌</strong>。</li>
+  <li>（F）<strong>浏览器</strong>执行上一步获得的脚本，提取出令牌。</li>
+  <li>（G）浏览器将令牌发给<strong>客户端</strong>。</li>
+</ul>
+
+<p><img src="../assets/202e8e80d8b1740f38bde7a3d889e088.jpg" alt="简化模式" style="zoom: 80%;" /></p>
+
+<h3 id="客户端模式">客户端模式</h3>
+
+<p>步骤：</p>
+
+<ul>
+  <li>（A）客户端向授权服务器进行身份认证，并要求一个<strong>访问令牌</strong>。</li>
+  <li>（B）授权服务器确认无误后，向客户端提供访问令牌。</li>
+</ul>
+
+<p><img src="../assets/062fff24b9564ca9e0cbf4f702af9ee6.jpg" alt="客户端模式" style="zoom:80%;" /></p>
+
+<h2 id="合并服务器">合并服务器</h2>
+
+<p>在项目比较小时，考虑到节省服务器资源，会考虑将<strong>授权</strong>服务器和<strong>资源</strong>服务器<strong>合并</strong>到一个项目中，避免启动多个 Java 进程。</p>
+
+<h2 id="refresh-token">Refresh Token</h2>
+
+<p>在 OAuth2.0 中，一共有<strong>两类</strong>令牌：</p>
+
+<ol>
+  <li><strong>访问</strong>令牌（Access Token）</li>
+  <li><strong>刷新</strong>令牌（Refresh Token）：在访问令牌过期时，可以使用刷新令牌向<strong>授权服务器</strong>获取一个<strong>新的访问令牌</strong>。</li>
+</ol>
+
+<p>为什么会有<strong>刷新</strong>令牌呢？</p>
+
+<ul>
+  <li>
+    <p>每次请求资源服务器时，都会在请求上带上<strong>访问</strong>令牌，这样它的泄露风险是<strong>相对</strong>高的。</p>
+  </li>
+  <li>因此，出于<strong>安全性</strong>的考虑，访问令牌的过期时间<strong>比较短</strong>，刷新令牌的过期时间<strong>比较长</strong>。</li>
+  <li>这样，如果访问令牌即使被盗用走，那么在一定的时间后，访问令牌也能在较短的时间吼过期。</li>
+  <li>当然，安全也是相对的，如果使用刷新令牌后，获取到新的访问令牌，访问令牌<strong>后续</strong>又<strong>可能</strong>被盗用。</li>
+</ul>
+
+<p>常用开放平台的令牌过期时间：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">开放平台</th>
+      <th style="text-align: left">Access Token 有效期</th>
+      <th style="text-align: left">Refresh Token 有效期</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><a href="https://open.weixin.qq.com/cgi-bin/showdocument?action=dir_list&amp;t=resource/res_list&amp;verify=1&amp;id=open1419316505&amp;token=&amp;lang=zh_CN">微信开放平台</a></td>
+      <td style="text-align: left">2 小时</td>
+      <td style="text-align: left">未知</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><a href="http://wiki.open.qq.com/wiki/website/获取Access_Token">腾讯开放平台</a></td>
+      <td style="text-align: left">90 天</td>
+      <td style="text-align: left">未知</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><a href="https://dev.mi.com/docs/passport/access-token-life-cycle/">小米开放平台</a></td>
+      <td style="text-align: left">90 天</td>
+      <td style="text-align: left">10 年</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="删除令牌">删除令牌</h2>
+
+<p>在用户<strong>登出</strong>系统时，会有<strong>删除</strong>令牌的需求。</p>
+
+<ul>
+  <li>虽然说，可以通过客户端<strong>本地</strong>删除令牌的方式实现。如，清除本地 Cookie、localStorage 的<strong>令牌缓存</strong>。</li>
+  <li>但是，考虑到真正的彻底的实现删除令牌，必然服务端<strong>自身</strong>需要删除令牌。</li>
+</ul>
+
+<p>在 Spring Security OAuth2 中，<strong>并没有提供内置的接口</strong>，所以需要自己去实现。</p>
+
+<ul>
+  <li>具体的实现，通过调用 <a href="https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/token/ConsumerTokenServices.java">ConsumerTokenServices</a> 的 <code class="highlighter-rouge">#revokeToken(String tokenValue)</code> 方法，删除<strong>访问</strong>令牌和<strong>刷新</strong>令牌。</li>
+  <li>参看 <a href="https://www.baeldung.com/spring-security-oauth-revoke-tokens">《Spring Security OAuth2 – Simple Token Revocation》</a> 文档，实现删除令牌的 API 接口。</li>
+</ul>

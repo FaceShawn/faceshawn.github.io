@@ -63,6 +63,10 @@
 
 <p><img src="../assets/arch_screen_02.png" alt="img" style="zoom:70%;" /><img src="../assets/image-20250805140940884.png" alt="img" style="zoom:60%;" /></p>
 
+<p>在<a href="https://github.com/alibaba/p3c/blob/master/阿里巴巴Java开发手册（华山版）.pdf">《阿里巴巴 Java 开发手册》</a>中，推荐分层如下图：</p>
+
+<p><img src="../assets/ef0d24cfaecdbe703ad646e09e697454" alt="应用分层" style="zoom:80%;" /></p>
+
 <h4 id="分层目录">分层目录</h4>
 
 <p>项目的目录结构展示了Maven所约定了源代码的位置，只需配置很少的信息就可以自动完成编译，测试和打包等工作。</p>
@@ -73,7 +77,7 @@
 
 <h5 id="mall-adminsrc"><code class="highlighter-rouge">mall-admin/src/</code></h5>
 
-<p><code class="highlighter-rouge">mall-admin/src/test/</code>：编写测试用例。</p>
+<p><code class="highlighter-rouge">mall-admin/src/test/</code>：编写测试用例</p>
 
 <p><code class="highlighter-rouge">mall-admin/src/main/</code>：自定义的代码</p>
 
@@ -220,7 +224,7 @@
 <ul>
   <li>一个POJO持久化以后就是<code class="highlighter-rouge">PO</code></li>
   <li>直接用它传递、传递过程中就是<code class="highlighter-rouge">DTO</code></li>
-  <li>直接用来对应表示层就是<code class="highlighter-rouge">VO</code></li>
+  <li>直接用来对应<strong>表示层</strong>就是<code class="highlighter-rouge">VO</code></li>
 </ul>
 
 <p>分类：</p>
@@ -232,13 +236,13 @@
     </ul>
   </li>
   <li><code class="highlighter-rouge">BO</code>（Business Object）：业务对象，由 Service 层向上（Controller 层）传输的，主要作用是把业务逻辑封装为一个对象。通常由 DO <strong>转化、整合</strong>而来，可包含<strong>多个 DO 的属性</strong>，也可只包含一个 DO 的部分属性。</li>
-  <li><code class="highlighter-rouge">DTO</code>（Data Transfer Object）：数据传输对象，用于展示层（前端）与服务层间的数据传输对象。存放<strong>参数类型定义类</strong>。DTO为系统与外界交互的模型对象，可以将DTO对象转化为<strong>BO对象</strong>或者是普通的<strong>entity对象</strong>，让service层去处理。
+  <li><code class="highlighter-rouge">DTO</code>（Data Transfer Object）：数据传输对象，用于展示层（前端）与<strong>服务层</strong>间的数据传输对象。存放<strong>参数类型定义类</strong>。DTO为系统与外界交互的模型对象，可以将DTO对象转化为<strong>BO对象</strong>或者是普通的<strong>entity对象</strong>，让service层去处理。
     <ul>
       <li><code class="highlighter-rouge">BeanUtils.copyProperties(umsAdminParam, umsAdmin);</code>，Service 中将 DTO 对象 <code class="highlighter-rouge">UmsAdminParm </code>赋值给 DO 实体类对象 <code class="highlighter-rouge">UmsAdmin</code>。</li>
       <li>比如添加用户时，只需要传过来用户的姓名和年龄，后端接受到数据后，将添加创建时间和更新时间和默认密码三个字段，然后保存到数据库。</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">VO</code>（View Object）：视图对象，通常是 Web 向<strong>模板渲染引擎层</strong>传输的对象。用于展示层，把某个指定页面（或组件）的所有数据封装起来。</li>
+  <li><code class="highlighter-rouge">VO</code>（View Object）：视图对象，通常是 Web 向<strong>模板渲染引擎层</strong>传输的对象。用于<strong>展示层</strong>，把某个指定页面（或组件）的所有数据封装起来。</li>
   <li><del><code class="highlighter-rouge">Query</code></del>：数据查询对象，各层接收上层的查询请求。注意超过 2 个参数的查询封装，禁止使用 Map 类传输。</li>
 </ol>
 
@@ -321,7 +325,476 @@
   <li>返回<strong>数据对象 DO 或业务对象 BO</strong>。外部调用（HTTP、RPC）方法也在这一层，对于外部调用来说，Service 一般会将外部调用返回的 DTO 转化为 BO。</li>
 </ul>
 
-<h3 id="spring-mvc">Spring MVC</h3>
+<h2 id="springspring-mvcspring-boot">Spring、Spring MVC、Spring Boot</h2>
+
+<p>Spring，Spring MVC，Spring Boot 之间什么关系?</p>
+
+<ol>
+  <li><code class="highlighter-rouge">Spring</code>：是一个<strong>轻量级开源框架</strong>，用于简化 <del>Java EE</del> 企业级应用程序开发。核心是 IoC（<strong>控制反转</strong>）和 <strong>AOP</strong>（面向切面编程）。还提供了事务管理等功能。
+    <ul>
+      <li>可以用于构建<strong>任何类型</strong>的 Java 应用程序，包括 Web 应用程序、桌面应用程序、和批处理应用程序等。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">Spring MVC</code>：Spring MVC 是构建在 Spring 之上的 <strong>Web 框架</strong>，用于<strong>构建 Web 应用程序</strong>。提供了一个基于 Model、View、Controller 模式的 Web 框架，用于处理 Web 请求和响应。
+    <ul>
+      <li>通过将请求<strong>映射</strong>到相应的处理器方法，并使用<strong>视图</strong>来呈现响应，使得构建Web应用程序变得简单和灵活。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">Spring Boot</code>：是一个用于<strong>简化 Spring 应用程序开发</strong>的框架，用于快速构建基于 Spring 的 Web 应用程序。Spring Boot <strong>依赖于</strong> Spring 框架和 Spring MVC。提供了<strong>自动配置</strong>、开箱即用等功能。
+    <ul>
+      <li>内置了许多常用的<strong>第三方库和框架</strong>，简化了配置和部署过程。还提供了一组用于开发Web应用程序、RESTful 服务和微服务的起步<strong>依赖项</strong>。</li>
+    </ul>
+  </li>
+</ol>
+
+<h2 id="java-web">Java Web</h2>
+
+<blockquote>
+  <p>Spring 整合 Web</p>
+</blockquote>
+
+<h3 id="服务器">服务器</h3>
+
+<p><strong>Web 服务器</strong>：指能为<strong>发出请求</strong>的浏览器（客户端）<strong>提供文档</strong>的程序。只需支持HTTP协议、HTML文档格式及URL。与客户端的网络浏览器配合。因为Web服务器主要支持的协议就是HTTP，所以通常情况下HTTP服务器和WEB服务器是相等的。</p>
+
+<ul>
+  <li><code class="highlighter-rouge">N’ginx</code>：轻量级的 Web （静态资源）服务器、反向代理服务器，内存占用少，启动极快，高并发能力强，在互联网项目中广泛应用。</li>
+  <li>Apache HTTP 服务器：用 C 语言实现的 HTTP Web 服务器。</li>
+</ul>
+
+<p><strong>应用程序服务器</strong>：Web服务器传送(serves)页面使浏览器可以浏览，而应用程序服务器提供的是客户端应用程序可以调用(call)的方法(methods)。</p>
+
+<ul>
+  <li><code class="highlighter-rouge">Tomcat</code>：是一个开源 <code class="highlighter-rouge">Servlet容器 / Web容器</code>，负责处理客户端请求，并返回响应。简单来说，Tomcat 主要实现了 2 个核心功能：
+    <ol>
+      <li>处理 <code class="highlighter-rouge">Socket</code> 连接，负责网络字节流、<code class="highlighter-rouge">Request</code> 和 <code class="highlighter-rouge">Response</code> 对象的<strong>转化</strong>。用来管理、运行、支持 Java Servlet、JSP（JavaServer Pages ）、Java 表达式语言、 Java WebSocket 技术 。</li>
+      <li>加载和管理 <code class="highlighter-rouge">Servlet</code>，及具体处理 <code class="highlighter-rouge">Request</code> 请求。</li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">Jetty</code>、<code class="highlighter-rouge">Undertow</code>：</li>
+</ul>
+
+<p><strong>Web 应用服务器</strong>：目前常用的混合软件解决方案。</p>
+
+<p>Servlet 容器（<strong>重点理解</strong>）：是一个（基于 Java）<strong>运行在服务器端</strong>的 Web 组件 / 接口，用于交互式的浏览和修改数据，生成动态 Web 内容。</p>
+
+<ul>
+  <li>按照 Servlet 规范编写的 Java 类，被编译为平台独立的字节码，可被动态地加载到支持 Java 的 Web 服务器中运行。</li>
+  <li>执行过程。</li>
+</ul>
+
+<h3 id="filter-过滤器">Filter 过滤器</h3>
+
+<blockquote>
+  <p>见统一异常文档。</p>
+</blockquote>
+
+<h3 id="tomcat">Tomcat</h3>
+
+<p><img src="../assets/tomcat_server_response.png" alt="在这里插入图片描述" style="zoom: 50%;" /></p>
+
+<p>Tomcat 运行机制：Tomcat 服务器接受客户请求并做出响应的过程。</p>
+
+<p>Spring Boot 在启动 SpringMVC 时，会默认初始化一个内嵌的 Tomcat ，监听 8080 端口的请求。</p>
+
+<h3 id="http-请求处理流程">HTTP 请求处理流程</h3>
+
+<ol>
+  <li><strong>客户端</strong>（通常都是浏览器）访问 <strong>Web 服务器</strong>，发送 HTTP 请求。
+    <ul>
+      <li>Web 服务器：也叫 HTTP 服务器、web容器，其需要提供web应用运行所需的环境，接收客户端的Http请求</li>
+    </ul>
+  </li>
+  <li>Web 服务器接收到请求后，传递给 <strong>Servlet 容器</strong>。
+    <ul>
+      <li>Servlet 容器：也称Servlet引擎，为Servlet的运行提供环境支持，可以理解为 <strong>Tomcat</strong> 或其他服务器。</li>
+    </ul>
+  </li>
+  <li><strong>Servlet 容器</strong>（根据 url 等路径决定）加载对应 Servlet 实例；调用 Servlet 的 <code class="highlighter-rouge">service()</code> 方法返回 <strong>response 对象</strong>，向其传递表示请求和响应的对象。
+    <ol>
+      <li>如果Serlvet没有被实例化，则创建该Servlet的一个实例（调用init方法）；</li>
+      <li>或从线程池中取出一个空闲线程（产生 Servlet 实例）；</li>
+    </ol>
+  </li>
+  <li>Servlet容器根据用户的HTTP请求，创建一个<strong><code class="highlighter-rouge">ServletRequest</code>请求对象</strong>（封装了 HTTP 请求信息、见 <a href="#接收请求参数">HttpServletRequest</a>）和一个可以对HTTP请求进行响应的<code class="highlighter-rouge">ServletResponse</code>对象（类似于寄信，并在信中说明回信的地址），</li>
+  <li>然后调用<code class="highlighter-rouge">HttpServlet</code>中重写的<strong><code class="highlighter-rouge">service(ServletRequest req, ServletResponse res)</code>方法</strong>，
+    <ol>
+      <li>并在这个方法中，将这两个对象<strong>向下转型</strong>，得到<strong><code class="highlighter-rouge">HttpServletRequest</code></strong>和<code class="highlighter-rouge">HttpServletResponse</code>两个对象，</li>
+      <li>然后将客户端的请求转发到<code class="highlighter-rouge">HttpServlet</code>中的<code class="highlighter-rouge">service(HttpServletRequest req, HttpServletResponse resp)</code>。</li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">HttpServletResponse</code>：服务端处理完Http的请求后，将处理结果作为<strong>Http响应</strong>返回给客户端。</li>
+</ol>
+
+<p>参考：<a href="https://blog.csdn.net/qq_41358574/article/details/120422160">HttpServletRequest和@Requestparam、@RequestBody、直接实体接收请求参数的区别与示例</a></p>
+
+<h3 id="websocket">WebSocket</h3>
+
+<blockquote>
+  <p>WebSocket 框架，支持多节点的广播。见 WebSocket 文档。</p>
+</blockquote>
+
+<p>提供 <strong>Token 认证</strong>、WebSocket <strong>集群广播</strong>、Message 监听。</p>
+
+<h2 id="web-相关的封装组件">Web 相关的封装组件</h2>
+
+<p>Web 相关的封装组件：</p>
+
+<ol>
+  <li>web：针对 <strong>SpringMVC</strong> 的基础封装 ：
+    <ol>
+      <li>YudaoWebAutoConfiguration API 前缀和跨域</li>
+      <li>参数校验</li>
+      <li>统一响应和异常处理（GlobalResponseBodyHandler、GlobalExceptionHandler、ApiRequestFilter）。</li>
+    </ol>
+  </li>
+  <li>encrypt：HTTP API 加密组件：支持 Request 和 Response 的加密、解密</li>
+  <li>API log 访问日志</li>
+  <li>Swagger 接口文档</li>
+  <li>XSS 安全、漏洞防护</li>
+  <li>数据脱敏</li>
+  <li>Jackson 序列化</li>
+</ol>
+
+<h3 id="http-api-加解密配置">HTTP API 加解密配置</h3>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">cn</span><span class="o">..</span><span class="na">framework</span><span class="o">.</span><span class="na">encrypt</span><span class="o">.</span><span class="na">config</span><span class="o">;</span>
+
+<span class="cm">/**
+ * HTTP API 加解密配置
+ *
+ */</span>
+<span class="nd">@ConfigurationProperties</span><span class="o">(</span><span class="n">prefix</span> <span class="o">=</span> <span class="s">"yudao.api-encrypt"</span><span class="o">)</span>
+<span class="nd">@Validated</span>
+<span class="nd">@Data</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ApiEncryptProperties</span> <span class="o">{</span>
+
+    <span class="cm">/**
+     * 是否开启
+     */</span>
+    <span class="nd">@NotNull</span><span class="o">(</span><span class="n">message</span> <span class="o">=</span> <span class="s">"是否开启不能为空"</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="n">Boolean</span> <span class="n">enable</span><span class="o">;</span>
+
+    <span class="cm">/**
+     * 请求头（响应头）名称
+     *
+     * 1. 如果该请求头非空，则表示请求参数已被「前端」加密，「后端」需要解密
+     * 2. 如果该响应头非空，则表示响应结果已被「后端」加密，「前端」需要解密
+     */</span>
+    <span class="nd">@NotEmpty</span><span class="o">(</span><span class="n">message</span> <span class="o">=</span> <span class="s">"请求头（响应头）名称不能为空"</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">header</span> <span class="o">=</span> <span class="s">"X-Api-Encrypt"</span><span class="o">;</span>
+
+    <span class="cm">/**
+     * 对称加密算法，用于请求/响应的加解密
+     *
+     * 目前支持
+     * 【对称加密】：
+     *      1. {@link cn.hutool.crypto.symmetric.SymmetricAlgorithm#AES}
+     *      2. {@link cn.hutool.crypto.symmetric.SM4#ALGORITHM_NAME} （需要自己二次开发，成本低）
+     * 【非对称加密】
+     *      1. {@link cn.hutool.crypto.asymmetric.AsymmetricAlgorithm#RSA}
+     *      2. {@link cn.hutool.crypto.asymmetric.SM2} （需要自己二次开发，成本低）
+     *
+     * @see &lt;a href="https://help.aliyun.com/zh/ssl-certificate/what-are-a-public-key-and-a-private-key"&gt;什么是公钥和私钥？&lt;/a&gt;
+     */</span>
+    <span class="nd">@NotEmpty</span><span class="o">(</span><span class="n">message</span> <span class="o">=</span> <span class="s">"对称加密算法不能为空"</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">algorithm</span><span class="o">;</span>
+
+    <span class="cm">/**
+     * 请求的解密密钥
+     *
+     * 注意：
+     * 1. 如果是【对称加密】时，它「后端」对应的是“密钥”。对应的，「前端」也对应的也是“密钥”。
+     * 2. 如果是【非对称加密】时，它「后端」对应的是“私钥”。对应的，「前端」对应的是“公钥”。（重要！！！）
+     */</span>
+    <span class="nd">@NotEmpty</span><span class="o">(</span><span class="n">message</span> <span class="o">=</span> <span class="s">"请求的解密密钥不能为空"</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">requestKey</span><span class="o">;</span>
+
+    <span class="cm">/**
+     * 响应的加密密钥
+     *
+     * 注意：
+     * 1. 如果是【对称加密】时，它「后端」对应的是“密钥”。对应的，「前端」也对应的也是“密钥”。
+     * 2. 如果是【非对称加密】时，它「后端」对应的是“公钥”。对应的，「前端」对应的是“私钥”。（重要！！！）
+     */</span>
+    <span class="nd">@NotEmpty</span><span class="o">(</span><span class="n">message</span> <span class="o">=</span> <span class="s">"响应的加密密钥不能为空"</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">responseKey</span><span class="o">;</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="api-日志">API 日志</h3>
+
+<h3 id="swagger">Swagger</h3>
+
+<blockquote>
+  <p>见 Swagger 文档。</p>
+</blockquote>
+
+<p>基于 Swagger + Knife4j 实现 API 接口文档。</p>
+
+<ul>
+  <li>Swagger 自动配置类，基于 OpenAPI + Springdoc 实现。
+    <ol>
+      <li>Springdoc 文档地址：<a href="https://github.com/springdoc/springdoc-openapi">仓库</a></li>
+      <li>Swagger 规范，于 2015 更名为 OpenAPI 规范，本质是一个东西</li>
+    </ol>
+  </li>
+  <li>构建 Authorization 认证请求头参数</li>
+</ul>
+
+<h3 id="xss">XSS</h3>
+
+<blockquote>
+  <p>跨站脚本攻击。见攻击技术和漏洞防护文档。</p>
+</blockquote>
+
+<p>创建 XssFilter Bean，解决 Xss 安全问题。</p>
+
+<ul>
+  <li>XSS 过滤 jackson 反序列化器。</li>
+  <li>在反序列化的过程中，会对字符串进行 XSS 过滤。</li>
+</ul>
+
+<h3 id="脱敏">脱敏</h3>
+
+<blockquote>
+  <p>见数据脱敏文档。</p>
+</blockquote>
+
+<h3 id="jackson-框架">JackSon 框架</h3>
+
+<p>Jackson可以轻松的将<strong>Java对象</strong>转换成<strong>json对象和xml文档</strong>，同样也可以将json、xml转换成Java对象。</p>
+
+<ul>
+  <li>相比json-lib框架，Jackson所依赖的jar包较少，简单易用并且性能也要相对高些。</li>
+  <li>Jackson解析的速度算是同类框架中最快的，同时也是Spring MVC中内置使用的 <strong>json 解析方式</strong>。</li>
+</ul>
+
+<h4 id="注解">注解</h4>
+
+<p>核心 Jackson 注解由 <strong>jackson-annotations 核心组件</strong>定义，它不依赖于任何其他包。</p>
+
+<ul>
+  <li><strong>@JsonProperty：</strong>用于在 Java 对象的属性和 JSON 字段之间建立映射关系。通过该注解，可以自定义属性在序列化和反序列化过程中所对应的 JSON 字段的名称。</li>
+  <li><strong>@JsonAlias：</strong>在反序列化时可以让Bean的属性接<strong>收多个json字段的名称</strong>。</li>
+  <li>@JsonAutoDetect：用于控制序列化和反序列化过程中Java对象中哪些属性可以被JSON格式化库处理。默认情况下，只有公有的getters才能被自动识别并进行JSON序列化。因此，若Java对象需要在序列化和反序列化过程中使用非公有的成员变量，需添加@JsonAutoDetect注解来告诉JACKSON库何时自动序列化和反序列化成员变量。</li>
+  <li><strong>@JsonInclude：</strong>是为实体类在接口序列化返回值时增加规则的注解。
+    <ul>
+      <li>例如，一个接口需要<strong>过滤掉返回值为null的字段</strong>，即值为null的字段不返回，可以在实体类中增加如下注解 <code class="highlighter-rouge">@JsonInclude(JsonInclude.Include.NON_NULL)</code></li>
+    </ul>
+  </li>
+  <li><strong>@JsonUnwrapped：</strong>表明属性应该以<strong>扁平化</strong>的形式进行序列化，即目标属性将不会序列化为 JSON 对象，但其属性将序列化为包含它的对象的属性。</li>
+  <li>@JsonView：两个URL，一个为获取用户详情信息包含用户的所有字段（用户名，密码），一个为获取用户信息字段（只要用户名），怎么处理呢？@JsonView可以十分方便的解决以上问题。
+    <ul>
+      <li>使用接口声明多个视图</li>
+      <li>在对象属性的get方法上指定视图</li>
+    </ul>
+  </li>
+  <li>@JacksonInject：在使用 JSON格式进行反序列化的时候，经常有这样一些需求。从客户端或者其他渠道获取了一个JSON格式的数据对象，该对象包含若干个属性。但是在将JSON字符串反序列化时，需要给它加上一些默认数据，比如：
+    <ul>
+      <li>responseTime数据响应时间，赋值为当前时间即可；
+  数据反序列化的操作人，赋值为系统当前用户等</li>
+    </ul>
+  </li>
+  <li><strong>@JsonValue（get方法、属性字段）：一个类只能用一个</strong>，加上这个注解时，该类的对象序列化时就会<strong>只返回</strong>这个字段的值做为序列化的结果。
+    <ul>
+      <li>比如一个枚举类的<strong>get方法</strong>上加上该注解，那么在序列化这个枚举类的对象时，返回的就是枚举对象的这个属性，而不是这个枚举对象的序列化json串。</li>
+    </ul>
+  </li>
+  <li><strong>@JsonPropertyOrder：</strong>用于指定实体生成 json 时的属性<strong>顺序</strong>，一般用得不多</li>
+  <li><strong>@JsonRawValue：</strong>能够按<strong>原样序列化</strong>属性。属性值<strong>不会被转义或者加引号</strong>（或者说，会自动去掉转义，多余的引号）。属性值已经是一个 JSON String，或者属性值已经被加了引号时很有用。</li>
+  <li>@JsonRootName：用来指定root wrapper的名字。注意，只有当WRAP_ROOT_VALUE开启时，此注解才生效。
+    <ul>
+      <li>比如：一般序列化 User是这样的格式 { “id”: 1, “name”: “yooo” }，但是我想添加一个root wrapper，挂载在”User”节点下，</li>
+    </ul>
+  </li>
+  <li>@JsonSerialize（用于字段或get方法上）：主要用于定制 Java 对象到 JSON 的序列化过程。通过在 Java 类或属性上使用 @JsonSerialize注解，开发者可以指定一个自定义的序列化器，从而掌握对象如何被转换为 JSON 。这种灵活性使得开发者能够更好地应对各种复杂的序列化需求。使用场景：处理敏感信息、处理日期格式、处理特殊类型数据或者逻辑</li>
+  <li><strong>@JsonDeserialize（</strong>用于字段或set方法上<strong>）：</strong>json反序列化注解，用于字段或set方法上，作用于setter()方法，将json数据反序列化为java对象。使用方法同@JsonSerialize类似。</li>
+  <li><code class="highlighter-rouge">@JsonUnwrapped</code>：扁平化对象。</li>
+</ul>
+
+<h5 id="日期">日期</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">@JsonFormat</code>：是一个<strong>时间格式化</strong>注解。用来格式化 JSON 数据。
+    <ul>
+      <li>比如存储在mysql中的数据是date类型的，当读取出来封装在实体类中时，就会变成英文时间格式，而不是yyyy-MM-dd HH:mm:ss这样的中文时间，因此需要用注解来格式化时间。</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@JsonFormat</span><span class="o">(</span><span class="n">shape</span><span class="o">=</span><span class="n">JsonFormat</span><span class="o">.</span><span class="na">Shape</span><span class="o">.</span><span class="na">STRING</span><span class="o">,</span> <span class="n">pattern</span><span class="o">=</span><span class="s">"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"</span><span class="o">,</span> <span class="n">timezone</span><span class="o">=</span><span class="s">"GMT"</span><span class="o">)</span>
+<span class="kd">private</span> <span class="n">Date</span> <span class="n">date</span><span class="o">;</span>
+</code></pre></div></div>
+
+<h5 id="双向引用">双向引用</h5>
+
+<p><code class="highlighter-rouge">@JsonBackReference和@JsonManagedReference，以及@JsonIgnore</code>均是为了解决对象中存在<strong>双向引用</strong>导致的<strong>无限递归</strong>（infinite recursion）问题。这些标注均可用在<strong>属性</strong>或<strong>对应的get、set方法</strong>中。</p>
+
+<ul>
+  <li><strong>@JsonBackReference和@JsonManagedReference</strong>：通常配对使用，用在父子关系中。
+    <ul>
+      <li>在<strong>序列化</strong>（serialization，即将对象转换为json数据）时，
+        <ol>
+          <li><code class="highlighter-rouge">@JsonBackReference</code>标注的属性会<strong>被忽略</strong>（即结果中的json数据不包含该属性的内容），作用相当于<strong>@JsonIgnore</strong>。</li>
+          <li><code class="highlighter-rouge">@JsonManagedReference</code>标注的属性（也可以没有此注解）则会<strong>被序列化</strong>。</li>
+        </ol>
+      </li>
+      <li>但在<strong>反序列化</strong>（deserialization，即json数据转换为对象）时，
+        <ol>
+          <li>如果没有<code class="highlighter-rouge">@JsonManagedReference</code>，则不会自动注入@JsonBackReference标注的属性（被忽略的父或子）；</li>
+          <li>如果有<code class="highlighter-rouge">@JsonManagedReference</code>，则会自动注入@JsonBackReference标注的属性。</li>
+        </ol>
+      </li>
+    </ul>
+  </li>
+  <li><strong>@JsonIgnore</strong>：用于属性上。在json序列化时将java bean中的一些<strong>属性忽略掉</strong>，序列化和反序列化都受影响。一般标记在属性或者方法上，返回的json数据即<strong>不包含该属性</strong>。
+    <ul>
+      <li>直接忽略某个属性，以断开无限递归，序列化或反序列化均忽略。</li>
+      <li>当然如果标注在get、set方法中，则可以分开控制，<strong>序列化</strong>对应的是get方法，反序列化对应的是set方法。</li>
+      <li>在父子关系中，当<strong>反序列化</strong>时，@JsonIgnore不会<strong>自动注入</strong>被忽略的属性值（父或子），这是它跟<code class="highlighter-rouge">@JsonBackReference和@JsonManagedReference</code>最大的区别。</li>
+    </ul>
+  </li>
+  <li><strong>@JsonIgnoreProperties：</strong>此注解是<strong>类</strong>注解，作用是json序列化时将java bean中的一些属性忽略掉，序列化和反序列化都受影响。
+    <ul>
+      <li><code class="highlighter-rouge">@JsonIgnoreProperties({"userRoles"})</code>：作用在类上，用于过滤掉特定字段，不返回或不解析；</li>
+    </ul>
+  </li>
+  <li><strong>@JsonIgnoreType：</strong>该类作为别的类的属性时，该属性忽略序列化和反序列化。</li>
+  <li>@JacksonAnnotationsInside：需要<strong>自定义注解</strong>来标注类属性，来达到批量解析类属性的目的，而且并且我们希望<strong>被这个注解标志的属性不被 Json 序列化</strong>（不希望返回给前端）。通常情况下会采用<strong>@JsonIgnore</strong></li>
+</ul>
+
+<h5 id="settergettercreator">Setter、Getter、Creator</h5>
+
+<ul>
+  <li>
+    <p>@JsonAnySetter：可以将序列化时未识别到的属性都扔进一个map里。</p>
+
+    <p>@JsonAnyGetter：将map里的属性都平铺输出。</p>
+  </li>
+  <li>
+    <p>@JsonSetter 和 @JsonGetter：@JsonSetter只能用于setter方法，@JsonGetter只能用户getter方法，只用二者中的一个标签时，与@JsonProperty作用一模一样。</p>
+
+    <ul>
+      <li>这样一种情景：对于一个java的pojo类的一个属性，我们希望序列化时是一个属性名，反序列化时是另一个属性名。</li>
+    </ul>
+  </li>
+  <li>
+    <p>@JsonCreator（静态的工厂方法、构造方法上）：加了@JsonCreator注解，该类的对象在反序列化时，就走有@JsonCreator注解的方法来反序列化，原先无参+set的过程失效。</p>
+
+    <ul>
+      <li>注意：反序列化时，默认会调用实体类的无参构造来实例化一个对象，然后使用setter来初始化属性值。如果我们想走别的方法来实例化对象，就需要@JsonCreator方法</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="导入依赖">导入依赖</h4>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>com.fasterxml.jackson.core<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>jackson-databind<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>2.13.0<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div></div>
+
+<h4 id="配置文件">配置文件</h4>
+
+<p>这里介绍两种方式，第一种采用<strong>配置类</strong>的方式进行自定义Jackson的配置，例如</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Configuration</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MapperConfig</span> <span class="o">{</span>
+    <span class="nd">@Bean</span>
+    <span class="kd">public</span> <span class="n">Jackson2ObjectMapperBuilder</span> <span class="nf">jackson2ObjectMapperBuilder</span><span class="o">(){</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">Jackson2ObjectMapperBuilder</span><span class="o">()</span>
+            <span class="c1">// 配置日期格式</span>
+            <span class="o">.</span><span class="na">dateFormat</span><span class="o">(</span><span class="k">new</span> <span class="n">SimpleDateFormat</span><span class="o">(</span><span class="s">"yyyy-MM-dd HH:mm:ss"</span><span class="o">))</span>
+            <span class="c1">// 配置时区</span>
+            <span class="o">.</span><span class="na">timeZone</span><span class="o">(</span><span class="n">TimeZone</span><span class="o">.</span><span class="na">getTimeZone</span><span class="o">(</span><span class="s">"Asia/Shanghai"</span><span class="o">))</span>
+            <span class="c1">// 配置序列化时包含哪些属性</span>
+            <span class="o">.</span><span class="na">serializationInclusion</span><span class="o">(</span><span class="n">JsonInclude</span><span class="o">.</span><span class="na">Include</span><span class="o">.</span><span class="na">NON_NULL</span><span class="o">)</span>
+            <span class="c1">// 配置禁用一些特性</span>
+            <span class="o">.</span><span class="na">featuresToDisable</span><span class="o">(</span><span class="n">SerializationFeature</span><span class="o">.</span><span class="na">WRITE_DATES_AS_TIMESTAMPS</span><span class="o">)</span>
+            <span class="c1">// 配置启用一些特性</span>
+            <span class="o">.</span><span class="na">featuresToEnable</span><span class="o">(</span><span class="n">DeserializationFeature</span><span class="o">.</span><span class="na">ACCEPT_EMPTY_STRING_AS_NULL_OBJECT</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>第二种，采用配置文件的方式进行自定义Jackson的配置，例如</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spring</span><span class="pi">:</span>
+  <span class="na">jackson</span><span class="pi">:</span>
+    <span class="c1">#日期格式化</span>
+    <span class="na">date-format</span><span class="pi">:</span> <span class="s">yyyy-MM-dd HH:mm:ss</span>
+    <span class="na">time-zone</span><span class="pi">:</span> <span class="s">GMT+8</span>
+    <span class="c1">#设置空如何序列化</span>
+    <span class="na">default-property-inclusion</span><span class="pi">:</span> <span class="s">non_null</span>    
+    <span class="na">serialization</span><span class="pi">:</span>
+      <span class="c1">#格式化输出 </span>
+      <span class="na">indent_output</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="c1">#忽略无法转换的对象</span>
+      <span class="na">fail_on_empty_beans</span><span class="pi">:</span> <span class="no">false</span>
+    <span class="na">deserialization</span><span class="pi">:</span>
+      <span class="c1">#允许对象忽略json中不存在的属性</span>
+      <span class="na">fail_on_unknown_properties</span><span class="pi">:</span> <span class="no">false</span>
+    <span class="na">parser</span><span class="pi">:</span>
+      <span class="c1">#允许出现特殊字符和转义符</span>
+      <span class="na">allow_unquoted_control_chars</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="c1">#允许出现单引号</span>
+      <span class="na">allow_single_quotes</span><span class="pi">:</span> <span class="no">true</span>
+</code></pre></div></div>
+
+<h5 id="自定义-jackson-的配置大全">自定义 Jackson 的配置大全</h5>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spring</span><span class="pi">:</span>
+  <span class="na">jackson</span><span class="pi">:</span>
+    <span class="c1"># 设置属性命名策略,对应jackson下PropertyNamingStrategy中的常量值，SNAKE_CASE-返回的json驼峰式转下划线，json body下划线传到后端自动转驼峰式</span>
+    <span class="na">property-naming-strategy</span><span class="pi">:</span> <span class="s">SNAKE_CASE</span>
+    <span class="c1"># 全局设置@JsonFormat的格式pattern</span>
+    <span class="na">date-format</span><span class="pi">:</span> <span class="s">yyyy-MM-dd HH:mm:ss</span>
+    <span class="c1"># 当地时区</span>
+    <span class="na">locale</span><span class="pi">:</span> <span class="s">zh_CN</span>
+    <span class="c1"># 设置全局时区</span>
+    <span class="na">time-zone</span><span class="pi">:</span> <span class="s">GMT+8</span>
+    <span class="c1"># 常用，全局设置pojo或被@JsonInclude注解的属性的序列化方式</span>
+    <span class="na">default-property-inclusion</span><span class="pi">:</span> <span class="s">NON_NULL</span> <span class="c1">#不为空的属性才会序列化,具体属性可看JsonInclude.Include</span>
+    
+    <span class="c1"># 常规默认,枚举类SerializationFeature中的枚举属性为key，值为boolean设置jackson序列化特性,具体key请看SerializationFeature源码</span>
+    <span class="na">visibility</span><span class="pi">:</span>
+      <span class="c1">#属性序列化的可见范围</span>
+      <span class="na">getter</span><span class="pi">:</span> <span class="s">non_private</span>
+      <span class="c1">#属性反序列化的可见范围</span>
+      <span class="na">setter</span><span class="pi">:</span> <span class="s">protected_and_public</span>
+      <span class="c1">#静态工厂方法的反序列化</span>
+      <span class="na">CREATOR</span><span class="pi">:</span> <span class="s">public_only</span>
+      <span class="c1">#字段</span>
+      <span class="na">FIELD</span><span class="pi">:</span> <span class="s">public_only</span>
+      <span class="c1">#布尔的序列化</span>
+      <span class="na">IS_GETTER</span><span class="pi">:</span> <span class="s">public_only</span>
+      <span class="c1">#所有类型(即getter setter FIELD）不受影响,无意义</span>
+      <span class="na">NONE</span><span class="pi">:</span> <span class="s">public_only</span>
+      <span class="c1">#所有类型(即getter setter FIELD）都受其影响（慎用）</span>
+      <span class="na">ALL</span><span class="pi">:</span> <span class="s">public_only</span>
+      
+    <span class="na">serialization</span><span class="pi">:</span>
+      <span class="c1">#反序列化是否有根节点</span>
+      <span class="na">WRAP_ROOT_VALUE</span><span class="pi">:</span> <span class="no">false</span>
+      <span class="c1">#是否使用缩进，格式化输出</span>
+      
+    <span class="c1"># 枚举类DeserializationFeature中的枚举属性为key，值为boolean设置jackson反序列化特性,具体key请看DeserializationFeature源码</span>
+    <span class="na">deserialization</span><span class="pi">:</span>
+
+    <span class="c1"># 枚举类MapperFeature中的枚举属性为key，值为boolean设置jackson ObjectMapper特性</span>
+    <span class="c1"># ObjectMapper在jackson中负责json的读写、json与pojo的互转、json tree的互转,具体特性请看MapperFeature,常规默认即可</span>
+    <span class="na">mapper</span><span class="pi">:</span>
+
+    <span class="na">parser</span><span class="pi">:</span>
+    
+    <span class="na">generator</span><span class="pi">:</span>
+</code></pre></div></div>
+
+<h2 id="spring-mvc">Spring MVC</h2>
 
 <blockquote>
   <p>本质上相当于传统的 Servlet 和 Struts 中的 action</p>
@@ -341,7 +814,7 @@
   <p><a href="#声明 Bean 的注解">Spring MVC 常用基本注解</a></p>
 </blockquote>
 
-<h5 id="mvc-设计模式">MVC 设计模式</h5>
+<h3 id="mvc-设计模式演化">MVC 设计模式演化</h3>
 
 <p><code class="highlighter-rouge">Model 1</code> 时代：</p>
 
@@ -373,7 +846,7 @@
   <li>业务逻辑层（Service）：<code class="highlighter-rouge">service + serviceImpl</code> 。处理业务逻辑；处理请求和响应事件，“事件”包括<strong>用户的行为</strong>和<strong>数据的改变</strong>；管理事务和记录日志等。</li>
 </ol>
 
-<h5 id="spring-mvc-vs-struts2">Spring MVC VS Struts2</h5>
+<h4 id="spring-mvc-vs-struts2">Spring MVC VS Struts2</h4>
 
 <ol>
   <li><code class="highlighter-rouge">Spring MVC</code> 基于方法开发，会将 URL 信息与 Controller 类的某个方法绑定并进行映射，请求参数作为该方法的形参，生成 Handler 对象，只包含一个 method 方法；<code class="highlighter-rouge">Struts2</code> 基于类开发，<strong>Action 类</strong>中所有方法的请求参数都是<strong>成员变量</strong>，方法越多，类越乱。</li>
@@ -388,7 +861,11 @@
   <li>请求方式不同：Struts2 值栈存储请求和响应的数据，通过OGNL存取数据；SpringMVC 通过参数解析器将 request 请求内容解析，给方法形参赋值，将数据和视图封装成 ModelAndView 对象，最后又将其中的模型数据通过 request 域传输到页面，jsp 视图解析器默认使用的是 jstl。</li>
 </ol>
 
-<h5 id="spring-mvc-的核心组件">Spring MVC 的核心组件</h5>
+<h3 id="工作原理流程说明">工作原理/流程说明</h3>
+
+<p><img src="../assets/springmvc_work_flow.jpg" alt="img" style="zoom:100%;" /></p>
+
+<h4 id="核心组件">核心组件</h4>
 
 <ol>
   <li><strong><code class="highlighter-rouge">DispatcherServlet</code></strong>：<strong>核心的中央处理器</strong>、<strong>前端控制器</strong>/分发器/<strong>调度器</strong>，负责接收请求、分发，并给予客户端响应。</li>
@@ -398,17 +875,15 @@
   <li><strong><code class="highlighter-rouge">ViewResolver</code></strong>：<strong>视图解析器</strong>，根据 <code class="highlighter-rouge">Handler</code> 返回的逻辑视图 / 视图 / <strong><code class="highlighter-rouge">ModelAndView</code> 对象</strong>，解析并渲染真正的视图，并传递给 <code class="highlighter-rouge">DispatcherServlet</code> 响应客户端。</li>
 </ol>
 
-<h5 id="spring-mvc-工作原理流程说明">Spring MVC 工作原理/流程说明</h5>
-
-<p><img src="../assets/springmvc_work_flow.jpg" alt="img" style="zoom:100%;" /></p>
+<h4 id="工作原理">工作原理</h4>
 
 <p>传统开发模式（JSP，Thymeleaf 等）的工作原理：</p>
 
 <ol>
   <li>客户端（浏览器）发送请求到 <strong><code class="highlighter-rouge">Di'spatcherServlet</code> 前端控制器</strong>/分发器/<strong>调度器</strong>；</li>
-  <li><code class="highlighter-rouge">DispatcherServlet</code> （根据请求信息）查询 <code class="highlighter-rouge">HandlerMapping</code> 处理器映射；<code class="highlighter-rouge">HandlerMapping</code> 根据 URL 去匹配查找能处理的 <code class="highlighter-rouge">Handler</code>（也就是我们平常说的 <code class="highlighter-rouge">Controller</code> 控制器） ，并会将请求涉及到的拦截器和 <code class="highlighter-rouge">Handler</code> 一起封装。</li>
+  <li><code class="highlighter-rouge">DispatcherServlet</code> （根据请求信息）查询 <strong><code class="highlighter-rouge">HandlerMapping</code> 处理器映</strong>射；<code class="highlighter-rouge">HandlerMapping</code> 根据 URL 去匹配查找能处理的 <code class="highlighter-rouge">Handler</code>（也就是平常说的 <code class="highlighter-rouge">Controller</code> 控制器） ，并会将请求涉及到的拦截器和 <code class="highlighter-rouge">Handler</code> 一起封装。</li>
   <li><del>返回 <code class="highlighter-rouge">Handler</code> 处理器对象；</del></li>
-  <li>调用 <code class="highlighter-rouge">HandlerA'dapter</code> 适配器，解析请求到对应的具体 Handler（即 <strong>Controller</strong>）；</li>
+  <li>调用 <strong><code class="highlighter-rouge">HandlerA'dapter</code> 适配器</strong>，解析请求到对应的具体 Handler（即 <strong>Controller</strong>）；</li>
   <li><code class="highlighter-rouge">HandlerAdapter</code> 适配器调用<strong>真正的处理器</strong> <code class="highlighter-rouge">Handler</code> 处理请求和相应的业务逻辑；Controller 调用 Service 业务逻辑层处理后返回结果；</li>
   <li>处理器处理完业务后，会返回一个 <strong><code class="highlighter-rouge">ModelAndView</code> 对象</strong>（Model 是返回的数据对象，View 是逻辑上的 View）；</li>
   <li><del>返回 <code class="highlighter-rouge">ModelAndView</code> 对象给前端控制器；</del></li>
@@ -417,6 +892,8 @@
   <li>JSP 渲染视图；</li>
   <li>将 View 响应给浏览器。</li>
 </ol>
+
+<h3 id="前后端分离">前后端分离</h3>
 
 <p>然而现在主流的开发方式是<strong>前后端分离</strong>，这种情况下 Spring MVC 的 <code class="highlighter-rouge">View</code> 概念发生了一些变化。</p>
 
@@ -427,109 +904,56 @@
   <li><code class="highlighter-rouge">View</code> 的部分往往不需要设置，Spring MVC 的控制器方法只需要返回数据，不再返回 <code class="highlighter-rouge">ModelAndView</code>，而是直接返回数据，Spring 会自动将其转换为 JSON 格式。相应的，<code class="highlighter-rouge">ViewResolver</code> 也将不再被使用。</li>
 </ul>
 
-<p>怎么做到呢？</p>
+<h5 id="restcontroller">@RestController</h5>
+
+<blockquote>
+  <p>见 Spring Boot 文档。</p>
+</blockquote>
+
+<p><code class="highlighter-rouge">@RestController</code> 注解，添加在类上，是 <code class="highlighter-rouge">@Controller</code> 和 <code class="highlighter-rouge">@ResponseBody</code> 的组合注解。</p>
 
 <ul>
-  <li>使用 <code class="highlighter-rouge">@RestController</code> 注解代替传统的 <code class="highlighter-rouge">@Controller</code> 注解，这样所有方法默认会返回 JSON 格式的数据，而不是试图解析视图。</li>
-  <li>如果你使用的是 <code class="highlighter-rouge">@Controller</code>，可以结合 <code class="highlighter-rouge">@ResponseBody</code> 注解来返回 JSON。</li>
+  <li>表示直接使用接口方法的返回结果。默认情况下，使用 JSON 作为序列化方式。</li>
+  <li><strong>默认会返回 JSON 格式</strong>的数据，而不是试图解析视图。无需使用 InternalResourceViewResolver 解析视图，返回 HTML 结果。</li>
 </ul>
 
-<h3 id="springspring-mvcspring-boot">Spring、Spring MVC、Spring Boot</h3>
+<p>目前主流的架构，都是 前后端分离 的架构，后端只需要提供 API 接口，仅仅返回数据。</p>
 
-<p>Spring，Spring MVC，Spring Boot 之间什么关系?</p>
+<ul>
+  <li>而视图部分的工作，全部交给前端来做。</li>
+  <li>也因此，项目中 99.99% 使用 <code class="highlighter-rouge">@RestController</code> 注解。</li>
+  <li>如果使用的是 <code class="highlighter-rouge">@Controller</code>，可以结合 <code class="highlighter-rouge">@ResponseBody</code> 注解来返回 JSON。</li>
+</ul>
+
+<h3 id="接收请求参数">接收请求参数</h3>
+
+<p>HTTP 请求中接收前端参数的三种常用方式</p>
 
 <ol>
-  <li><code class="highlighter-rouge">Spring</code>：是一个<strong>轻量级开源框架</strong>，用于简化 <del>Java EE</del> 企业级应用程序开发。核心是 IoC（<strong>控制反转</strong>）和 <strong>AOP</strong>（面向切面编程）。还提供了事务管理等功能。
+  <li><code class="highlighter-rouge">HttpServletRequest</code>：
     <ul>
-      <li>可以用于构建<strong>任何类型</strong>的 Java 应用程序，包括 Web 应用程序、桌面应用程序、和批处理应用程序等。</li>
+      <li>后端用于响应的有<code class="highlighter-rouge">HttpServletResponse</code>。</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">Spring MVC</code>：Spring MVC 是构建在 Spring 之上的 <strong>Web 框架</strong>，用于<strong>构建 Web 应用程序</strong>。提供了一个基于 Model、View、Controller 模式的 Web 框架，用于处理 Web 请求和响应。
-    <ul>
-      <li>通过将请求<strong>映射</strong>到相应的处理器方法，并使用<strong>视图</strong>来呈现响应，使得构建Web应用程序变得简单和灵活。</li>
-    </ul>
-  </li>
-  <li><code class="highlighter-rouge">Spring Boot</code>：是一个用于<strong>简化 Spring 应用程序开发</strong>的框架，用于快速构建基于 Spring 的 Web 应用程序。Spring Boot <strong>依赖于</strong> Spring 框架和 Spring MVC。提供了<strong>自动配置</strong>、开箱即用等功能。
-    <ul>
-      <li>内置了许多常用的<strong>第三方库和框架</strong>，简化了配置和部署过程。还提供了一组用于开发Web应用程序、RESTful 服务和微服务的起步<strong>依赖项</strong>。</li>
-    </ul>
-  </li>
+  <li><code class="highlighter-rouge">@RequestParam</code>：具体见下面 <a href="#REST 常用注解">REST 常用注解</a>。</li>
+  <li><code class="highlighter-rouge">@RequestBody</code>：具体见下面 <a href="#REST 常用注解">REST 常用注解</a>。</li>
 </ol>
 
-<h2 id="spring-整合-web">Spring 整合 Web</h2>
-
-<h4 id="java-web">Java Web</h4>
-
-<h5 id="服务器">服务器</h5>
-
-<p><strong>Web 服务器</strong>：指能为<strong>发出请求</strong>的浏览器（客户端）<strong>提供文档</strong>的程序。只需支持HTTP协议、HTML文档格式及URL。与客户端的网络浏览器配合。因为Web服务器主要支持的协议就是HTTP，所以通常情况下HTTP服务器和WEB服务器是相等的。</p>
+<p>取参类型区别：</p>
 
 <ul>
-  <li><code class="highlighter-rouge">N’ginx</code>：轻量级的 Web （静态资源）服务器、反向代理服务器，内存占用少，启动极快，高并发能力强，在互联网项目中广泛应用。</li>
-  <li>Apache HTTP 服务器：用 C 语言实现的 HTTP Web 服务器。</li>
+  <li>
+    <p><code class="highlighter-rouge">@RequestParam</code> 和 <code class="highlighter-rouge">@RequestBody</code> 都是从 <code class="highlighter-rouge">HttpServletRequest request</code> 中取参的，而 <code class="highlighter-rouge">@PathVariable</code> 是映射 URI 请求参数中的<strong>占位符</strong>到目标方法的参数。</p>
+  </li>
+  <li><code class="highlighter-rouge">@RequestParam</code> 可以获取（Content-Type 的<strong>默认值</strong>） <code class="highlighter-rouge">application/x-www-form-urlencoded</code> 以及 <code class="highlighter-rouge">application/json</code> 这两种类型的参数，</li>
+  <li>但是 <code class="highlighter-rouge">@RequestBody</code> 是用来获取<strong>非默认类型</strong>的数据，比如 <code class="highlighter-rouge">application/json</code>、<code class="highlighter-rouge">application/xml</code> 等。</li>
 </ul>
 
-<p><strong>应用程序服务器</strong>：Web服务器传送(serves)页面使浏览器可以浏览，而应用程序服务器提供的是客户端应用程序可以调用(call)的方法(methods)。</p>
+<h4 id="httpservletrequest">HttpServletRequest</h4>
 
-<ul>
-  <li><code class="highlighter-rouge">Tomcat</code>：是一个开源 <code class="highlighter-rouge">Servlet容器 / Web容器</code>，负责处理客户端请求，并返回响应。简单来说，Tomcat 主要实现了 2 个核心功能：
-    <ol>
-      <li>处理 <code class="highlighter-rouge">Socket</code> 连接，负责网络字节流、<code class="highlighter-rouge">Request</code> 和 <code class="highlighter-rouge">Response</code> 对象的<strong>转化</strong>。用来管理、运行、支持 Java Servlet、JSP（JavaServer Pages ）、Java 表达式语言、 Java WebSocket 技术 。</li>
-      <li>加载和管理 <code class="highlighter-rouge">Servlet</code>，及具体处理 <code class="highlighter-rouge">Request</code> 请求。</li>
-    </ol>
-  </li>
-  <li><code class="highlighter-rouge">Jetty</code>、<code class="highlighter-rouge">Undertow</code>：</li>
-</ul>
+<h5 id="获取-request-对象">获取 request 对象</h5>
 
-<p><strong>Web 应用服务器</strong>：目前常用的混合软件解决方案。</p>
-
-<p>Servlet 容器（<strong>重点理解</strong>）：是一个（基于 Java）<strong>运行在服务器端</strong>的 Web 组件 / 接口，用于交互式的浏览和修改数据，生成动态 Web 内容。</p>
-
-<ul>
-  <li>按照 Servlet 规范编写的 Java 类，被编译为平台独立的字节码，可被动态地加载到支持 Java 的 Web 服务器中运行。</li>
-  <li>执行过程。</li>
-</ul>
-
-<h5 id="tomcat">Tomcat</h5>
-
-<p><img src="../assets/tomcat_server_response.png" alt="在这里插入图片描述" style="zoom: 50%;" /></p>
-
-<p>Tomcat 运行机制：Tomcat 服务器接受客户请求并做出响应的过程。</p>
-
-<h5 id="http-请求处理流程">HTTP 请求处理流程</h5>
-
-<ol>
-  <li><strong>客户端</strong>（通常都是浏览器）访问 <strong>Web 服务器</strong>，发送 HTTP 请求。
-    <ul>
-      <li>Web 服务器：也叫 HTTP 服务器、web容器，其需要提供web应用运行所需的环境，接收客户端的Http请求</li>
-    </ul>
-  </li>
-  <li>Web 服务器接收到请求后，传递给 <strong>Servlet 容器</strong>。
-    <ul>
-      <li>Servlet 容器：也称Servlet引擎，为Servlet的运行提供环境支持，可以理解为 <strong>Tomcat</strong> 或其他服务器。</li>
-    </ul>
-  </li>
-  <li><strong>Servlet 容器</strong>（根据 url 等路径决定）加载对应 Servlet 实例；调用 Servlet 的 <code class="highlighter-rouge">service()</code> 方法返回 response 对象，向其传递表示请求和响应的对象。
-    <ol>
-      <li>如果Serlvet没有被实例化，则创建该Servlet的一个实例（调用init方法）；</li>
-      <li>或从线程池中取出一个空闲线程（产生 Servlet 实例）；</li>
-    </ol>
-  </li>
-  <li>Servlet容器根据用户的HTTP请求，创建一个<strong><code class="highlighter-rouge">ServletRequest</code>请求对象</strong>（封装了 HTTP 请求信息）和一个可以对HTTP请求进行响应的<code class="highlighter-rouge">ServletResponse</code>对象（类似于寄信，并在信中说明回信的地址），</li>
-  <li>然后调用<code class="highlighter-rouge">HttpServlet</code>中重写的<strong><code class="highlighter-rouge">service(ServletRequest req, ServletResponse res)</code>方法</strong>，
-    <ol>
-      <li>并在这个方法中，将这两个对象<strong>向下转型</strong>，得到<strong><code class="highlighter-rouge">HttpServletRequest</code></strong>和<code class="highlighter-rouge">HttpServletResponse</code>两个对象，</li>
-      <li>然后将客户端的请求转发到<code class="highlighter-rouge">HttpServlet</code>中的<code class="highlighter-rouge">service(HttpServletRequest req, HttpServletResponse resp)</code>。</li>
-    </ol>
-  </li>
-  <li><code class="highlighter-rouge">HttpServletResponse</code>：服务端处理完Http的请求后，将处理结果作为<strong>Http响应</strong>返回给客户端。</li>
-</ol>
-
-<p>参考：<a href="https://blog.csdn.net/qq_41358574/article/details/120422160">HttpServletRequest和@Requestparam、@RequestBody、直接实体接收请求参数的区别与示例</a></p>
-
-<h4 id="获取-httpservletrequest-对象">获取 HttpServletRequest 对象</h4>
-
-<p>获取 request 对象的四种方法：</p>
+<p>获取 HttpServletRequest 对象的四种方法：</p>
 
 <ol>
   <li>
@@ -553,12 +977,12 @@
       <li>
         <p>大大减少了代码冗余。</p>
 
-        <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> @Autowire
- HttpServletRequest request;
+        <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nd">@Autowire</span>
+ <span class="n">HttpServletRequest</span> <span class="n">request</span><span class="o">;</span>
         
- //?
- @Autowire
- HttpSession session;
+ <span class="c1">//?</span>
+ <span class="nd">@Autowire</span>
+ <span class="n">HttpSession</span> <span class="n">session</span><span class="o">;</span>
 </code></pre></div>        </div>
       </li>
     </ol>
@@ -566,10 +990,10 @@
   <li>
     <p><strong>基类</strong>中自动注入（推荐）；</p>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> public class BaseController {
-     @Autowired
-     protected HttpServletRequest request;     
- }
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="kd">public</span> <span class="kd">class</span> <span class="nc">BaseController</span> <span class="o">{</span>
+     <span class="nd">@Autowired</span>
+     <span class="kd">protected</span> <span class="n">HttpServletRequest</span> <span class="n">request</span><span class="o">;</span>     
+ <span class="o">}</span>
 </code></pre></div>    </div>
   </li>
   <li>
@@ -580,59 +1004,139 @@
       <li><code class="highlighter-rouge">RequestContextHolder</code>：持有上下文的Request容器。</li>
     </ul>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> //获取当前请求对象
- ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
- HttpServletRequest request = attributes.getRequest();
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c1">//获取当前请求对象</span>
+ <span class="n">ServletRequestAttributes</span> <span class="n">attributes</span> <span class="o">=</span> <span class="o">(</span><span class="n">ServletRequestAttributes</span><span class="o">)</span> <span class="n">RequestContextHolder</span><span class="o">.</span><span class="na">getRequestAttributes</span><span class="o">();</span>
+ <span class="n">HttpServletRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="n">attributes</span><span class="o">.</span><span class="na">getRequest</span><span class="o">();</span>
+    
+ <span class="c1">//or</span>
+ <span class="nd">@SuppressWarnings</span><span class="o">(</span><span class="s">"PatternVariableCanBeUsed"</span><span class="o">)</span>
+ <span class="kd">public</span> <span class="kd">static</span> <span class="n">HttpServletRequest</span> <span class="nf">getRequest</span><span class="o">()</span> <span class="o">{</span>
+     <span class="n">RequestAttributes</span> <span class="n">requestAttrs</span> <span class="o">=</span> <span class="n">RequestContextHolder</span><span class="o">.</span><span class="na">getRequestAttributes</span><span class="o">();</span>
+     <span class="k">if</span> <span class="o">(!(</span><span class="n">requestAttrs</span> <span class="k">instanceof</span> <span class="n">ServletRequestAttributes</span><span class="o">))</span> <span class="o">{</span>
+         <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+     <span class="o">}</span>
+     <span class="n">ServletRequestAttributes</span> <span class="n">servletRequestAttrs</span> <span class="o">=</span> <span class="o">(</span><span class="n">ServletRequestAttributes</span><span class="o">)</span> <span class="n">requestAttrs</span><span class="o">;</span>
+     <span class="k">return</span> <span class="n">servletRequestAttrs</span><span class="o">.</span><span class="na">getRequest</span><span class="o">();</span>
+ <span class="o">}</span>
 </code></pre></div>    </div>
   </li>
 </ol>
 
-<h4 id="http-请求中接收前端参数的方式">HTTP 请求中接收前端参数的方式</h4>
+<h5 id="使用-request-对象">使用 request 对象</h5>
 
-<h5 id="三种常用的方式">三种常用的方式</h5>
-
-<ol>
-  <li><code class="highlighter-rouge">HttpServletRequest</code>：
-    <ul>
-      <li>后端用于响应的有<code class="highlighter-rouge">HttpServletResponse</code>。</li>
-    </ul>
-  </li>
-  <li><code class="highlighter-rouge">@RequestParam</code>：具体见下面 <a href="#REST 常用注解">REST 常用注解</a>。</li>
-  <li><code class="highlighter-rouge">@RequestBody</code>：具体见下面 <a href="#REST 常用注解">REST 常用注解</a>。</li>
-</ol>
-
-<p>取参类型区别：</p>
-
-<ul>
-  <li>
-    <p><code class="highlighter-rouge">@RequestParam</code> 和 <code class="highlighter-rouge">@RequestBody</code> 都是从 <code class="highlighter-rouge">HttpServletRequest request</code> 中取参的，而 <code class="highlighter-rouge">@PathVariable</code> 是映射 URI 请求参数中的<strong>占位符</strong>到目标方法的参数。</p>
-  </li>
-  <li><code class="highlighter-rouge">@RequestParam</code> 可以获取（Content-Type 的<strong>默认值</strong>） <code class="highlighter-rouge">application/x-www-form-urlencoded</code> 以及 <code class="highlighter-rouge">application/json</code> 这两种类型的参数，</li>
-  <li>但是 <code class="highlighter-rouge">@RequestBody</code> 是用来获取<strong>非默认类型</strong>的数据，比如 <code class="highlighter-rouge">application/json</code>、<code class="highlighter-rouge">application/xml</code> 等。</li>
-</ul>
-
-<h5 id="httpservletrequest">HttpServletRequest</h5>
-
-<p><code class="highlighter-rouge">HttpServletRequest</code> 接口可以获得的参数更多，它可以获得客户端的<strong>请求行和请求头、请求体</strong>信息。</p>
+<p><code class="highlighter-rouge">HttpServletRequest</code> 接口可以获得的参数更多，可以获得客户端的<strong>请求行和请求头、请求体</strong>信息。</p>
 
 <p>当访问Servlet时，会在请求消息的请求行中，包含请求方法、请求资源名、请求路径等信息，为了获取这些信息，定义了一系列用于获取请求行的方法。</p>
 
 <ol>
   <li>获得请求行：<code class="highlighter-rouge">String getMethod()</code> GET/POST等。</li>
-  <li>获得请求头：<code class="highlighter-rouge">String getHeader(String name)</code>等。</li>
+  <li>获得<strong>请求头</strong>：<code class="highlighter-rouge">String getHeader(String name)</code>等。</li>
   <li>获得请求体：<code class="highlighter-rouge">String getParameter(String name)</code>等。</li>
+  <li><code class="highlighter-rouge">getServletPath()</code></li>
   <li>获取 Session：<code class="highlighter-rouge">getSession()</code>。</li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Public static void login(User user, HttpServletRequest request) {
-    HttpSession session = request.getSession();
-    Session.setAttribute(User, user);
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">login</span><span class="o">(</span><span class="n">User</span> <span class="n">user</span><span class="o">,</span> <span class="n">HttpServletRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">HttpSession</span> <span class="n">session</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="na">getSession</span><span class="o">();</span>
+    <span class="n">Session</span><span class="o">.</span><span class="na">setAttribute</span><span class="o">(</span><span class="n">User</span><span class="o">,</span> <span class="n">user</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="cm">/**
+  * 获得租户编号，从 header 中
+  * 考虑到其它 framework 组件也会使用到租户编号，所以不得不放在 WebFrameworkUtils 统一提供
+  * @param request 请求
+  * @return 租户编号
+  */</span>
+<span class="kd">public</span> <span class="kd">static</span> <span class="n">Long</span> <span class="nf">getTenantId</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">String</span> <span class="n">tenantId</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="na">getHeader</span><span class="o">(</span><span class="n">HEADER_TENANT_ID</span><span class="o">);</span>
+    <span class="k">return</span> <span class="n">NumberUtil</span><span class="o">.</span><span class="na">isNumber</span><span class="o">(</span><span class="n">tenantId</span><span class="o">)</span> <span class="o">?</span> <span class="n">Long</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="n">tenantId</span><span class="o">)</span> <span class="o">:</span> <span class="kc">null</span><span class="o">;</span>
+<span class="o">}</span>
+
+<span class="cm">/**
+     * 获得当前用户的类型
+     * 注意：该方法仅限于 web 相关的 framework 组件使用！！！
+     *
+     * @param request 请求
+     * @return 用户编号
+     */</span>
+<span class="kd">public</span> <span class="kd">static</span> <span class="n">Integer</span> <span class="nf">getLoginUserType</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">request</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="c1">// 1. 优先，从 Attribute 中获取</span>
+    <span class="n">Integer</span> <span class="n">userType</span> <span class="o">=</span> <span class="o">(</span><span class="n">Integer</span><span class="o">)</span> <span class="n">request</span><span class="o">.</span><span class="na">getAttribute</span><span class="o">(</span><span class="n">REQUEST_ATTRIBUTE_LOGIN_USER_TYPE</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">userType</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">userType</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="c1">// 2. 其次，基于 URL 前缀的约定</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">getServletPath</span><span class="o">().</span><span class="na">startsWith</span><span class="o">(</span><span class="n">properties</span><span class="o">.</span><span class="na">getAdminApi</span><span class="o">().</span><span class="na">getPrefix</span><span class="o">()))</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">UserTypeEnum</span><span class="o">.</span><span class="na">ADMIN</span><span class="o">.</span><span class="na">getValue</span><span class="o">();</span>
+    <span class="o">}</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">getServletPath</span><span class="o">().</span><span class="na">startsWith</span><span class="o">(</span><span class="n">properties</span><span class="o">.</span><span class="na">getAppApi</span><span class="o">().</span><span class="na">getPrefix</span><span class="o">()))</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">UserTypeEnum</span><span class="o">.</span><span class="na">MEMBER</span><span class="o">.</span><span class="na">getValue</span><span class="o">();</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
-<h5 id="httpservletresponse">HttpServletResponse</h5>
+<h4 id="httpservletresponse">HttpServletResponse</h4>
 
 <p><code class="highlighter-rouge">HttpServletResponse</code>：服务端处理完Http的请求后，根据HttpServletResponse对象将处理结果作为Http响应返回给客户端。</p>
+
+<h4 id="httpheaders">HttpHeaders</h4>
+
+<p>是一个用于表示HTTP请求或响应头的类，<del>属于 <code class="highlighter-rouge">java.net.http</code> 包，从Java 11开始引入</del>。</p>
+
+<ul>
+  <li>这个类提供了一种方便的方式来操作<strong>HTTP消息头</strong>，包括添加、删除和获取头字段的值。</li>
+  <li>是Spring框架中的一个常用类，用于表示<strong>HTTP请求或响应中</strong>的头部信息。提供了一系列方法来操作头部信息，例如获取所有头部信息、获取特定头部信息、添加头部信息等。</li>
+  <li>在Spring框架中，HttpHeaders类通常位于org.springframework.http包中 。</li>
+</ul>
+
+<p>以下是 HttpHeaders 类的一些关键特性和用法：</p>
+
+<ul>
+  <li>不可变性：HttpHeaders 实例是不可变的，这意味着一旦创建，就不能更改其内容。这有助于确保线程安全性。</li>
+  <li>构建器模式：HttpHeaders 的实例是通过构建器模式创建的，这允许你以一种灵活和链式的方式设置头字段。</li>
+  <li>头字段操作：可以使用 set、add、remove 和 clear 等方法来操作头字段。</li>
+  <li>遍历头字段：可以通过迭代器或使用 names 和 values 方法来遍历头字段。</li>
+  <li>获取头字段值：可以使用 firstValue 或 allValues 方法来获取头字段的值。</li>
+  <li>条件请求：HttpHeaders 类还支持创建条件请求，例如 If-Modified-Since 和 If-None-Match。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="cm">/**
+     * 快递 100 API 请求
+     *
+     * @param url 请求 url
+     * @param req 对应请求的请求参数
+     * @param respClass 对应请求的响应 class
+     * @param &lt;Req&gt; 每个请求的请求结构 Req DTO
+     * @param &lt;Resp&gt; 每个请求的响应结构 Resp DTO
+     */</span>
+<span class="kd">private</span> <span class="o">&lt;</span><span class="n">Req</span><span class="o">,</span> <span class="n">Resp</span><span class="o">&gt;</span> <span class="n">Resp</span> <span class="nf">httpRequest</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="n">Req</span> <span class="n">req</span><span class="o">,</span> <span class="n">Class</span><span class="o">&lt;</span><span class="n">Resp</span><span class="o">&gt;</span> <span class="n">respClass</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// 请求头</span>
+    <span class="n">HttpHeaders</span> <span class="n">headers</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HttpHeaders</span><span class="o">();</span>
+    <span class="n">headers</span><span class="o">.</span><span class="na">setContentType</span><span class="o">(</span><span class="n">MediaType</span><span class="o">.</span><span class="na">APPLICATION_FORM_URLENCODED</span><span class="o">);</span>
+    <span class="c1">// 请求体</span>
+    <span class="n">String</span> <span class="n">param</span> <span class="o">=</span> <span class="n">JsonUtils</span><span class="o">.</span><span class="na">toJsonString</span><span class="o">(</span><span class="n">req</span><span class="o">);</span>
+    <span class="n">String</span> <span class="n">sign</span> <span class="o">=</span> <span class="n">generateReqSign</span><span class="o">(</span><span class="n">param</span><span class="o">,</span> <span class="n">config</span><span class="o">.</span><span class="na">getKey</span><span class="o">(),</span> <span class="n">config</span><span class="o">.</span><span class="na">getCustomer</span><span class="o">());</span> <span class="c1">// 签名</span>
+    <span class="n">MultiValueMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">requestBody</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LinkedMultiValueMap</span><span class="o">&lt;&gt;();</span>
+    <span class="n">requestBody</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"customer"</span><span class="o">,</span> <span class="n">config</span><span class="o">.</span><span class="na">getCustomer</span><span class="o">());</span>
+    <span class="n">requestBody</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"sign"</span><span class="o">,</span> <span class="n">sign</span><span class="o">);</span>
+    <span class="n">requestBody</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"param"</span><span class="o">,</span> <span class="n">param</span><span class="o">);</span>
+    <span class="n">log</span><span class="o">.</span><span class="na">debug</span><span class="o">(</span><span class="s">"[httpRequest][请求参数({})]"</span><span class="o">,</span> <span class="n">requestBody</span><span class="o">);</span>
+
+    <span class="c1">// 发送请求</span>
+    <span class="n">HttpEntity</span><span class="o">&lt;</span><span class="n">MultiValueMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;&gt;</span> <span class="n">requestEntity</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HttpEntity</span><span class="o">&lt;&gt;(</span><span class="n">requestBody</span><span class="o">,</span> <span class="n">headers</span><span class="o">);</span>
+    <span class="n">ResponseEntity</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">responseEntity</span> <span class="o">=</span> <span class="n">restTemplate</span><span class="o">.</span><span class="na">exchange</span><span class="o">(</span><span class="n">url</span><span class="o">,</span> <span class="n">HttpMethod</span><span class="o">.</span><span class="na">POST</span><span class="o">,</span> <span class="n">requestEntity</span><span class="o">,</span> <span class="n">String</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+    <span class="n">log</span><span class="o">.</span><span class="na">debug</span><span class="o">(</span><span class="s">"[httpRequest][的响应结果({})]"</span><span class="o">,</span> <span class="n">responseEntity</span><span class="o">);</span>
+    <span class="c1">// 处理响应</span>
+    <span class="k">if</span> <span class="o">(!</span><span class="n">responseEntity</span><span class="o">.</span><span class="na">getStatusCode</span><span class="o">().</span><span class="na">is2xxSuccessful</span><span class="o">())</span> <span class="o">{</span>
+        <span class="k">throw</span> <span class="nf">exception</span><span class="o">(</span><span class="n">EXPRESS_API_QUERY_ERROR</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="n">JsonUtils</span><span class="o">.</span><span class="na">parseObject</span><span class="o">(</span><span class="n">responseEntity</span><span class="o">.</span><span class="na">getBody</span><span class="o">(),</span> <span class="n">respClass</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
 
 <h4 id="rest-常用注解">REST 常用注解</h4>
 
@@ -686,15 +1190,25 @@
   <li>获取参数值的方式不同，<code class="highlighter-rouge">@RequestParam</code> 从请求携带的<strong>参数</strong>中获取参数（<code class="highlighter-rouge">/teachers?type=web</code>），而 <code class="highlighter-rouge">@PathVariable</code> 从<strong>请求的 URI</strong> 中获取（<code class="highlighter-rouge">/klasses/123456/</code>）。</li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 如果请求的 url 是：/klasses/123456/teachers?type=web
-// 则获取到的数据就是：klassId=123456, type=web
-@GetMapping("/klasses/{klassId}/teachers")
-public List&lt;Teacher&gt; getKlassRelatedTeachers(
-	@PathVariable("klassId") Long klassId,
-	@RequestParam(value = "type", defaultValue = "10000", required = false) String klassType ) {
-	...
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 如果请求的 url 是：/klasses/123456/teachers?type=web</span>
+<span class="c1">// 则获取到的数据就是：klassId=123456, type=web</span>
+<span class="nd">@GetMapping</span><span class="o">(</span><span class="s">"/klasses/{klassId}/teachers"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Teacher</span><span class="o">&gt;</span> <span class="nf">getKlassRelatedTeachers</span><span class="o">(</span>
+	<span class="nd">@PathVariable</span><span class="o">(</span><span class="s">"klassId"</span><span class="o">)</span> <span class="n">Long</span> <span class="n">klassId</span><span class="o">,</span>
+	<span class="nd">@RequestParam</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">"type"</span><span class="o">,</span> <span class="n">defaultValue</span> <span class="o">=</span> <span class="s">"10000"</span><span class="o">,</span> <span class="n">required</span> <span class="o">=</span> <span class="kc">false</span><span class="o">)</span> <span class="n">String</span> <span class="n">klassType</span> <span class="o">)</span> <span class="o">{</span>
+	<span class="o">...</span>
+<span class="o">}</span>
 </code></pre></div></div>
+
+<h6 id="不使用-pathvariable">不使用 @PathVariable</h6>
+
+<p>对于 SpringMVC 提供的 <code class="highlighter-rouge">@PathVariable</code> 路径参数，并没有在项目中使用，主要原因如下：</p>
+
+<ol>
+  <li>封装的权限框架，基于 URL 作为<strong>权限标识</strong>，暂时是不支持带有路径参数的 URL 。</li>
+  <li>基于 URL 进行告警，而带有路径参数的 URL ，“相同” URL 实际对应的是不同的 URL ，导致无法很方便的实现按照单位时间<strong>请求错误次数</strong>告警。</li>
+  <li><code class="highlighter-rouge">@PathVariable</code> 路径参数的 URL ，会带来一定的 SpringMVC 的<strong>性能下滑</strong>。具体可以看看 <a href="https://tech.imdada.cn/2015/12/23/springmvc-restful-optimize/">《SpringMVC RESTful 性能优化》</a> 文章。</li>
+</ol>
 
 <h5 id="requestbody">@RequestBody</h5>
 
@@ -729,7 +1243,7 @@ public CommonResult login(@Validated @RequestBody UmsAdminLoginParam umsAdminLog
 
 <ul>
   <li>
-    <p>使用 <code class="highlighter-rouge">@RequestParam</code> 可以直接获取指定的参数，可以获取 默认以及 <code class="highlighter-rouge">application/json</code> 这两种类型的参数，但是一旦前端传递的是 JSON 数据，那么使用 @RequestParam 取不到值，还报错。</p>
+    <p>使用 <code class="highlighter-rouge">@RequestParam</code> 可以直接获取指定的参数，可以获取默认以及 <code class="highlighter-rouge">application/json</code> 这两种类型的参数，但是一旦前端传递的是 JSON 数据，那么使用 @RequestParam 取不到值，还报错。</p>
   </li>
   <li>
     <p>使用 <code class="highlighter-rouge">@RequestBody</code> 是用来获取<strong>非默认类型</strong>的数据，比如 <code class="highlighter-rouge">application/json</code>、<code class="highlighter-rouge">application/xml</code> 等。</p>
@@ -748,6 +1262,10 @@ public CommonResult login(@Validated @RequestBody UmsAdminLoginParam umsAdminLog
 <p><code class="highlighter-rouge">@Required</code>：用于 Bean 设置方法。表示在配置时用<strong>必需的属性</strong>填充带注解的 Bean，否则将引发异常 <code class="highlighter-rouge">BeanInitilizationException</code> 。</p>
 
 <h5 id="crossorigin">@CrossOrigin</h5>
+
+<blockquote>
+  <p>见计算机网络文档</p>
+</blockquote>
 
 <p>用于解决跨域问题。</p>
 
@@ -822,26 +1340,25 @@ public ResponseEntity updateStudent(@RequestBody StudentUpdateRequest stuUpdateR
 }
 </code></pre></div></div>
 
-<h4 id="ajaxjson">AJAX、JSON</h4>
+<h3 id="参数校验统一响应和异常">参数校验、统一响应和异常</h3>
+
+<blockquote>
+  <p>参考参数校验、统一响应和异常处理文档</p>
+</blockquote>
+
+<h3 id="测试接口">测试接口</h3>
+
+<p>方法有：</p>
 
 <ol>
-  <li>
-    <p><code class="highlighter-rouge">@JsonIgnoreProperties({"userRoles"})</code>：作用在类上，用于过滤掉特定字段，不返回或不解析；</p>
-  </li>
-  <li>
-    <p><code class="highlighter-rouge">@JsonIgnore</code>：用于属性上，同上；</p>
-  </li>
-  <li>
-    <p><code class="highlighter-rouge">@JsonFormat</code>：用来格式化 JSON 数据。</p>
-
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone="GMT")
- private Date date;
-</code></pre></div>    </div>
-  </li>
-  <li>
-    <p><code class="highlighter-rouge">@JsonUnwrapped</code>：扁平化对象。</p>
-  </li>
+  <li>Postman、</li>
+  <li>CURL</li>
+  <li>浏览器，手工模拟请求后端 API 接口。</li>
+  <li>IDEA HTTP Client 插件 .http 模拟请求</li>
+  <li>@Test 单元测试</li>
 </ol>
+
+<h3 id="ajax">AJAX</h3>
 
 <p>SpringMVC 中的转发和重定向：</p>
 
@@ -854,8 +1371,754 @@ public ResponseEntity updateStudent(@RequestBody StudentUpdateRequest stuUpdateR
   </li>
 </ul>
 
-<p>通过 <strong>JackSon 框架</strong>把 Java 里的对象直接转换成 js 可识别的 JSON 对象，在接受 AJAX 方法里直接返回Object，List 等，方法前需要加上注解 @ResponseBody。</p>
+<p>通过 <strong>JackSon 框架</strong>把 Java 里的对象直接转换成 js 可识别的 JSON 对象，在接受 AJAX 方法里直接返回Object，List 等，方法前需要加上注解 <code class="highlighter-rouge">@ResponseBody</code>。</p>
 
-<h4 id="axios">Axios</h4>
+<h3 id="axios">Axios</h3>
 
 <p>前端 HTTP 框架</p>
+
+<h2 id="hutool-工具类">Hutool 工具类</h2>
+
+<p>Hutool 是一个小而全的 Java工具类库，通过<strong>静态方法封装</strong>，降低相关API的学习成本，提高工作效率，使Java拥有函数式语言般的优雅，让Java语言也可以“甜甜的”。</p>
+
+<ul>
+  <li>
+    <p>是项目中<strong>“util”包</strong>友好的替代，节省了开发人员对项目中<strong>常用工具类和方法</strong>的封装时间，使开发专注于业务，同时可以最大限度的避免封装不完善带来的bug</p>
+  </li>
+  <li>该工具类主要对 文件、流、加密解密、转码、正则、线程、XML等 JDK方法进行封装，组成各种Util工具类，同时提供以下组件：</li>
+  <li><a href="https://hutool.cn/docs/#/">官方参考文档</a></li>
+</ul>
+
+<h3 id="包含组件">包含组件</h3>
+
+<p>一个Java基础工具类，对文件、流、加密解密、转码、正则、线程、XML等JDK方法进行封装，组成各种Util工具类，同时提供以下组件：</p>
+
+<blockquote>
+  <p>可以根据需求对每个模块单独引入，也可以通过引入<code class="highlighter-rouge">hutool-all</code>方式引入所有模块。</p>
+</blockquote>
+
+<table>
+  <thead>
+    <tr>
+      <th>模块</th>
+      <th>介绍</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>hutool-aop</td>
+      <td>JDK动态代理封装，提供非IOC下的<strong>切面</strong>支持</td>
+    </tr>
+    <tr>
+      <td>hutool-bloomFilter</td>
+      <td><strong>布隆过滤</strong>，提供一些Hash算法的布隆过滤</td>
+    </tr>
+    <tr>
+      <td>hutool-cache</td>
+      <td>简单缓存实现</td>
+    </tr>
+    <tr>
+      <td><strong>hutool-core</strong></td>
+      <td>核心，包括<strong>Bean操作、日期、各种Util</strong>等</td>
+    </tr>
+    <tr>
+      <td>hutool-cron</td>
+      <td>定时任务模块，提供类Crontab表达式的定时任务</td>
+    </tr>
+    <tr>
+      <td>hutool-crypto</td>
+      <td><strong>加密解密</strong>模块，提供对称、非对称和摘要算法封装</td>
+    </tr>
+    <tr>
+      <td>hutool-db</td>
+      <td>JDBC封装后的数据操作，基于ActiveRecord思想</td>
+    </tr>
+    <tr>
+      <td>hutool-dfa</td>
+      <td>基于DFA模型的多关键字查找</td>
+    </tr>
+    <tr>
+      <td>hutool-extra</td>
+      <td>扩展模块，对第三方封装（模板引擎、邮件、Servlet、二维码、Emoji、FTP、分词等）</td>
+    </tr>
+    <tr>
+      <td>hutool-http</td>
+      <td>基于HttpUrlConnection的Http客户端封装</td>
+    </tr>
+    <tr>
+      <td>hutool-log</td>
+      <td>自动识别日志实现的日志门面</td>
+    </tr>
+    <tr>
+      <td>hutool-script</td>
+      <td>脚本执行封装，例如Javascript</td>
+    </tr>
+    <tr>
+      <td>hutool-setting</td>
+      <td>功能更强大的Setting配置文件和Properties封装</td>
+    </tr>
+    <tr>
+      <td>hutool-system</td>
+      <td>系统参数调用封装（JVM信息等）</td>
+    </tr>
+    <tr>
+      <td>hutool-json</td>
+      <td>JSON实现</td>
+    </tr>
+    <tr>
+      <td>hutool-captcha</td>
+      <td>图片验证码实现</td>
+    </tr>
+    <tr>
+      <td>hutool-poi</td>
+      <td>针对POI中Excel和Word的封装</td>
+    </tr>
+    <tr>
+      <td>hutool-socket</td>
+      <td>基于Java的NIO和AIO的Socket封装</td>
+    </tr>
+    <tr>
+      <td>hutool-jwt</td>
+      <td>JSON Web Token (JWT)封装实现</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="依赖">依赖</h4>
+
+<p>【Hutool 5.x 支持 JDK8+，JDK7 使用 Hutool 4.x版本】</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>cn.hutool<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>hutool-all<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>4.6.3<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div></div>
+
+<h3 id="convertutil">ConvertUtil</h3>
+
+<p><a href="https://www.bookstack.cn/read/hutool/52e25ad985b3cc80.md">类型转换工具类-Convert</a>：封装了针对Java常见类型的转换，用于简化类型转换。</p>
+
+<ul>
+  <li>常见类型转换：大部分方法为toXXX，参数为Object，可以实现将任意可能的类型转换为指定类型。同时支持第二个参数<strong>defaultValue</strong>用于在转换失败时返回一个默认值。
+    <ul>
+      <li><code class="highlighter-rouge">Convert.toLong(id)</code></li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">Convert.convert(Class&lt;T&gt;, Object)</code>方法：可以将任意类型转换为指定类型，Hutool中预定义了许多类型转换，例如转换为URI、URL、Calendar等等，</li>
+  <li>半角和全角转换、16进制（Hex）、Unicode和字符串转换、编码转换、时间单位转换、金额大小写转换、原始类和包装类转换。</li>
+</ul>
+
+<h3 id="javabean-和-class">JavaBean 和 Class</h3>
+
+<p>该类别主要对 对象、类、类加载、类的类型判断、反射 等相关功能进行了封装（ <a href="https://apidoc.gitee.com/dromara/hutool/">API 文档</a> ）</p>
+
+<ul>
+  <li>ResourceUtils：</li>
+  <li>
+    <p><code class="highlighter-rouge">ClassPathResource</code> ：获取 classPath 下的文件，在 Tomcat 等容器下，classPath 一般是WEB-INF/classes；用于日志。</p>
+  </li>
+  <li>ClassLoaderUtil：ClassLoader 工具类</li>
+  <li>ClassUtil：类工具类</li>
+  <li><code class="highlighter-rouge">ObjectUtil</code>：对象工具类</li>
+  <li>TypeUtil：针对Type的工具类封装</li>
+  <li><code class="highlighter-rouge">ReflectUtil</code>：反射工具类</li>
+  <li><code class="highlighter-rouge">ReferenceUtil</code>： 引用工具类</li>
+  <li>JAXBUtil：JAXB（Java Architecture for XML Binding），根据XML Schema产生Java对象</li>
+  <li>SerializeUtil：类序列化工具类</li>
+  <li>ModifierUtil：类修饰符工具类</li>
+  <li>ServiceLoaderUtil：SPI机制中的服务加载工具类</li>
+  <li><a href="https://www.bookstack.cn/read/hutool/567f1944215621a9.md">泛型类型工具-TypeUtil</a></li>
+</ul>
+
+<p>介绍链接：<a href="https://blog.csdn.net/weixin_42272869/article/details/124809368?csdn_share_tail={&quot;type&quot;%3A&quot;blog&quot;%2C&quot;rType&quot;%3A&quot;article&quot;%2C&quot;rId&quot;%3A&quot;124809368&quot;%2C&quot;source&quot;%3A&quot;weixin_42272869&quot;}&amp;ctrtid=4Rj2n">Java - HuTool 使用 ReflectUtil、ClassUtil等工具类（二）</a></p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+     * 获得自身的代理对象，解决 AOP 生效问题
+     *
+     * @return 自己
+     */</span>
+    <span class="kd">private</span> <span class="n">TradeOrderQueryServiceImpl</span> <span class="nf">getSelf</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">SpringUtil</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="n">getClass</span><span class="o">());</span>
+    <span class="o">}</span>
+</code></pre></div></div>
+
+<h5 id="beanutil">BeanUtil</h5>
+
+<p><code class="highlighter-rouge">BeanUtil</code> JavaBean 工具类：提供对<strong>Java反射</strong>和自省API的包装。主要目的是利用反射机制对JavaBean的属性进行处理。用于 Map 与 JavaBean 对象的互相转换及对象属性的拷贝。</p>
+
+<ol>
+  <li><code class="highlighter-rouge">BeanUtil.copyProperties(Object source, Object target)</code>：将 source 中的值赋给 target，名称不同的属性不进行处理，需手动处理。
+    <ol>
+      <li>如 构造入参 PO；</li>
+      <li>如 浅拷贝方法 <code class="highlighter-rouge">BeanUtils.copyProperties(umsAdminParam, umsAdmin);</code>，Service 中将 DTO 对象 <code class="highlighter-rouge">UmsAdminParm </code>赋值给 DO 实体类对象 <code class="highlighter-rouge">UmsAdmin</code>。</li>
+      <li>支持浅拷贝或深拷贝。</li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">toBean()</code>：此处并不是传Bean对象，而是Bean类，Hutool会自动调用<strong>默认构造方法</strong>创建对象。</li>
+</ol>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">FileDO</span> <span class="n">file</span> <span class="o">=</span> <span class="n">BeanUtil</span><span class="o">.</span><span class="na">toBean</span><span class="o">(</span><span class="n">createReqVO</span><span class="o">,</span> <span class="n">FileDO</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+
+<span class="nd">@Override</span>
+<span class="nd">@TenantIgnore</span> <span class="c1">// 访问令牌校验时，无需传递租户编号；主要解决上传文件的场景，前端不会传递 tenant-id</span>
+<span class="kd">public</span> <span class="n">CommonResult</span><span class="o">&lt;</span><span class="n">OAuth2AccessTokenCheckRespDTO</span><span class="o">&gt;</span> <span class="nf">checkAccessToken</span><span class="o">(</span><span class="n">String</span> <span class="n">accessToken</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">OAuth2AccessTokenDO</span> <span class="n">accessTokenDO</span> <span class="o">=</span> <span class="n">oauth2TokenService</span><span class="o">.</span><span class="na">checkAccessToken</span><span class="o">(</span><span class="n">accessToken</span><span class="o">);</span>
+    <span class="k">return</span> <span class="nf">success</span><span class="o">(</span><span class="n">BeanUtils</span><span class="o">.</span><span class="na">toBean</span><span class="o">(</span><span class="n">accessTokenDO</span><span class="o">,</span> <span class="n">OAuth2AccessTokenCheckRespDTO</span><span class="o">.</span><span class="na">class</span><span class="o">));</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h5 id="objectutil">ObjectUtil</h5>
+
+<ul>
+  <li><code class="highlighter-rouge">isAllNotEmpty(values)</code>：</li>
+  <li><code class="highlighter-rouge">defaultIfNull(levelId, 0L)</code>：</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ObjectUtil</span><span class="o">.</span><span class="na">notEqual</span><span class="o">(</span><span class="n">orderItem</span><span class="o">.</span><span class="na">getUserId</span><span class="o">(),</span> <span class="n">userId</span><span class="o">);</span>
+
+<span class="c1">// 校验是否是活动订单</span>
+<span class="k">if</span> <span class="o">(</span><span class="n">ObjUtil</span><span class="o">.</span><span class="na">isAllEmpty</span><span class="o">(</span><span class="n">seckillActivityId</span><span class="o">,</span> <span class="n">combinationActivityId</span><span class="o">,</span> <span class="n">combinationHeadId</span><span class="o">,</span> <span class="n">bargainRecordId</span><span class="o">))</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h5 id="reflectutil">ReflectUtil</h5>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 执行方法</span>
+<span class="n">ReflectUtil</span><span class="o">.</span><span class="na">invoke</span><span class="o">(</span><span class="n">user</span><span class="o">,</span> <span class="s">"getEmail"</span><span class="o">)</span>
+</code></pre></div></div>
+
+<h4 id="文件--路径--系统相关">文件 / 路径 / 系统相关</h4>
+
+<p>包括像文件中内容转义、XML文件处理、URL处理、系统属性相关工具类</p>
+
+<ul>
+  <li>EscapeUtil：转义和反转义工具类</li>
+  <li>XmlUtil：XML工具类</li>
+  <li>HashUtil：Hash算法工具类</li>
+  <li>SystemPropsUtil：系统属性工具</li>
+  <li>URLUtil：URL统一资源定位符相关工具类</li>
+  <li>PageUtil：分页工具类</li>
+  <li>RuntimeUtil：系统运行时工具类</li>
+</ul>
+
+<p>介绍链接：<a href="https://blog.csdn.net/weixin_42272869/article/details/124830106?csdn_share_tail={&quot;type&quot;%3A&quot;blog&quot;%2C&quot;rType&quot;%3A&quot;article&quot;%2C&quot;rId&quot;%3A&quot;124830106&quot;%2C&quot;source&quot;%3A&quot;weixin_42272869&quot;}&amp;ctrtid=01vBF">Java - HuTool 使用 EscapeUtil、XmlUtil等工具类（四）</a></p>
+
+<h3 id="数据类型">数据类型</h3>
+
+<h4 id="基本类型-转换">基本类型 转换</h4>
+
+<ul>
+  <li>BooleanUtil ：Boolean 类型相关工具类</li>
+  <li>ByteUtil：Byte 类型相关工具类</li>
+  <li>CharUtil：字符工具类</li>
+  <li><a href="https://www.bookstack.cn/read/hutool/dad076e947f5795b.md">EnumUtil</a>：枚举工具类</li>
+</ul>
+
+<h4 id="数字">数字</h4>
+
+<ul>
+  <li>NumberUtil：数字工具类</li>
+  <li>CharsetUtil：字符集工具类</li>
+  <li>HexUtil：十六进制工具类</li>
+  <li>RadixUtil：进制转换工具类</li>
+  <li><a href="https://www.bookstack.cn/read/hutool/377f64112be7197a.md">随机工具-RandomUtil</a>
+    <ul>
+      <li><code class="highlighter-rouge">RandomUtil.randomString(CHARACTERS, length)</code></li>
+      <li><code class="highlighter-rouge">RandomUtil.randomNumbers(6)</code></li>
+    </ul>
+  </li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+     * 生成指定长度的随机字符串
+     *
+     * @param length 长度
+     * @return {@link String}
+     */</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">generateRandomText</span><span class="o">(</span><span class="kt">int</span> <span class="n">length</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">RandomUtil</span><span class="o">.</span><span class="na">randomString</span><span class="o">(</span><span class="n">CHARACTERS</span><span class="o">,</span> <span class="n">length</span><span class="o">);</span>
+    <span class="o">}</span>
+
+<span class="cm">/**
+     * 计算百分比金额
+     *
+     * @param price        金额
+     * @param rate         百分比，例如说 56.77% 则传入 56.77
+     * @param scale        保留小数位数
+     * @param roundingMode 舍入模式
+     */</span>
+<span class="kd">public</span> <span class="kd">static</span> <span class="n">BigDecimal</span> <span class="nf">calculateRatePrice</span><span class="o">(</span><span class="n">Number</span> <span class="n">price</span><span class="o">,</span> <span class="n">Number</span> <span class="n">rate</span><span class="o">,</span> <span class="kt">int</span> <span class="n">scale</span><span class="o">,</span> <span class="n">RoundingMode</span> <span class="n">roundingMode</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">NumberUtil</span><span class="o">.</span><span class="na">toBigDecimal</span><span class="o">(</span><span class="n">price</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">multiply</span><span class="o">(</span><span class="n">NumberUtil</span><span class="o">.</span><span class="na">toBigDecimal</span><span class="o">(</span><span class="n">rate</span><span class="o">))</span> <span class="c1">// 乘以</span>
+        <span class="o">.</span><span class="na">divide</span><span class="o">(</span><span class="n">BigDecimal</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="mi">100</span><span class="o">),</span> <span class="n">scale</span><span class="o">,</span> <span class="n">roundingMode</span><span class="o">);</span> <span class="c1">// 除以 100</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h4 id="日期时间">日期时间</h4>
+
+<p><code class="highlighter-rouge">DateUtil</code> 日期时间工具类：定义了一些常用的日期时间操作方法；</p>
+
+<p><a href="https://www.bookstack.cn/read/hutool/date.md">日期时间</a> DateUtil：提供针对JDK中Date和Calendar对象的封装</p>
+
+<ul>
+  <li><strong><a href="https://www.bookstack.cn/read/hutool/8168b022b2c31abe.md"><code class="highlighter-rouge">DateUtil</code> </a></strong>针对日期时间操作提供一系列静态方法。封装主要是日期和字符串之间的<strong>转换</strong>，以及提供对日期的定位（一个月前等）。</li>
+  <li><code class="highlighter-rouge">DateTime</code> 提供类似于Joda-Time中日期时间对象的封装。对于Date对象，为了便捷，使用了一个<strong>DateTime类</strong>来代替之，继承自Date对象，
+    <ul>
+      <li>主要的便利在于，覆盖了toString()方法，返回yyyy-MM-dd HH:mm:ss形式的字符串，方便在输出时的调用（例如日志记录等），提供了众多便捷的方法对日期对象操作。</li>
+    </ul>
+  </li>
+</ul>
+
+<h5 id="localdatetimeutil">LocalDateTimeUtil</h5>
+
+<p>从Hutool的5.4.x开始，Hutool加入了针对JDK8+日期API的封装，此工具类的功能包括<code class="highlighter-rouge">LocalDateTime</code>和<code class="highlighter-rouge">LocalDate</code>的解析、格式化、转换等操作。</p>
+
+<p>详细接口参考：<a href="https://blog.csdn.net/qq_41463655/article/details/106007147">时间工具类– LocalDateTimeUtil (修正版)</a></p>
+
+<h6 id="between">between</h6>
+
+<p>between(LocalDateTime.now(), accessTokenDO.getExpiresTime(), ChronoUnit.SECONDS)：返回</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kt">void</span> <span class="nf">set</span><span class="o">(</span><span class="n">OAuth2AccessTokenDO</span> <span class="n">accessTokenDO</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">String</span> <span class="n">redisKey</span> <span class="o">=</span> <span class="n">formatKey</span><span class="o">(</span><span class="n">accessTokenDO</span><span class="o">.</span><span class="na">getAccessToken</span><span class="o">());</span>
+    <span class="c1">// 清理多余字段，避免缓存</span>
+    <span class="n">accessTokenDO</span><span class="o">.</span><span class="na">setUpdater</span><span class="o">(</span><span class="kc">null</span><span class="o">).</span><span class="na">setUpdateTime</span><span class="o">(</span><span class="kc">null</span><span class="o">).</span><span class="na">setCreateTime</span><span class="o">(</span><span class="kc">null</span><span class="o">).</span><span class="na">setCreator</span><span class="o">(</span><span class="kc">null</span><span class="o">).</span><span class="na">setDeleted</span><span class="o">(</span><span class="kc">null</span><span class="o">);</span>
+    <span class="kt">long</span> <span class="n">time</span> <span class="o">=</span> <span class="n">LocalDateTimeUtil</span><span class="o">.</span><span class="na">between</span><span class="o">(</span><span class="n">LocalDateTime</span><span class="o">.</span><span class="na">now</span><span class="o">(),</span> <span class="n">accessTokenDO</span><span class="o">.</span><span class="na">getExpiresTime</span><span class="o">(),</span> <span class="n">ChronoUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">time</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">stringRedisTemplate</span><span class="o">.</span><span class="na">opsForValue</span><span class="o">().</span><span class="na">set</span><span class="o">(</span><span class="n">redisKey</span><span class="o">,</span> <span class="n">JsonUtils</span><span class="o">.</span><span class="na">toJsonString</span><span class="o">(</span><span class="n">accessTokenDO</span><span class="o">),</span> <span class="n">time</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h5 id="日期转换">日期转换</h5>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">String</span> <span class="n">dateStr</span> <span class="o">=</span> <span class="s">"2020-01-23T12:23:56"</span><span class="o">;</span>
+<span class="n">DateTime</span> <span class="n">dt</span> <span class="o">=</span> <span class="n">DateUtil</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="n">dateStr</span><span class="o">);</span>
+
+<span class="c1">// Date对象转换为LocalDateTime</span>
+<span class="n">LocalDateTime</span> <span class="n">of</span> <span class="o">=</span> <span class="n">LocalDateTimeUtil</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="n">dt</span><span class="o">);</span>
+
+<span class="c1">// 时间戳转换为LocalDateTime</span>
+<span class="n">of</span> <span class="o">=</span> <span class="n">LocalDateTimeUtil</span><span class="o">.</span><span class="na">ofUTC</span><span class="o">(</span><span class="n">dt</span><span class="o">.</span><span class="na">getTime</span><span class="o">());</span>
+</code></pre></div></div>
+
+<h5 id="日期字符串解析">日期字符串解析</h5>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 解析ISO时间</span>
+<span class="n">LocalDateTime</span> <span class="n">localDateTime</span> <span class="o">=</span> <span class="n">LocalDateTimeUtil</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="s">"2020-01-23T12:23:56"</span><span class="o">);</span>
+
+<span class="c1">// 解析自定义格式时间</span>
+<span class="n">localDateTime</span> <span class="o">=</span> <span class="n">LocalDateTimeUtil</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="s">"2020-01-23"</span><span class="o">,</span> <span class="n">DatePattern</span><span class="o">.</span><span class="na">NORM_DATE_PATTERN</span><span class="o">);</span>
+</code></pre></div></div>
+
+<p>解析同样支持<code class="highlighter-rouge">LocalDate</code>：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">LocalDate</span> <span class="n">localDate</span> <span class="o">=</span> <span class="n">LocalDateTimeUtil</span><span class="o">.</span><span class="na">parseDate</span><span class="o">(</span><span class="s">"2020-01-23"</span><span class="o">);</span>
+
+<span class="c1">// 解析日期时间为LocalDate，时间部分舍弃</span>
+<span class="n">localDate</span> <span class="o">=</span> <span class="n">LocalDateTimeUtil</span><span class="o">.</span><span class="na">parseDate</span><span class="o">(</span><span class="s">"2020-01-23T12:23:56"</span><span class="o">,</span> <span class="n">DateTimeFormatter</span><span class="o">.</span><span class="na">ISO_DATE_TIME</span><span class="o">);</span>
+</code></pre></div></div>
+
+<h5 id="日期格式化">日期格式化</h5>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">LocalDateTime</span> <span class="n">localDateTime</span> <span class="o">=</span> <span class="n">LocalDateTimeUtil</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="s">"2020-01-23T12:23:56"</span><span class="o">);</span>
+
+<span class="c1">// "2020-01-23 12:23:56"</span>
+<span class="n">String</span> <span class="n">format</span> <span class="o">=</span> <span class="n">LocalDateTimeUtil</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="n">localDateTime</span><span class="o">,</span> <span class="n">DatePattern</span><span class="o">.</span><span class="na">NORM_DATETIME_PATTERN</span><span class="o">);</span>
+</code></pre></div></div>
+
+<h5 id="日期偏移">日期偏移</h5>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">final</span> <span class="n">LocalDateTime</span> <span class="n">localDateTime</span> <span class="o">=</span> <span class="n">LocalDateTimeUtil</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="s">"2020-01-23T12:23:56"</span><span class="o">);</span>
+
+<span class="c1">// 增加一天</span>
+<span class="c1">// "2020-01-24T12:23:56"</span>
+<span class="n">LocalDateTime</span> <span class="n">offset</span> <span class="o">=</span> <span class="n">LocalDateTimeUtil</span><span class="o">.</span><span class="na">offset</span><span class="o">(</span><span class="n">localDateTime</span><span class="o">,</span> <span class="mi">1</span><span class="o">,</span> <span class="n">ChronoUnit</span><span class="o">.</span><span class="na">DAYS</span><span class="o">);</span>
+</code></pre></div></div>
+
+<p>如果是减少时间，offset第二个参数传负数即可：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// "2020-01-22T12:23:56"</span>
+<span class="n">offset</span> <span class="o">=</span> <span class="n">LocalDateTimeUtil</span><span class="o">.</span><span class="na">offset</span><span class="o">(</span><span class="n">localDateTime</span><span class="o">,</span> <span class="o">-</span><span class="mi">1</span><span class="o">,</span> <span class="n">ChronoUnit</span><span class="o">.</span><span class="na">DAYS</span><span class="o">);</span>
+</code></pre></div></div>
+
+<h5 id="计算时间间隔">计算时间间隔</h5>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">LocalDateTime</span> <span class="n">start</span> <span class="o">=</span> <span class="n">LocalDateTimeUtil</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="s">"2019-02-02T00:00:00"</span><span class="o">);</span>
+<span class="n">LocalDateTime</span> <span class="n">end</span> <span class="o">=</span> <span class="n">LocalDateTimeUtil</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="s">"2020-02-02T00:00:00"</span><span class="o">);</span>
+
+<span class="n">Duration</span> <span class="n">between</span> <span class="o">=</span> <span class="n">LocalDateTimeUtil</span><span class="o">.</span><span class="na">between</span><span class="o">(</span><span class="n">start</span><span class="o">,</span> <span class="n">end</span><span class="o">);</span>
+
+<span class="c1">// 365</span>
+<span class="n">between</span><span class="o">.</span><span class="na">toDays</span><span class="o">();</span>
+</code></pre></div></div>
+
+<h5 id="一天的开始和结束">一天的开始和结束</h5>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">LocalDateTime</span> <span class="n">localDateTime</span> <span class="o">=</span> <span class="n">LocalDateTimeUtil</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="s">"2020-01-23T12:23:56"</span><span class="o">);</span>
+
+<span class="c1">// "2020-01-23T00:00"</span>
+<span class="n">LocalDateTime</span> <span class="n">beginOfDay</span> <span class="o">=</span> <span class="n">LocalDateTimeUtil</span><span class="o">.</span><span class="na">beginOfDay</span><span class="o">(</span><span class="n">localDateTime</span><span class="o">);</span>
+
+<span class="c1">// "2020-01-23T23:59:59.999999999"</span>
+<span class="n">LocalDateTime</span> <span class="n">endOfDay</span> <span class="o">=</span> <span class="n">LocalDateTimeUtil</span><span class="o">.</span><span class="na">endOfDay</span><span class="o">(</span><span class="n">localDateTime</span><span class="o">);</span>
+</code></pre></div></div>
+
+<h4 id="strutil-字符串">StrUtil 字符串</h4>
+
+<p><code class="highlighter-rouge">StrUtil</code> 字符串工具类：定义了一些常用的字符串操作方法；</p>
+
+<h5 id="hastextval"><code class="highlighter-rouge">hasText(val)</code></h5>
+
+<p>有文本。</p>
+
+<h5 id="hasblankhasempty">hasBlank、hasEmpty</h5>
+
+<p>如果<strong>一旦有空的</strong>就返回true，常用于判断好多字段是否有空的（例如web表单数据）。</p>
+
+<ul>
+  <li>区别是<code class="highlighter-rouge">hasEmpty</code>只判断是否为null或者空字符串（”“），<code class="highlighter-rouge">hasBlank</code>则会把不可见字符也算做空，<code class="highlighter-rouge">isEmpty</code>和<code class="highlighter-rouge">isBlank</code>同理。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="o">(</span><span class="n">StrUtil</span><span class="o">.</span><span class="na">isBlank</span><span class="o">(</span><span class="n">orderItem</span><span class="o">.</span><span class="na">getPicUrl</span><span class="o">()))</span> <span class="o">{</span>
+    <span class="n">orderItem</span><span class="o">.</span><span class="na">setPicUrl</span><span class="o">(</span><span class="n">spu</span><span class="o">.</span><span class="na">getPicUrl</span><span class="o">());</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h5 id="removeprefixremovesuffix">removePrefix、removeSuffix</h5>
+
+<p>去掉字符串的前缀后缀，例如文件名的扩展名。</p>
+
+<ul>
+  <li>还有忽略大小写的<code class="highlighter-rouge">removePrefixIgnoreCase</code>和<code class="highlighter-rouge">removeSuffixIgnoreCase</code>。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">String</span> <span class="n">fileName</span> <span class="o">=</span> <span class="n">StrUtil</span><span class="o">.</span><span class="na">removeSuffix</span><span class="o">(</span><span class="s">"pretty_girl.jpg"</span><span class="o">,</span> <span class="s">".jpg"</span><span class="o">)</span>  <span class="c1">//fileName -&gt; pretty_girl</span>
+</code></pre></div></div>
+
+<h5 id="sub-方法">sub() 方法</h5>
+
+<p>String 的 subString方法<strong>越界</strong>啥的都会报异常，还得自己判断。</p>
+
+<ul>
+  <li>把各种情况判断都加进来了，而且index的位置还支持负数，-1表示最后一个字符（这个思想来自于<a href="https://www.python.org/">Python</a>），</li>
+  <li>还有就是如果不小心把第一个位置和第二个位置搞反了，也会自动修正（例如想截取第4个和第2个字符之间的部分也是可以）</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">String</span> <span class="n">str</span> <span class="o">=</span> <span class="s">"abcdefgh"</span><span class="o">;</span>
+<span class="n">String</span> <span class="n">strSub1</span> <span class="o">=</span> <span class="n">StrUtil</span><span class="o">.</span><span class="na">sub</span><span class="o">(</span><span class="n">str</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">3</span><span class="o">);</span>  <span class="c1">//strSub1 -&gt; c</span>
+<span class="n">String</span> <span class="n">strSub2</span> <span class="o">=</span> <span class="n">StrUtil</span><span class="o">.</span><span class="na">sub</span><span class="o">(</span><span class="n">str</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="o">-</span><span class="mi">3</span><span class="o">);</span> <span class="c1">//strSub2 -&gt; cde</span>
+<span class="n">String</span> <span class="n">strSub3</span> <span class="o">=</span> <span class="n">StrUtil</span><span class="o">.</span><span class="na">sub</span><span class="o">(</span><span class="n">str</span><span class="o">,</span> <span class="mi">3</span><span class="o">,</span> <span class="mi">2</span><span class="o">);</span>  <span class="c1">//strSub2 -&gt; c</span>
+</code></pre></div></div>
+
+<h5 id="format">format()</h5>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">formatPrice</span><span class="o">(</span><span class="n">Integer</span> <span class="n">price</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">"%.2f"</span><span class="o">,</span> <span class="n">price</span> <span class="o">/</span> <span class="mi">100</span><span class="n">d</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="n">StrUtil</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">"砍价活动：省 {} 元"</span><span class="o">,</span> <span class="n">TradePriceCalculatorHelper</span><span class="o">.</span><span class="na">formatPrice</span><span class="o">(</span><span class="n">discountPrice</span><span class="o">));</span>
+</code></pre></div></div>
+
+<h3 id="集合容器">集合容器</h3>
+
+<h4 id="arrayutil-数组工具类"><a href="https://www.bookstack.cn/read/hutool/50db4cabc87b5968.md">ArrayUtil</a> 数组工具类</h4>
+
+<ul>
+  <li><code class="highlighter-rouge">ArrayUtil.firstMatch()</code></li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="n">SmsSceneEnum</span> <span class="nf">getCodeByScene</span><span class="o">(</span><span class="n">Integer</span> <span class="n">scene</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">ArrayUtil</span><span class="o">.</span><span class="na">firstMatch</span><span class="o">(</span><span class="n">sceneEnum</span> <span class="o">-&gt;</span> <span class="n">sceneEnum</span><span class="o">.</span><span class="na">getScene</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="n">scene</span><span class="o">),</span>
+                                <span class="n">values</span><span class="o">());</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h5 id="primitivearrayutil">PrimitiveArrayUtil</h5>
+
+<blockquote>
+  <p>原始类型数组工具类</p>
+</blockquote>
+
+<h4 id="collutil-集合工具"><a href="https://www.bookstack.cn/read/hutool/85a7389837bd401f.md">CollUtil</a> 集合工具</h4>
+
+<p>定义了一些常用的集合操作；</p>
+
+<ul>
+  <li><code class="highlighter-rouge">CollUtil.isNotEmpty(list)</code></li>
+  <li><code class="highlighter-rouge">CollUtil.toList()</code></li>
+  <li><code class="highlighter-rouge">CollUtil.containsAny(coll1, coll2)</code>：若 coll2 有 coll1，则返回 true。交集</li>
+  <li>ListUtil.empty()：相当于 new 空的 List。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//如果有交集，说明有权限</span>
+<span class="k">if</span> <span class="o">(</span><span class="n">CollUtil</span><span class="o">.</span><span class="na">containsAny</span><span class="o">(</span><span class="n">menuRoleIds</span><span class="o">,</span> <span class="n">roleIds</span><span class="o">))</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+<span class="o">}</span>
+
+<span class="c1">// 2.2 满减送活动</span>
+<span class="n">RewardActivityMatchRespDTO</span> <span class="n">rewardActivity</span> <span class="o">=</span> 
+    <span class="n">CollUtil</span><span class="o">.</span><span class="na">findOne</span><span class="o">(</span><span class="n">rewardActivityMap</span><span class="o">,</span>
+                     <span class="n">activity</span> <span class="o">-&gt;</span> <span class="n">CollUtil</span><span class="o">.</span><span class="na">contains</span><span class="o">(</span><span class="n">activity</span><span class="o">.</span><span class="na">getSpuIds</span><span class="o">(),</span> <span class="n">spuId</span><span class="o">));</span>
+<span class="n">spuVO</span><span class="o">.</span><span class="na">setRewardActivity</span><span class="o">(</span><span class="n">BeanUtils</span><span class="o">.</span><span class="na">toBean</span><span class="o">(</span><span class="n">rewardActivity</span><span class="o">,</span>
+                  	 <span class="n">AppTradeProductSettlementRespVO</span><span class="o">.</span><span class="na">RewardActivity</span><span class="o">.</span><span class="na">class</span><span class="o">));</span>
+
+<span class="n">List</span><span class="o">&lt;</span><span class="n">ArticleDO</span><span class="o">&gt;</span> <span class="n">articles</span> <span class="o">=</span> <span class="n">articleMapper</span><span class="o">.</span><span class="na">selectListByTitle</span><span class="o">(</span><span class="n">title</span><span class="o">);</span>
+<span class="k">return</span> <span class="n">CollUtil</span><span class="o">.</span><span class="na">getLast</span><span class="o">(</span><span class="n">articles</span><span class="o">);</span> <span class="c1">// 返回列表中的最后一个元素</span>
+</code></pre></div></div>
+
+<h5 id="collectionutils">CollectionUtils</h5>
+
+<ul>
+  <li>convertMap：</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Override</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">validateCategoryList</span><span class="o">(</span><span class="n">Collection</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">&gt;</span> <span class="n">ids</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">CollUtil</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">(</span><span class="n">ids</span><span class="o">))</span> <span class="o">{</span>
+        <span class="k">return</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="c1">// 获得商品分类信息</span>
+    <span class="n">List</span><span class="o">&lt;</span><span class="n">ProductCategoryDO</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">=</span> <span class="n">productCategoryMapper</span><span class="o">.</span><span class="na">selectByIds</span><span class="o">(</span><span class="n">ids</span><span class="o">);</span>
+    <span class="c1">// for forEach</span>
+    <span class="n">Map</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">,</span> <span class="n">ProductCategoryDO</span><span class="o">&gt;</span> <span class="n">categoryMap</span> <span class="o">=</span> <span class="n">CollectionUtils</span><span class="o">.</span><span class="na">convertMap</span><span class="o">(</span><span class="n">list</span><span class="o">,</span> <span class="nl">ProductCategoryDO:</span><span class="o">:</span><span class="n">getId</span><span class="o">);</span>
+    <span class="c1">// 校验</span>
+    <span class="n">ids</span><span class="o">.</span><span class="na">forEach</span><span class="o">(</span><span class="n">id</span> <span class="o">-&gt;</span> <span class="o">{</span>
+        <span class="c1">// 校验分类是否存在</span>
+        <span class="n">ProductCategoryDO</span> <span class="n">category</span> <span class="o">=</span> <span class="n">categoryMap</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">id</span><span class="o">);</span>
+        <span class="o">...</span>
+    <span class="o">});</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h4 id="listutil"><a href="https://plus.hutool.cn/apidocs/cn/hutool/core/collection/ListUtil.html">ListUtil</a></h4>
+
+<h4 id="maputil-工具"><strong><a href="https://www.bookstack.cn/read/hutool/fa3d273651700cb0.md">MapUtil</a> 工具</strong></h4>
+
+<p>用于创建 Map 对象及判空；</p>
+
+<blockquote>
+  <p>介绍链接: <a href="https://blog.csdn.net/weixin_42272869/article/details/124754171?spm=1001.2014.3001.5501">Java - HuTool 使用 ArrayUtil、StrUtil等工具类（一）</a></p>
+</blockquote>
+
+<ul>
+  <li>getLong()</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Long</span> <span class="n">count</span> <span class="o">=</span> <span class="n">MapUtil</span><span class="o">.</span><span class="na">getLong</span><span class="o">(</span><span class="n">map</span><span class="o">,</span> <span class="s">"count"</span><span class="o">,</span> <span class="mi">0L</span><span class="o">);</span>
+</code></pre></div></div>
+
+<h3 id="信息验证">信息验证</h3>
+
+<p>在项目开发过程中，会涉及到一些信息的有效性验证，例如电话号码、身份证号、社会信用代码，对身份敏感的数据需要脱敏等，下面的工具类就是我们常用的一些工具类的封装</p>
+
+<ul>
+  <li>PhoneUtil：电话号码工具类</li>
+  <li><code class="highlighter-rouge">Validator.isEmail(userMail)</code></li>
+  <li>IdcardUtil：身份证相关工具类</li>
+  <li>IdUtil：<strong>唯一ID</strong>生成器工具类</li>
+  <li>ReUtil：正则相关工具类</li>
+  <li>ZipUtil：压缩工具类</li>
+  <li>CreditCodeUtil：统一社会信用代码（GB32100-2015）工具类</li>
+  <li>CoordinateUtil：坐标系转换相关工具类</li>
+  <li>DesensitizedUtil：脱敏工具类</li>
+  <li><a href="https://www.bookstack.cn/read/hutool/bd698900f58f95bf.md">网络工具-NetUtil</a></li>
+  <li><a href="https://www.bookstack.cn/read/hutool/773ebbbf4d030326.md">图形验证码（Hutool-captcha）</a>：</li>
+</ul>
+
+<p>介绍链接：<a href="https://blog.csdn.net/weixin_42272869/article/details/124822098?csdn_share_tail={&quot;type&quot;%3A&quot;blog&quot;%2C&quot;rType&quot;%3A&quot;article&quot;%2C&quot;rId&quot;%3A&quot;124822098&quot;%2C&quot;source&quot;%3A&quot;weixin_42272869&quot;}&amp;ctrtid=IWQ9X">Java - HuTool 使用 PhoneUtil、ReUtil等工具类（三）</a></p>
+
+<h4 id="idutil">IdUtil</h4>
+
+<blockquote>
+  <p>见分布式、微服务框架文档。</p>
+</blockquote>
+
+<p>唯一ID生成器的工具类，涵盖了：</p>
+
+<ol>
+  <li>UUID</li>
+  <li>ObjectId（MongoDB）</li>
+  <li>Snowflake（Twitter）</li>
+</ol>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 生成密码</span>
+<span class="n">String</span> <span class="n">password</span> <span class="o">=</span> <span class="n">IdUtil</span><span class="o">.</span><span class="na">fastSimpleUUID</span><span class="o">();</span>
+</code></pre></div></div>
+
+<h3 id="文件格式">文件格式</h3>
+
+<p><code class="highlighter-rouge">JSONUtil</code>：</p>
+
+<ul>
+  <li>常用方式：<code class="highlighter-rouge">String json1 = JSONUtil.toJsonStr(实体类);</code>：将 Java 对象转为 JSON。</li>
+  <li>较原始且不好用：<code class="highlighter-rouge">String json2 = JSONUtil.parse(实体类).toJSONString(0);</code></li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">String</span> <span class="n">callbackData</span> <span class="o">=</span> <span class="n">BinaryUtil</span><span class="o">.</span><span class="na">toBase64String</span><span class="o">(</span><span class="n">JSONUtil</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="n">callback</span><span class="o">).</span><span class="na">toString</span><span class="o">().</span><span class="na">getBytes</span><span class="o">(</span><span class="s">"utf-8"</span><span class="o">));</span>
+
+<span class="c1">// 将redis返回的 String value 格式化为 DO 对象</span>
+<span class="n">JsonUtils</span><span class="o">.</span><span class="na">parseObject</span><span class="o">(</span><span class="n">stringRedisTemplate</span><span class="o">.</span><span class="na">opsForValue</span><span class="o">().</span><span class="na">get</span><span class="o">(</span><span class="n">redisKey</span><span class="o">),</span> <span class="n">OAuth2AccessTokenDO</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</code></pre></div></div>
+
+<p><a href="https://www.bookstack.cn/read/hutool/e41e0b0a699544fb.md">XML工具-XmlUtil</a></p>
+
+<p><a href="https://www.bookstack.cn/read/hutool/a56da94bbb16617b.md">压缩工具-ZipUtil</a></p>
+
+<p><a href="https://www.bookstack.cn/read/hutool/io.md">IO流相关</a></p>
+
+<h3 id="未经过分类">未经过分类</h3>
+
+<p><a href="https://www.bookstack.cn/read/hutool/tools.md">工具类</a>：此包中为未经过分类的一些工具类。</p>
+
+<ul>
+  <li><del><a href="https://www.bookstack.cn/read/hutool/b91f19c931503e63.md">Escape工具-EscapeUtil</a></del></li>
+  <li><a href="https://www.bookstack.cn/read/hutool/4e2278edfa70fef4.md">Hash算法-HashUtil</a></li>
+  <li><a href="https://www.bookstack.cn/read/hutool/5122006c1ce039fe.md">URL工具-URLUtil</a></li>
+  <li><a href="https://www.bookstack.cn/read/hutool/eaafedba59607164.md">分页工具-PageUtil</a></li>
+  <li><a href="https://www.bookstack.cn/read/hutool/d923a0a14060def3.md">剪贴板工具-ClipboardUtil</a></li>
+  <li><a href="https://www.bookstack.cn/read/hutool/936a34d4b083c6ec.md">命令行工具-RuntimeUtil</a></li>
+  <li>
+    <p><a href="https://www.bookstack.cn/read/hutool/1316caf9fe4aa391.md">正则工具-ReUtil</a></p>
+  </li>
+  <li><a href="https://www.bookstack.cn/read/hutool/feature.md">语言特性</a></li>
+  <li><a href="https://www.bookstack.cn/read/hutool/codec.md">Codec编码</a></li>
+  <li><a href="https://www.bookstack.cn/read/hutool/text.md">文本操作</a></li>
+  <li><a href="https://www.bookstack.cn/read/hutool/6db01cdbb910c883.md">注解工具-AnnotationUtil</a></li>
+  <li><a href="https://www.bookstack.cn/read/hutool/dc6a3e5f8e5ae899.md">比较器</a></li>
+  <li><a href="https://www.bookstack.cn/read/hutool/exceptions.md">异常</a></li>
+  <li><a href="https://www.bookstack.cn/read/hutool/5f276f91bbc1d925.md">数学相关-MathUtil</a></li>
+  <li><a href="https://www.bookstack.cn/read/hutool/e46eae82b27baa7c.md">线程和并发 - 线程工具-ThreadUtil</a></li>
+  <li><a href="https://www.bookstack.cn/read/hutool/image.md">图片</a></li>
+</ul>
+
+<h4 id="其它组件">其它组件</h4>
+
+<ul>
+  <li><a href="https://www.bookstack.cn/read/hutool/setting.md">配置文件(Hutool-setting）</a></li>
+  <li><a href="https://www.bookstack.cn/read/hutool/logs.md">日志（Hutool-log）</a></li>
+  <li><a href="https://www.bookstack.cn/read/hutool/cache.md">缓存（Hutool-cache）</a></li>
+  <li><a href="https://www.bookstack.cn/read/hutool/crypto.md">加密解密（Hutool-crypto）</a>：</li>
+  <li><a href="https://www.bookstack.cn/read/hutool/dfa.md">DFA查找（Hutool-dfa）</a></li>
+  <li><a href="https://www.bookstack.cn/read/hutool/db.md">数据库（Hutool-db）</a></li>
+  <li><a href="https://www.bookstack.cn/read/hutool/http.md">HTTP客户端（Hutool-http）</a>：</li>
+  <li><a href="https://www.bookstack.cn/read/hutool/crontab.md">定时任务（Hutool-cron）</a></li>
+  <li><a href="https://www.bookstack.cn/read/hutool/extra.md">扩展（Hutool-extra）</a></li>
+  <li><a href="https://www.bookstack.cn/read/hutool/1dbb5bac320e9439.md">布隆过滤（Hutool-bloomFilter</a>：</li>
+  <li><a href="https://www.bookstack.cn/read/hutool/aop.md">切面（Hutool-aop）</a></li>
+  <li><a href="https://www.bookstack.cn/read/hutool/script.md">脚本（Hutool-script）</a></li>
+  <li><a href="https://www.bookstack.cn/read/hutool/office.md">Office文档操作（Hutool-poi）</a></li>
+  <li><a href="https://www.bookstack.cn/read/hutool/277cdf75daebb48c.md">系统属性调用-SystemUtil</a></li>
+</ul>
+
+<h2 id="guava-工具类">Guava 工具类</h2>
+
+<p>Guava是一个功能非常强大的工具类，提供了很多实用的封装方法，让代码变得简约。</p>
+
+<h3 id="优点">优点</h3>
+
+<ol>
+  <li>高效设计良好的API，被Google的开发者设计，实现和使用</li>
+  <li>遵循高效的java语法实践</li>
+  <li>使代码更刻度，简洁，简单</li>
+  <li>节约时间，资源，提高生产力</li>
+</ol>
+
+<h3 id="核心库">核心库</h3>
+
+<ol>
+  <li>原生类型支持 [primitives support]</li>
+  <li>字符串处理 [string processing]</li>
+  <li>集合 [collections]</li>
+  <li>缓存 [caching]</li>
+  <li>通用注解 [common annotations]</li>
+  <li>并发库 [concurrency libraries]</li>
+  <li>I/O 等等。</li>
+</ol>
+
+<h3 id="字符串处理">字符串处理</h3>
+
+<h4 id="拼接">拼接</h4>
+
+<p>Joiner 可以快速地把多个字符串或字符串数组连接成为用特殊符号连接的字符串。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">=</span> <span class="n">Lists</span><span class="o">.</span><span class="na">newArrayList</span><span class="o">(</span><span class="s">"a"</span><span class="o">,</span> <span class="s">"b"</span><span class="o">,</span> <span class="s">"c"</span><span class="o">);</span>
+<span class="n">String</span> <span class="n">value</span> <span class="o">=</span> <span class="n">Joiner</span><span class="o">.</span><span class="na">on</span><span class="o">(</span><span class="s">"-"</span><span class="o">).</span><span class="na">skipNulls</span><span class="o">().</span><span class="na">join</span><span class="o">(</span><span class="n">list</span><span class="o">);</span>
+<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">value</span><span class="o">);</span>
+<span class="c1">//输出为： a-b-c</span>
+</code></pre></div></div>
+
+<h4 id="分割">分割</h4>
+
+<h3 id="集合">集合</h3>
+
+<h4 id="集合创建">集合创建</h4>
+
+<p>各种以S结尾的<strong>工厂类</strong>简化了集合的创建。在创建泛型实例时，使代码更加简洁。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">=</span><span class="n">Lists</span><span class="o">.</span><span class="na">newArrayList</span><span class="o">();</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">list2</span> <span class="o">=</span> <span class="n">Lists</span><span class="o">.</span><span class="na">newArrayList</span><span class="o">(</span><span class="s">"a"</span><span class="o">,</span><span class="s">"b"</span><span class="o">,</span><span class="s">"c"</span><span class="o">);</span>
+<span class="n">Set</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">set</span> <span class="o">=</span> <span class="n">Sets</span><span class="o">.</span><span class="na">newHashSet</span><span class="o">();</span>
+</code></pre></div></div>
+
+<p>类型推导的功能，在Java 7中已经得到支持。</p>
+
+<h4 id="maps">Maps</h4>
+
+<h5 id="newlinkedhashmapwithexpectedsize">newLinkedHashMapWithExpectedSize</h5>
+
+<p>初始化一个<strong>大小合适</strong>的map集合，避免在向集合添加元素时，因为大小不合适而resize。</p>
+
+<ul>
+  <li>
+    <p>每次resize都得执行以下步骤：再次去<strong>分配空间</strong>，再次去计算所有元素的<strong>hashcode</strong>，再次根据hashcode计算数组的<strong>分配位置</strong>，然后数组拷贝。</p>
+  </li>
+  <li>
+    <p>这样就可以大大提升 在使用hashmap时候的性能。和不必要的空间浪费。</p>
+  </li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Long</span><span class="o">&gt;</span> <span class="n">orderCount</span> <span class="o">=</span> <span class="n">Maps</span><span class="o">.</span><span class="na">newLinkedHashMapWithExpectedSize</span><span class="o">(</span><span class="mi">5</span><span class="o">);</span>
+<span class="c1">// 全部</span>
+<span class="n">orderCount</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"allCount"</span><span class="o">,</span> <span class="n">tradeOrderQueryService</span><span class="o">.</span><span class="na">getOrderCount</span><span class="o">(</span><span class="n">getLoginUserId</span><span class="o">(),</span> <span class="kc">null</span><span class="o">,</span> <span class="kc">null</span><span class="o">));</span>
+
+<span class="c1">// 待付款（未支付）</span>
+<span class="n">orderCount</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"unpaidCount"</span><span class="o">,</span> 
+               	<span class="n">tradeOrderQueryService</span><span class="o">.</span><span class="na">getOrderCount</span><span class="o">(</span><span class="n">getLoginUserId</span><span class="o">(),</span><span class="n">TradeOrderStatusEnum</span><span class="o">.</span><span class="na">UNPAID</span><span class="o">.</span><span class="na">getStatus</span><span class="o">(),</span> <span class="kc">null</span><span class="o">)</span>
+<span class="o">);</span>
+</code></pre></div></div>
+
+<h3 id="cache">Cache</h3>
+
+<p>Cache 是一个全内存的本地缓存实现，提供了<strong>线程安全</strong>的实现机制。
+cache的常用参数：</p>
+
+<p>　　1. 缓存最大大小的设置：CacheBuilder.maximumSize(long)
+        　　2. 过期时间：expireAfterAccess(long, TimeUnit) expireAfterWrite(long, TimeUnit)
+              　　3. 引用类型：CacheBuilder.weakKeys() CacheBuilder.weakValues() CacheBuilder.softValues()
+                    　　4. 自动刷新cache：CacheBuilder.refreshAfterWrite
+          　　5. 过期时间：CacheBuilder.expireAfterWrite</p>
+
+<h3 id="线程">线程</h3>
+
+<p>com.google.common.util.concurrent目录下是各种线程工具类。</p>
+
+<ul>
+  <li>ListenableFuture：顾名思义就是可以监听的Future，它是对java原生Future的扩展增强。</li>
+  <li>MoreExecutors：该工具类，提供了很多静态方法。其中listeningDecorator方法初始化</li>
+  <li>ListeningExecutorService方法，使用此实例submit方法即可初始化ListenableFuture对象。</li>
+  <li>ListeningExecutorService的invokeAny继承自Jdk原生类，率先返回线程组中首个执行完毕的。</li>
+  <li>ListeningExecutorService的invokeAll并行执行线程组，等待所有线程执行完毕，适用于批量处理。</li>
+</ul>
+
+<h3 id="算法">算法</h3>
+
+<h4 id="布隆过滤器">布隆过滤器</h4>
+
+<p>用于判断一个元素是否在一个超大的集合中。</p>
+
+<ul>
+  <li><strong>哈希表</strong>也能用于判断元素是否在集合中，但是布隆过滤器只需要哈希表的<strong>1/8或1/4的空间复杂度</strong>就能完成同样的功能。</li>
+</ul>

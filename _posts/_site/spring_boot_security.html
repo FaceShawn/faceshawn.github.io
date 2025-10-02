@@ -1,0 +1,1123 @@
+<blockquote>
+  <p>摘要：整合 Spring Security 和 JWT 实现用户的<strong>登录和授权功能</strong>，同时改造 <code class="highlighter-rouge">Swagger-UI</code> 的配置使其可自动发送<strong>登录令牌</strong>。</p>
+</blockquote>
+
+<!-- more -->
+
+<h2 id="目录">目录</h2>
+
+<p>[TOC]</p>
+
+<h2 id="整合-spring-security-权限">整合 Spring Security 权限</h2>
+
+<h4 id="添加依赖">添加依赖</h4>
+
+<p>在 <code class="highlighter-rouge">pom.xml</code> 中</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-security<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div></div>
+
+<h4 id="spring-boot-配置">Spring Boot 配置</h4>
+
+<p>在Spring Boot应用程序中，可以通过在<code class="highlighter-rouge">application.properties</code>文件或<code class="highlighter-rouge">application.yml</code>文件中配置Spring Security。</p>
+
+<ul>
+  <li>这里的配置表示启用<strong>基于HTTP基本身份验证</strong>的Spring Security，并指定了一个用户名为admin，密码为password的用户。</li>
+  <li>默认情况下，Spring Boot <a href="https://github.com/spring-projects/spring-boot/blob/master/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/security/servlet/UserDetailsServiceAutoConfiguration.java">UserDetailsServiceAutoConfiguration</a> 自动化配置类，会创建一个<strong>内存级别</strong>的 <a href="https://github.com/spring-projects/spring-security/blob/master/core/src/main/java/org/springframework/security/provisioning/InMemoryUserDetailsManager.java">InMemoryUserDetailsManager</a> Bean 对象，提供认证的用户信息。
+    <ul>
+      <li>这里，<strong>添加了</strong> <code class="highlighter-rouge">spring.security.user</code> 配置项，UserDetailsServiceAutoConfiguration 会基于配置的信息创建一个用户 <a href="https://github.com/spring-projects/spring-security/blob/master/core/src/main/java/org/springframework/security/core/userdetails/User.java">User</a> 在内存中。</li>
+      <li>如果，<strong>未添加</strong> <code class="highlighter-rouge">spring.security.user</code> 配置项，UserDetailsServiceAutoConfiguration 会自动创建一个用户名为 <code class="highlighter-rouge">"user"</code> ，密码为 <strong>UUID 随机</strong>的用户 <a href="https://github.com/spring-projects/spring-security/blob/master/core/src/main/java/org/springframework/security/core/userdetails/User.java">User</a> 在内存中。</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">jwt</span><span class="pi">:</span>
+  <span class="na">tokenHeader</span><span class="pi">:</span> <span class="s">Authorization</span> <span class="c1">#JWT存储的请求头</span>
+  <span class="na">secret</span><span class="pi">:</span> <span class="s">mall-admin-secret</span>  <span class="c1">#JWT加解密使用的密钥</span>
+  <span class="na">expiration</span><span class="pi">:</span> <span class="s">604800</span>    <span class="c1">#JWT的超期限时间(60*60*24*7)</span>
+  <span class="na">tokenHead</span><span class="pi">:</span> <span class="s1">'</span><span class="s">Bearer</span><span class="nv"> </span><span class="s">'</span>  <span class="c1">#JWT负载中拿到开头</span>
+
+<span class="na">spring</span><span class="pi">:</span>
+  <span class="c1"># Spring Security 配置项，对应 SecurityProperties 配置类</span>
+  <span class="na">security</span><span class="pi">:</span>
+    <span class="c1"># 配置默认的 InMemoryUserDetailsManager 的用户账号与密码。</span>
+    <span class="na">user</span><span class="pi">:</span>
+      <span class="na">name</span><span class="pi">:</span> <span class="s">user</span> <span class="c1"># 账号</span>
+      <span class="na">password</span><span class="pi">:</span> <span class="s">user</span> <span class="c1"># 密码</span>
+      <span class="na">roles</span><span class="pi">:</span> <span class="s">ADMIN</span> <span class="c1"># 拥有角色</span>
+    <span class="na">basic</span><span class="pi">:</span>
+      <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
+</code></pre></div></div>
+
+<h4 id="添加配置类">添加配置类</h4>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SecurityConfig.java</span>
+
+<span class="c1">//实现 Spring Security 在 Web 场景下的自定义配置</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SecurityConfig</span> <span class="kd">extends</span> <span class="n">WebSecurityConfigurerAdapter</span> <span class="o">{</span>
+<span class="o">}</span>
+
+<span class="c1">//类上加注解</span>
+<span class="nd">@Configuration</span>
+<span class="nd">@EnableWebSecurity</span>
+<span class="nd">@EnableGlobalMethodSecurity</span><span class="o">(</span><span class="n">prePostEnabled</span> <span class="o">=</span> <span class="kc">true</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MallSecurityConfig</span> <span class="kd">extends</span> <span class="n">SecurityConfig</span> <span class="o">{</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>自定义的 Spring Security 安全配置类  <code class="highlighter-rouge">SecurityConfig</code>，可以通过继承<code class="highlighter-rouge">WebSecurityConfigurerAdapter</code>类、重写方法，实现自定义的 Spring Security 的配置。</p>
+
+<ol>
+  <li><code class="highlighter-rouge">configure(AuthenticationManagerBuilder auth)</code>：用于配置 <code class="highlighter-rouge">UserDetailsService</code> 及<code class="highlighter-rouge">PasswordEncoder</code>；<code class="highlighter-rouge">AuthenticationManager</code>：</li>
+  <li><code class="highlighter-rouge">UserDetailsService</code>：SpringSecurity 定义的<strong>核心接口</strong>，用于根据用户名获取用户信息，需要自行实现；
+    <ol>
+      <li><code class="highlighter-rouge">UserDetails</code>：定义用于<strong>封装用户信息</strong>的类（主要是用户信息和权限），需要自行实现；</li>
+      <li><code class="highlighter-rouge">PasswordEncoder</code>：用于对密码进行编码及<strong>校验</strong>比对的接口，目前使用的是<code class="highlighter-rouge">BCryptPasswordEncoder</code> 哈希加密算法；</li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">configure(HttpSecurity httpSecurity)</code>：用于读取并配置需拦截的 URL 路径、<strong>白名单路径</strong>，是否允许跨域（的OPTIONS请求），配置权限 JWT 过滤器、权限<strong>拒绝处理器</strong>、抛出异常后的处理器、动态权限<strong>校验过滤器</strong>等；</li>
+  <li>
+    <p>添加 <code class="highlighter-rouge">JwtAuthenticationTokenFilter</code> 类：自定义 JWT 登录<strong>授权过滤器</strong>/拦截器，（在用户名和密码校验前）添加<strong>过滤器</strong> ，如果请求中有 JWT 的 token 且<strong>验证</strong>有效，会自行根据token信息进行登录。</p>
+
+    <ul>
+      <li>
+        <p>会取出 token 中的用户名，创建 <code class="highlighter-rouge">UsernamePasswordAuthenticationToken</code> 实例，并保存至安全上下文。</p>
+      </li>
+      <li>
+        <p>调用 <code class="highlighter-rouge">UserDetailsService</code>、<code class="highlighter-rouge">UserDetails</code>、<code class="highlighter-rouge">PasswordEncoder</code> 验证、取出；</p>
+        <ul>
+          <li><code class="highlighter-rouge">SecurityContextHolder.getContext().getAuthentication() == null</code></li>
+          <li><code class="highlighter-rouge">SecurityContextHolder.getContext().setAuthentication(UsernamePasswordAuthenticationToken);</code>：将 Authentication 保存至<strong>安全上下文</strong>。</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>添加 <code class="highlighter-rouge">RestfulAccessDeniedHandler</code> 类：自定义权限<strong>拒绝处理器</strong>，当用户<strong>没有访问权限</strong>时的处理器，用于返回JSON格式的处理结果；</p>
+
+    <ul>
+      <li><del><code class="highlighter-rouge">RestAuthenticationEntryPoint</code></del>：当未登录或token失效（登录过期）时，返回JSON格式的结果。</li>
+    </ul>
+  </li>
+  <li>
+    <p>添加 <code class="highlighter-rouge">DynamicSecurityFilter</code> 类：动态权限<strong>校验过滤器</strong>，用于实现<strong>基于路径</strong>的动态权限过滤；</p>
+
+    <ol>
+      <li><code class="highlighter-rouge">DynamicAccessDecisionManager</code> 类：动态权限<strong>决策</strong>管理器，用于判断用户是否有访问权限；</li>
+      <li><code class="highlighter-rouge">DynamicSecurityMetadataSource</code> 类：动态权限数据源，用于获取动态权限<strong>规则</strong>；
+        <ul>
+          <li>实现 <code class="highlighter-rouge">DynamicSecurityService</code> 动态权限相关<strong>业务接口</strong>：读取动态权限配置；加载资源ANT通配符和资源对应MAP；</li>
+        </ul>
+      </li>
+    </ol>
+  </li>
+</ol>
+
+<p><img src="../assets/8fdccbc24a2225db315a8800cdfe1c09.png" alt="img" style="zoom:80%;" /></p>
+
+<h5 id="示例一"><strong>示例一</strong></h5>
+
+<p>自定义 Spring Security 的配置，实现<strong>权限控制</strong>。</p>
+
+<h6 id="securityconfig">SecurityConfig</h6>
+
+<p>在 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-01-spring-security/lab-01-springsecurity-demo-role/src/main/java/cn/iocoder/springboot/lab01/springsecurity/config"><code class="highlighter-rouge">cn.iocoder.springboot.lab01.springsecurity.config</code></a> 包下，创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-01-spring-security/lab-01-springsecurity-demo-role/src/main/java/cn/iocoder/springboot/lab01/springsecurity/config/SecurityConfig.java">SecurityConfig</a> 配置类，继承 <a href="https://github.com/spring-projects/spring-security/blob/master/config/src/main/java/org/springframework/security/config/annotation/web/configuration/WebSecurityConfigurerAdapter.java">WebSecurityConfigurerAdapter</a> 抽象类，实现 Spring Security 在 Web 场景下的自定义配置。</p>
+
+<ul>
+  <li>可以通过重写 WebSecurityConfigurerAdapter 的方法，实现自定义的 Spring Security 的配置。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SecurityConfig.java</span>
+
+<span class="nd">@Configuration</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SecurityConfig</span> <span class="kd">extends</span> <span class="n">WebSecurityConfigurerAdapter</span> <span class="o">{</span>
+    <span class="c1">// ...</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h6 id="重写-configureauthenticationmanagerbuilder-auth-方法">重写 <code class="highlighter-rouge">#configure(AuthenticationManagerBuilder auth)</code> 方法</h6>
+
+<p>重写 <code class="highlighter-rouge">#configure(AuthenticationManagerBuilder auth)</code> 方法，实现 <a href="https://github.com/spring-projects/spring-security/blob/master/core/src/main/java/org/springframework/security/authentication/AuthenticationManager.java">AuthenticationManager</a> 认证管理器。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SecurityConfig.java</span>
+
+<span class="nd">@Override</span>
+<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">(</span><span class="n">AuthenticationManagerBuilder</span> <span class="n">auth</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+    <span class="n">auth</span><span class="o">.</span>
+            <span class="c1">// &lt;X&gt; 使用内存中的 InMemoryUserDetailsManager</span>
+            <span class="n">inMemoryAuthentication</span><span class="o">()</span>
+            <span class="c1">// &lt;Y&gt; 不使用 PasswordEncoder 密码编码器</span>
+            <span class="o">.</span><span class="na">passwordEncoder</span><span class="o">(</span><span class="n">NoOpPasswordEncoder</span><span class="o">.</span><span class="na">getInstance</span><span class="o">())</span>
+            <span class="c1">// &lt;Z&gt; 配置 admin 用户</span>
+            <span class="o">.</span><span class="na">withUser</span><span class="o">(</span><span class="s">"admin"</span><span class="o">).</span><span class="na">password</span><span class="o">(</span><span class="s">"admin"</span><span class="o">).</span><span class="na">roles</span><span class="o">(</span><span class="s">"ADMIN"</span><span class="o">)</span>
+            <span class="c1">// &lt;Z&gt; 配置 normal 用户</span>
+            <span class="o">.</span><span class="na">and</span><span class="o">().</span><span class="na">withUser</span><span class="o">(</span><span class="s">"normal"</span><span class="o">).</span><span class="na">password</span><span class="o">(</span><span class="s">"normal"</span><span class="o">).</span><span class="na">roles</span><span class="o">(</span><span class="s">"NORMAL"</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<ul>
+  <li><code class="highlighter-rouge">&lt;X&gt;</code> 处，调用 <code class="highlighter-rouge">AuthenticationManagerBuilder#inMemoryAuthentication()</code> 方法，使用<strong>内存级别</strong>的 <a href="https://github.com/spring-projects/spring-security/blob/master/core/src/main/java/org/springframework/security/provisioning/InMemoryUserDetailsManager.java">InMemoryUserDetailsManager</a> Bean 对象，提供认证的用户信息。
+    <ul>
+      <li>Spring 内置了两种 <a href="https://github.com/spring-projects/spring-security/blob/master/core/src/main/java/org/springframework/security/provisioning/UserDetailsManager.java">UserDetailsManager</a> 实现：
+        <ul>
+          <li>InMemoryUserDetailsManager，和<a href="https://www.iocoder.cn/Spring-Boot/Spring-Security/#">「2. 快速入门」</a>是一样的。</li>
+          <li>JdbcUserDetailsManager ，基于 <strong>JDBC</strong>的 <a href="https://github.com/spring-projects/spring-security/blob/master/core/src/main/java/org/springframework/security/provisioning/JdbcUserDetailsManager.java">JdbcUserDetailsManager</a> 。</li>
+        </ul>
+      </li>
+      <li>实际项目中，更多采用调用 <code class="highlighter-rouge">AuthenticationManagerBuilder#userDetailsService(userDetailsService)</code> 方法，使用自定义实现的 <a href="https://github.com/spring-projects/spring-security/blob/master/core/src/main/java/org/springframework/security/core/userdetails/UserDetailsService.java">UserDetailsService</a> 实现类，更加<strong>灵活</strong>且<strong>自由</strong>的实现认证的用户信息的读取。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">&lt;Y&gt;</code> 处，调用 <code class="highlighter-rouge">AbstractDaoAuthenticationConfigurer#passwordEncoder(passwordEncoder)</code> 方法，设置 PasswordEncoder 密码编码器。
+    <ul>
+      <li>在这里，为了方便，我们使用 <a href="https://github.com/spring-projects/spring-security/blob/master/crypto/src/main/java/org/springframework/security/crypto/password/NoOpPasswordEncoder.java">NoOpPasswordEncoder</a> 。实际上，等于不使用 PasswordEncoder ，不配置的话会报错。</li>
+      <li>生产环境下，推荐使用 <a href="https://github.com/spring-projects/spring-security/blob/master/crypto/src/main/java/org/springframework/security/crypto/bcrypt/BCryptPasswordEncoder.java">BCryptPasswordEncoder</a> 。更多关于 PasswordEncoder 的内容，推荐阅读<a href="http://www.iocoder.cn/Spring-Security/laoxu/PasswordEncoder/?self">《该如何设计你的 PasswordEncoder?》</a>文章。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">&lt;Z&gt;</code> 处，配置了「admin/admin」和「normal/normal」两个用户，分别对应 ADMIN 和 NORMAL 角色。相比<a href="https://www.iocoder.cn/Spring-Boot/Spring-Security/#">「2. 快速入门」</a>来说，可以配置更多的用户。</li>
+</ul>
+
+<h5 id="重写-configurehttpsecurity-http-方法">重写 <code class="highlighter-rouge">#configure(HttpSecurity http)</code> 方法</h5>
+
+<p>然后，重写 <code class="highlighter-rouge">#configure(HttpSecurity http)</code> 方法，主要配置 URL 的权限控制。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SecurityConfig.java</span>
+
+<span class="nd">@Override</span>
+<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">(</span><span class="n">HttpSecurity</span> <span class="n">http</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+    <span class="n">http</span>
+            <span class="c1">// &lt;X&gt; 配置请求地址的权限</span>
+            <span class="o">.</span><span class="na">authorizeRequests</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">antMatchers</span><span class="o">(</span><span class="s">"/test/echo"</span><span class="o">).</span><span class="na">permitAll</span><span class="o">()</span> <span class="c1">// 所有用户可访问</span>
+                <span class="o">.</span><span class="na">antMatchers</span><span class="o">(</span><span class="s">"/test/admin"</span><span class="o">).</span><span class="na">hasRole</span><span class="o">(</span><span class="s">"ADMIN"</span><span class="o">)</span> <span class="c1">// 需要 ADMIN 角色</span>
+                <span class="o">.</span><span class="na">antMatchers</span><span class="o">(</span><span class="s">"/test/normal"</span><span class="o">).</span><span class="na">access</span><span class="o">(</span><span class="s">"hasRole('ROLE_NORMAL')"</span><span class="o">)</span> <span class="c1">// 需要 NORMAL 角色。</span>
+                <span class="c1">// 任何请求，访问的用户都需要经过认证</span>
+                <span class="o">.</span><span class="na">anyRequest</span><span class="o">().</span><span class="na">authenticated</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">and</span><span class="o">()</span>
+            <span class="c1">// &lt;Y&gt; 设置 Form 表单登录</span>
+            <span class="o">.</span><span class="na">formLogin</span><span class="o">()</span>
+<span class="c1">//                    .loginPage("/login") // 登录 URL 地址</span>
+                <span class="o">.</span><span class="na">permitAll</span><span class="o">()</span> <span class="c1">// 所有用户可访问</span>
+            <span class="o">.</span><span class="na">and</span><span class="o">()</span>
+            <span class="c1">// 配置退出相关</span>
+            <span class="o">.</span><span class="na">logout</span><span class="o">()</span>
+<span class="c1">//                    .logoutUrl("/logout") // 退出 URL 地址</span>
+                <span class="o">.</span><span class="na">permitAll</span><span class="o">();</span> <span class="c1">// 所有用户可访问</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<ul>
+  <li><code class="highlighter-rouge">&lt;X&gt;</code> 处，调用 <code class="highlighter-rouge">HttpSecurity#authorizeRequests()</code> 方法，开始配置 URL 的<strong>权限控制</strong>。注意看艿艿配置的<strong>四个</strong>权限控制的配置。下面，是配置权限控制会使用到的方法：
+    <ul>
+      <li><code class="highlighter-rouge">#(String... antPatterns)</code> 方法，配置匹配的 URL 地址，基于 <a href="https://blog.csdn.net/songdexv/article/details/7219686">Ant 风格路径表达式</a> ，可传入多个。</li>
+      <li>【常用】<code class="highlighter-rouge">#permitAll()</code> 方法，所有用户可访问。</li>
+      <li>【常用】<code class="highlighter-rouge">#denyAll()</code> 方法，所有用户不可访问。</li>
+      <li>【常用】<code class="highlighter-rouge">#authenticated()</code> 方法，登录用户可访问。</li>
+      <li><code class="highlighter-rouge">#anonymous()</code> 方法，无需登录，即匿名用户可访问。</li>
+      <li><code class="highlighter-rouge">#rememberMe()</code> 方法，通过 <a href="https://docs.spring.io/spring-security/site/docs/3.0.x/reference/remember-me.html">remember me</a> 登录的用户可访问。</li>
+      <li><code class="highlighter-rouge">#fullyAuthenticated()</code> 方法，非 <a href="https://docs.spring.io/spring-security/site/docs/3.0.x/reference/remember-me.html">remember me</a> 登录的用户可访问。</li>
+      <li><code class="highlighter-rouge">#hasIpAddress(String ipaddressExpression)</code> 方法，来自指定 IP 表达式的用户可访问。</li>
+      <li>【常用】<code class="highlighter-rouge">#hasRole(String role)</code> 方法， 拥有指定角色的用户可访问。</li>
+      <li>【常用】<code class="highlighter-rouge">#hasAnyRole(String... roles)</code> 方法，拥有指定任一角色的用户可访问。</li>
+      <li>【常用】<code class="highlighter-rouge">#hasAuthority(String authority)</code> 方法，拥有指定权限(<code class="highlighter-rouge">authority</code>)的用户可访问。</li>
+      <li>【常用】<code class="highlighter-rouge">#hasAuthority(String... authorities)</code> 方法，拥有指定任一权限(<code class="highlighter-rouge">authority</code>)的用户可访问。</li>
+      <li>【最牛】<code class="highlighter-rouge">#access(String attribute)</code> 方法，当 <a href="https://docs.spring.io/spring/docs/4.3.10.RELEASE/spring-framework-reference/html/expressions.html">Spring EL 表达式</a>的执行结果为 <code class="highlighter-rouge">true</code> 时，可以访问。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">&lt;Y&gt;</code> 处，调用 <code class="highlighter-rouge">HttpSecurity#formLogin()</code> 方法，设置 Form 表单<strong>登录</strong>。
+    <ul>
+      <li>如果胖友想要自定义登录页面，可以通过 <code class="highlighter-rouge">#loginPage(String loginPage)</code> 方法，来进行设置。不过这里我们希望像<a href="https://www.iocoder.cn/Spring-Boot/Spring-Security/#">「2. 快速入门」</a>一样，使用默认的登录界面，所以不进行设置。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">&lt;Z&gt;</code> 处，调用 <code class="highlighter-rouge">HttpSecurity#logout()</code> 方法，配置<strong>退出</strong>相关。
+    <ul>
+      <li>如果胖友想要自定义退出页面，可以通过 <code class="highlighter-rouge">#logoutUrl(String logoutUrl)</code> 方法，来进行设置。不过这里我们希望像<a href="https://www.iocoder.cn/Spring-Boot/Spring-Security/#">「2. 快速入门」</a>一样，使用默认的退出界面，所以不进行设置。</li>
+    </ul>
+  </li>
+</ul>
+
+<h5 id="示例二">示例二</h5>
+
+<p>使用 Spring Security 的注解，实现权限控制。</p>
+
+<h6 id="331-securityconfig">3.3.1 SecurityConfig</h6>
+
+<p>修改 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-01-spring-security/lab-01-springsecurity-demo-role/src/main/java/cn/iocoder/springboot/lab01/springsecurity/config/SecurityConfig.java">SecurityConfig</a> 配置类，增加 <a href="https://docs.spring.io/spring-security/site/docs/current/api/org/springframework/security/config/annotation/method/configuration/EnableGlobalMethodSecurity.html"><code class="highlighter-rouge">@EnableGlobalMethodSecurity</code></a> 注解，开启对 Spring Security 注解的方法，进行权限验证。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Configuration</span>
+<span class="nd">@EnableGlobalMethodSecurity</span><span class="o">(</span><span class="n">prePostEnabled</span> <span class="o">=</span> <span class="kc">true</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SecurityConfig</span> <span class="kd">extends</span> <span class="n">WebSecurityConfigurerAdapter</span>
+</code></pre></div></div>
+
+<h6 id="democontroller">DemoController</h6>
+
+<ul>
+  <li>
+    <p><a href="https://github.com/jboss/jboss-annotations-api_spec/blob/master/src/main/java/javax/annotation/security/PermitAll.java"><code class="highlighter-rouge">@PermitAll</code></a> 注解，等价于 <code class="highlighter-rouge">#permitAll()</code> 方法，所有用户可访问。</p>
+
+    <blockquote>
+      <p>重要！！！因为在<a href="https://www.iocoder.cn/Spring-Boot/Spring-Security/#">「3.2.1 SecurityConfig」</a>中，配置了 <code class="highlighter-rouge">.anyRequest().authenticated()</code> ，任何请求，访问的用户都需要经过认证。所以这里 <code class="highlighter-rouge">@PermitAll</code> <strong>注解实际是不生效的</strong>。</p>
+
+      <p>也就是说，Java Config 配置的权限，和注解配置的权限，两者是<strong>叠加</strong>的。</p>
+    </blockquote>
+  </li>
+  <li>
+    <p><a href="https://github.com/spring-projects/spring-security/blob/master/core/src/main/java/org/springframework/security/access/prepost/PreAuthorize.java"><code class="highlighter-rouge">@PreAuthorize</code></a> 注解，等价于 <code class="highlighter-rouge">#access(String attribute)</code> 方法，，当 Spring EL 表达式的执行结果为 true 时，可以访问。</p>
+  </li>
+</ul>
+
+<h4 id="添加-jwttokenutil-工具类">添加 <code class="highlighter-rouge">JwtTokenUtil</code> 工具类</h4>
+
+<blockquote>
+  <p>用于生成、解析、验证<code class="highlighter-rouge">JwtToken </code> 的工具类；</p>
+</blockquote>
+
+<p>相关方法说明：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">generateToken(UserDetails userDetails)</code>：用于根据登录用户信息生成token；</li>
+  <li><code class="highlighter-rouge">validateToken(String token, UserDetails userDetails)</code>：判断token是否还有效；
+    <ul>
+      <li><code class="highlighter-rouge">getUserNameFromToken(String token)</code>：从token中获取登录用户的信息；</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="登录注册功能实现">登录注册功能实现</h4>
+
+<blockquote>
+  <p>如果没有<strong>自定义</strong>登录界面，所以默认会使用 <a href="https://github.com/spring-projects/spring-security/blob/master/web/src/main/java/org/springframework/security/web/authentication/ui/DefaultLoginPageGeneratingFilter.java">DefaultLoginPageGeneratingFilter</a> 类，生成上述界面。</p>
+</blockquote>
+
+<p>实现登录注册：</p>
+
+<ol>
+  <li>添加用户数据库表、及 <code class="highlighter-rouge"><span class="k">model</span> </code>类 <code class="highlighter-rouge">com.macro.mall.model.UmsAdmin</code>；</li>
+  <li>添加 <code class="highlighter-rouge">com.macro.mall.bo.AdminUserDetails</code>：Spring Security 需要的用户详情；</li>
+  <li>添加 <code class="highlighter-rouge">UmsAdminController</code> 类：实现用户登录、注册及获取权限的接口；为接口中的方法添加<strong>访问权限</strong>。</li>
+  <li>添加 <code class="highlighter-rouge">UmsAdminService</code> 接口及其实现类：<strong>核心接口</strong>，用于根据用户名获取用户信息，需自行实现；
+    <ul>
+      <li><code class="highlighter-rouge">UmsAdminCacheService</code>：用户<strong>缓存</strong>操作Service实现类，存在 <code class="highlighter-rouge">RedisService </code>中。</li>
+    </ul>
+  </li>
+</ol>
+
+<p><img src="../assets/1218593-20220809143059104-330636126.webp" alt="img" /></p>
+
+<p>给PmsBrandController接口中的方法添加访问权限：</p>
+
+<ul>
+  <li>给查询接口添加<code class="highlighter-rouge">pms:brand:read</code>权限</li>
+  <li>给修改接口添加<code class="highlighter-rouge">pms:brand:update</code>权限</li>
+  <li>给删除接口添加<code class="highlighter-rouge">pms:brand:delete</code>权限</li>
+  <li>给添加接口添加<code class="highlighter-rouge">pms:brand:create</code>权限</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 给 `PmsBrandController` 接口中的方法添加访问权限</span>
+<span class="nd">@PreAuthorize</span><span class="o">(</span><span class="s">"hasAuthority('pms:brand:read')"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="n">CommonResult</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">PmsBrand</span><span class="o">&gt;&gt;</span> <span class="nf">getBrandList</span><span class="o">()</span> <span class="o">{</span>
+	<span class="k">return</span> <span class="n">CommonResult</span><span class="o">.</span><span class="na">success</span><span class="o">(</span><span class="n">brandService</span><span class="o">.</span><span class="na">listAllBrand</span><span class="o">());</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="整合-swagger3">整合 Swagger3</h3>
+
+<blockquote>
+  <p>通过修改配置实现调用接口自带Authorization头，这样就可以访问需要登录的接口了。</p>
+</blockquote>
+
+<p>参考：</p>
+
+<ol>
+  <li><a href="https://juejin.cn/post/6844904183762550797">用 Swagger 测试接口，怎么在请求头中携带 Token？</a></li>
+  <li><a href="https://blog.csdn.net/qq_34963264/article/details/126684715">Swagger2.7升级到3.0后的若干问题</a></li>
+</ol>
+
+<h5 id="直接在-swagger-中填入认证信息">直接在 Swagger 中填入认证信息</h5>
+
+<p><strong>认证方式二</strong>、直接在 Swagger 中填入认证信息，这样就不用从外部去获取 access_token 了。</p>
+
+<ul>
+  <li>主要是 SecurityScheme 不同。这里采用了 OAuthBuilder 来构建，构建时即得配置 token 的获取地址。仅限于 OAuth2 模式。</li>
+</ul>
+
+<h5 id="swagger-配置实现自带-authorization--头">Swagger 配置实现自带 <code class="highlighter-rouge">Authorization </code> 头</h5>
+
+<p><strong>认证方式一</strong>、修改 Swagger 的配置，实现调用接口自带 <code class="highlighter-rouge">Authorization </code> 头，通过 <code class="highlighter-rouge">Authorize</code> 按钮设置 Token，即可访问需登录的接口。</p>
+
+<ol>
+  <li>
+    <p>在 <code class="highlighter-rouge">BaseSwaggerConfig</code> 中配置一个 Docket Bean 实例，配置映射路径和要扫描的接口的位置。</p>
+
+    <ul>
+      <li><code class="highlighter-rouge">securityContexts</code>：用来配置有哪些请求需要携带 Token。</li>
+    </ul>
+  </li>
+  <li>
+    <p>配置 <code class="highlighter-rouge">config/SwaggerConfig</code> 继承此 <code class="highlighter-rouge">BaseSwaggerConfig</code> 类：Swagger API 文档相关配置，没有 .yml 配置；</p>
+  </li>
+  <li>
+    <p>在 <code class="highlighter-rouge">application.yml</code> 中给 <code class="highlighter-rouge">Swagger-UI</code> 安全路径<strong>白名单</strong>放行。</p>
+
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="na">secure</span><span class="pi">:</span>
+   <span class="na">ignored</span><span class="pi">:</span>
+     <span class="na">urls</span><span class="pi">:</span> <span class="c1">#安全路径白名单</span>
+       <span class="pi">-</span> <span class="s">/swagger-ui/index.html</span>
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<p>Security 整合 Swagger3 相关配置的代码：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//认证方式一、</span>
+<span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">macro</span><span class="o">.</span><span class="na">mall</span><span class="o">.</span><span class="na">common</span><span class="o">.</span><span class="na">config</span><span class="o">.</span><span class="na">BaseSwaggerConfig</span><span class="o">;</span>
+
+<span class="k">if</span> <span class="o">(</span><span class="n">swaggerProperties</span><span class="o">.</span><span class="na">isEnableSecurity</span><span class="o">())</span> <span class="o">{</span>
+    <span class="n">docket</span><span class="o">.</span><span class="na">securitySchemes</span><span class="o">(</span><span class="n">securitySchemes</span><span class="o">()).</span><span class="na">securityContexts</span><span class="o">(</span><span class="n">securityContexts</span><span class="o">());</span>
+<span class="o">}</span>
+
+<span class="kd">private</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">SecurityScheme</span><span class="o">&gt;</span> <span class="nf">securitySchemes</span><span class="o">()</span> <span class="o">{</span>
+    <span class="c1">//设置请求头信息</span>
+    <span class="n">List</span><span class="o">&lt;</span><span class="n">SecurityScheme</span><span class="o">&gt;</span> <span class="n">result</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
+    <span class="n">ApiKey</span> <span class="n">apiKey</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ApiKey</span><span class="o">(</span><span class="s">"Authorization"</span><span class="o">,</span> <span class="s">"Authorization"</span><span class="o">,</span> <span class="s">"header"</span><span class="o">);</span>
+    <span class="n">result</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">apiKey</span><span class="o">);</span>
+    <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
+<span class="o">}</span>
+
+ <span class="kd">private</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">SecurityContext</span><span class="o">&gt;</span> <span class="nf">securityContexts</span><span class="o">()</span> <span class="o">{</span>
+     <span class="c1">//设置需要登录认证的路径</span>
+     <span class="n">List</span><span class="o">&lt;</span><span class="n">SecurityContext</span><span class="o">&gt;</span> <span class="n">result</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
+     <span class="n">result</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">getContextByPath</span><span class="o">(</span><span class="s">"/*/.*"</span><span class="o">));</span>
+     <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
+ <span class="o">}</span>
+
+<span class="kd">private</span> <span class="n">SecurityContext</span> <span class="nf">getContextByPath</span><span class="o">(</span><span class="n">String</span> <span class="n">pathRegex</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">SecurityContext</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
+    <span class="o">.</span><span class="na">securityReferences</span><span class="o">(</span><span class="n">defaultAuth</span><span class="o">())</span>
+    <span class="o">.</span><span class="na">forPaths</span><span class="o">(</span><span class="n">PathSelectors</span><span class="o">.</span><span class="na">regex</span><span class="o">(</span><span class="n">pathRegex</span><span class="o">))</span>
+    <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+<span class="o">}</span>
+
+<span class="c1">//com.macro.mall.admin.config.SwaggerConfig</span>
+<span class="nd">@Configuration</span>
+<span class="nd">@EnableSwagger2</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SwaggerConfig</span> <span class="kd">extends</span> <span class="n">BaseSwaggerConfig</span> <span class="o">{</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">SwaggerProperties</span> <span class="nf">swaggerProperties</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">SwaggerProperties</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">apiBasePackage</span><span class="o">(</span><span class="s">"com.macro.mall.controller"</span><span class="o">)</span>
+                <span class="o">...</span>
+                <span class="o">.</span><span class="na">enableSecurity</span><span class="o">(</span><span class="kc">true</span><span class="o">)</span> <span class="c1">//用来做认证</span>
+                <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span> 
+</code></pre></div></div>
+
+<h2 id="security-自动配置类">Security 自动配置类</h2>
+
+<blockquote>
+  <p>Spring Security 自动配置类，主要用于相关组件的配置</p>
+</blockquote>
+
+<p>SecurityAutoConfiguration：</p>
+
+<ul>
+  <li>SecurityProperties</li>
+  <li>AuthenticationEntryPoint：认证失败处理类 Bean</li>
+  <li>AccessDeniedHandler：权限不够处理器 Bean</li>
+  <li>PasswordEncoder：Spring Security 加密器</li>
+  <li>TokenAuthenticationFilter：Token 认证过滤器 Bean</li>
+  <li>SecurityFrameworkService：</li>
+</ul>
+
+<p>注意，不能和 {@link YudaoWebSecurityConfigurerAdapter} 用一个，原因是会导致初始化报错。</p>
+
+<ul>
+  <li>参见 https://stackoverflow.com/questions/53847050/spring-boot-delegatebuilder-cannot-be-null-on-autowiring-authenticationmanager 文档。</li>
+</ul>
+
+<h3 id="token-认证过滤器">Token 认证过滤器</h3>
+
+<blockquote>
+  <p>TokenAuthenticationFilter，在 SecurityAutoConfiguration 中调用。</p>
+</blockquote>
+
+<ul>
+  <li>验证通过后，获得 {@link LoginUser} 信息，并加入到 Spring Security 上下文
+    <ol>
+      <li>情况一，基于 header[login-user] 获得用户，例如说来自 Gateway 或者其它服务透传</li>
+      <li>情况二，基于 Token 获得用户。
+        <ul>
+          <li>注意，这里主要满足直接使用 Nginx 直接转发到 Spring Cloud 服务的场景。</li>
+        </ul>
+      </li>
+    </ol>
+  </li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@RequiredArgsConstructor</span>
+<span class="nd">@Slf4j</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">TokenAuthenticationFilter</span> <span class="kd">extends</span> <span class="n">OncePerRequestFilter</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">SecurityProperties</span> <span class="n">securityProperties</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">GlobalExceptionHandler</span> <span class="n">globalExceptionHandler</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">OAuth2TokenCommonApi</span> <span class="n">oauth2TokenApi</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="nd">@SuppressWarnings</span><span class="o">(</span><span class="s">"NullableProblems"</span><span class="o">)</span>
+    <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">doFilterInternal</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">request</span><span class="o">,</span> <span class="n">HttpServletResponse</span> <span class="n">response</span><span class="o">,</span> <span class="n">FilterChain</span> <span class="n">chain</span><span class="o">)</span>
+            <span class="kd">throws</span> <span class="n">ServletException</span><span class="o">,</span> <span class="n">IOException</span> <span class="o">{</span>
+        <span class="c1">// 情况一，基于 header[login-user] 获得用户，例如说来自 Gateway 或者其它服务透传</span>
+        <span class="n">LoginUser</span> <span class="n">loginUser</span> <span class="o">=</span> <span class="n">buildLoginUserByHeader</span><span class="o">(</span><span class="n">request</span><span class="o">);</span>
+
+        <span class="c1">// 情况二，基于 Token 获得用户</span>
+        <span class="c1">// 注意，这里主要满足直接使用 Nginx 直接转发到 Spring Cloud 服务的场景。</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">loginUser</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">String</span> <span class="n">token</span> <span class="o">=</span> <span class="n">SecurityFrameworkUtils</span><span class="o">.</span><span class="na">obtainAuthorization</span><span class="o">(</span><span class="n">request</span><span class="o">,</span>
+                    <span class="n">securityProperties</span><span class="o">.</span><span class="na">getTokenHeader</span><span class="o">(),</span> <span class="n">securityProperties</span><span class="o">.</span><span class="na">getTokenParameter</span><span class="o">());</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">StrUtil</span><span class="o">.</span><span class="na">isNotEmpty</span><span class="o">(</span><span class="n">token</span><span class="o">))</span> <span class="o">{</span>
+                <span class="n">Integer</span> <span class="n">userType</span> <span class="o">=</span> <span class="n">WebFrameworkUtils</span><span class="o">.</span><span class="na">getLoginUserType</span><span class="o">(</span><span class="n">request</span><span class="o">);</span>
+                <span class="k">try</span> <span class="o">{</span>
+                    <span class="c1">// 1.1 基于 token 构建登录用户</span>
+                    <span class="n">loginUser</span> <span class="o">=</span> <span class="n">buildLoginUserByToken</span><span class="o">(</span><span class="n">token</span><span class="o">,</span> <span class="n">userType</span><span class="o">);</span>
+                    <span class="c1">// 1.2 模拟 Login 功能，方便日常开发调试</span>
+                    <span class="c1">// forlai</span>
+                    <span class="k">if</span> <span class="o">(</span><span class="n">loginUser</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                        <span class="n">loginUser</span> <span class="o">=</span> <span class="n">mockLoginUser</span><span class="o">(</span><span class="n">request</span><span class="o">,</span> <span class="n">token</span><span class="o">,</span> <span class="n">userType</span><span class="o">);</span>
+                    <span class="o">}</span>
+                <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Throwable</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">CommonResult</span><span class="o">&lt;?&gt;</span> <span class="n">result</span> <span class="o">=</span> <span class="n">globalExceptionHandler</span><span class="o">.</span><span class="na">allExceptionHandler</span><span class="o">(</span><span class="n">request</span><span class="o">,</span> <span class="n">ex</span><span class="o">);</span>
+                    <span class="n">ServletUtils</span><span class="o">.</span><span class="na">writeJSON</span><span class="o">(</span><span class="n">response</span><span class="o">,</span> <span class="n">result</span><span class="o">);</span>
+                    <span class="k">return</span><span class="o">;</span>
+                <span class="o">}</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+
+        <span class="c1">// 设置当前用户</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">loginUser</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">SecurityFrameworkUtils</span><span class="o">.</span><span class="na">setLoginUser</span><span class="o">(</span><span class="n">loginUser</span><span class="o">,</span> <span class="n">request</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="c1">// 继续过滤链</span>
+        <span class="n">chain</span><span class="o">.</span><span class="na">doFilter</span><span class="o">(</span><span class="n">request</span><span class="o">,</span> <span class="n">response</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="n">LoginUser</span> <span class="nf">buildLoginUserByToken</span><span class="o">(</span><span class="n">String</span> <span class="n">token</span><span class="o">,</span> <span class="n">Integer</span> <span class="n">userType</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="c1">// 校验访问令牌, forlai</span>
+            <span class="n">OAuth2AccessTokenCheckRespDTO</span> <span class="n">accessToken</span> <span class="o">=</span> <span class="n">oauth2TokenApi</span><span class="o">.</span><span class="na">checkAccessToken</span><span class="o">(</span><span class="n">token</span><span class="o">).</span><span class="na">getCheckedData</span><span class="o">();</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">accessToken</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+            <span class="o">}</span>
+            <span class="c1">// 用户类型不匹配，无权限</span>
+            <span class="c1">// 注意：只有 /admin-api/* 和 /app-api/* 有 userType，才需要比对用户类型</span>
+            <span class="c1">// 类似 WebSocket 的 /ws/* 连接地址，是不需要比对用户类型的</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">userType</span> <span class="o">!=</span> <span class="kc">null</span>
+                    <span class="o">&amp;&amp;</span> <span class="n">ObjectUtil</span><span class="o">.</span><span class="na">notEqual</span><span class="o">(</span><span class="n">accessToken</span><span class="o">.</span><span class="na">getUserType</span><span class="o">(),</span> <span class="n">userType</span><span class="o">))</span> <span class="o">{</span>
+                <span class="k">throw</span> <span class="k">new</span> <span class="nf">AccessDeniedException</span><span class="o">(</span><span class="s">"错误的用户类型"</span><span class="o">);</span>
+            <span class="o">}</span>
+            <span class="c1">// 构建登录用户</span>
+            <span class="k">return</span> <span class="k">new</span> <span class="nf">LoginUser</span><span class="o">().</span><span class="na">setId</span><span class="o">(</span><span class="n">accessToken</span><span class="o">.</span><span class="na">getUserId</span><span class="o">()).</span><span class="na">setUserType</span><span class="o">(</span><span class="n">accessToken</span><span class="o">.</span><span class="na">getUserType</span><span class="o">())</span>
+                    <span class="o">.</span><span class="na">setInfo</span><span class="o">(</span><span class="n">accessToken</span><span class="o">.</span><span class="na">getUserInfo</span><span class="o">())</span> <span class="c1">// 额外的用户信息</span>
+                    <span class="o">.</span><span class="na">setTenantId</span><span class="o">(</span><span class="n">accessToken</span><span class="o">.</span><span class="na">getTenantId</span><span class="o">()).</span><span class="na">setScopes</span><span class="o">(</span><span class="n">accessToken</span><span class="o">.</span><span class="na">getScopes</span><span class="o">())</span>
+                    <span class="o">.</span><span class="na">setExpiresTime</span><span class="o">(</span><span class="n">accessToken</span><span class="o">.</span><span class="na">getExpiresTime</span><span class="o">());</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">ServiceException</span> <span class="n">serviceException</span><span class="o">)</span> <span class="o">{</span>
+            <span class="c1">// 校验 Token 不通过时，考虑到一些接口是无需登录的，所以直接返回 null 即可</span>
+            <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**
+     * 模拟登录用户，方便日常开发调试
+     *
+     * 注意，在线上环境下，一定要关闭该功能！！！
+     *
+     * @param request 请求
+     * @param token 模拟的 token，格式为 {@link SecurityProperties#getMockSecret()} + 用户编号
+     * @param userType 用户类型
+     * @return 模拟的 LoginUser
+     */</span>
+    <span class="kd">private</span> <span class="n">LoginUser</span> <span class="nf">mockLoginUser</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">request</span><span class="o">,</span> <span class="n">String</span> <span class="n">token</span><span class="o">,</span> <span class="n">Integer</span> <span class="n">userType</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">securityProperties</span><span class="o">.</span><span class="na">getMockEnable</span><span class="o">())</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="c1">// 必须以 mockSecret 开头</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">token</span><span class="o">.</span><span class="na">startsWith</span><span class="o">(</span><span class="n">securityProperties</span><span class="o">.</span><span class="na">getMockSecret</span><span class="o">()))</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="c1">// 构建模拟用户</span>
+        <span class="n">Long</span> <span class="n">userId</span> <span class="o">=</span> <span class="n">Long</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="n">token</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="n">securityProperties</span><span class="o">.</span><span class="na">getMockSecret</span><span class="o">().</span><span class="na">length</span><span class="o">()));</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">LoginUser</span><span class="o">().</span><span class="na">setId</span><span class="o">(</span><span class="n">userId</span><span class="o">).</span><span class="na">setUserType</span><span class="o">(</span><span class="n">userType</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">setTenantId</span><span class="o">(</span><span class="n">WebFrameworkUtils</span><span class="o">.</span><span class="na">getTenantId</span><span class="o">(</span><span class="n">request</span><span class="o">));</span>
+    <span class="o">}</span>
+
+    <span class="nd">@SneakyThrows</span>
+    <span class="kd">private</span> <span class="n">LoginUser</span> <span class="nf">buildLoginUserByHeader</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">String</span> <span class="n">loginUserStr</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="na">getHeader</span><span class="o">(</span><span class="n">SecurityFrameworkUtils</span><span class="o">.</span><span class="na">LOGIN_USER_HEADER</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">StrUtil</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">(</span><span class="n">loginUserStr</span><span class="o">))</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">loginUserStr</span> <span class="o">=</span> <span class="n">URLDecoder</span><span class="o">.</span><span class="na">decode</span><span class="o">(</span><span class="n">loginUserStr</span><span class="o">,</span> <span class="n">StandardCharsets</span><span class="o">.</span><span class="na">UTF_8</span><span class="o">.</span><span class="na">name</span><span class="o">());</span> <span class="c1">// 解码，解决中文乱码问题</span>
+            <span class="n">LoginUser</span> <span class="n">loginUser</span> <span class="o">=</span> <span class="n">JsonUtils</span><span class="o">.</span><span class="na">parseObject</span><span class="o">(</span><span class="n">loginUserStr</span><span class="o">,</span> <span class="n">LoginUser</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+            <span class="c1">// 用户类型不匹配，无权限</span>
+            <span class="c1">// 注意：只有 /admin-api/* 和 /app-api/* 有 userType，才需要比对用户类型</span>
+            <span class="c1">// 类似 WebSocket 的 /ws/* 连接地址，是不需要比对用户类型的</span>
+            <span class="n">Integer</span> <span class="n">userType</span> <span class="o">=</span> <span class="n">WebFrameworkUtils</span><span class="o">.</span><span class="na">getLoginUserType</span><span class="o">(</span><span class="n">request</span><span class="o">);</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">userType</span> <span class="o">!=</span> <span class="kc">null</span>
+                    <span class="o">&amp;&amp;</span> <span class="n">loginUser</span> <span class="o">!=</span> <span class="kc">null</span>
+                    <span class="o">&amp;&amp;</span> <span class="n">ObjectUtil</span><span class="o">.</span><span class="na">notEqual</span><span class="o">(</span><span class="n">loginUser</span><span class="o">.</span><span class="na">getUserType</span><span class="o">(),</span> <span class="n">userType</span><span class="o">))</span> <span class="o">{</span>
+                <span class="k">throw</span> <span class="k">new</span> <span class="nf">AccessDeniedException</span><span class="o">(</span><span class="s">"错误的用户类型"</span><span class="o">);</span>
+            <span class="o">}</span>
+            <span class="k">return</span> <span class="n">loginUser</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">log</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="s">"[buildLoginUserByHeader][解析 LoginUser({}) 发生异常]"</span><span class="o">,</span> <span class="n">loginUserStr</span><span class="o">,</span> <span class="n">ex</span><span class="o">);</span>  <span class="o">;</span>
+            <span class="k">throw</span> <span class="n">ex</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h2 id="整合-spring-session">整合 Spring Session</h2>
+
+<h3 id="spring-session--redis">Spring Session + Redis</h3>
+
+<p>使用 Redis 作为 Spring Session 的存储器，这也是生产环境下，主流的选择。</p>
+
+<h4 id="依赖">依赖</h4>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">&lt;!-- 实现对 Spring Session 使用 Redis 作为数据源的自动化配置 --&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.springframework.session<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>spring-session-data-redis<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+
+<span class="c">&lt;!-- 实现对 Spring Data Redis 的自动化配置 --&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-data-redis<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;exclusions&gt;</span>
+        <span class="c">&lt;!-- 去掉对 Lettuce 的依赖，因为 Spring Boot 优先使用 Lettuce 作为 Redis 客户端 --&gt;</span>
+        <span class="nt">&lt;exclusion&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>io.lettuce<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>lettuce-core<span class="nt">&lt;/artifactId&gt;</span>
+        <span class="nt">&lt;/exclusion&gt;</span>
+    <span class="nt">&lt;/exclusions&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+<span class="c">&lt;!-- 引入 Jedis 的依赖，这样 Spring Boot 实现对 Jedis 的自动化配置 --&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>redis.clients<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>jedis<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div></div>
+
+<h4 id="配置文件">配置文件</h4>
+
+<p>在 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-26/lab-26-distributed-session-01/src/main/resources"><code class="highlighter-rouge">resources</code></a> 目录下，创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-26/lab-26-distributed-session-01/src/main/resources/application.yaml"><code class="highlighter-rouge">application.yaml</code></a> 配置文件。</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spring</span><span class="pi">:</span>
+  <span class="c1"># 对应 RedisProperties 类</span>
+  <span class="na">redis</span><span class="pi">:</span>
+    <span class="na">host</span><span class="pi">:</span> <span class="s">127.0.0.1</span>
+    <span class="na">port</span><span class="pi">:</span> <span class="s">6379</span>
+    <span class="na">password</span><span class="pi">:</span> <span class="c1"># Redis 服务器密码，默认为空。生产中，一定要设置 Redis 密码！</span>
+    <span class="na">database</span><span class="pi">:</span> <span class="s">0</span> <span class="c1"># Redis 数据库号，默认为 0 。</span>
+    <span class="na">timeout</span><span class="pi">:</span> <span class="s">0</span> <span class="c1"># Redis 连接超时时间，单位：毫秒。</span>
+    <span class="c1"># 对应 RedisProperties.Jedis 内部类</span>
+    <span class="na">jedis</span><span class="pi">:</span>
+      <span class="na">pool</span><span class="pi">:</span>
+        <span class="na">max-active</span><span class="pi">:</span> <span class="s">8</span> <span class="c1"># 连接池最大连接数，默认为 8 。使用负数表示没有限制。</span>
+        <span class="na">max-idle</span><span class="pi">:</span> <span class="s">8</span> <span class="c1"># 默认连接数最大空闲的连接数，默认为 8 。使用负数表示没有限制。</span>
+        <span class="na">min-idle</span><span class="pi">:</span> <span class="s">0</span> <span class="c1"># 默认连接池最小空闲的连接数，默认为 0 。允许设置 0 和 正数。</span>
+        <span class="na">max-wait</span><span class="pi">:</span> <span class="s">-1</span> <span class="c1"># 连接池最大阻塞等待时间，单位：毫秒。默认为 -1 ，表示不限制。</span>
+</code></pre></div></div>
+
+<h4 id="sessionconfiguration">SessionConfiguration</h4>
+
+<p>创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-26/lab-26-distributed-session-01/src/main/java/cn/iocoder/springboot/lab26/distributedsession/config/SessionConfiguration.java">SessionConfiguration</a> 类，自定义 Spring Session Redis 的配置。</p>
+
+<ul>
+  <li>在类上，添加 <a href="https://github.com/spring-projects/spring-session/blob/master/spring-session-data-redis/src/main/java/org/springframework/session/data/redis/config/annotation/web/http/EnableRedisHttpSession.java"><code class="highlighter-rouge">@EnableRedisHttpSession</code></a> 注解，开启自动化配置 Spring Session 使用 Redis 作为数据源。该注解有如下属性：
+    <ul>
+      <li><code class="highlighter-rouge">maxInactiveIntervalInSeconds</code> 属性，Session 不活跃后的过期时间，默认为 1800 秒。</li>
+      <li><code class="highlighter-rouge">redisNamespace</code> 属性，在 Redis 的 key 的统一前缀，默认为 <code class="highlighter-rouge">"spring:session"</code> 。</li>
+      <li><code class="highlighter-rouge">redisFlushMode</code> 属性，Redis 会话刷新模式(<a href="https://github.com/spring-projects/spring-session/blob/master/spring-session-data-redis/src/main/java/org/springframework/session/data/redis/RedisFlushMode.java">RedisFlushMode</a>)。目前有两种，默认为 <code class="highlighter-rouge">RedisFlushMode.ON_SAVE</code> 。
+        <ul>
+          <li><code class="highlighter-rouge">RedisFlushMode.ON_SAVE</code> ，在请求执行完成时，统一写入 Redis 存储。</li>
+          <li><code class="highlighter-rouge">RedisFlushMode.IMMEDIATE</code> ，在每次修改 Session 时，立即写入 Redis 存储。</li>
+        </ul>
+      </li>
+      <li><code class="highlighter-rouge">cleanupCron</code> 属性，清理 Redis Session 会话过期的任务执行 CRON 表达式，默认为 <code class="highlighter-rouge">"0 * * * * *"</code> 每分钟执行一次。
+        <ul>
+          <li>虽然说，Redis 自带了 key 的过期，但是<strong>惰性删除策略</strong>，实际过期的 Session 还在 Redis 中占用内存。</li>
+          <li>所以，Spring Session 通过定时任务，删除 Redis 中过期的 Session ，尽快释放 Redis 的内存。</li>
+          <li>不了解 Redis 的删除过期 key 的策略的胖友，可以看看 <a href="https://blog.csdn.net/a_bang/article/details/52986935/">《Redis 中删除过期 Key 的三种策略》</a> 文章。</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>在 <code class="highlighter-rouge">#springSessionDefaultRedisSerializer()</code> 方法，定义了一个 Bean 名字为 <code class="highlighter-rouge">"springSessionDefaultRedisSerializer"</code> 的 RedisSerializer Bean ，采用 JSON 序列化方式。因为默认情况下，采用 <a href="https://juejin.im/post/5ce3cdc8e51d45777b1a3cdf">Java 自带的序列化方式</a> ，可读性很差，所以进行替换。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SessionConfiguration.java</span>
+
+<span class="nd">@Configuration</span>
+<span class="nd">@EnableRedisHttpSession</span> <span class="c1">// 自动化配置 Spring Session 使用 Redis 作为数据源</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SessionConfiguration</span> <span class="o">{</span>
+
+    <span class="cm">/**
+     * 创建 {@link RedisOperationsSessionRepository} 使用的 RedisSerializer Bean 。
+     *
+     * 具体可以看看 {@link RedisHttpSessionConfiguration#setDefaultRedisSerializer(RedisSerializer)} 方法，
+     * 它会引入名字为 "springSessionDefaultRedisSerializer" 的 Bean 。
+     *
+     * @return RedisSerializer Bean
+     */</span>
+    <span class="nd">@Bean</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"springSessionDefaultRedisSerializer"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">RedisSerializer</span> <span class="nf">springSessionDefaultRedisSerializer</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">RedisSerializer</span><span class="o">.</span><span class="na">json</span><span class="o">();</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="spring-session--mongodb">Spring Session + MongoDB</h3>
+
+<h3 id="整合-spring-session--spring-security">整合 Spring Session + Spring Security</h3>
+
+<h2 id="整合-oauth2">整合 OAuth2</h2>
+
+<h2 id="整合-jwt">整合 JWT</h2>
+
+<h2 id="项目实战">项目实战</h2>
+
+<p>在开源项目翻了一圈，找到一个相对合适项目 <a href="https://gitee.com/y_project/RuoYi-Vue">RuoYi-Vue</a> 。主要以下几点原因：</p>
+
+<ul>
+  <li>基于 Spring Security 实现。</li>
+  <li>基于 RBAC 权限模型，并且支持动态的权限配置。</li>
+  <li>基于 Redis 服务，实现登录用户的信息缓存。</li>
+  <li>前后端分离。同时前端采用 Vue ，相对来说后端会 Vue 的比 React 的多。</li>
+</ul>
+
+<h3 id="sysmenu"><a href="https://github.com/YunaiV/RuoYi-Vue/blob/master/ruoyi/src/main/java/com/ruoyi/project/system/domain/SysMenu.java">SysMenu</a></h3>
+
+<p>菜单权限实体类。</p>
+
+<ul>
+  <li>
+    <p><code class="highlighter-rouge">menuType</code> 属性，定义了三种类型。其中，<code class="highlighter-rouge">F</code> 代表按钮，是为了做页面中的功能级的权限。</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">perms</code> 属性，对应的权限<strong>标识</strong>字符串。一般格式为 <code class="highlighter-rouge">${大模块}:${小模块}:{操作}</code> 。示例如下：</p>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  用户查询：system:user:query
+  用户新增：system:user:add
+  用户修改：system:user:edit
+  用户删除：system:user:remove
+  用户导出：system:user:export
+  用户导入：system:user:import
+  重置密码：system:user:resetPwd
+</code></pre></div>    </div>
+
+    <ul>
+      <li>对于前端来说，每个按钮在展示时，可以判断用户是否有该按钮的权限。如果没有，则进行隐藏。当然，前端在首次进入系统的时候，会请求一次权限列表到本地进行缓存。</li>
+      <li>对于后端来说，每个接口上会添加 <code class="highlighter-rouge">@PreAuthorize("@ss.hasPermi('system:user:list')")</code> 注解。在请求接口时，会校验用户是否有该 URL 对应的权限。如果没有，则会抛出权限验证失败的异常。</li>
+      <li>一个 <code class="highlighter-rouge">perms</code> 属性，可以对应多个权限<strong>标识</strong>，使用逗号分隔。例如说：<code class="highlighter-rouge">"system:user:query,system:user:add"</code> 。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="securityconfig-1">SecurityConfig</h3>
+
+<p>在 <a href="https://github.com/YunaiV/RuoYi-Vue/blob/master/ruoyi/src/main/java/com/ruoyi/framework/config/SecurityConfig.java">SecurityConfig</a> 配置类，继承 WebSecurityConfigurerAdapter 抽象类，实现 Spring Security 在 Web 场景下的自定义配置。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SecurityConfig.java</span>
+
+<span class="nd">@Configuration</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SecurityConfig</span> <span class="kd">extends</span> <span class="n">WebSecurityConfigurerAdapter</span> <span class="o">{</span>
+
+    <span class="c1">// ...</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<ul>
+  <li>涉及到的配置方法较多。</li>
+</ul>
+
+<h4 id="configureauthenticationmanagerbuilder-auth"><code class="highlighter-rouge">#configure(AuthenticationManagerBuilder auth)</code></h4>
+
+<p>重写 <code class="highlighter-rouge">#configure(AuthenticationManagerBuilder auth)</code> 方法，实现 <a href="https://github.com/spring-projects/spring-security/blob/master/core/src/main/java/org/springframework/security/authentication/AuthenticationManager.java">AuthenticationManager</a> 认证管理器。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SecurityConfig.java</span>
+
+<span class="cm">/**
+ * 自定义用户认证逻辑
+ */</span>
+<span class="nd">@Autowired</span>
+<span class="kd">private</span> <span class="n">UserDetailsService</span> <span class="n">userDetailsService</span><span class="o">;</span>
+
+<span class="cm">/**
+ * 身份认证接口
+ */</span>
+<span class="nd">@Override</span>
+<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">(</span><span class="n">AuthenticationManagerBuilder</span> <span class="n">auth</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+    <span class="n">auth</span><span class="o">.</span><span class="na">userDetailsService</span><span class="o">(</span><span class="n">userDetailsService</span><span class="o">)</span> <span class="c1">// &lt;X&gt;</span>
+            <span class="o">.</span><span class="na">passwordEncoder</span><span class="o">(</span><span class="n">bCryptPasswordEncoder</span><span class="o">());</span> <span class="c1">// &lt;Y&gt;</span>
+<span class="o">}</span>
+
+<span class="cm">/**
+ * 强散列哈希加密实现
+ */</span>
+<span class="nd">@Bean</span>
+<span class="kd">public</span> <span class="n">BCryptPasswordEncoder</span> <span class="nf">bCryptPasswordEncoder</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nf">BCryptPasswordEncoder</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<ul>
+  <li><code class="highlighter-rouge">&lt;X&gt;</code> 处，调用 <code class="highlighter-rouge">AuthenticationManagerBuilder#userDetailsService(userDetailsService)</code> 方法，使用自定义实现的 <a href="https://github.com/spring-projects/spring-security/blob/master/core/src/main/java/org/springframework/security/core/userdetails/UserDetailsService.java">UserDetailsService</a> 实现类，更加<strong>灵活</strong>且<strong>自由</strong>的实现认证的用户信息的读取。在<a href="https://www.iocoder.cn/Spring-Boot/Spring-Security/#">「7.3.1 加载用户信息」</a>中，我们会看到 RuoYi-Vue 对 UserDetailsService 的自定义实现类。</li>
+  <li><code class="highlighter-rouge">&lt;Y&gt;</code> 处，调用 <code class="highlighter-rouge">AbstractDaoAuthenticationConfigurer#passwordEncoder(passwordEncoder)</code> 方法，设置 PasswordEncoder 密码编码器。这里，就使用了 bCryptPasswordEncoder 强散列哈希加密实现。</li>
+</ul>
+
+<h4 id="configurehttpsecurity-httpsecurity"><code class="highlighter-rouge">#configure(HttpSecurity httpSecurity)</code></h4>
+
+<p>重写 <code class="highlighter-rouge">#configure(HttpSecurity httpSecurity)</code> 方法，主要配置 URL 的权限控制。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SecurityConfig.java</span>
+
+<span class="cm">/**
+ * 认证失败处理类
+ */</span>
+<span class="nd">@Autowired</span>
+<span class="kd">private</span> <span class="n">AuthenticationEntryPointImpl</span> <span class="n">unauthorizedHandler</span><span class="o">;</span>
+
+<span class="cm">/**
+ * 退出处理类
+ */</span>
+<span class="nd">@Autowired</span>
+<span class="kd">private</span> <span class="n">LogoutSuccessHandlerImpl</span> <span class="n">logoutSuccessHandler</span><span class="o">;</span>
+
+<span class="cm">/**
+ * token 认证过滤器
+ */</span>
+<span class="nd">@Autowired</span>
+<span class="kd">private</span> <span class="n">JwtAuthenticationTokenFilter</span> <span class="n">authenticationTokenFilter</span><span class="o">;</span>
+
+<span class="nd">@Override</span>
+<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">configure</span><span class="o">(</span><span class="n">HttpSecurity</span> <span class="n">httpSecurity</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+    <span class="n">httpSecurity</span>
+            <span class="c1">// CRSF禁用，因为不使用session</span>
+            <span class="o">.</span><span class="na">csrf</span><span class="o">().</span><span class="na">disable</span><span class="o">()</span>
+            <span class="c1">// &lt;X&gt; 认证失败处理类</span>
+            <span class="o">.</span><span class="na">exceptionHandling</span><span class="o">().</span><span class="na">authenticationEntryPoint</span><span class="o">(</span><span class="n">unauthorizedHandler</span><span class="o">).</span><span class="na">and</span><span class="o">()</span>
+            <span class="c1">// 基于token，所以不需要session</span>
+            <span class="o">.</span><span class="na">sessionManagement</span><span class="o">().</span><span class="na">sessionCreationPolicy</span><span class="o">(</span><span class="n">SessionCreationPolicy</span><span class="o">.</span><span class="na">STATELESS</span><span class="o">).</span><span class="na">and</span><span class="o">()</span>
+            <span class="c1">// 过滤请求</span>
+            <span class="o">.</span><span class="na">authorizeRequests</span><span class="o">()</span>
+            <span class="c1">// &lt;Y&gt; 对于登录login 验证码captchaImage 允许匿名访问</span>
+            <span class="o">.</span><span class="na">antMatchers</span><span class="o">(</span><span class="s">"/login"</span><span class="o">,</span> <span class="s">"/captchaImage"</span><span class="o">).</span><span class="na">anonymous</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">antMatchers</span><span class="o">(</span>
+                    <span class="n">HttpMethod</span><span class="o">.</span><span class="na">GET</span><span class="o">,</span>
+                    <span class="s">"/*.html"</span><span class="o">,</span>
+                    <span class="s">"/**/*.html"</span><span class="o">,</span>
+                    <span class="s">"/**/*.css"</span><span class="o">,</span>
+                    <span class="s">"/**/*.js"</span>
+            <span class="o">).</span><span class="na">permitAll</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">antMatchers</span><span class="o">(</span><span class="s">"/profile/**"</span><span class="o">).</span><span class="na">anonymous</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">antMatchers</span><span class="o">(</span><span class="s">"/common/download**"</span><span class="o">).</span><span class="na">anonymous</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">antMatchers</span><span class="o">(</span><span class="s">"/swagger-ui.html"</span><span class="o">).</span><span class="na">anonymous</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">antMatchers</span><span class="o">(</span><span class="s">"/swagger-resources/**"</span><span class="o">).</span><span class="na">anonymous</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">antMatchers</span><span class="o">(</span><span class="s">"/webjars/**"</span><span class="o">).</span><span class="na">anonymous</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">antMatchers</span><span class="o">(</span><span class="s">"/*/api-docs"</span><span class="o">).</span><span class="na">anonymous</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">antMatchers</span><span class="o">(</span><span class="s">"/druid/**"</span><span class="o">).</span><span class="na">anonymous</span><span class="o">()</span>
+            <span class="c1">// 除上面外的所有请求全部需要鉴权认证</span>
+            <span class="o">.</span><span class="na">anyRequest</span><span class="o">().</span><span class="na">authenticated</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">and</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">headers</span><span class="o">().</span><span class="na">frameOptions</span><span class="o">().</span><span class="na">disable</span><span class="o">();</span>
+    <span class="n">httpSecurity</span><span class="o">.</span><span class="na">logout</span><span class="o">().</span><span class="na">logoutUrl</span><span class="o">(</span><span class="s">"/logout"</span><span class="o">).</span><span class="na">logoutSuccessHandler</span><span class="o">(</span><span class="n">logoutSuccessHandler</span><span class="o">);</span> <span class="c1">// &lt;Z&gt;</span>
+    <span class="c1">// &lt;P&gt; 添加 JWT filter</span>
+    <span class="n">httpSecurity</span><span class="o">.</span><span class="na">addFilterBefore</span><span class="o">(</span><span class="n">authenticationTokenFilter</span><span class="o">,</span> <span class="n">UsernamePasswordAuthenticationFilter</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>比较长，选择重点的来看。</p>
+
+<ul>
+  <li><code class="highlighter-rouge">&lt;X&gt;</code> 处，设置认证失败时的处理器为 <code class="highlighter-rouge">unauthorizedHandler</code> 。详细解析，见<a href="https://www.iocoder.cn/Spring-Boot/Spring-Security/#">「7.6.1 AuthenticationEntryPointImpl」</a>。</li>
+  <li><code class="highlighter-rouge">&lt;Y&gt;</code> 处，设置用于登录的 <code class="highlighter-rouge">/login</code> 接口，允许匿名访问。这样，后续我们就可以使用自定义的登录接口。详细解析，见<a href="https://www.iocoder.cn/Spring-Boot/Spring-Security/#">「7.3 登录 API 接口」</a>。</li>
+  <li><code class="highlighter-rouge">&lt;Z&gt;</code> 处，设置登出成功的处理器为 <code class="highlighter-rouge">logoutSuccessHandler</code> 。详细解析，见<a href="https://www.iocoder.cn/Spring-Boot/Spring-Security/#">「7.6.3 LogoutSuccessHandlerImpl」</a>。</li>
+  <li><code class="highlighter-rouge">&lt;P&gt;</code> 处，添加 JWT 认证过滤器 <code class="highlighter-rouge">authenticationTokenFilter</code> ，用于用户使用用户名与密码登录完成后，后续请求基于 JWT 来认证。 详细解析，见<a href="https://www.iocoder.cn/Spring-Boot/Spring-Security/#">「7.4 JwtAuthenticationTokenFilter」</a>。</li>
+</ul>
+
+<h4 id="authenticationmanagerbean"><code class="highlighter-rouge">#authenticationManagerBean</code></h4>
+
+<p>重写 <code class="highlighter-rouge">#authenticationManagerBean</code> 方法，解决无法直接注入 AuthenticationManager 的问题。</p>
+
+<ul>
+  <li>在方法上，额外添加了 <code class="highlighter-rouge">@Bean</code> 注解，保证创建出 AuthenticationManager Bean 。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SecurityConfig.java</span>
+
+<span class="nd">@Bean</span>
+<span class="nd">@Override</span>
+<span class="kd">public</span> <span class="n">AuthenticationManager</span> <span class="nf">authenticationManagerBean</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="kd">super</span><span class="o">.</span><span class="na">authenticationManagerBean</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="jwtauthenticationtokenfilter">JwtAuthenticationTokenFilter</h3>
+
+<p>在 <a href="https://github.com/YunaiV/RuoYi-Vue/blob/master/ruoyi/src/main/java/com/ruoyi/framework/security/filter/JwtAuthenticationTokenFilter.java">JwtAuthenticationTokenFilter</a> 中，继承 <a href="https://github.com/spring-projects/spring-framework/blob/master/spring-web/src/main/java/org/springframework/web/filter/OncePerRequestFilter.java">OncePerRequestFilter</a> 过滤器，实现了基于 Token 的认证。</p>
+
+<h3 id="权限验证">权限验证</h3>
+
+<p>在<a href="https://www.iocoder.cn/Spring-Boot/Spring-Security/#">「3. 进阶使用」</a>中，我们看到可以通过 Spring Security 提供的 <code class="highlighter-rouge">@PreAuthorize</code> 注解，实现基于 Spring EL 表达式的执行结果为 <code class="highlighter-rouge">true</code> 时，可以访问，从而实现灵活的权限校验。</p>
+
+<p>在 RuoYi-Vue 中，通过 <code class="highlighter-rouge">@PreAuthorize</code> 注解的特性，使用其 <a href="https://github.com/YunaiV/RuoYi-Vue/blob/master/ruoyi/src/main/java/com/ruoyi/framework/security/service/PermissionService.java">PermissionService</a> 提供的权限验证的方法。</p>
+
+<ul>
+  <li>请求 <code class="highlighter-rouge">/system/dict/data/list</code> 接口，会调用 PermissionService 的 <code class="highlighter-rouge">#hasPermi(String permission)</code> 方法，校验用户是否有指定的权限。</li>
+  <li>为什么这里会有一个 <code class="highlighter-rouge">@ss</code> 呢？在 Spring EL 表达式中，调用指定 Bean 名字的方法时，使用 <code class="highlighter-rouge">@</code> + Bean 的名字。在 RuoYi-Vue 中，声明 PermissionService 的 Bean 名字为 <code class="highlighter-rouge">ss</code> 。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SysDictDataController.java</span>
+
+<span class="nd">@PreAuthorize</span><span class="o">(</span><span class="s">"@ss.hasPermi('system:dict:list')"</span><span class="o">)</span>
+<span class="nd">@GetMapping</span><span class="o">(</span><span class="s">"/list"</span><span class="o">)</span>
+</code></pre></div></div>
+
+<h4 id="判断是否有权限">判断是否有权限</h4>
+
+<p>在 PermissionService 中，定义了 <code class="highlighter-rouge">#hasPermi(String permission)</code> 方法，判断当前用户是否<strong>有</strong>指定的权限。</p>
+
+<h4 id="判断是否有角色">判断是否有角色</h4>
+
+<p>在 PermissionService 中，定义了 <code class="highlighter-rouge">#hasRole(String role)</code> 方法，判断当前用户是否<strong>有</strong>指定的角色。</p>
+
+<h3 id="各种处理器">各种处理器</h3>
+
+<p>在 Ruoyi-Vue 中，提供了各种处理器，处理各种情况，所以我们汇总在<a href="https://www.iocoder.cn/Spring-Boot/Spring-Security/#">「7.6 各种处理器」</a> 中，一起来瞅瞅。</p>
+
+<h4 id="authenticationentrypointimpl">AuthenticationEntryPointImpl</h4>
+
+<p>在 <a href="https://github.com/YunaiV/RuoYi-Vue/blob/master/ruoyi/src/main/java/com/ruoyi/framework/security/handle/AuthenticationEntryPointImpl.java">AuthenticationEntryPointImpl</a> 中，实现 Spring Security <a href="https://github.com/spring-projects/spring-security/blob/master/web/src/main/java/org/springframework/security/web/AuthenticationEntryPoint.java">AuthenticationEntryPoint</a> 接口，处理认失败的 <a href="https://github.com/spring-projects/spring-security/blob/master/core/src/main/java/org/springframework/security/core/AuthenticationException.java">AuthenticationException</a> 异常。</p>
+
+<h4 id="globalexceptionhandler">GlobalExceptionHandler</h4>
+
+<p>在 <a href="https://github.com/YunaiV/RuoYi-Vue/blob/master/ruoyi/src/main/java/com/ruoyi/framework/web/exception/GlobalExceptionHandler.java">GlobalExceptionHandler</a> 中，定义了对 Spring Security 的异常处理。</p>
+
+<h4 id="logoutsuccesshandlerimpl">LogoutSuccessHandlerImpl</h4>
+
+<p>在 <a href="https://github.com/YunaiV/RuoYi-Vue/blob/master/ruoyi/src/main/java/com/ruoyi/framework/security/handle/LogoutSuccessHandlerImpl.java">LogoutSuccessHandlerImpl</a> 中，实现 Spring Security <a href="https://github.com/spring-projects/spring-security/blob/master/web/src/main/java/org/springframework/security/web/authentication/logout/LogoutSuccessHandler.java">LogoutSuccessHandler</a> 接口，自定义退出的处理，主动删除 LoginUser 在 Redis 中的缓存。</p>
+
+<h3 id="权限管理">权限管理</h3>
+
+<p>如下的 Controller ，提供了 RuoYi-Vue 的<strong>权限管理</strong>功能，比较简单，胖友自己去瞅瞅即可。</p>
+
+<ul>
+  <li>用户管理 <a href="https://github.com/YunaiV/RuoYi-Vue/blob/master/ruoyi/src/main/java/com/ruoyi/project/system/controller/SysUserController.java">SysUserController</a> ：用户是系统操作者，该功能主要完成系统用户配置。</li>
+  <li>角色管理 <a href="https://github.com/YunaiV/RuoYi-Vue/blob/master/ruoyi/src/main/java/com/ruoyi/project/system/controller/SysRoleController.java">SysRoleController</a> ：角色菜单权限分配、设置角色按机构进行数据范围权限划分。</li>
+  <li>菜单管理 <a href="https://github.com/YunaiV/RuoYi-Vue/blob/master/ruoyi/src/main/java/com/ruoyi/project/system/controller/SysMenuController.java">SysMenuController</a> ：配置系统菜单，操作权限，按钮权限标识等。</li>
+</ul>
+
+<h2 id="权限">权限</h2>
+
+<h3 id="rbac-权限模型">RBAC 权限模型</h3>
+
+<p>系统采用 RBAC 权限模型，全称是 <code class="highlighter-rouge">Role-Based Access Control</code> <strong>基于角色</strong>的访问控制。</p>
+
+<ul>
+  <li>简单来说，每个用户拥有若干角色，每个角色拥有若干个菜单，菜单中存在菜单权限、按钮权限。</li>
+  <li>
+    <p>这样，就形成了 <strong>“用户&lt;-&gt;角色&lt;-&gt;菜单”</strong> 的授权模型。</p>
+  </li>
+  <li>在这种模型中，用户与角色、角色与菜单之间构成了<strong>多对多</strong>的关系。</li>
+</ul>
+
+<h3 id="token-认证">Token 认证</h3>
+
+<p><a href="https://github.com/YunaiV/yudao-cloud/tree/master/yudao-module-member/yudao-module-member-server/src/main/java/cn/iocoder/yudao/module/member/controller/app/auth/AppAuthController.java">AppAuthController.java</a></p>
+
+<p>Token 存储在数据库中，对应 <code class="highlighter-rouge">system_oauth2_access_token</code> 访问令牌表的 <strong><code class="highlighter-rouge">id</code> 字段</strong>。</p>
+
+<ul>
+  <li>考虑到访问的性能，缓存在 Redis 的 <a href="https://github.com/YunaiV/yudao-cloud/blob/master/yudao-module-system/yudao-module-system-server/src/main/java/cn/iocoder/yudao/module/system/dal/redis/RedisKeyConstants.java#L21"><code class="highlighter-rouge">oauth2_access_token:%s</code></a>键中。</li>
+</ul>
+
+<p>疑问：为什么不使用 <strong>JWT</strong>（JSON Web Token）？</p>
+
+<ul>
+  <li>JWT 是<strong>无状态的</strong>，无法实现 <strong>Token 的作废</strong>，例如说用户登出系统、修改密码等场景。</li>
+</ul>
+
+<p>默认配置下，Token 有效期为 30 天，可通过 <code class="highlighter-rouge">system_oauth2_client</code> 表中 <code class="highlighter-rouge">client_id = default</code> 的记录进行自定义：</p>
+
+<p><img src="../assets/04.png" alt=" 表" /></p>
+
+<ul>
+  <li>修改 <code class="highlighter-rouge">access_token_validity_seconds</code> 字段，设置<strong>访问令牌</strong>的过期时间，默认 1800 秒 = 30 分钟</li>
+  <li>修改 <code class="highlighter-rouge">refresh_token_validity_seconds</code> 字段，设置<strong>刷新令牌</strong>的过期时间，默认 2592000 秒 = 30 天</li>
+</ul>
+
+<p>② 前端调用其它接口，需要在请求头带上 Token 进行访问。</p>
+
+<p>请求头格式如下：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">### Authorization: Bearer 登录时返回的 Token</span>
+Authorization: Bearer d2a3cdbc6c53470db67a582bd115103f
+</code></pre></div></div>
+
+<ul>
+  <li>具体的代码实现，可见 <a href="https://github.com/YunaiV/yudao-cloud/blob/master/yudao-framework/yudao-spring-boot-starter-security/src/main/java/cn/iocoder/yudao/framework/security/core/filter/TokenAuthenticationFilter.java">TokenAuthenticationFilter</a> 过滤器。</li>
+</ul>
+
+<h4 id="token-的模拟机制">Token 的模拟机制</h4>
+
+<p>考虑到使用 Postman、Swagger 调试接口方便，提供了 <strong>Token 的模拟机制</strong>。</p>
+
+<p>请求头格式如下：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">### Authorization: Bearer test用户编号</span>
+Authorization: Bearer test1
+</code></pre></div></div>
+
+<p>其中 <code class="highlighter-rouge">"test"</code> 可自定义，配置项如下：</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">### application-local.yaml</span>
+
+<span class="na">yudao</span><span class="pi">:</span>
+  <span class="na">security</span><span class="pi">:</span>
+    <span class="na">mock-enable</span><span class="pi">:</span> <span class="no">true</span> <span class="c1"># 是否开启 Token 的模拟机制</span>
+    <span class="na">mock-secret</span><span class="pi">:</span> <span class="s">test</span> <span class="c1"># Token 模拟机制的 Token 前缀</span>
+</code></pre></div></div>
+
+<h3 id="preauthorize-权限注解">@PreAuthorize 权限注解</h3>
+
+<p><a href="https://github.com/spring-projects/spring-security/blob/main/core/src/main/java/org/springframework/security/access/prepost/PreAuthorize.java"><code class="highlighter-rouge">@PreAuthorize</code> (opens new window)</a>是 Spring Security 内置的<strong>前置</strong>权限注解，添加在<strong>接口方法</strong>上，声明需要的权限，实现访问权限的控制。</p>
+
+<h4 id="基于权限标识的权限控制">基于【权限标识】的权限控制</h4>
+
+<p>权限标识：对应 <code class="highlighter-rouge">system_menu</code> 权限相关表的 <code class="highlighter-rouge">permission</code> 字段，推荐格式为 <code class="highlighter-rouge">${系统}:${模块}:${操作}</code>，例如说 <code class="highlighter-rouge">system:admin:add</code> 标识 system 服务的添加管理员。</p>
+
+<p>使用示例如下：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 符合 system:user:list 权限要求</span>
+<span class="nd">@PreAuthorize</span><span class="o">(</span><span class="s">"@ss.hasPermission('system:user:list')"</span><span class="o">)</span>
+
+<span class="c1">// 符合 system:user:add 或 system:user:edit 权限要求即可</span>
+<span class="nd">@PreAuthorize</span><span class="o">(</span><span class="s">"@ss.hasAnyPermissions('system:user:add', 'system:user:edit')"</span><span class="o">)</span>
+</code></pre></div></div>
+
+<h4 id="基于角色标识的权限控制">基于【角色标识】的权限控制</h4>
+
+<p>权限标识：对应 <code class="highlighter-rouge">system_role</code> 表的 <code class="highlighter-rouge">code</code> 字段， 例如说 <code class="highlighter-rouge">super_admin</code> 超级管理员、<code class="highlighter-rouge">tenant_admin</code> 租户管理员。</p>
+
+<p>使用示例如下：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 属于 user 角色</span>
+<span class="nd">@PreAuthorize</span><span class="o">(</span><span class="s">"@ss.hasRole('user')"</span><span class="o">)</span>
+
+<span class="c1">// 属于 user 或者 admin 之一</span>
+<span class="nd">@PreAuthorize</span><span class="o">(</span><span class="s">"@ss.hasAnyRoles('user', 'admin')"</span><span class="o">)</span>
+</code></pre></div></div>
+
+<p>实现原理是什么？</p>
+
+<ul>
+  <li><code class="highlighter-rouge">@PreAuthorize("@ss.hasPermission('system:user:list')")</code> 表示调用 <strong>Bean 名字为 <code class="highlighter-rouge">ss</code></strong> 的 <code class="highlighter-rouge">#hasPermission(...)</code> 方法，方法参数为 <code class="highlighter-rouge">"system:user:list"</code> 字符串。
+    <ul>
+      <li><code class="highlighter-rouge">ss</code> 对应的 Bean 是 <a href="https://github.com/YunaiV/yudao-cloud/blob/master/yudao-module-system/yudao-module-system-server/src/main/java/cn/iocoder/yudao/module/system/service/permission/PermissionServiceImpl.java#L43">PermissionServiceImpl</a>类，所以只需要去看该方法的<a href="https://github.com/YunaiV/yudao-cloud/blob/master/yudao-module-system/yudao-module-system-server/src/main/java/cn/iocoder/yudao/module/system/service/permission/PermissionServiceImpl.java#L293-L326">实现代码</a>。</li>
+      <li>当 <code class="highlighter-rouge">@PreAuthorize</code> 注解里的 <strong>Spring EL 表达式</strong>返回 <code class="highlighter-rouge">false</code> 时，表示没有权限。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="自定义权限配置">自定义权限配置</h3>
+
+<p>默认配置下，所有接口都需要登录后才能访问，不限于管理后台的 <code class="highlighter-rouge">/admin-api/**</code> 所有 API 接口、用户 App 的 <code class="highlighter-rouge">/app-api/**</code> 所有 API 接口。</p>
+
+<p>如下想要自定义权限配置，设置定义 API 接口可以匿名（不登录）进行访问，可以通过下面三种方式：</p>
+
+<h5 id="自定义-authorizerequestscustomizer-实现">自定义 AuthorizeRequestsCustomizer 实现</h5>
+
+<p>每个 Maven Module 可以实现自定义的 <a href="https://github.com/YunaiV/yudao-cloud/blob/master/yudao-framework/yudao-spring-boot-starter-security/src/main/java/cn/iocoder/yudao/framework/security/config/YudaoWebSecurityConfigurerAdapter.java">AuthorizeRequestsCustomizer (opens new window)</a>Bean，额外定义每个 Module 的 API 接口的访问规则。例如说 <code class="highlighter-rouge">yudao-module-infra</code> 模块的 <a href="https://github.com/YunaiV/yudao-cloud/blob/master/yudao-module-infra/yudao-module-infra-server/src/main/java/cn/iocoder/yudao/module/infra/framework/security/config/SecurityConfiguration.java">SecurityConfiguration (opens new window)</a>类。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Configuration</span><span class="o">(</span><span class="n">proxyBeanMethods</span> <span class="o">=</span> <span class="kc">false</span><span class="o">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s">"infraSecurityConfiguration"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SecurityConfiguration</span> <span class="o">{</span>
+
+    <span class="nd">@Value</span><span class="o">(</span><span class="s">"${spring.boot.admin.context-path:''}"</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">adminSeverContextPath</span><span class="o">;</span>
+
+    <span class="nd">@Bean</span><span class="o">(</span><span class="s">"infraAuthorizeRequestsCustomizer"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">AuthorizeRequestsCustomizer</span> <span class="nf">authorizeRequestsCustomizer</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">AuthorizeRequestsCustomizer</span><span class="o">()</span> <span class="o">{</span>
+
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">customize</span><span class="o">(</span><span class="n">AuthorizeHttpRequestsConfigurer</span><span class="o">&lt;</span><span class="n">HttpSecurity</span><span class="o">&gt;.</span><span class="na">AuthorizationManagerRequestMatcherRegistry</span> <span class="n">registry</span><span class="o">)</span> <span class="o">{</span>
+                <span class="c1">// Swagger 接口文档</span>
+                <span class="n">registry</span><span class="o">.</span><span class="na">requestMatchers</span><span class="o">(</span><span class="s">"/v3/api-docs/**"</span><span class="o">).</span><span class="na">permitAll</span><span class="o">()</span>
+                        <span class="o">.</span><span class="na">requestMatchers</span><span class="o">(</span><span class="s">"/swagger-ui.html"</span><span class="o">).</span><span class="na">permitAll</span><span class="o">()</span>
+                        <span class="o">.</span><span class="na">requestMatchers</span><span class="o">(</span><span class="s">"/swagger-ui/**"</span><span class="o">).</span><span class="na">permitAll</span><span class="o">()</span>
+                        <span class="o">.</span><span class="na">requestMatchers</span><span class="o">(</span><span class="s">"/swagger-resources/**"</span><span class="o">).</span><span class="na">permitAll</span><span class="o">()</span>
+                        <span class="o">.</span><span class="na">requestMatchers</span><span class="o">(</span><span class="s">"/webjars/**"</span><span class="o">).</span><span class="na">permitAll</span><span class="o">()</span>
+                        <span class="o">.</span><span class="na">requestMatchers</span><span class="o">(</span><span class="s">"/*/api-docs"</span><span class="o">).</span><span class="na">permitAll</span><span class="o">();</span>
+                <span class="c1">// Spring Boot Actuator 的安全配置</span>
+                <span class="n">registry</span><span class="o">.</span><span class="na">requestMatchers</span><span class="o">(</span><span class="s">"/actuator"</span><span class="o">).</span><span class="na">permitAll</span><span class="o">()</span>
+                        <span class="o">.</span><span class="na">requestMatchers</span><span class="o">(</span><span class="s">"/actuator/**"</span><span class="o">).</span><span class="na">permitAll</span><span class="o">();</span>
+                <span class="c1">// Druid 监控</span>
+                <span class="n">registry</span><span class="o">.</span><span class="na">requestMatchers</span><span class="o">(</span><span class="s">"/druid/**"</span><span class="o">).</span><span class="na">permitAll</span><span class="o">();</span>
+                <span class="c1">// Spring Boot Admin Server 的安全配置</span>
+                <span class="n">registry</span><span class="o">.</span><span class="na">requestMatchers</span><span class="o">(</span><span class="n">adminSeverContextPath</span><span class="o">).</span><span class="na">permitAll</span><span class="o">()</span>
+                        <span class="o">.</span><span class="na">requestMatchers</span><span class="o">(</span><span class="n">adminSeverContextPath</span> <span class="o">+</span> <span class="s">"/**"</span><span class="o">).</span><span class="na">permitAll</span><span class="o">();</span>
+                <span class="c1">// 文件读取</span>
+                <span class="n">registry</span><span class="o">.</span><span class="na">requestMatchers</span><span class="o">(</span><span class="n">buildAdminApi</span><span class="o">(</span><span class="s">"/infra/file/*/get/**"</span><span class="o">)).</span><span class="na">permitAll</span><span class="o">();</span>
+            <span class="o">}</span>
+
+        <span class="o">};</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>友情提示</p>
+
+<ul>
+  <li><code class="highlighter-rouge">permitAll()</code> 方法：所有用户可以任意访问，包括带上 Token 访问</li>
+  <li><code class="highlighter-rouge">anonymous()</code> 方法：匿名用户可以任意访问，带上 Token 访问会报错</li>
+</ul>
+
+<p>如果你对 Spring Security 了解不多，可以阅读艿艿写的 <a href="https://www.iocoder.cn/Spring-Boot/Spring-Security/?yudao">《芋道 Spring Boot 安全框架 Spring Security 入门 》 (opens new window)</a>文章。</p>
+
+<h5 id="permitall-注解"><code class="highlighter-rouge">@PermitAll</code> 注解</h5>
+
+<p>在 API 接口上添加 <a href="https://javaee.github.io/javaee-spec/javadocs/javax/annotation/security/PermitAll.html"><code class="highlighter-rouge">@PermitAll</code> (opens new window)</a>注解，示例如下：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// FileController.java</span>
+<span class="nd">@GetMapping</span><span class="o">(</span><span class="s">"/{configId}/get/{path}"</span><span class="o">)</span>
+<span class="nd">@PermitAll</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">getFileContent</span><span class="o">(</span><span class="n">HttpServletResponse</span> <span class="n">response</span><span class="o">,</span>
+                           <span class="nd">@PathVariable</span><span class="o">(</span><span class="s">"configId"</span><span class="o">)</span> <span class="n">Long</span> <span class="n">configId</span><span class="o">,</span>
+                           <span class="nd">@PathVariable</span><span class="o">(</span><span class="s">"path"</span><span class="o">)</span> <span class="n">String</span> <span class="n">path</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+    <span class="c1">// ...</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h5 id="配置文件-1">配置文件</h5>
+
+<p>在 <code class="highlighter-rouge">application.yaml</code> 配置文件，设置<code class="highlighter-rouge">yudao.security.permit-all-urls</code> 配置项。</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">yudao</span><span class="pi">:</span>
+  <span class="na">security</span><span class="pi">:</span>
+    <span class="na">permit-all-urls</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">/admin-ui/**</span> <span class="c1"># /resources/admin-ui 目录下的静态资源</span>
+      <span class="pi">-</span> <span class="s">/admin-api/xxx/yyy</span>
+</code></pre></div></div>
+

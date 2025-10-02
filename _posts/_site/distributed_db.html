@@ -1,16 +1,16 @@
 <blockquote>
-  <p>摘要：为了保证服务读写效率以及高可用性，通过<strong>读写分离</strong>、冷热分离解决数据库<strong>读并发</strong>的问题，</p>
+  <p>摘要：为了保证服务读写效率以及高可用性，通过<strong>读写分离</strong>、冷热分离解决数据库<strong>读并发</strong>的问题。</p>
 </blockquote>
 
 <!-- more -->
 
 <hr />
 
-<h3 id="目录">目录</h3>
+<h2 id="目录">目录</h2>
 
 <p>[TOC]</p>
 
-<h3 id="数据库架构优化">数据库架构优化</h3>
+<h2 id="数据库架构优化">数据库架构优化</h2>
 
 <p>为了保证服务读写效率以及高可用性，通过<strong>读写分离</strong>、冷热分离解决数据库<strong>读并发</strong>的问题，</p>
 
@@ -35,7 +35,23 @@
   <li><strong>冷热分离、使用缓存</strong>：根据数据的<strong>访问频率和业务重要性</strong>，将数据分为冷数据和热数据。使用缓存存储热点数据。</li>
 </ol>
 
-<h3 id="读写分离">读写分离</h3>
+<h2 id="常见中间件">常见中间件</h2>
+
+<ol>
+  <li><code class="highlighter-rouge">Sharding-Sphere</code>（分库分表的首选）：是一款分布式的数据库生态系统， 可以将任意数据库<strong>转换为分布式数据库</strong>，并通过数据分片、弹性伸缩、加密等能力对原有数据库进行增强。
+    <ol>
+      <li>功能完善，除了支持读写分离和分库分表，还提供<strong>分布式事务</strong>、数据库治理、影子库、<strong>数据加密和脱敏</strong>等功能。</li>
+      <li>社区强大，已经进入 Apache 孵化。是当当捐入 Apache 的，目前主要由京东的一些巨佬维护。</li>
+      <li>在京东、当当等大型互联网公司落地使用，并且已经提供的有 100+ 企业的成功案例。</li>
+      <li>子项目 <code class="highlighter-rouge">sharding-jdbc</code>：<strong>推荐首选方案</strong>，是一款轻量级 <code class="highlighter-rouge">Java</code> 框架，以 <code class="highlighter-rouge">jar</code> 包形式提供服务，不需做额外运维，且兼容性很好。</li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">MyCAT</code>：基于 Cobar</li>
+  <li><code class="highlighter-rouge">TSharding</code>（蘑菇街）</li>
+  <li><code class="highlighter-rouge">Cobar</code>（阿里巴巴）</li>
+</ol>
+
+<h2 id="读写分离">读写分离</h2>
 
 <p>读写分离：主要是为了将数据库的读操作和写操作<strong>分散到</strong>不同的数据库节点上。部署多台数据库（集群），主数据库负责写，从数据库负责读，通常<strong>一主多从</strong>。主从数据库间（通过<strong>主从复制</strong>）进行<strong>数据同步</strong>。需要尽量避免主从延迟。</p>
 
@@ -88,7 +104,7 @@
   <p>当然，除了主从复制之外，binlog 还能帮助实现数据恢复。</p>
 </blockquote>
 
-<p><img src="../assets/640" alt="图片" style="zoom: 80%;" /></p>
+<p><img src="../assets/master_slave_copy.png" alt="图片" style="zoom: 100%;" /></p>
 
 <p>关于MySql的主从复制的实线可以参考：<a href="https://mp.weixin.qq.com/s/W9G9_yo46zlttNwnz0DuQQ">MySql主从复制，从原理到实践！</a></p>
 
@@ -146,7 +162,7 @@
   <li>然后再通过Gaea代理查询该表数据，如果没有这条数据，表示<strong>读操作</strong>走的是从库，证明读写分离成功。</li>
 </ol>
 
-<h3 id="分库分表">分库分表</h3>
+<h2 id="分库分表">分库分表</h2>
 
 <blockquote>
   <p>通过读写分离、冷热分离解决数据库<strong>读并发</strong>的问题，通过分库分表解决数据库<strong>存储压力</strong>的问题。</p>
@@ -200,7 +216,7 @@
   <li>高端点则要将分库分表和其它中间件进行一个横向比较，站在一个集群模式的角度去讨论这个问题</li>
 </ol>
 
-<h4 id="分库分表的设计原理">分库分表的设计原理</h4>
+<h4 id="设计原理">设计原理</h4>
 
 <p>分库分表中间件的设计原理、步骤：</p>
 
@@ -265,7 +281,7 @@
   <li>非典型查询，是指不符合分库分表初衷的查询。例如在订单表中，典型的分库分表方案是使用买家 ID，那么如果卖家要查询自己卖了多少单，就很难查询</li>
 </ul>
 
-<h4 id="常见的分片算法">常见的分片算法</h4>
+<h3 id="常见的分片算法">常见的分片算法</h3>
 
 <p>分片算法：主要解决了数据被<strong>水平分片</strong>（拆行）之后，数据该放在哪个表的问题。</p>
 
@@ -296,7 +312,7 @@
   <li>……</li>
 </ol>
 
-<h4 id="分片键如何选择">分片键如何选择？</h4>
+<h3 id="分片键如何选择">分片键如何选择？</h3>
 
 <p>分片键（Sharding Key）：是数据分片的关键字段。分片键的选择非常重要，它关系着数据的分布和查询效率。</p>
 
@@ -315,7 +331,7 @@
 
 <p>并且，分片键可以是表中多个字段的组合，例如<strong>取用户 ID 后四位</strong>作为订单 ID 后缀。</p>
 
-<h4 id="带来的问题">带来的问题</h4>
+<h3 id="带来的问题">带来的问题</h3>
 
 <p>同一个数据库中的表分布在了<strong>不同的数据库中</strong>，可能会带来的问题：</p>
 
@@ -341,22 +357,7 @@
   </li>
 </ol>
 
-<h4 id="常见的分库分表工具">常见的分库分表工具</h4>
-
-<ol>
-  <li><code class="highlighter-rouge">Sharding-Sphere</code>（分库分表的首选）：是一款分布式的数据库生态系统， 可以将任意数据库<strong>转换为分布式数据库</strong>，并通过数据分片、弹性伸缩、加密等能力对原有数据库进行增强。
-    <ol>
-      <li>功能完善，除了支持读写分离和分库分表，还提供<strong>分布式事务</strong>、数据库治理、影子库、<strong>数据加密和脱敏</strong>等功能。</li>
-      <li>是当当捐入 Apache 的，目前主要由京东数科的一些巨佬维护。</li>
-      <li><code class="highlighter-rouge">sharding-jdbc</code>：<strong>推荐首选方案</strong>，是一款轻量级 <code class="highlighter-rouge">Java</code> 框架，以 <code class="highlighter-rouge">jar</code> 包形式提供服务，不需做额外运维，且兼容性很好。</li>
-    </ol>
-  </li>
-  <li><code class="highlighter-rouge">TSharding</code>（蘑菇街）</li>
-  <li><code class="highlighter-rouge">Cobar</code>（阿里巴巴）</li>
-  <li><code class="highlighter-rouge">MyCAT</code>：基于 Cobar</li>
-</ol>
-
-<h3 id="冷热分离">冷热分离</h3>
+<h2 id="冷热分离">冷热分离</h2>
 
 <p>数据冷热分离：指根据数据的<strong>访问频率和业务重要性</strong>，将数据分为冷数据和热数据。冷数据一般存储在低成本、低性能的介质中，热数据存储在高性能存储介质中。</p>
 
@@ -409,3 +410,1003 @@
   <li>TiDB 6.0 正式支持数据冷热存储分离，可以降低 SSD 使用成本。</li>
   <li>使用 TiDB 6.0 的<strong>数据放置</strong>功能，可以在同一个集群实现海量数据的冷热存储，将新的热数据存入 SSD，历史冷数据存入 HDD。</li>
 </ul>
+
+<h2 id="数据库连接池">数据库连接池</h2>
+
+<p>在项目中，数据库连接池基本是必不可少的组件。在目前数据库连接池的选型中，主要是</p>
+
+<ol>
+  <li><a href="https://github.com/alibaba/druid">Druid</a>：为<strong>监控</strong>而生的数据库连接池。Alibaba 开源的高性能数据库连接池。加入了强大的<strong>监控功能</strong>，可实时观察数据库连接池和 SQL 的运行情况，帮用户及时排查出系统中存在的问题。</li>
+  <li><a href="https://github.com/brettwooldridge/HikariCP">HikariCP</a>：号称<strong>性能</strong>最好的数据库连接池。Spring Boot 默认数据源。</li>
+  <li><code class="highlighter-rouge">C3P0</code></li>
+  <li><code class="highlighter-rouge">DBCP</code></li>
+</ol>
+
+<p>至于怎么选择，两者都非常优秀，不用过多纠结。</p>
+
+<ol>
+  <li>阿里大规模采用 Druid 。</li>
+  <li>Spring Boot 2.X 版本，默认采用 HikariCP 。</li>
+</ol>
+
+<p>当然，如下有一些资料，胖友可以阅读参考：</p>
+
+<ul>
+  <li><a href="https://github.com/alibaba/druid/wiki/Druid连接池介绍">《Druid 连接池介绍》</a></li>
+  <li><a href="https://blog.csdn.net/clementad/article/details/46928621">《为什么 HikariCP 被号称为性能最好的 Java 数据库连接池，如何配置使用》</a></li>
+  <li><a href="https://github.com/brettwooldridge/HikariCP/issues/232">《alibaba/druid pool analysis》</a> ，一个小小的“撕逼”。</li>
+</ul>
+
+<p>HikariCP 和 Druid 的入门，会配置单数据源和多数据源情况下的连接池。</p>
+
+<h3 id="整合-hikaricp-连接池">整合 HikariCP 连接池</h3>
+
+<h4 id="依赖">依赖</h4>
+
+<h4 id="配置文件">配置文件</h4>
+
+<p>添加 HikariCP 配置：</p>
+
+<ul>
+  <li>在 <code class="highlighter-rouge">spring.datasource</code> 配置项下，可以添加数据源的<strong>通用</strong>配置。定义了 <code class="highlighter-rouge">orders</code> 和 <code class="highlighter-rouge">users</code> 两个数据源的配置。
+    <ul>
+      <li>在 <code class="highlighter-rouge">.hikari</code> 配置项下，可以添加 HikariCP 连接池的<strong>自定义</strong>配置。然后 <a href="https://github.com/spring-projects/spring-boot/blob/master/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/jdbc/DataSourceConfiguration.java#L72-L92"><code class="highlighter-rouge">DataSourceConfiguration.Hikari</code></a> 会自动化配置 HikariCP 连接池。</li>
+    </ul>
+  </li>
+</ul>
+
+<blockquote>
+  <p>参考：<a href="https://www.iocoder.cn/Spring-Boot/datasource-pool/">HikariCP 更多配置项</a></p>
+</blockquote>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spring</span><span class="pi">:</span>
+  <span class="c1"># datasource 数据源配置内容</span>
+  <span class="na">datasource</span><span class="pi">:</span>
+    <span class="c1"># 订单数据源配置</span>
+    <span class="na">orders</span><span class="pi">:</span>
+      <span class="na">url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/test_orders?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8</span>
+      <span class="na">driver-class-name</span><span class="pi">:</span> <span class="s">com.mysql.jdbc.Driver</span>
+      <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
+      <span class="na">password</span><span class="pi">:</span>
+      <span class="c1"># HikariCP 自定义配置，对应 HikariConfig 配置属性类</span>
+      <span class="na">hikari</span><span class="pi">:</span>
+        <span class="na">minimum-idle</span><span class="pi">:</span> <span class="s">20</span> <span class="c1"># 池中维护的最小空闲连接数，默认为 10 个。</span>
+        <span class="na">maximum-pool-size</span><span class="pi">:</span> <span class="s">20</span> <span class="c1"># 池中最大连接数，包括闲置和使用中的连接，默认为 10 个。</span>
+    
+    <span class="c1"># 用户数据源配置</span>
+    <span class="na">users</span><span class="pi">:</span>
+      <span class="na">url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/test_users?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8</span>
+      <span class="na">driver-class-name</span><span class="pi">:</span> <span class="s">com.mysql.jdbc.Driver</span>
+      <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
+      <span class="na">password</span><span class="pi">:</span>
+      <span class="c1"># HikariCP 自定义配置，对应 HikariConfig 配置属性类</span>
+      <span class="na">hikari</span><span class="pi">:</span>
+        <span class="na">minimum-idle</span><span class="pi">:</span> <span class="s">15</span> <span class="c1"># 池中维护的最小空闲连接数，默认为 10 个。</span>
+        <span class="na">maximum-pool-size</span><span class="pi">:</span> <span class="s">15</span> <span class="c1"># 池中最大连接数，包括闲置和使用中的连接，默认为 10 个。</span>
+</code></pre></div></div>
+
+<h4 id="数据源配置类">数据源配置类</h4>
+
+<p>创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-19/lab-19-datasource-pool-hikaricp-multiple/src/main/java/cn/iocoder/springboot/lab19/datasourcepool/config/DataSourceConfig.java">DataSourceConfig</a> 配置类。</p>
+
+<ul>
+  <li>这块代码，是参考 Spring Boot <a href="https://github.com/spring-projects/spring-boot/blob/master/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/jdbc/DataSourceConfiguration.java#L72-L92"><code class="highlighter-rouge">DataSourceConfiguration.Hikari</code></a> 配置类来实现的。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// DataSourceConfig.java</span>
+
+<span class="nd">@Configuration</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">DataSourceConfig</span> <span class="o">{</span>
+
+    <span class="cm">/**
+     * 创建 orders 数据源的配置对象
+     */</span>
+    <span class="nd">@Primary</span> <span class="c1">// 保证项目中有一个主的 DataSourceProperties Bean 。</span>
+    <span class="nd">@Bean</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"ordersDataSourceProperties"</span><span class="o">)</span>
+    <span class="nd">@ConfigurationProperties</span><span class="o">(</span><span class="n">prefix</span> <span class="o">=</span> <span class="s">"spring.datasource.orders"</span><span class="o">)</span> <span class="c1">// 读取 spring.datasource.orders 配置到 DataSourceProperties 对象</span>
+    <span class="kd">public</span> <span class="n">DataSourceProperties</span> <span class="nf">ordersDataSourceProperties</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">DataSourceProperties</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**
+     * 创建 orders 数据源
+     */</span>
+    <span class="nd">@Bean</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"ordersDataSource"</span><span class="o">)</span> <span class="c1">//创建一个名字为 `"ordersDataSource"` 的 HikariDataSource Bean</span>
+    <span class="nd">@ConfigurationProperties</span><span class="o">(</span><span class="n">prefix</span> <span class="o">=</span> <span class="s">"spring.datasource.orders.hikari"</span><span class="o">)</span> <span class="c1">// 读取 spring.datasource.orders 自定义配置项，逐个属性赋值给 HikariDataSource Bean 对象</span>
+    <span class="kd">public</span> <span class="n">DataSource</span> <span class="nf">ordersDataSource</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">// &lt;1.1&gt; 获得 `orders` 数据源的 DataSourceProperties 对象</span>
+        <span class="n">DataSourceProperties</span> <span class="n">properties</span> <span class="o">=</span>  <span class="k">this</span><span class="o">.</span><span class="na">ordersDataSourceProperties</span><span class="o">();</span>
+        <span class="c1">// &lt;1.2&gt; 创建 HikariDataSource 对象。这样，`"spring.datasource.orders"` 配置项，逐个属性赋值给 HikariDataSource Bean 。</span>
+        <span class="k">return</span> <span class="nf">createHikariDataSource</span><span class="o">(</span><span class="n">properties</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="c1">// 省略 users 数据源配置类</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">HikariDataSource</span> <span class="nf">createHikariDataSource</span><span class="o">(</span><span class="n">DataSourceProperties</span> <span class="n">properties</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// 创建 HikariDataSource 对象</span>
+        <span class="n">HikariDataSource</span> <span class="n">dataSource</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="na">initializeDataSourceBuilder</span><span class="o">().</span><span class="na">type</span><span class="o">(</span><span class="n">HikariDataSource</span><span class="o">.</span><span class="na">class</span><span class="o">).</span><span class="na">build</span><span class="o">();</span>
+        <span class="c1">// 设置线程池名</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">StringUtils</span><span class="o">.</span><span class="na">hasText</span><span class="o">(</span><span class="n">properties</span><span class="o">.</span><span class="na">getName</span><span class="o">()))</span> <span class="o">{</span>
+            <span class="n">dataSource</span><span class="o">.</span><span class="na">setPoolName</span><span class="o">(</span><span class="n">properties</span><span class="o">.</span><span class="na">getName</span><span class="o">());</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">dataSource</span><span class="o">;</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="整合-druid-连接池">整合 Druid 连接池</h3>
+
+<h4 id="依赖-1">依赖</h4>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">&lt;!--添加 druid 的 starter--&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>com.alibaba<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>druid-spring-boot-starter<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>1.1.17<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div></div>
+
+<h4 id="数据源配置">数据源配置</h4>
+
+<p>在 <code class="highlighter-rouge">application.yml</code> 文件中添加数据源配置，会与 Druid 数据源中的属性进行绑定；</p>
+
+<ul>
+  <li>将 Druid 的自定义配置，和 <code class="highlighter-rouge">url</code>、<code class="highlighter-rouge">driver-class-name</code> 等数据源的<strong>通用配置</strong>放在同一级，这样后续只需要使用 <code class="highlighter-rouge">@ConfigurationProperties(prefix = "spring.datasource.orders")</code> 的方式，就能完成 DruidDataSource 的配置属性设置。</li>
+  <li>在 <code class="highlighter-rouge">spring.datasource.druid</code> 配置项下，还配置了 <code class="highlighter-rouge">filter.stat</code> 和 <code class="highlighter-rouge">stat-view-servlet</code> 配置项，用于 Druid 监控功能。</li>
+</ul>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">		</span><span class="c1">######## JDBC 通用配置 ############### </span>
+<span class="nn">...</span>
+<span class="err">      	</span><span class="c1">######## Druid 连接池的配置 ###############</span>
+<span class="na">spring</span><span class="pi">:</span>
+  <span class="c1"># datasource 数据源配置内容</span>
+  <span class="na">datasource</span><span class="pi">:</span>
+    <span class="c1"># 订单数据源配置</span>
+    <span class="na">orders</span><span class="pi">:</span>
+      <span class="na">url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/test_orders?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8</span>
+      <span class="na">driver-class-name</span><span class="pi">:</span> <span class="s">com.mysql.jdbc.Driver</span>
+      <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
+      <span class="na">password</span><span class="pi">:</span>
+      <span class="na">type</span><span class="pi">:</span> <span class="s">com.alibaba.druid.pool.DruidDataSource</span> <span class="c1"># 设置类型为 DruidDataSource</span>
+      <span class="c1"># Druid 自定义配置，对应 DruidDataSource 中的 setting 方法的属性</span>
+      <span class="na">min-idle</span><span class="pi">:</span> <span class="s">0</span> <span class="c1"># 池中维护的最小空闲连接数，默认为 0 个。</span>
+      <span class="na">max-active</span><span class="pi">:</span> <span class="s">20</span> <span class="c1"># 池中最大连接数，包括闲置和使用中的连接，默认为 8 个。</span>
+    <span class="c1"># 用户数据源配置</span>
+    <span class="na">users</span><span class="pi">:</span>
+      <span class="na">url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/test_users?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8</span>
+      <span class="na">driver-class-name</span><span class="pi">:</span> <span class="s">com.mysql.jdbc.Driver</span>
+      <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
+      <span class="na">password</span><span class="pi">:</span>
+      <span class="na">type</span><span class="pi">:</span> <span class="s">com.alibaba.druid.pool.DruidDataSource</span> <span class="c1"># 设置类型为 DruidDataSource</span>
+      <span class="c1"># Druid 自定义配置，对应 DruidDataSource 中的 setting 方法的属性</span>
+      <span class="na">min-idle</span><span class="pi">:</span> <span class="s">0</span> <span class="c1"># 池中维护的最小空闲连接数，默认为 0 个。</span>
+      <span class="na">max-active</span><span class="pi">:</span> <span class="s">20</span> <span class="c1"># 池中最大连接数，包括闲置和使用中的连接，默认为 8 个。</span>
+      
+      <span class="na">initial-size</span><span class="pi">:</span> <span class="s">5</span> <span class="c1"># 初始化连接大小</span>
+      <span class="na">max-wait</span><span class="pi">:</span> <span class="s">60000</span> <span class="c1"># 获取连接时最大等待时间，毫秒</span>
+      <span class="na">time-between-eviction-runs-millis</span><span class="pi">:</span> <span class="s">60000</span> <span class="c1"># 间隔多久检测一次需关闭的空闲连接，毫秒</span>
+      <span class="na">min-evictable-idle-time-millis</span><span class="pi">:</span> <span class="s">300000</span> <span class="c1"># 连接在池中最小生存时间，毫秒</span>
+      <span class="na">connection-properties</span><span class="pi">:</span> <span class="s">’druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000‘</span> <span class="c1"># 打开mergeSql功能;慢SQL记录</span>
+      
+    <span class="c1"># Druid 自定已配置</span>
+    <span class="na">druid</span><span class="pi">:</span>
+      <span class="na">filter</span><span class="pi">:</span> <span class="c1"># 配置扩展插件，常用的有stat:监控统计，wall:防sql注入</span>
+        <span class="na">stat</span><span class="pi">:</span> <span class="c1"># 配置 StatFilter ，对应文档 https://github.com/alibaba/druid/wiki/%E9%85%8D%E7%BD%AE_StatFilter</span>
+          <span class="na">log-slow-sql</span><span class="pi">:</span> <span class="no">true</span> <span class="c1"># 开启慢查询记录</span>
+          <span class="na">slow-sql-millis</span><span class="pi">:</span> <span class="s">5000</span> <span class="c1"># 慢 SQL 的标准，单位：毫秒</span>
+      <span class="na">stat-view-servlet</span><span class="pi">:</span> <span class="c1"># 配置 StatViewServlet ，对应文档 https://github.com/alibaba/druid/wiki/%E9%85%8D%E7%BD%AE_StatViewServlet%E9%85%8D%E7%BD%AE</span>
+        <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span> <span class="c1"># 是否开启 StatViewServlet</span>
+        <span class="na">login-username</span><span class="pi">:</span> <span class="s">yudaoyuanma</span> <span class="c1"># 账号</span>
+        <span class="na">login-password</span><span class="pi">:</span> <span class="s">javaniubi</span> <span class="c1"># 密码</span>
+</code></pre></div></div>
+
+<h4 id="数据源配置类-1">数据源配置类</h4>
+
+<p>数据库连接池、数据源自动配置；<code class="highlighter-rouge">DataSourceAutoConfiguration</code> 类；</p>
+
+<p>自定义方式需创建<strong>数据源配置类</strong>：配置类创建 Druid 数据源对象时，应避免将数据源信息（如 URL、username、password 等）硬编码到代码中，可通过 <code class="highlighter-rouge">@ConfigurationProperties("spring.datasource")</code> 注解，将数据源属性与配置文件中以 <code class="highlighter-rouge">spring.datasource</code> 开头的配置绑定。</p>
+
+<p>创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-19/lab-19-datasource-pool-druid-multiple/src/main/java/cn/iocoder/springboot/lab19/datasourcepool/config/DataSourceConfig.java">DataSourceConfig</a> 配置类。</p>
+
+<ul>
+  <li>因为在 <a href="https://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao#">「5.2 应用配置」</a> 中，将 Druid 自定义的配置项，和数据源的通用配置放在了同一级，所以只需使用 <code class="highlighter-rouge">@ConfigurationProperties(prefix = "spring.datasource.orders")</code> 这样的方式即可。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// DataSourceConfig.java</span>
+
+<span class="nd">@Configuration</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">DataSourceConfig</span> <span class="o">{</span>
+
+    <span class="cm">/**
+     * 创建 orders 数据源
+     */</span>
+    <span class="nd">@Primary</span>
+    <span class="nd">@Bean</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"ordersDataSource"</span><span class="o">)</span>
+    <span class="nd">@ConfigurationProperties</span><span class="o">(</span><span class="n">prefix</span> <span class="o">=</span> <span class="s">"spring.datasource.orders"</span><span class="o">)</span> <span class="c1">// 读取 spring.datasource.orders 配置到 HikariDataSource 对象</span>
+    <span class="kd">public</span> <span class="n">DataSource</span> <span class="nf">ordersDataSource</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">DruidDataSourceBuilder</span><span class="o">.</span><span class="na">create</span><span class="o">().</span><span class="na">build</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**
+     * 创建 users 数据源
+     */</span>
+    <span class="nd">@Bean</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"usersDataSource"</span><span class="o">)</span>
+    <span class="nd">@ConfigurationProperties</span><span class="o">(</span><span class="n">prefix</span> <span class="o">=</span> <span class="s">"spring.datasource.users"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">DataSource</span> <span class="nf">usersDataSource</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">DruidDataSourceBuilder</span><span class="o">.</span><span class="na">create</span><span class="o">().</span><span class="na">build</span><span class="o">();</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h4 id="监控功能">监控功能</h4>
+
+<ol>
+  <li>内置提供的名为 <code class="highlighter-rouge">StatViewServlet</code> 的 <code class="highlighter-rouge">Servlet</code>，可开启 Druid 内置监控页面功能， 展示 Druid 的统计信息；需将该 <code class="highlighter-rouge">Servlet </code>配置在 Web 应用中的 WEB-INF/web.xml 中；</li>
+  <li>内置提供的 StatFilter，可开启 Druid 的 SQL 监控功能；</li>
+  <li>内置提供了 WallFilter，可开启防火墙功能，防御 SQL 注入攻击。</li>
+</ol>
+
+<ul>
+  <li>通过 <code class="highlighter-rouge">spring.datasource.filter.stat</code> 配置了 StatFilter ，统计监控信息。</li>
+  <li>通过 <code class="highlighter-rouge">spring.datasource.filter.stat-view-servlet</code> 配置了 StatViewServlet ，提供监控信息的展示的 html 页面和 JSON API 。</li>
+</ul>
+
+<p>所以在启动项目后，访问 <code class="highlighter-rouge">http://127.0.0.1:8080/druid</code> 地址，可以看到监控 html 页面。</p>
+
+<p><img src="../assets/StatViewServlet 01.png" alt="监控界面" style="zoom: 20%;" /></p>
+
+<ul>
+  <li>在界面的顶部，提供了数据源、SQL 监控、SQL 防火墙等等功能。</li>
+  <li>每个界面上，可以通过 <a href="https://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao#">View JSON API</a> 获得数据的来源。同时，可以在 <a href="https://www.iocoder.cn/Spring-Boot/datasource-pool/?yudao#">JSON API( <code class="highlighter-rouge">http://127.0.0.1:8080/druid/api.html</code> )</a> 菜单对应的界面中，看到 StatViewServlet 内置的监控信息的 JSON API 列表。</li>
+  <li>因为监控信息是存储在 JVM 内存中，在 JVM 进程重启时，信息将会丢失。如果我们希望持久化到 MySQL、Elasticsearch、HBase 等存储器中，可以通过 StatViewServlet 提供的 JSON API 接口，采集监控信息。另外，有个 <a href="https://github.com/bungder/druid-aggregated-monitor">druid-aggregated-monitor</a> 开源项目，提供了 集中监控分布式服务中的 Druid 连接池的方案和思路。</li>
+  <li>如果 StatViewServlet 提供的 JSON API 接口，无法满足诉求，可以通过自定义 API 接口，使用 <a href="https://github.com/alibaba/druid/blob/master/src/main/java/com/alibaba/druid/stat/DruidStatManagerFacade.java">DruidStatManagerFacade</a> 获得监控信息。使用示例 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-19/lab-19-datasource-pool-druid-single/src/main/java/cn/iocoder/springboot/lab19/datasourcepool/controller/DruidStatController.java">DruidStatController</a> 代码。</li>
+</ul>
+
+<h4 id="测试类">测试类</h4>
+
+<p>Spring Boot 提供的默认测试类；</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">net</span><span class="o">.</span><span class="na">biancheng</span><span class="o">.</span><span class="na">www</span><span class="o">;</span>
+
+<span class="nd">@SpringBootTest</span>
+<span class="kd">class</span> <span class="nc">SpringBootAdminexApplicationTests</span> <span class="o">{</span>
+    <span class="c1">// 数据源组件</span>
+    <span class="nd">@Autowired</span>
+    <span class="n">DataSource</span> <span class="n">dataSource</span><span class="o">;</span>
+    <span class="c1">// 用于访问数据库的组件</span>
+    <span class="nd">@Autowired</span>
+    <span class="n">JdbcTemplate</span> <span class="n">jdbcTemplate</span><span class="o">;</span>
+    
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">contextLoads</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">SQLException</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="err">”默认数据源为：“</span> <span class="o">+</span> <span class="n">dataSource</span><span class="o">.</span><span class="na">getClass</span><span class="o">());</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="err">”数据库连接实例：“</span> <span class="o">+</span> <span class="n">dataSource</span><span class="o">.</span><span class="na">getConnection</span><span class="o">());</span>
+        <span class="c1">// 访问数据库</span>
+        <span class="n">Integer</span> <span class="n">cnt</span> <span class="o">=</span> <span class="n">jdbcTemplate</span><span class="o">.</span><span class="na">queryForObject</span><span class="o">(</span><span class="err">”</span><span class="n">SELECT</span> <span class="nf">count</span><span class="o">(*)</span> <span class="n">from</span> <span class="err">`</span><span class="n">user</span><span class="err">`“</span><span class="o">,</span> <span class="n">Integer</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="err">”</span><span class="n">user</span> <span class="err">表中共有“</span> <span class="o">+</span> <span class="n">cnt</span> <span class="o">+</span> <span class="err">”条数据。“</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h2 id="数据权限">数据权限</h2>
+
+<p>data-permisssion</p>
+
+<h1 id="多数据源">多数据源</h1>
+
+<p>在项目中，可能会碰到需要多数据源的场景。</p>
+
+<ul>
+  <li>
+    <p>多数据源（<strong>分库？</strong>）：一个复杂的单体项目，因为没有拆分成不同的服务，需要连接<strong>多个业务</strong>的数据源。</p>
+  </li>
+  <li>
+    <p>读写分离：数据库主节点压力比较大，需要增加从节点提供读操作，以减少压力。</p>
+    <ul>
+      <li>本质上，读写分离，仅仅是多数据源的一个场景，从节点是只提供读操作的数据源。所以只要实现了多数据源的功能，也就能够提供读写分离。</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="实现方式">实现方式</h2>
+
+<p>目前，实现多数据源有三种方案：</p>
+
+<h4 id="基于-abstractroutingdatasource">基于 AbstractRoutingDataSource</h4>
+
+<p>基于 Spring <a href="https://github.com/spring-projects/spring-framework/blob/master/spring-jdbc/src/main/java/org/springframework/jdbc/datasource/lookup/AbstractRoutingDataSource.java">AbstractRoutingDataSource</a> 做拓展。</p>
+
+<ol>
+  <li>简单来说，通过继承 AbstractRoutingDataSource 抽象类，实现一个管理项目中多个 DataSource 的<strong>动态</strong> <strong>DynamicRoutingDataSource 实现类</strong>。</li>
+  <li>这样，Spring 在获取数据源时，可以通过 DynamicRoutingDataSource 返回<strong>实际</strong>的 DataSource 。</li>
+  <li>然后，可以自定义一个 <code class="highlighter-rouge">@DS</code> 注解，可以添加在 Service 方法、Dao 方法上，表示其<strong>实际</strong>对应的 DataSource 。</li>
+</ol>
+
+<p>如此，整个过程就变成，执行数据操作时，通过配置的 <code class="highlighter-rouge">@DS</code> 注解，使用 DynamicRoutingDataSource 获得<strong>对应的实际的</strong> DataSource 。之后，在通过该 DataSource 获得 Connection 连接，最后发起数据库操作。</p>
+
+<ul>
+  <li>
+    <p>缺点：在结合 Spring 事务的时候，会存在<strong>无法切换数据源</strong>的问题。</p>
+  </li>
+  <li>
+    <p>比较好的开源项目是 <strong>baomidou</strong> 提供的 <a href="https://mp.baomidou.com/guide/dynamic-datasource.html"><code class="highlighter-rouge">dynamic-datasource-spring-boot-starter</code></a> 。</p>
+  </li>
+</ul>
+
+<p>如， <a href="https://www.iocoder.cn/Spring-Boot/dynamic-datasource/?yudao#">「3. baomidou 多数据源」</a> 和 <a href="https://www.iocoder.cn/Spring-Boot/dynamic-datasource/?yudao#">「4. baomidou 读写分离」</a></p>
+
+<h4 id="不同操作类固定数据源">不同操作类，固定数据源</h4>
+
+<blockquote>
+  <p>整个配置过程会相对繁琐</p>
+</blockquote>
+
+<p>以 MyBatis 举例子，假设有 <code class="highlighter-rouge">orders</code> 和 <code class="highlighter-rouge">users</code> 两个数据源。</p>
+
+<ol>
+  <li>那么可以创建两个 <strong>SqlSessionTemplate</strong> <code class="highlighter-rouge">ordersSqlSessionTemplate</code> 和 <code class="highlighter-rouge">usersSqlSessionTemplate</code> ，分别使用这两个数据源。</li>
+  <li>然后，配置不同的 Mapper 使用不同的 SqlSessionTemplate 。</li>
+</ol>
+
+<p>如此，整个过程就变成，执行数据操作时，通过 Mapper 可以对应到其 SqlSessionTemplate ，进而获得<strong>对应的实际的</strong> DataSource 。之后获得 Connection 连接，最后发起数据库操作。</p>
+
+<p>如， <a href="https://www.iocoder.cn/Spring-Boot/dynamic-datasource/?yudao#">「5. MyBatis 多数据源」</a>、<a href="https://www.iocoder.cn/Spring-Boot/dynamic-datasource/?yudao#">「6. Spring Data JPA 多数据源」</a>、<a href="https://www.iocoder.cn/Spring-Boot/dynamic-datasource/?yudao#">「7. JdbcTemplate 多数据源」</a> 。</p>
+
+<p>缺点：在结合 Spring 事务的时候，也会存在<strong>无法切换数据源</strong>的问题。</p>
+
+<h4 id="分库分表中间件">分库分表中间件</h4>
+
+<p>对于分库分表的中间件，会解析我们编写的 SQL ，路由操作到对应的数据源。那么，它们天然就支持多数据源。如此，仅需配置好每个表对应的数据源，中间件就可以<strong>透明</strong>的实现多数据源、或者读写分离。</p>
+
+<p>目前，Java 最好用的分库分表中间件，就是 <a href="https://sharding-jdbc.apache.org/">Apache ShardingSphere</a> ，没有之一。</p>
+
+<h5 id="无法切换数据源的问题"><strong>无法切换数据源</strong>的问题</h5>
+
+<p>这种方式在结合 Spring 事务的时候，不会存在<strong>无法切换数据源</strong>的问题。</p>
+
+<ul>
+  <li>
+    <p>在上述的方案一和方案二中，在 Spring 事务中，会获得对应的 DataSource ，再获得 Connection 进行数据库操作。而获得的 Connection 以及其上的事务，会通过 <strong>ThreadLocal 的方式</strong>和当前线程进行绑定。这样，就导致无法切换数据源。</p>
+  </li>
+  <li>
+    <p>虽然分库分表中间件也需要 Connection 进行这些事情，但是不同的是 Connection 返回的实际是<strong>动态</strong>的 DynamicRoutingConnection ，它管理了整个请求（逻辑）过程中，使用的所有的 Connection ，而<strong>最终执行 SQL</strong> 时，它会解析 SQL ，获得表对应的真正的 Connection 执行 SQL 操作。</p>
+  </li>
+  <li>
+    <p>难道方案一和方案二也可以这么做，前提是，他们要实现解析 SQL 的能力。</p>
+  </li>
+</ul>
+
+<p>分库分表中间件（从一定程度上来说）就是多数据源的完美方案。</p>
+
+<ul>
+  <li>但是，它需要解决多个 Connection 可能产生的<strong>多个事务的一致性</strong>问题，即分布式事务。不过相信，Sharding-JDBC 最终会解决分布式事务的难题，提供<strong>透明</strong>的多数据源的功能。</li>
+</ul>
+
+<h2 id="应用场景-1">应用场景</h2>
+
+<p>实际场景下怎么选择呢？</p>
+
+<ul>
+  <li>方案二：首先，基本排除了<strong>方案二</strong>【不同操作类，固定数据源】。配置繁琐，使用不变。
+    <ul>
+      <li>这种方案，更加适合<strong>不同类型</strong>的数据源，例如说一个项目中，既有 MySQL 数据源，又有 MongoDB、Elasticsarch 等其它数据源。</li>
+    </ul>
+  </li>
+  <li>方案一：然后，对于大多数场景下，方案一【基于 SpringAbstractRoutingDataSource 做拓展】，基本能够满足。
+    <ul>
+      <li>这种方案，目前是比较主流的方案，大多数项目都采用。</li>
+      <li>在实现上，可以比较容易的自己封装一套，当然也可以考虑使用 <a href="https://mp.baomidou.com/guide/dynamic-datasource.html"><code class="highlighter-rouge">dynamic-datasource-spring-boot-starter</code></a> 开源项目。</li>
+    </ul>
+  </li>
+  <li>当然，方案一和方案二，会存在<strong>和 Spring 事务</strong>结合的时候，在事务中无法切换数据源。
+    <ul>
+      <li>这是因为 Spring 事务会将 Connection 和当前线程变量绑定定，后续会通过线程变量重用该 Connection ，导致无法切换数据源。</li>
+      <li>所以，方案一和方案二，可以理解成 <strong>DataSource 级别上</strong>实现的数据源方案。</li>
+    </ul>
+  </li>
+  <li>方案三：最后，【分库分表中间件】是<strong>完美解决方案</strong>，基本满足了所有的场景。
+    <ul>
+      <li>个人强烈推荐使用 <a href="https://shardingsphere.apache.org/document/current/cn/overview/">Apache ShardingSphere</a> 的 <a href="https://github.com/apache/incubator-shardingsphere/tree/dev/sharding-jdbc">Sharding-JDBC</a> 组件，无论胖友是有多数据源，还是分库分表，还是读写分离，都能完美的匹配。</li>
+      <li>并且，Apache ShardingSphere 已经提供<a href="https://shardingsphere.apache.org/document/current/cn/features/transaction/">多种分布式事务方案</a>，也能解决在文章的开头，提到的分布式事务的问题。这种类型的方案，目前很多大厂都是这样去玩的。</li>
+    </ul>
+  </li>
+</ul>
+
+<blockquote>
+  <ul>
+    <li>京东：采用 client 模式的读写分离和分库分表。</li>
+    <li>美团：采用 client 模式的读写分离和分库分表。</li>
+    <li>陌陌：采用 client 模式的读写分离和分库分表。</li>
+  </ul>
+</blockquote>
+
+<h2 id="方案一">方案一</h2>
+
+<h3 id="baomidou-多数据源">baomidou 多数据源</h3>
+
+<p>使用 <code class="highlighter-rouge">test_orders</code> 和 <code class="highlighter-rouge">test_users</code> 两个数据源作为两个数据源，然后实现在其上的 SQL 操作。并且，会结合在 Spring 事务的不同场景下，会发生的结果以及原因。</p>
+
+<ul>
+  <li>order 表、user 表分别位于不同的数据库。</li>
+  <li>不分主从，没有备份。</li>
+</ul>
+
+<h4 id="依赖-2">依赖</h4>
+
+<h4 id="application">Application</h4>
+
+<p>创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-17/lab-17-dynamic-datasource-baomidou-01/src/main/java/cn/iocoder/springboot/lab17/dynamicdatasource/Application.java"><code class="highlighter-rouge">Application.java</code></a> 类</p>
+
+<ul>
+  <li>添加 <code class="highlighter-rouge">@MapperScan</code> 注解，指定 Mapper 接口所在的包路径。</li>
+  <li>添加 <code class="highlighter-rouge">@EnableAspectJAutoProxy</code> 注解，重点是配置 <code class="highlighter-rouge">exposeProxy = true</code> ，因为希望 Spring AOP 能将当前代理对象设置到 <a href="https://github.com/spring-projects/spring-framework/blob/master/spring-aop/src/main/java/org/springframework/aop/framework/AopContext.java">AopContext</a> 中。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Application.java</span>
+
+<span class="nd">@SpringBootApplication</span>
+<span class="nd">@MapperScan</span><span class="o">(</span><span class="n">basePackages</span> <span class="o">=</span> <span class="s">"cn.iocoder.springboot.lab17.dynamicdatasource.mapper"</span><span class="o">)</span>
+<span class="nd">@EnableAspectJAutoProxy</span><span class="o">(</span><span class="n">exposeProxy</span> <span class="o">=</span> <span class="kc">true</span><span class="o">)</span> <span class="c1">// http://www.voidcn.com/article/p-zddcuyii-bpt.html</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Application</span> <span class="o">{</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h4 id="配置文件-1">配置文件</h4>
+
+<p>在 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-17/lab-17-dynamic-datasource-baomidou-01/src/main/resources"><code class="highlighter-rouge">resources</code></a> 目录下，创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-17/lab-17-dynamic-datasource-baomidou-01/src/main/resources/application.yaml"><code class="highlighter-rouge">application.yaml</code></a> 配置文件。</p>
+
+<p>主要是 <code class="highlighter-rouge">spring.datasource.dynamic</code> 配置项</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spring</span><span class="pi">:</span>
+  <span class="na">datasource</span><span class="pi">:</span>
+    <span class="c1"># dynamic-datasource-spring-boot-starter 动态数据源的配置内容</span>
+    <span class="na">dynamic</span><span class="pi">:</span>
+      <span class="na">primary</span><span class="pi">:</span> <span class="s">users</span> <span class="c1"># 设置默认的数据源或者数据源组，默认值即为 master</span>
+      <span class="na">datasource</span><span class="pi">:</span> <span class="c1"># 配置每个动态数据源。这里配置了 `orders`、`users` 两个</span>
+        <span class="c1"># 订单 orders 数据源配置</span>
+        <span class="na">orders</span><span class="pi">:</span>
+          <span class="na">url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/test_orders?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8</span>
+          <span class="na">driver-class-name</span><span class="pi">:</span> <span class="s">com.mysql.jdbc.Driver</span>
+          <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
+          <span class="na">password</span><span class="pi">:</span>
+        <span class="c1"># 用户 users 数据源配置</span>
+        <span class="na">users</span><span class="pi">:</span>
+          <span class="na">url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/test_users?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8</span>
+          <span class="na">driver-class-name</span><span class="pi">:</span> <span class="s">com.mysql.jdbc.Driver</span>
+          <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
+          <span class="na">password</span><span class="pi">:</span>
+
+<span class="c1"># mybatis 配置内容</span>
+<span class="na">mybatis</span><span class="pi">:</span>
+  <span class="na">config-location</span><span class="pi">:</span> <span class="s">classpath:mybatis-config.xml</span> <span class="c1"># 配置 MyBatis 配置文件路径</span>
+  <span class="na">mapper-locations</span><span class="pi">:</span> <span class="s">classpath:mapper/*.xml</span> <span class="c1"># 配置 Mapper XML 地址</span>
+  <span class="na">type-aliases-package</span><span class="pi">:</span> <span class="s">cn.iocoder.springboot.lab17.dynamicdatasource.dataobject</span> <span class="c1"># 配置数据库实体包路径</span>
+</code></pre></div></div>
+
+<h4 id="mybatis-配置文件">MyBatis 配置文件</h4>
+
+<p>在 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-17/lab-17-dynamic-datasource-baomidou-01/src/main/resources"><code class="highlighter-rouge">resources</code></a> 目录下，创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-17/lab-17-dynamic-datasource-baomidou-01/src/main/resources/mybatis-config.xml"><code class="highlighter-rouge">mybatis-config.xml</code></a> 配置文件。</p>
+
+<ul>
+  <li>因为在数据库中表的字段，是使用下划线风格，而数据库实体的字段使用驼峰风格，所以通过 <code class="highlighter-rouge">mapUnderscoreToCamelCase = true</code> 来自动转换。</li>
+</ul>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="UTF-8" ?&gt;</span>
+<span class="cp">&lt;!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd"&gt;</span>
+<span class="nt">&lt;configuration&gt;</span>
+
+    <span class="nt">&lt;settings&gt;</span>
+        <span class="c">&lt;!-- 使用驼峰命名法转换字段 --&gt;</span>
+        <span class="nt">&lt;setting</span> <span class="na">name=</span><span class="s">"mapUnderscoreToCamelCase"</span> <span class="na">value=</span><span class="s">"true"</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/settings&gt;</span>
+
+    <span class="nt">&lt;typeAliases&gt;</span>
+        <span class="nt">&lt;typeAlias</span> <span class="na">alias=</span><span class="s">"Integer"</span> <span class="na">type=</span><span class="s">"java.lang.Integer"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;typeAlias</span> <span class="na">alias=</span><span class="s">"Long"</span> <span class="na">type=</span><span class="s">"java.lang.Long"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;typeAlias</span> <span class="na">alias=</span><span class="s">"HashMap"</span> <span class="na">type=</span><span class="s">"java.util.HashMap"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;typeAlias</span> <span class="na">alias=</span><span class="s">"LinkedHashMap"</span> <span class="na">type=</span><span class="s">"java.util.LinkedHashMap"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;typeAlias</span> <span class="na">alias=</span><span class="s">"ArrayList"</span> <span class="na">type=</span><span class="s">"java.util.ArrayList"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;typeAlias</span> <span class="na">alias=</span><span class="s">"LinkedList"</span> <span class="na">type=</span><span class="s">"java.util.LinkedList"</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/typeAliases&gt;</span>
+
+<span class="nt">&lt;/configuration&gt;</span>
+</code></pre></div></div>
+
+<h4 id="实体类">实体类</h4>
+
+<h4 id="mapper">Mapper</h4>
+
+<p>@DS 注解，是 dynamic-datasource-spring-boot-starter 提供，可添加在 Service 或 Mapper 的类/接口上，或者方法上。在其 value 属性种，填写数据源的名字。</p>
+
+<ul>
+  <li><strong>OrderMapper 接口</strong>上，添加了 <code class="highlighter-rouge">@DS(DBConstants.DATASOURCE_ORDERS)</code> 注解，访问 orders 数据源。</li>
+  <li><strong>UserMapper 接口</strong>上，添加了 <code class="highlighter-rouge">@DS(DBConstants.DATASOURCE_USERS)</code> 注解，访问 users 数据源。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// OrderMapper.java</span>
+<span class="nd">@Repository</span>
+<span class="nd">@DS</span><span class="o">(</span><span class="n">DBConstants</span><span class="o">.</span><span class="na">DATASOURCE_ORDERS</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">OrderMapper</span> <span class="o">{</span>
+
+    <span class="n">OrderDO</span> <span class="nf">selectById</span><span class="o">(</span><span class="nd">@Param</span><span class="o">(</span><span class="s">"id"</span><span class="o">)</span> <span class="n">Integer</span> <span class="n">id</span><span class="o">);</span>
+
+<span class="o">}</span>
+
+<span class="c1">// UserMapper.java</span>
+<span class="nd">@Repository</span>
+<span class="nd">@DS</span><span class="o">(</span><span class="n">DBConstants</span><span class="o">.</span><span class="na">DATASOURCE_USERS</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">UserMapper</span> <span class="o">{</span>
+
+    <span class="n">UserDO</span> <span class="nf">selectById</span><span class="o">(</span><span class="nd">@Param</span><span class="o">(</span><span class="s">"id"</span><span class="o">)</span> <span class="n">Integer</span> <span class="n">id</span><span class="o">);</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="baomidou-读写分离">baomidou 读写分离</h3>
+
+<blockquote>
+  <p>示例代码对应仓库：<a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-17/lab-17-dynamic-datasource-baomidou-02">lab-17-dynamic-datasource-baomidou-02</a> 。</p>
+</blockquote>
+
+<p>在绝大多数情况下，使用多数据源的目的，是为了实现读写分离。</p>
+
+<ul>
+  <li>分主从库。</li>
+  <li>user 库？</li>
+</ul>
+
+<blockquote>
+  <p>其它与多数据源一致。</p>
+</blockquote>
+
+<h4 id="应用配置文件">应用配置文件</h4>
+
+<p>在 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-17/lab-17-dynamic-datasource-baomidou-02/src/main/resources"><code class="highlighter-rouge">resources</code></a> 目录下，创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-17/lab-17-dynamic-datasource-baomidou-02/src/main/resources/application.yaml"><code class="highlighter-rouge">application.yaml</code></a> 配置文件。</p>
+
+<ul>
+  <li>相比 「3.3 应用配置」 来说，配置了<strong>订单库</strong>的多个数据源：
+    <ol>
+      <li>master ：订单库的主库。</li>
+      <li>slave_1 和 slave_2 ：订单库的两个从库。</li>
+    </ol>
+  </li>
+  <li>在 dynamic-datasource-spring-boot-starter 中，多个<strong>相同角色的</strong>数据源可以形成一个数据源组。
+    <ul>
+      <li>判断标准是，数据源名以下划线 _ 分隔后的首部即为组名。例如说，slave_1 和 slave_2 形成了 slave 组。</li>
+      <li>可以使用 <code class="highlighter-rouge">@DS("slave_1")</code> 或 <code class="highlighter-rouge">@DS("slave_2")</code> 注解，明确访问数据源组的指定数据源。</li>
+      <li>也可以使用 <code class="highlighter-rouge">@DS("slave")</code> 注解，此时会<strong>负载均衡</strong>，选择分组中的某个数据源进行访问。目前，负载均衡默认采用<strong>轮询</strong>的方式。</li>
+    </ul>
+  </li>
+</ul>
+
+<blockquote>
+  <p>因为本地并未搭建 MySQL 一主多从的环境，所以是通过创建了 <code class="highlighter-rouge">test_orders_01</code>、<code class="highlighter-rouge">test_orders_02</code> 库，手动模拟作为 <code class="highlighter-rouge">test_orders</code> 的从库。</p>
+
+  <ul>
+    <li>user 库？</li>
+  </ul>
+</blockquote>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spring</span><span class="pi">:</span>
+  <span class="na">datasource</span><span class="pi">:</span>
+    <span class="c1"># dynamic-datasource-spring-boot-starter 动态数据源的配置内容</span>
+    <span class="na">dynamic</span><span class="pi">:</span>
+      <span class="na">primary</span><span class="pi">:</span> <span class="s">master</span> <span class="c1"># 设置默认的数据源或者数据源组，默认值即为 master</span>
+      <span class="na">datasource</span><span class="pi">:</span>
+        <span class="c1"># 订单 orders 主库的数据源配置</span>
+        <span class="na">master</span><span class="pi">:</span>
+          <span class="na">url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/test_orders?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8</span>
+          <span class="na">driver-class-name</span><span class="pi">:</span> <span class="s">com.mysql.jdbc.Driver</span>
+          <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
+          <span class="na">password</span><span class="pi">:</span>
+          
+        <span class="c1"># 订单 orders 从库数据源配置</span>
+        <span class="na">slave_1</span><span class="pi">:</span>
+          <span class="na">url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/test_orders_01?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8</span>
+          <span class="na">driver-class-name</span><span class="pi">:</span> <span class="s">com.mysql.jdbc.Driver</span>
+          <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
+          <span class="na">password</span><span class="pi">:</span>
+          
+        <span class="c1"># 订单 orders 从库数据源配置</span>
+        <span class="na">slave_2</span><span class="pi">:</span>
+          <span class="na">url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/test_orders_02?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8</span>
+          <span class="na">driver-class-name</span><span class="pi">:</span> <span class="s">com.mysql.jdbc.Driver</span>
+          <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
+          <span class="na">password</span><span class="pi">:</span>
+
+<span class="c1"># mybatis 配置内容</span>
+<span class="na">mybatis</span><span class="pi">:</span>
+  <span class="na">config-location</span><span class="pi">:</span> <span class="s">classpath:mybatis-config.xml</span> <span class="c1"># 配置 MyBatis 配置文件路径</span>
+  <span class="na">mapper-locations</span><span class="pi">:</span> <span class="s">classpath:mapper/*.xml</span> <span class="c1"># 配置 Mapper XML 地址</span>
+  <span class="na">type-aliases-package</span><span class="pi">:</span> <span class="s">cn.iocoder.springboot.lab17.dynamicdatasource.dataobject</span> <span class="c1"># 配置数据库实体包路径</span>
+</code></pre></div></div>
+
+<h4 id="orderdo">OrderDO</h4>
+
+<p>只使用 <a href="https://www.iocoder.cn/Spring-Boot/dynamic-datasource/?yudao#">「3.5 实体类」</a> 的 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-17/lab-17-dynamic-datasource-baomidou-02/src/main/java/cn/iocoder/springboot/lab17/dynamicdatasource/dataobject/OrderDO.java"><code class="highlighter-rouge">OrderDO.java</code></a> 类。</p>
+
+<h4 id="ordermapper">OrderMapper</h4>
+
+<p>创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-17/lab-17-dynamic-datasource-baomidou-02/src/main/java/cn/iocoder/springboot/lab17/dynamicdatasource/mapper/OrderMapper.java"><code class="highlighter-rouge">OrderMapper.java</code></a> 接口。</p>
+
+<ul>
+  <li><a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-17/lab-17-dynamic-datasource-baomidou-02/src/main/java/cn/iocoder/springboot/lab17/dynamicdatasource/constant/DBConstants.java"><code class="highlighter-rouge">DBConstants.java</code></a> 类，枚举了 <code class="highlighter-rouge">DATASOURCE_MASTER</code> 和 <code class="highlighter-rouge">DATASOURCE_SLAVE</code> 两个数据源。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// OrderMapper.java</span>
+
+<span class="nd">@Repository</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">OrderMapper</span> <span class="o">{</span>
+
+    <span class="c1">// 读操作，访问从库</span>
+    <span class="nd">@DS</span><span class="o">(</span><span class="n">DBConstants</span><span class="o">.</span><span class="na">DATASOURCE_SLAVE</span><span class="o">)</span>
+    <span class="n">OrderDO</span> <span class="nf">selectById</span><span class="o">(</span><span class="nd">@Param</span><span class="o">(</span><span class="s">"id"</span><span class="o">)</span> <span class="n">Integer</span> <span class="n">id</span><span class="o">);</span>
+
+    <span class="c1">// 写操作，访问主库</span>
+    <span class="nd">@DS</span><span class="o">(</span><span class="n">DBConstants</span><span class="o">.</span><span class="na">DATASOURCE_MASTER</span><span class="o">)</span>
+    <span class="kt">int</span> <span class="nf">insert</span><span class="o">(</span><span class="n">OrderDO</span> <span class="n">entity</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>在 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-17/lab-17-dynamic-datasource-baomidou-02/src/main/resources/mapper"><code class="highlighter-rouge">resources/mapper</code></a> 路径下，创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-17/lab-17-dynamic-datasource-baomidou-02/src/main/resources/mapper/OrderMapper.xml"><code class="highlighter-rouge">OrderMapper.xml</code></a> 配置文件。</p>
+
+<h2 id="方案二">方案二</h2>
+
+<h3 id="mybatis-多数据源">MyBatis 多数据源</h3>
+
+<h4 id="配置文件-2">配置文件</h4>
+
+<p>在 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-17/lab-17-dynamic-datasource-mybatis/src/main/resources"><code class="highlighter-rouge">resources</code></a> 目录下，创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-17/lab-17-dynamic-datasource-mybatis/src/main/resources/application.yaml"><code class="highlighter-rouge">application.yaml</code></a> 配置文件。</p>
+
+<ul>
+  <li>注释掉 <code class="highlighter-rouge">mybatis</code> 配置项，因为不使用 <code class="highlighter-rouge">mybatis-spring-boot-starter</code> 自动化配置 MyBatis ，而是自己写配置类，自定义配置 MyBatis 。</li>
+</ul>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spring</span><span class="pi">:</span>
+  <span class="c1"># datasource 数据源配置内容</span>
+  <span class="na">datasource</span><span class="pi">:</span>
+    <span class="c1"># 订单数据源配置</span>
+    <span class="na">orders</span><span class="pi">:</span>
+      <span class="na">jdbc-url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/test_orders?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8</span>
+      <span class="na">driver-class-name</span><span class="pi">:</span> <span class="s">com.mysql.jdbc.Driver</span>
+      <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
+      <span class="na">password</span><span class="pi">:</span>
+    <span class="c1"># 用户数据源配置</span>
+    <span class="na">users</span><span class="pi">:</span>
+      <span class="na">jdbc-url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/test_users?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8</span>
+      <span class="na">driver-class-name</span><span class="pi">:</span> <span class="s">com.mysql.jdbc.Driver</span>
+      <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
+      <span class="na">password</span><span class="pi">:</span>
+
+<span class="c1"># mybatis 配置内容</span>
+<span class="c1">#mybatis:</span>
+<span class="c1">#  config-location: classpath:mybatis-config.xml # 配置 MyBatis 配置文件路径</span>
+<span class="c1">#  type-aliases-package: cn.iocoder.springboot.lab17.dynamicdatasource.dataobject # 配置数据库实体包路径</span>
+</code></pre></div></div>
+
+<h4 id="配置类">配置类</h4>
+
+<p>在 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-17/lab-17-dynamic-datasource-baomidou-01/src/main/java/cn/iocoder/springboot/lab17/dynamicdatasource/config"><code class="highlighter-rouge">cn.iocoder.springboot.lab17.dynamicdatasource.config</code></a> 包路径下，我们会分别创建：</p>
+
+<ul>
+  <li><a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-17/lab-17-dynamic-datasource-mybatis/src/main/java/cn/iocoder/springboot/lab17/dynamicdatasource/config/MyBatisOrdersConfig.java">MyBatisOrdersConfig</a> 配置类，配置使用 <code class="highlighter-rouge">orders</code> 数据源的 MyBatis 配置。</li>
+  <li><a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-17/lab-17-dynamic-datasource-mybatis/src/main/java/cn/iocoder/springboot/lab17/dynamicdatasource/config/MyBatisUsersConfig.java">MyBatisUsersConfig</a> 配置类，配置使用 <code class="highlighter-rouge">users</code> 数据源的 MyBatis 配置。</li>
+</ul>
+
+<p>两个 MyBatis 配置类代码是一致的，只是部分配置项的值不同。所以我们仅仅来看下 MyBatisOrdersConfig 配置类，而 MyBatisUsersConfig 配置类胖友自己看看即可。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// MyBatisOrdersConfig.java</span>
+
+<span class="nd">@Configuration</span>
+<span class="nd">@MapperScan</span><span class="o">(</span><span class="n">basePackages</span> <span class="o">=</span> <span class="s">"cn.iocoder.springboot.lab17.dynamicdatasource.mapper.orders"</span><span class="o">,</span> <span class="n">sqlSessionTemplateRef</span> <span class="o">=</span> <span class="s">"ordersSqlSessionTemplate"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyBatisOrdersConfig</span> <span class="o">{</span>
+
+    <span class="cm">/**
+     * 创建 orders 数据源
+     */</span>
+    <span class="nd">@Bean</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"ordersDataSource"</span><span class="o">)</span>
+    <span class="nd">@ConfigurationProperties</span><span class="o">(</span><span class="n">prefix</span> <span class="o">=</span> <span class="s">"spring.datasource.orders"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">DataSource</span> <span class="nf">dataSource</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">DataSourceBuilder</span><span class="o">.</span><span class="na">create</span><span class="o">().</span><span class="na">build</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**
+     * 创建 MyBatis SqlSessionFactory
+     */</span>
+    <span class="nd">@Bean</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"ordersSqlSessionFactory"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">SqlSessionFactory</span> <span class="nf">sqlSessionFactory</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+        <span class="n">SqlSessionFactoryBean</span> <span class="n">bean</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SqlSessionFactoryBean</span><span class="o">();</span>
+        <span class="c1">// &lt;2.1&gt; 设置 orders 数据源</span>
+        <span class="n">bean</span><span class="o">.</span><span class="na">setDataSource</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">dataSource</span><span class="o">());</span>
+        <span class="c1">// &lt;2.2&gt; 设置 entity 所在包</span>
+        <span class="n">bean</span><span class="o">.</span><span class="na">setTypeAliasesPackage</span><span class="o">(</span><span class="s">"cn.iocoder.springboot.lab17.dynamicdatasource.dataobject"</span><span class="o">);</span>
+        <span class="c1">// &lt;2.3&gt; 设置 config 路径</span>
+        <span class="n">bean</span><span class="o">.</span><span class="na">setConfigLocation</span><span class="o">(</span><span class="k">new</span> <span class="n">PathMatchingResourcePatternResolver</span><span class="o">().</span><span class="na">getResource</span><span class="o">(</span><span class="s">"classpath:mybatis-config.xml"</span><span class="o">));</span>
+        <span class="c1">// &lt;2.4&gt; 设置 mapper 路径，拆分为 orders、users 路径</span>
+        <span class="n">bean</span><span class="o">.</span><span class="na">setMapperLocations</span><span class="o">(</span><span class="k">new</span> <span class="n">PathMatchingResourcePatternResolver</span><span class="o">().</span><span class="na">getResources</span><span class="o">(</span><span class="s">"classpath:mapper/orders/*.xml"</span><span class="o">));</span>
+        <span class="k">return</span> <span class="n">bean</span><span class="o">.</span><span class="na">getObject</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**
+     * 创建 MyBatis SqlSessionTemplate
+     * 其内部的 sqlSessionFactory 使用的就是对应 orders 数据源的 SqlSessionFactory 对象。
+     */</span>
+    <span class="nd">@Bean</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"ordersSqlSessionTemplate"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">SqlSessionTemplate</span> <span class="nf">sqlSessionTemplate</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">SqlSessionTemplate</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">sqlSessionFactory</span><span class="o">());</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**
+     * 创建 orders 数据源的 TransactionManager 事务管理器
+     */</span>
+    <span class="nd">@Bean</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="n">DBConstants</span><span class="o">.</span><span class="na">TX_MANAGER_ORDERS</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">PlatformTransactionManager</span> <span class="nf">transactionManager</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">DataSourceTransactionManager</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">dataSource</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h4 id="读写分离-1">读写分离</h4>
+
+<p>按照这个思路，如果想要实现 MyBatis 读写分离。还是类似的思路。只是将<strong>从库</strong>作为一个“<strong>特殊</strong>”的数据源，需要做的是：</p>
+
+<ol>
+  <li>应用配置文件增加<strong>从库</strong>的数据源。</li>
+  <li>增加一套<strong>从库</strong>的 MyBatis 配置类。</li>
+  <li>增加一套<strong>从库</strong>相关的 MyBatis Mapper 接口、Mapper XML 文件。</li>
+</ol>
+
+<p>相比方案一【基于 Spring AbstractRoutingDataSource 做拓展】来说，更加麻烦。并且，万一有多从呢？</p>
+
+<p>所以呢，实际项目在选型时，方案一会<strong>优</strong>于方案二，被更普遍的采用。</p>
+
+<h3 id="spring-data-jpa-多数据源">Spring Data JPA 多数据源</h3>
+
+<blockquote>
+  <p>整个过程，和 <a href="https://www.iocoder.cn/Spring-Boot/dynamic-datasource/?yudao#">「5. MyBatis 多数据源」</a> 是类似的。</p>
+</blockquote>
+
+<h4 id="配置文件-3">配置文件</h4>
+
+<p>在 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-17/lab-17-dynamic-datasource-springdatajpa/src/main/resources"><code class="highlighter-rouge">resources</code></a> 目录下，创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-17/lab-17-dynamic-datasource-springdatajpa/src/main/resources/application.yaml"><code class="highlighter-rouge">application.yaml</code></a> 配置文件。</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spring</span><span class="pi">:</span>
+  <span class="c1"># datasource 数据源配置内容</span>
+  <span class="na">datasource</span><span class="pi">:</span>
+    <span class="c1"># 订单数据源配置</span>
+    <span class="na">orders</span><span class="pi">:</span>
+      <span class="na">jdbc-url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/test_orders?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8</span>
+      <span class="na">driver-class-name</span><span class="pi">:</span> <span class="s">com.mysql.jdbc.Driver</span>
+      <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
+      <span class="na">password</span><span class="pi">:</span>
+    <span class="c1"># 用户数据源配置</span>
+    <span class="na">users</span><span class="pi">:</span>
+      <span class="na">jdbc-url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/test_users?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8</span>
+      <span class="na">driver-class-name</span><span class="pi">:</span> <span class="s">com.mysql.jdbc.Driver</span>
+      <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
+      <span class="na">password</span><span class="pi">:</span>
+  <span class="na">jpa</span><span class="pi">:</span>
+    <span class="na">show-sql</span><span class="pi">:</span> <span class="no">true</span> <span class="c1"># 打印 SQL 。生产环境，建议关闭</span>
+    <span class="c1"># Hibernate 配置内容，对应 HibernateProperties 类</span>
+    <span class="na">hibernate</span><span class="pi">:</span>
+      <span class="na">ddl-auto</span><span class="pi">:</span> <span class="s">none</span>
+</code></pre></div></div>
+
+<h4 id="配置类-1">配置类</h4>
+
+<p>创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-17/lab-17-dynamic-datasource-springdatajpa/src/main/java/cn/iocoder/springboot/lab17/dynamicdatasource/config/HibernateConfig.java"><code class="highlighter-rouge">HibernateConfig.java</code></a> 配置类。</p>
+
+<ul>
+  <li>目的是获得 Hibernate Vendor 相关配置。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// HibernateConfig.java</span>
+
+<span class="nd">@Configuration</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">HibernateConfig</span> <span class="o">{</span>
+
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="n">JpaProperties</span> <span class="n">jpaProperties</span><span class="o">;</span>
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="n">HibernateProperties</span> <span class="n">hibernateProperties</span><span class="o">;</span>
+
+    <span class="cm">/**
+     * 获取 Hibernate Vendor 相关配置
+     */</span>
+    <span class="nd">@Bean</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"hibernateVendorProperties"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="nf">hibernateVendorProperties</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">hibernateProperties</span><span class="o">.</span><span class="na">determineHibernateProperties</span><span class="o">(</span>
+                <span class="n">jpaProperties</span><span class="o">.</span><span class="na">getProperties</span><span class="o">(),</span> <span class="k">new</span> <span class="n">HibernateSettings</span><span class="o">());</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>分别创建：</p>
+
+<ul>
+  <li><a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-17/lab-17-dynamic-datasource-springdatajpa/src/main/java/cn/iocoder/springboot/lab17/dynamicdatasource/config/JpaOrdersConfig.java">JpaOrdersConfig</a> 配置类，配置使用 <code class="highlighter-rouge">orders</code> 数据源的 Spring Data JPA 配置。</li>
+  <li><a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-17/lab-17-dynamic-datasource-springdatajpa/src/main/java/cn/iocoder/springboot/lab17/dynamicdatasource/config/JpaUsersConfig.java">JpaUsersConfig</a> 配置类，配置使用 <code class="highlighter-rouge">users</code> 数据源的 Spring Data JPA 配置。</li>
+</ul>
+
+<h3 id="jdbctemplate-多数据源">JdbcTemplate 多数据源</h3>
+
+<blockquote>
+  <p>整个过程，和 <a href="https://www.iocoder.cn/Spring-Boot/dynamic-datasource/?yudao#">「5. MyBatis 多数据源」</a> 是类似的</p>
+</blockquote>
+
+<h2 id="方案三">方案三</h2>
+
+<h3 id="sharding-jdbc-多数据源">Sharding-JDBC 多数据源</h3>
+
+<p><a href="https://github.com/apache/incubator-shardingsphere/tree/dev/sharding-jdbc">Sharding-JDBC</a> 是 <a href="https://shardingsphere.apache.org/document/current/cn/overview/">Apache ShardingSphere</a> 下，基于 JDBC 的分库分表组件。对于 Java 语言来说，推荐选择 Sharding-JDBC 优于 <a href="https://github.com/apache/incubator-shardingsphere/tree/dev/sharding-proxy">Sharding-Proxy</a> ，主要原因是：</p>
+
+<ul>
+  <li>减少一层 Proxy 的<strong>开销</strong>，性能更优。</li>
+  <li><strong>去中心化</strong>，无需多考虑一次 Proxy 的高可用。</li>
+</ul>
+
+<h4 id="application-1">Application</h4>
+
+<blockquote>
+  <p>和 <a href="https://www.iocoder.cn/Spring-Boot/dynamic-datasource/?yudao#">「3.2 Application」</a> 是完全一致的。</p>
+</blockquote>
+
+<p>创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-17/lab-17-dynamic-datasource-sharding-jdbc-01/src/main/java/cn/iocoder/springboot/lab17/dynamicdatasource/Application.java"><code class="highlighter-rouge">Application.java</code></a> 类</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Application.java</span>
+
+<span class="nd">@SpringBootApplication</span>
+<span class="nd">@MapperScan</span><span class="o">(</span><span class="n">basePackages</span> <span class="o">=</span> <span class="s">"cn.iocoder.springboot.lab17.dynamicdatasource.mapper"</span><span class="o">)</span>
+<span class="nd">@EnableAspectJAutoProxy</span><span class="o">(</span><span class="n">exposeProxy</span> <span class="o">=</span> <span class="kc">true</span><span class="o">)</span> <span class="c1">// http://www.voidcn.com/article/p-zddcuyii-bpt.html</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Application</span> <span class="o">{</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h4 id="配置文件-4">配置文件</h4>
+
+<p>在 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-17/lab-17-dynamic-datasource-sharding-jdbc-01/src/main/resources"><code class="highlighter-rouge">resources</code></a> 目录下，创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-17/lab-17-dynamic-datasource-sharding-jdbc-01/src/main/resources/application.yaml"><code class="highlighter-rouge">application.yaml</code></a> 配置文件。</p>
+
+<ul>
+  <li>结合使用 Hikari 数据库连接池</li>
+  <li><code class="highlighter-rouge">spring.shardingsphere.datasource</code> 配置项下，配置了 <code class="highlighter-rouge">ds_orders</code> 和 <code class="highlighter-rouge">ds_users</code> 两个数据源。</li>
+  <li><code class="highlighter-rouge">spring.shardingsphere.sharding</code> 配置项下，配置了<strong>分片规则</strong>，
+    <ol>
+      <li>将 <code class="highlighter-rouge">orders</code> <a href="https://shardingsphere.apache.org/document/current/cn/features/sharding/concept/sql/">逻辑表</a>的操作路由到 <code class="highlighter-rouge">ds-orders</code> 数据源的 <code class="highlighter-rouge">orders</code> <a href="https://shardingsphere.apache.org/document/current/cn/features/sharding/concept/sql/">真实表</a> ，</li>
+      <li>将 <code class="highlighter-rouge">users</code> <a href="https://shardingsphere.apache.org/document/current/cn/features/sharding/concept/sql/">逻辑表</a>的操作路由到 <code class="highlighter-rouge">ds-users</code> 数据源的 <code class="highlighter-rouge">users</code> <a href="https://shardingsphere.apache.org/document/current/cn/features/sharding/concept/sql/">真实表</a> 。</li>
+    </ol>
+  </li>
+</ul>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spring</span><span class="pi">:</span>
+  <span class="c1"># ShardingSphere 配置项</span>
+  <span class="na">shardingsphere</span><span class="pi">:</span>
+    <span class="na">datasource</span><span class="pi">:</span>
+      <span class="c1"># 所有数据源的名字</span>
+      <span class="na">names</span><span class="pi">:</span> <span class="s">ds-orders, ds-users</span>
+      <span class="c1"># 订单 orders 数据源配置</span>
+      <span class="na">ds-orders</span><span class="pi">:</span>
+        <span class="na">type</span><span class="pi">:</span> <span class="s">com.zaxxer.hikari.HikariDataSource</span> <span class="c1"># 使用 Hikari 数据库连接池</span>
+        <span class="na">driver-class-name</span><span class="pi">:</span> <span class="s">com.mysql.jdbc.Driver</span>
+        <span class="na">jdbc-url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/test_orders?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8</span>
+        <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
+        <span class="na">password</span><span class="pi">:</span>
+        
+      <span class="c1"># 订单 users 数据源配置</span>
+      <span class="na">ds-users</span><span class="pi">:</span>
+        <span class="na">type</span><span class="pi">:</span> <span class="s">com.zaxxer.hikari.HikariDataSource</span> <span class="c1"># 使用 Hikari 数据库连接池</span>
+        <span class="na">driver-class-name</span><span class="pi">:</span> <span class="s">com.mysql.jdbc.Driver</span>
+        <span class="na">jdbc-url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/test_users?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8</span>
+        <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
+        <span class="na">password</span><span class="pi">:</span>
+        
+    <span class="c1"># 分片规则</span>
+    <span class="na">sharding</span><span class="pi">:</span>
+      <span class="na">tables</span><span class="pi">:</span>
+        <span class="c1"># orders 表配置</span>
+        <span class="na">orders</span><span class="pi">:</span>
+          <span class="na">actualDataNodes</span><span class="pi">:</span> <span class="s">ds-orders.orders</span> <span class="c1"># 映射到 ds-orders 数据源的 orders 表</span>
+        <span class="c1"># users 表配置</span>
+        <span class="na">users</span><span class="pi">:</span>
+          <span class="na">actualDataNodes</span><span class="pi">:</span> <span class="s">ds-users.users</span> <span class="c1"># 映射到 ds-users 数据源的 users 表</span>
+
+<span class="c1"># mybatis 配置内容</span>
+<span class="na">mybatis</span><span class="pi">:</span>
+  <span class="na">config-location</span><span class="pi">:</span> <span class="s">classpath:mybatis-config.xml</span> <span class="c1"># 配置 MyBatis 配置文件路径</span>
+  <span class="na">mapper-locations</span><span class="pi">:</span> <span class="s">classpath:mapper/*.xml</span> <span class="c1"># 配置 Mapper XML 地址</span>
+  <span class="na">type-aliases-package</span><span class="pi">:</span> <span class="s">cn.iocoder.springboot.lab17.dynamicdatasource.dataobject</span> <span class="c1"># 配置数据库实体包路径</span>
+</code></pre></div></div>
+
+<h3 id="sharding-jdbc-读写分离">Sharding-JDBC 读写分离</h3>
+
+<p>Sharding-JDBC 已经提供了读写分离的支持，可以看看如下两个文档：</p>
+
+<ul>
+  <li><a href="https://shardingsphere.apache.org/document/current/cn/features/read-write-split/">ShardingSphere &gt; 概念 &amp; 功能 &gt; 读写分离</a></li>
+  <li><a href="https://shardingsphere.apache.org/document/current/cn/manual/sharding-jdbc/usage/read-write-splitting/">ShardingSphere &gt; 用户手册 &gt; Sharding-JDBC &gt; 使用手册 &gt; 读写分离</a></li>
+</ul>
+
+<blockquote>
+  <p>未提及的部分与 Sharding-JDBC 多数据源一致</p>
+</blockquote>
+
+<h4 id="配置文件-5">配置文件</h4>
+
+<p>在 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-17/lab-17-dynamic-datasource-sharding-jdbc-02/src/main/resources"><code class="highlighter-rouge">resources</code></a> 目录下，创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-17/lab-17-dynamic-datasource-sharding-jdbc-02/src/main/resources/application.yaml"><code class="highlighter-rouge">application.yaml</code></a> 配置文件。</p>
+
+<ul>
+  <li><code class="highlighter-rouge">spring.shardingsphere</code>
+    <ol>
+      <li><code class="highlighter-rouge">datasource</code> 配置项下，配置了 一个主数据源 <code class="highlighter-rouge">ds-master</code> 、两个从数据源 <code class="highlighter-rouge">ds-slave-1</code>、<code class="highlighter-rouge">ds-slave-2</code> 。</li>
+      <li><code class="highlighter-rouge">masterslave</code> 配置项下：配置了读写分离。对于从库来说，Sharding-JDBC 提供了多种负载均衡策略，默认为轮询。</li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">mybatis</code> 配置项，设置 <code class="highlighter-rouge">mybatis-spring-boot-starter</code> MyBatis 的配置内容。</li>
+</ul>
+
+<blockquote>
+  <p>因为本地并未搭建 MySQL 一主多从的环境，所以是通过创建了 <code class="highlighter-rouge">test_orders_01</code>、<code class="highlighter-rouge">test_orders_02</code> 库，手动模拟作为 <code class="highlighter-rouge">test_orders</code> 的从库。</p>
+</blockquote>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spring</span><span class="pi">:</span>
+  <span class="c1"># ShardingSphere 配置项</span>
+  <span class="na">shardingsphere</span><span class="pi">:</span>
+    <span class="c1"># 数据源配置</span>
+    <span class="na">datasource</span><span class="pi">:</span>
+      <span class="c1"># 所有数据源的名字</span>
+      <span class="na">names</span><span class="pi">:</span> <span class="s">ds-master, ds-slave-1, ds-slave-2</span>
+      
+      <span class="c1"># 订单 orders 主库的数据源配置</span>
+      <span class="na">ds-master</span><span class="pi">:</span>
+        <span class="na">type</span><span class="pi">:</span> <span class="s">com.zaxxer.hikari.HikariDataSource</span> <span class="c1"># 使用 Hikari 数据库连接池</span>
+        <span class="na">driver-class-name</span><span class="pi">:</span> <span class="s">com.mysql.jdbc.Driver</span>
+        <span class="na">jdbc-url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/test_orders?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8</span>
+        <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
+        <span class="na">password</span><span class="pi">:</span>
+        
+      <span class="c1"># 订单 orders 从库数据源配置</span>
+      <span class="na">ds-slave-1</span><span class="pi">:</span>
+        <span class="na">type</span><span class="pi">:</span> <span class="s">com.zaxxer.hikari.HikariDataSource</span> <span class="c1"># 使用 Hikari 数据库连接池</span>
+        <span class="na">driver-class-name</span><span class="pi">:</span> <span class="s">com.mysql.jdbc.Driver</span>
+        <span class="na">jdbc-url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/test_orders_01?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8</span>
+        <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
+        <span class="na">password</span><span class="pi">:</span>
+        
+      <span class="c1"># 订单 orders 从库数据源配置</span>
+      <span class="na">ds-slave-2</span><span class="pi">:</span>
+        <span class="na">type</span><span class="pi">:</span> <span class="s">com.zaxxer.hikari.HikariDataSource</span> <span class="c1"># 使用 Hikari 数据库连接池</span>
+        <span class="na">driver-class-name</span><span class="pi">:</span> <span class="s">com.mysql.jdbc.Driver</span>
+        <span class="na">jdbc-url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/test_orders_02?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8</span>
+        <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
+        <span class="na">password</span><span class="pi">:</span>
+        
+    <span class="c1"># 读写分离配置，对应 YamlMasterSlaveRuleConfiguration 配置类</span>
+    <span class="na">masterslave</span><span class="pi">:</span>
+      <span class="na">name</span><span class="pi">:</span> <span class="s">ms</span> <span class="c1"># 名字，任意，需要保证唯一</span>
+      <span class="na">master-data-source-name</span><span class="pi">:</span> <span class="s">ds-master</span> <span class="c1"># 主库数据源</span>
+      <span class="na">slave-data-source-names</span><span class="pi">:</span> <span class="s">ds-slave-1, ds-slave-2</span> <span class="c1"># 从库数据源</span>
+
+<span class="c1"># mybatis 配置内容</span>
+<span class="c1">#mybatis:</span>
+<span class="c1">#  config-location: classpath:mybatis-config.xml # 配置 MyBatis 配置文件路径</span>
+<span class="c1">#  mapper-locations: classpath:mapper/*.xml # 配置 Mapper XML 地址</span>
+<span class="c1">#  type-aliases-package: cn.iocoder.springboot.lab17.dynamicdatasource.dataobject # 配置数据库实体包路径</span>
+  
+<span class="c1"># mybatis-plus 配置内容。</span>
+<span class="c1"># 使用 MyBatis-Plus 替换掉原生 MyBatis，进一步简化该示例</span>
+<span class="na">mybatis-plus</span><span class="pi">:</span>
+  <span class="na">configuration</span><span class="pi">:</span>
+    <span class="na">map-underscore-to-camel-case</span><span class="pi">:</span> <span class="no">true</span> <span class="c1"># 虽然默认为 true ，但是还是显示去指定下。</span>
+  <span class="na">global-config</span><span class="pi">:</span>
+    <span class="na">db-config</span><span class="pi">:</span>
+      <span class="na">id-type</span><span class="pi">:</span> <span class="s">none</span> <span class="c1"># 虽然 MyBatis Plus 也提供 ID 生成策略，但是还是使用 Sharding-JDBC 的</span>
+      <span class="na">logic-delete-value</span><span class="pi">:</span> <span class="s">1</span> <span class="c1"># 逻辑已删除值(默认为 1)</span>
+      <span class="na">logic-not-delete-value</span><span class="pi">:</span> <span class="s">0</span> <span class="c1"># 逻辑未删除值(默认为 0)</span>
+  <span class="na">mapper-locations</span><span class="pi">:</span> <span class="s">classpath*:mapper/*.xml</span>
+  <span class="na">type-aliases-package</span><span class="pi">:</span> <span class="s">cn.iocoder.springboot.lab18.shardingdatasource.dataobject</span>
+</code></pre></div></div>
+
+<h4 id="mapper-1">Mapper</h4>
+

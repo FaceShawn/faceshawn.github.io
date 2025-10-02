@@ -10,7 +10,7 @@
 
 <p>[TOC]</p>
 
-<h4 id="spring-cloud-ribbon"><del>Spring Cloud Ribbon</del></h4>
+<h2 id="spring-cloud-ribbon"><del>Spring Cloud Ribbon</del></h2>
 
 <blockquote>
   <p>在微服务架构中，很多服务都会部署多个，其他服务去调用该服务的时候，如何保证负载均衡是个不得不去考虑的问题。</p>
@@ -22,20 +22,20 @@
 
 <ul>
   <li>
-    <p>比如 Fegin 和 OpenFegin 都是基于 Ribbon 实现的，就连 Nacos 中的负载均衡也使用了 Ribbon 框架。</p>
+    <p>比如 Feign 和 OpenFeign 都是基于 Ribbon 实现的，就连 Nacos 中的负载均衡也使用了 Ribbon 框架。</p>
   </li>
   <li>
     <p>Ribbon 框架的强大之处在于，不仅内置了 7 种负载均衡策略，同时还支持用户自定义负载均衡策略，所以其开放性和便利性也是它得以流行的主要原因。</p>
   </li>
 </ul>
 
-<h5 id="resttemplate的使用">RestTemplate的使用</h5>
+<h2 id="resttemplate的使用">RestTemplate的使用</h2>
 
 <blockquote>
   <p>RestTemplate是一个<strong>HTTP客户端</strong>，可以方便的调用HTTP接口，支持GET、POST、PUT、DELETE等方法。</p>
 </blockquote>
 
-<h6 id="get请求方法">GET请求方法</h6>
+<h4 id="get请求方法">GET请求方法</h4>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">T</span> <span class="nf">getForObject</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="n">Class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">responseType</span><span class="o">,</span> <span class="n">Object</span><span class="o">...</span> <span class="n">uriVariables</span><span class="o">);</span>
 <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">T</span> <span class="nf">getForObject</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="n">Class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">responseType</span><span class="o">,</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="o">?&gt;</span> <span class="n">uriVariables</span><span class="o">);</span>
@@ -71,7 +71,7 @@
 <span class="o">}</span>
 </code></pre></div></div>
 
-<h6 id="post请求方法">POST请求方法</h6>
+<h4 id="post请求方法">POST请求方法</h4>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">T</span> <span class="nf">postForObject</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="nd">@Nullable</span> <span class="n">Object</span> <span class="n">request</span><span class="o">,</span> <span class="n">Class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">responseType</span><span class="o">,</span> <span class="n">Object</span><span class="o">...</span> <span class="n">uriVariables</span><span class="o">);</span>
 <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">T</span> <span class="nf">postForObject</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="nd">@Nullable</span> <span class="n">Object</span> <span class="n">request</span><span class="o">,</span> <span class="n">Class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">responseType</span><span class="o">,</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="o">?&gt;</span> <span class="n">uriVariables</span><span class="o">);</span>
@@ -98,7 +98,7 @@
 <span class="o">}</span>
 </code></pre></div></div>
 
-<h6 id="put请求方法">PUT请求方法</h6>
+<h4 id="put请求方法">PUT请求方法</h4>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">put</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="nd">@Nullable</span> <span class="n">Object</span> <span class="n">request</span><span class="o">,</span> <span class="n">Object</span><span class="o">...</span> <span class="n">uriVariables</span><span class="o">);</span>
 <span class="kt">void</span> <span class="nf">put</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="nd">@Nullable</span> <span class="n">Object</span> <span class="n">request</span><span class="o">,</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="o">?&gt;</span> <span class="n">uriVariables</span><span class="o">);</span>
@@ -114,7 +114,7 @@
 <span class="o">}</span>
 </code></pre></div></div>
 
-<h6 id="delete请求方法">DELETE请求方法</h6>
+<h4 id="delete请求方法">DELETE请求方法</h4>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">delete</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="n">Object</span><span class="o">...</span> <span class="n">uriVariables</span><span class="o">);</span>
 <span class="kt">void</span> <span class="nf">delete</span><span class="o">(</span><span class="n">String</span> <span class="n">url</span><span class="o">,</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="o">?&gt;</span> <span class="n">uriVariables</span><span class="o">);</span>
@@ -130,13 +130,13 @@
 <span class="o">}</span>
 </code></pre></div></div>
 
-<h5 id="创建一个user-service模块">创建一个user-service模块</h5>
+<h2 id="创建一个user-service模块">创建一个user-service模块</h2>
 
 <blockquote>
   <p>首先创建一个user-service，用于给Ribbon提供服务调用。</p>
 </blockquote>
 
-<h6 id="在pomxml中添加相关依赖">在pom.xml中添加相关依赖</h6>
+<h4 id="依赖">依赖</h4>
 
 <div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;dependency&gt;</span>
     <span class="nt">&lt;groupId&gt;</span>org.springframework.cloud<span class="nt">&lt;/groupId&gt;</span>
@@ -148,7 +148,7 @@
 <span class="nt">&lt;/dependency&gt;</span>
 </code></pre></div></div>
 
-<h6 id="在applicationyml进行配置">在application.yml进行配置</h6>
+<h4 id="yml-配置">yml 配置</h4>
 
 <blockquote>
   <p>主要是配置了端口和<strong>注册中心</strong>地址。</p>
@@ -167,7 +167,9 @@
       <span class="na">defaultZone</span><span class="pi">:</span> <span class="s">http://localhost:8001/eureka/</span>
 </code></pre></div></div>
 
-<h6 id="添加usercontroller用于提供调用接口">添加UserController用于提供调用接口</h6>
+<h4 id="usercontroller">UserController</h4>
+
+<p>添加UserController用于提供调用接口</p>
 
 <blockquote>
   <p>UserController类定义了对User对象常见的CRUD接口。</p>
@@ -210,13 +212,13 @@
 <span class="o">}</span>
 </code></pre></div></div>
 
-<h5 id="创建一个ribbon-service模块">创建一个ribbon-service模块</h5>
+<h2 id="创建一个ribbon-service模块">创建一个ribbon-service模块</h2>
 
 <blockquote>
   <p>创建一个ribbon-service模块来调用user-service模块，演示负载均衡的服务调用。</p>
 </blockquote>
 
-<h6 id="在pomxml中添加相关依赖-1">在pom.xml中添加相关依赖</h6>
+<h4 id="依赖-1">依赖</h4>
 
 <div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;dependency&gt;</span>
     <span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
@@ -232,7 +234,7 @@
 <span class="nt">&lt;/dependency&gt;</span>
 </code></pre></div></div>
 
-<h6 id="在applicationyml进行配置-1">在application.yml进行配置</h6>
+<h4 id="yml-配置-1">yml 配置</h4>
 
 <blockquote>
   <p>主要是配置了端口、注册中心地址及user-service的调用路径。</p>
@@ -253,7 +255,9 @@
   <span class="na">user-service</span><span class="pi">:</span> <span class="s">http://user-service</span>
 </code></pre></div></div>
 
-<h6 id="使用loadbalanced注解赋予resttemplate负载均衡的能力">使用@LoadBalanced注解赋予RestTemplate负载均衡的能力</h6>
+<h4 id="loadbalanced">@LoadBalanced</h4>
+
+<p>使用@LoadBalanced注解赋予RestTemplate负载均衡的能力</p>
 
 <blockquote>
   <p>可以看出使用Ribbon的负载均衡功能非常简单，和直接使用RestTemplate没什么两样，</p>
@@ -273,7 +277,7 @@
 
 </code></pre></div></div>
 
-<h6 id="添加userribboncontroller类">添加UserRibbonController类</h6>
+<h4 id="userribboncontroller">UserRibbonController</h4>
 
 <blockquote>
   <p>注入RestTemplate，使用其调用user-service中提供的相关接口，这里对GET和POST调用进行了演示，其他方法调用均可参考。</p>
@@ -325,7 +329,7 @@
 
 </code></pre></div></div>
 
-<h5 id="负载均衡功能演示">负载均衡功能演示</h5>
+<h2 id="负载均衡功能演示">负载均衡功能演示</h2>
 
 <ul>
   <li>启动eureka-server于8001端口；</li>
@@ -349,9 +353,9 @@
   <li>可以发现运行在8201和8202的user-service控制台交替打印信息。</li>
 </ul>
 
-<h5 id="ribbon的常用配置">Ribbon的常用配置</h5>
+<h2 id="ribbon的常用配置">Ribbon的常用配置</h2>
 
-<h6 id="全局配置">全局配置</h6>
+<h4 id="全局配置">全局配置</h4>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">ribbon</span><span class="pi">:</span>
   <span class="na">ConnectTimeout</span><span class="pi">:</span> <span class="s">1000</span> <span class="c1">#服务请求连接超时时间（毫秒）</span>
@@ -362,7 +366,7 @@
   <span class="na">NFLoadBalancerRuleClassName</span><span class="pi">:</span> <span class="s">com.netflix.loadbalancer.RandomRule</span> <span class="c1">#修改负载均衡算法</span>
 </code></pre></div></div>
 
-<h6 id="指定服务进行配置">指定服务进行配置</h6>
+<h4 id="指定服务进行配置">指定服务进行配置</h4>
 
 <blockquote>
   <p>与全局配置的区别就是ribbon节点挂在服务名称下面，如下是对ribbon-service调用user-service时的单独配置。</p>
@@ -378,7 +382,7 @@
     <span class="na">NFLoadBalancerRuleClassName</span><span class="pi">:</span> <span class="s">com.netflix.loadbalancer.RandomRule</span> <span class="c1">#修改负载均衡算法</span>
 </code></pre></div></div>
 
-<h5 id="ribbon的负载均衡策略">Ribbon的负载均衡策略</h5>
+<h2 id="ribbon的负载均衡策略">Ribbon的负载均衡策略</h2>
 
 <blockquote>
   <p>所谓的负载均衡策略，就是当A服务调用B服务时，此时B服务有多个实例，这时A服务以何种方式来选择调用的B实例，ribbon可以选择以下几种负载均衡策略。</p>

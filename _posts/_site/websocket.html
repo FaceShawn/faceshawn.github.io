@@ -1,0 +1,1251 @@
+<blockquote>
+  <p>摘要：最大特点就是：服务器可以<strong>主动</strong>向客户端发送数据（推送信息），这样就可以完成<strong>实时性</strong>较高的需求。提供 <strong>Token 认证</strong>、WebSocket <strong>集群广播</strong>、Message 监听。</p>
+</blockquote>
+
+<!-- more -->
+
+<h2 id="目录">目录</h2>
+
+<p>[TOC]</p>
+
+<blockquote>
+  <p>WebSocket 框架，支持多节点的广播。</p>
+
+  <p>提供 <strong>Token 认证</strong>、WebSocket <strong>集群广播</strong>、Message 监听。</p>
+</blockquote>
+
+<p>WebSocket 协议：</p>
+
+<ul>
+  <li>
+    <p>最大特点就是：服务器可以<strong>主动</strong>向客户端发送数据（推送信息），这样就可以完成<strong>实时性</strong>较高的需求。是真正的双向平等对话，属于<a href="https://en.wikipedia.org/wiki/Push_technology">服务器推送技术</a>的一种。</p>
+  </li>
+  <li>
+    <p>例如说，聊天 IM 即使通讯功能、<strong>消息订阅服务</strong>、网页游戏等等。</p>
+  </li>
+</ul>
+
+<p>同时，因为 WebSocket 使用 <strong>TCP 通信</strong>，可以避免<strong>重复创建连接</strong>，提升通信质量和效率。</p>
+
+<ul>
+  <li>例如说，美团的长连接服务，具体可以看看 <a href="https://tech.meituan.com/2017/03/17/shark-sdk.html">《美团点评移动网络优化实践》</a> 。</li>
+</ul>
+
+<blockquote>
+  <p>参考<a href="https://www.iocoder.cn/Spring-Boot/WebSocket/">芋道 Spring Boot WebSocket 入门</a></p>
+</blockquote>
+
+<h2 id="简介">简介</h2>
+
+<h3 id="为什么需要-websocket">为什么需要 WebSocket？</h3>
+
+<blockquote>
+  <p>已经有了 HTTP 协议，为什么还需要另一个协议？它能带来什么好处？</p>
+</blockquote>
+
+<ul>
+  <li>因为 HTTP 协议有一个缺陷：通信只能由客户端发起。HTTP 协议做不到服务器主动向客户端推送信息。</li>
+  <li>这种<strong>单向请求</strong>的特点，注定了如果服务器有<strong>连续的状态变化</strong>，客户端要获知就非常麻烦。
+    <ul>
+      <li>只能使用<a href="https://www.pubnub.com/blog/2014-12-01-http-long-polling/">“轮询”</a>：每隔一段时候，就发出一个询问，了解服务器有没有新的信息。最典型的场景就是聊天室。</li>
+      <li>轮询的<strong>效率低</strong>，非常浪费资源（因为必须不停连接，或者 HTTP 连接始终打开）。WebSocket 就是这样发明的。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="其他特点">其他特点</h3>
+
+<p>其他特点包括：</p>
+
+<p>（1）建立在 <strong>TCP 协议</strong>之上，服务器端的实现比较容易。</p>
+
+<p>（2）与 HTTP 协议有着良好的<strong>兼容性</strong>。默认端口也是<strong>80和443</strong>，并且<strong>握手阶段</strong>采用 HTTP 协议，因此握手时不容易屏蔽，能通过各种 HTTP 代理服务器。</p>
+
+<p>（3）数据格式比较轻量，<strong>性能开销小</strong>，通信高效。</p>
+
+<p>（4）可以发送文本，也可以发送二进制数据。</p>
+
+<p>（5）没有同源限制，客户端可以与任意服务器通信。</p>
+
+<p>（6）协议<strong>标识符</strong>是<code class="highlighter-rouge">ws</code>（如果加密，则为<code class="highlighter-rouge">wss</code>），服务器网址就是 URL。</p>
+
+<blockquote>
+  <pre><code class="language-markup">ws://example.com:80/some/path
+</code></pre>
+</blockquote>
+
+<p><img src="../assets/bg2017051503.jpg" alt="img" style="zoom:80%;" /></p>
+
+<h3 id="与-http-的关系">与 HTTP 的关系</h3>
+
+<p>基本上但凡提到WebSocket和HTTP的关系都会有以下两条：</p>
+
+<ol>
+  <li>WebSocket 和 HTTP 都是基于<strong>TCP协议</strong>的两个不同的协议。</li>
+  <li>WebSocket <strong>依赖于</strong> HTTP 连接。</li>
+</ol>
+
+<p><img src="../assets/bg2017051502.png" alt="img" style="zoom: 80%;" /></p>
+
+<h4 id="如何从连接的http协议转化为websocket协议">如何从连接的HTTP协议转化为WebSocket协议？</h4>
+
+<p>每个WebSocket连接都始于一个HTTP请求。 具体来说，WebSocket协议在<strong>第一次握手连接</strong>时，通过HTTP协议在传送WebSocket支持的版本号，协议的字版本号，原始地址，主机地址等等一些列字段给服务器端：</p>
+
+<div class="language-http highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">GET</span> <span class="nn">/chat</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">server.example.com</span>
+<span class="na">Upgrade</span><span class="p">:</span> <span class="s">websocket</span>
+<span class="na">Connection</span><span class="p">:</span> <span class="s">Upgrade</span>
+<span class="na">Sec-WebSocket-Key</span><span class="p">:</span><span class="s">dGhlIHNhbXBsZSBub25jZQ==</span>
+<span class="na">Origin</span><span class="p">:</span> <span class="s">http://example.com</span>
+<span class="na">Sec-WebSocket-Version</span><span class="p">:</span> <span class="s">13</span>
+</code></pre></div></div>
+
+<p>注意，关键的地方是，这里面有个Upgrade首部，用来把当前的HTTP请求升级到WebSocket协议，这是HTTP协议本身的内容，是为了扩展支持其他的通讯协议。</p>
+
+<ul>
+  <li>如果服务器支持新的协议，则必须返回101：</li>
+</ul>
+
+<div class="language-http highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">101</span> <span class="ne">Switching Protocols</span>
+<span class="na">Upgrade</span><span class="p">:</span> <span class="s">websocket</span>
+<span class="na">Connection</span><span class="p">:</span> <span class="s">Upgrade</span>
+<span class="na">Sec-WebSocket-Accept</span><span class="p">:</span><span class="s">s3pPLMBiTxaQ9kYGzzhZRbK+xOo=</span>
+</code></pre></div></div>
+
+<p>至此，HTTP请求物尽其用，如果成功则触发onopen事件，否则触发onerror事件，后面的传输则不再依赖HTTP协议。</p>
+
+<h4 id="websocket为什么要依赖于http协议的连接">WebSocket为什么要依赖于HTTP协议的连接？</h4>
+
+<ol>
+  <li>第一，WebSocket设计上就是天生为HTTP<strong>增强通信</strong>（全双工通信等），所以在HTTP协议连接的基础上是很自然的一件事，并因此而能获得HTTP的诸多便利。</li>
+  <li>第二，这诸多便利中有一条很重要，基于HTTP连接将获得最大的一个兼容支持，比如即使服务器不支持WebSocket也能<strong>建立HTTP通信</strong>，只不过返回的是onerror而已，这显然比服务器无响应要好的多。</li>
+</ol>
+
+<h2 id="websocket-解决方案">WebSocket 解决方案</h2>
+
+<p>在实现提供 WebSocket 服务的项目中，一般有如下几种解决方案：</p>
+
+<ul>
+  <li><strong>方案一</strong> <a href="https://docs.spring.io/spring-framework/docs/5.0.0.BUILD-SNAPSHOT/spring-framework-reference/html/websocket.html">Spring WebSocket</a></li>
+  <li>方案二 <a href="https://www.cnblogs.com/xdp-gacl/p/5193279.html">Tomcat WebSocket</a></li>
+  <li>方案三 <a href="https://netty.io/news/2012/11/15/websocket-enhancement.html">Netty WebSocket</a></li>
+</ul>
+
+<p>有个涉及到 IM 即使通讯的项目，采用的是方案三。</p>
+
+<ul>
+  <li>主要原因是，我们对 Netty 框架的实战、原理与源码，都相对熟悉一些。所以就考虑了它。</li>
+  <li>并且，除了需要支持 WebSocket 协议，我们还想提供原生的 Socket 协议。</li>
+</ul>
+
+<p>如果仅仅是仅仅提供 WebSocket 协议的支持，可以考虑采用方案一或者方案二。</p>
+
+<blockquote>
+  <p>在使用上，两个方案是比较接近的。二者的实现代码，没啥差别。</p>
+</blockquote>
+
+<ol>
+  <li>相比来说，<strong>方案一</strong> Spring WebSocket 内置了对 <strong><a href="https://docs.spring.io/spring-framework/docs/5.0.0.BUILD-SNAPSHOT/spring-framework-reference/html/websocket.html#websocket-stomp-overview">STOMP</a> 协议</strong>的支持。</li>
+  <li>不过，还是采用方案二 Tomcat WebSocket 来作为入门示例。</li>
+</ol>
+
+<p><a href="https://www.oracle.com/technical-resources/articles/java/jsr356.html">JSR-356</a> 规范：定义了 Java 针对 WebSocket 的 API ，即 <a href="https://mvnrepository.com/artifact/javax.websocket">Javax WebSocket</a> 。</p>
+
+<ul>
+  <li>目前，主流的 Web 容器都已经提供了 JSR-356 的实现，例如说 Tomcat、Jetty、Undertow 等等。</li>
+</ul>
+
+<h2 id="tomcat-websocket">Tomcat WebSocket</h2>
+
+<p>使用 Tomcat WebSocket 搭建一个 WebSocket 的示例。提供如下消息的功能支持：</p>
+
+<ul>
+  <li>身份认证请求</li>
+  <li>私聊消息</li>
+  <li>群聊消息</li>
+</ul>
+
+<p>考虑到让示例更加易懂，先做成全局有且仅有一个大的聊天室，即建立上 WebSocket 的连接，都自动动进入该聊天室。</p>
+
+<h3 id="依赖">依赖</h3>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">&lt;!-- 实现对 WebSocket 相关依赖的引入，方便~ --&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-websocket<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div></div>
+
+<h3 id="websocketserverendpoint">WebsocketServerEndpoint</h3>
+
+<p>创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-25/lab-websocket-25-01/src/main/java/cn/iocoder/springboot/lab25/springwebsocket/websocket/WebsocketServerEndpoint.java">WebsocketServerEndpoint</a> 类，定义 Websocket 服务的<strong>端点（EndPoint）</strong>。代码如下：</p>
+
+<ul>
+  <li>在类上，添加 <code class="highlighter-rouge">@Controller</code> 注解，保证创建一个 WebsocketServerEndpoint Bean 。</li>
+  <li>在类上，添加 JSR-356 定义的 <a href="https://github.com/eclipse-ee4j/websocket-api/blob/master/api/server/src/main/java/javax/websocket/server/ServerEndpoint.java"><code class="highlighter-rouge">@ServerEndpoint</code></a> 注解，标记这是一个 WebSocket EndPoint ，路径为 <code class="highlighter-rouge">/</code> 。</li>
+  <li>WebSocket 一共有四个事件，分别对应使用 JSR-356 定义的 <a href="https://github.com/eclipse-ee4j/websocket-api/blob/master/api/client/src/main/java/javax/websocket/OnOpen.java"><code class="highlighter-rouge">@OnOpen</code></a>、<a href="https://github.com/eclipse-ee4j/websocket-api/blob/master/api/client/src/main/java/javax/websocket/OnMessage.java"><code class="highlighter-rouge">@OnMessage</code></a>、<a href="https://github.com/eclipse-ee4j/websocket-api/blob/master/api/client/src/main/java/javax/websocket/OnClose.java"><code class="highlighter-rouge">@OnClose</code></a>、<a href="https://github.com/eclipse-ee4j/websocket-api/blob/master/api/client/src/main/java/javax/websocket/OnError.java"><code class="highlighter-rouge">@OnError</code></a> 注解。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// WebsocketServerEndpoint.java</span>
+
+<span class="nd">@Controller</span>
+<span class="nd">@ServerEndpoint</span><span class="o">(</span><span class="s">"/"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">WebsocketServerEndpoint</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="n">Logger</span> <span class="n">logger</span> <span class="o">=</span> <span class="n">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="n">getClass</span><span class="o">());</span>
+
+    <span class="nd">@OnOpen</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onOpen</span><span class="o">(</span><span class="n">Session</span> <span class="n">session</span><span class="o">,</span> <span class="n">EndpointConfig</span> <span class="n">config</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"[onOpen][session({}) 接入]"</span><span class="o">,</span> <span class="n">session</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@OnMessage</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onMessage</span><span class="o">(</span><span class="n">Session</span> <span class="n">session</span><span class="o">,</span> <span class="n">String</span> <span class="n">message</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"[onOpen][session({}) 接收到一条消息({})]"</span><span class="o">,</span> <span class="n">session</span><span class="o">,</span> <span class="n">message</span><span class="o">);</span> <span class="c1">// 生产环境下，请设置成 debug 级别</span>
+    <span class="o">}</span>
+
+    <span class="nd">@OnClose</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onClose</span><span class="o">(</span><span class="n">Session</span> <span class="n">session</span><span class="o">,</span> <span class="n">CloseReason</span> <span class="n">closeReason</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"[onClose][session({}) 连接关闭。关闭原因是({})}]"</span><span class="o">,</span> <span class="n">session</span><span class="o">,</span> <span class="n">closeReason</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@OnError</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onError</span><span class="o">(</span><span class="n">Session</span> <span class="n">session</span><span class="o">,</span> <span class="n">Throwable</span> <span class="n">throwable</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"[onClose][session({}) 发生异常]"</span><span class="o">,</span> <span class="n">session</span><span class="o">,</span> <span class="n">throwable</span><span class="o">);</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="websocketconfiguration">WebSocketConfiguration</h3>
+
+<p>创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-25/lab-websocket-25-01/src/main/java/cn/iocoder/springboot/lab25/springwebsocket/config/WebSocketConfiguration.java">WebsocketServerEndpoint</a> 配置类。</p>
+
+<ul>
+  <li>在 <code class="highlighter-rouge">#serverEndpointExporter()</code> 方法中，创建 ServerEndpointExporter Bean 。作用是扫描添加有 <code class="highlighter-rouge">@ServerEndpoint</code> 注解的 Bean 。</li>
+  <li><strong>@EnableWebSocket</strong>：使用 Spring WebSocket 时添加该注解</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// WebSocketConfiguration.java</span>
+
+<span class="nd">@Configuration</span>
+<span class="c1">// @EnableWebSocket // 无需添加该注解，因为我们并不是使用 Spring WebSocket</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">WebSocketConfiguration</span> <span class="o">{</span>
+
+    <span class="nd">@Bean</span>
+    <span class="kd">public</span> <span class="n">ServerEndpointExporter</span> <span class="nf">serverEndpointExporter</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">ServerEndpointExporter</span><span class="o">();</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="测试">测试</h3>
+
+<p>使用 <a href="http://www.easyswoole.com/wstool.html">WEBSOCKET 在线测试工具</a>  测试 WebSocket 连接</p>
+
+<h3 id="消息">消息</h3>
+
+<ul>
+  <li>在 HTTP 协议中，是基于 <strong>Request/Response 请求响应</strong>的<strong>同步</strong>模型，进行交互。</li>
+  <li>在 Websocket 协议中，是基于 <strong>Message 消息</strong>的<strong>异步</strong>模型，进行交互。</li>
+</ul>
+
+<blockquote>
+  <p>这一点是很大的不同的，具体的消息类，感受会更明显。</p>
+</blockquote>
+
+<p>所以在这个示例中，采用的 Message 采用 JSON 格式编码，主要考虑便捷性。</p>
+
+<ul>
+  <li>Message 也可以考虑 <a href="https://github.com/protocolbuffers/protobuf">Protobuf</a> 等更加高效且节省流量的编码格式。</li>
+</ul>
+
+<p>Message 格式如下：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">type</code> 字段，消息类型。指定使用哪个 MessageHandler 消息处理器。
+    <ul>
+      <li>因为 WebSocket 协议，不像 HTTP 协议有 <strong>URI</strong> 可以区分不同的 API 请求操作，所以需要在 Message 里，增加<code class="highlighter-rouge">type</code> 字段用于<strong>标识消息类型</strong> 。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">body</code> 字段，消息体。不同的消息类型，会有不同的消息体。</li>
+</ol>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="err">type</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">消息类型</span><span class="w">
+    </span><span class="err">body</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">消息体</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="message">Message</h4>
+
+<p>创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-25/lab-websocket-25-01/src/main/java/cn/iocoder/springboot/lab25/springwebsocket/message/Message.java">Message</a> 接口，基础消息体，所有消息体都要实现该接口。</p>
+
+<ul>
+  <li>目前作为一个标记接口，未定义任何操作。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Message.java</span>
+
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Message</span> <span class="o">{</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h4 id="认证相关-message">认证相关 Message</h4>
+
+<h5 id="authrequest">AuthRequest</h5>
+
+<p>创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-25/lab-websocket-25-01/src/main/java/cn/iocoder/springboot/lab25/springwebsocket/message/AuthRequest.java">AuthRequest</a> 类，用户认证请求。</p>
+
+<ul>
+  <li><code class="highlighter-rouge">TYPE</code> 静态属性，消息类型为 <code class="highlighter-rouge">AUTH_REQUEST</code> 。</li>
+  <li><code class="highlighter-rouge">accessToken</code> 属性，<strong>认证 Token</strong> 。在 WebSocket 协议中，也需要认证当前连接，用户身份是什么。
+    <ul>
+      <li>一般情况下，采用用户调用 <strong>HTTP 登录接口</strong>，登录成功后返回的访问令牌 <code class="highlighter-rouge">accessToken</code> 。</li>
+      <li>可以看看 <a href="https://yq.aliyun.com/articles/229057">《基于 Token 认证的 WebSocket 连接》</a> 文章。</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// AuthRequest.java</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">AuthRequest</span> <span class="kd">implements</span> <span class="n">Message</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">TYPE</span> <span class="o">=</span> <span class="s">"AUTH_REQUEST"</span><span class="o">;</span>
+
+    <span class="cm">/**
+     * 认证 Token
+     */</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">accessToken</span><span class="o">;</span>
+    
+    <span class="c1">// ... 省略 set/get 方法</span>
+    
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h5 id="authresponse">AuthResponse</h5>
+
+<p>虽然说，WebSocket 协议是基于 <strong>Message 模型</strong>进行交互。但是，这并不意味着它的操作，不需要响应结果。例如说，<strong>用户认证请求</strong>，是需要用户认证响应的。所以，创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-25/lab-websocket-25-01/src/main/java/cn/iocoder/springboot/lab25/springwebsocket/message/AuthResponse.java">AuthResponse</a> 类，作为用户认证响应。</p>
+
+<ul>
+  <li><code class="highlighter-rouge">TYPE</code> 静态属性，消息类型为 <code class="highlighter-rouge">AUTH_REQUEST</code> 。实际上，在每个 Message 实现类上，都增加了 <strong><code class="highlighter-rouge">TYPE</code> 静态属性</strong>，作为消息类型。下面就不重复赘述了。</li>
+  <li><code class="highlighter-rouge">code</code> 属性，响应状态码。</li>
+  <li><code class="highlighter-rouge">message</code> 属性，响应提示。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// AuthResponse.java</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">AuthResponse</span> <span class="kd">implements</span> <span class="n">Message</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">TYPE</span> <span class="o">=</span> <span class="s">"AUTH_RESPONSE"</span><span class="o">;</span>
+
+    <span class="cm">/**
+     * 响应状态码
+     */</span>
+    <span class="kd">private</span> <span class="n">Integer</span> <span class="n">code</span><span class="o">;</span>
+    <span class="cm">/**
+     * 响应提示
+     */</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">message</span><span class="o">;</span>
+    
+    <span class="c1">// ... 省略 set/get 方法</span>
+    
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h5 id="userjoinnoticerequest">UserJoinNoticeRequest</h5>
+
+<p>在本示例中，用户成功认证之后，会<strong>广播</strong>用户加入群聊的<strong>通知 Message</strong> ，使用 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-25/lab-websocket-25-01/src/main/java/cn/iocoder/springboot/lab25/springwebsocket/message/UserJoinNoticeRequest.java">UserJoinNoticeRequest</a> 。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// UserJoinNoticeRequest.java</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">UserJoinNoticeRequest</span> <span class="kd">implements</span> <span class="n">Message</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">TYPE</span> <span class="o">=</span> <span class="s">"USER_JOIN_NOTICE_REQUEST"</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">nickname</span><span class="o">;</span>
+    
+    <span class="c1">// ... 省略 set/get 方法</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h5 id="优化小想法">优化小想法</h5>
+
+<p>实际上，可以在需要使用到 Request/Response 模型的地方，将 Message 进行拓展：</p>
+
+<ul>
+  <li>Request 抽象类，增加 <strong><code class="highlighter-rouge">requestId</code> 字段</strong>，表示请求编号。</li>
+  <li>Response 抽象类，增加 <code class="highlighter-rouge">requestId</code> 字段，和每一个 Request 请求映射上。同时，里面统一定义 <code class="highlighter-rouge">code</code> 和 <code class="highlighter-rouge">message</code> 属性，表示<strong>响应状态码和响应提示</strong>。</li>
+</ul>
+
+<p>这样，</p>
+
+<ul>
+  <li>
+    <p>在使用到<strong>同步模型</strong>的业务场景下，Message 实现类使用 <strong>Request/Reponse 作为后缀</strong>。例如说，用户认证请求、删除一个好友请求等等。</p>
+  </li>
+  <li>
+    <p>而在使用到<strong>异步模型</strong>的业务场景下，Message 实现类还是继续 <strong>Message 作为后缀</strong>。例如说，发送一条消息，用户操作完后，无需阻塞等待结果</p>
+  </li>
+</ul>
+
+<h4 id="发送消息相关-message">发送消息相关 Message</h4>
+
+<h5 id="sendtoonerequest">SendToOneRequest</h5>
+
+<p>创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-25/lab-websocket-25-01/src/main/java/cn/iocoder/springboot/lab25/springwebsocket/message/SendToOneRequest.java">SendToOneRequest</a> 类，发送给指定人的私聊消息的 Message。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SendToOneRequest.java</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SendToOneRequest</span> <span class="kd">implements</span> <span class="n">Message</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">TYPE</span> <span class="o">=</span> <span class="s">"SEND_TO_ONE_REQUEST"</span><span class="o">;</span>
+
+    <span class="cm">/**
+     * 发送给的用户
+     */</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">toUser</span><span class="o">;</span>
+    <span class="cm">/**
+     * 消息编号
+     */</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">msgId</span><span class="o">;</span>
+    <span class="cm">/**
+     * 内容
+     */</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">content</span><span class="o">;</span>
+    
+    <span class="c1">// ... 省略 set/get 方法</span>
+    
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h5 id="sendtoallrequest">SendToAllRequest</h5>
+
+<p>创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-25/lab-websocket-25-01/src/main/java/cn/iocoder/springboot/lab25/springwebsocket/message/SendToAllRequest.java">SendToAllRequest</a> 类，发送给所有人的群聊消息的 Message。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SendToAllRequest.java</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SendToAllRequest</span> <span class="kd">implements</span> <span class="n">Message</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">TYPE</span> <span class="o">=</span> <span class="s">"SEND_TO_ALL_REQUEST"</span><span class="o">;</span>
+
+    <span class="cm">/**
+     * 消息编号
+     */</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">msgId</span><span class="o">;</span>
+    <span class="cm">/**
+     * 内容
+     */</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">content</span><span class="o">;</span>
+    
+    <span class="c1">// ... 省略 set/get 方法</span>
+     
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h5 id="sendresponse">SendResponse</h5>
+
+<p>在服务端接收到发送消息的请求，需要<strong>异步</strong>响应发送是否成功。所以，创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-25/lab-websocket-25-01/src/main/java/cn/iocoder/springboot/lab25/springwebsocket/message/SendResponse.java">SendResponse</a> 类，发送消息响应结果的 Message 。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SendResponse.java</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SendResponse</span> <span class="kd">implements</span> <span class="n">Message</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">TYPE</span> <span class="o">=</span> <span class="s">"SEND_RESPONSE"</span><span class="o">;</span>
+
+    <span class="cm">/**
+     * 消息编号
+     */</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">msgId</span><span class="o">;</span>
+    <span class="cm">/**
+     * 响应状态码
+     */</span>
+    <span class="kd">private</span> <span class="n">Integer</span> <span class="n">code</span><span class="o">;</span>
+    <span class="cm">/**
+     * 响应提示
+     */</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">message</span><span class="o">;</span>
+    
+    <span class="c1">// ... 省略 set/get 方法</span>
+    
+<span class="o">}</span>
+</code></pre></div></div>
+
+<ul>
+  <li>重点看 <code class="highlighter-rouge">msgId</code> 字段，消息编号。客户端在发送消息，通过使用 <a href="https://zh.wikipedia.org/zh-hans/通用唯一识别码">UUID</a> 算法，生成全局唯一消息编号。这样，服务端通过 SendResponse 消息响应，通过 <code class="highlighter-rouge">msgId</code> 做映射。</li>
+</ul>
+
+<h5 id="sendtouserrequest">SendToUserRequest</h5>
+
+<p>在<strong>服务端</strong>接收到发送消息的请求，需要转发消息给<strong>对应的人</strong>。所以，创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-25/lab-websocket-25-01/src/main/java/cn/iocoder/springboot/lab25/springwebsocket/message/SendToUserRequest.java">SendToUserRequest</a> 类，发送消息给一个用户的 Message 。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SendResponse.java</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SendToUserRequest</span> <span class="kd">implements</span> <span class="n">Message</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">TYPE</span> <span class="o">=</span> <span class="s">"SEND_TO_USER_REQUEST"</span><span class="o">;</span>
+
+    <span class="cm">/**
+     * 消息编号
+     */</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">msgId</span><span class="o">;</span>
+    <span class="cm">/**
+     * 内容
+     */</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">content</span><span class="o">;</span>
+    
+    <span class="c1">// ... 省略 set/get 方法</span>
+     
+<span class="o">}</span>
+</code></pre></div></div>
+
+<ul>
+  <li>相比 SendToOneRequest 来说，少一个 <strong><code class="highlighter-rouge">toUser</code> 字段</strong>。因为，可以通过 WebSocket 连接，已经知道发送给谁了。</li>
+</ul>
+
+<h3 id="消息处理器">消息处理器</h3>
+
+<p>每个<strong>客户端</strong>发起的 Message 消息类型，会声明对应的 <strong>MessageHandler 消息处理器</strong>。</p>
+
+<ul>
+  <li>这个就类似在 SpringMVC 中，每个 <strong>API 接口</strong>对应一个 Controller 的 <strong>Method 方法</strong>。</li>
+</ul>
+
+<p>所有的 MessageHandler 们，都放在 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-25/lab-websocket-25-01/src/main/java/cn/iocoder/springboot/lab25/springwebsocket/handler"><code class="highlighter-rouge">cn..springboot.lab25.springwebsocket.handler</code></a> 包路径下。</p>
+
+<h4 id="messagehandler">MessageHandler</h4>
+
+<p>创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-25/lab-websocket-25-01/src/main/java/cn/iocoder/springboot/lab25/springwebsocket/handler/MessageHandler.java">MessageHandler</a> 接口，消息处理器接口。</p>
+
+<ul>
+  <li>定义了泛型 <code class="highlighter-rouge">&lt;T&gt;</code> ，需要是 Message 的实现类。</li>
+  <li>定义的两个接口方法。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// MessageHandler.java</span>
+
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">MessageHandler</span><span class="o">&lt;</span><span class="n">T</span> <span class="kd">extends</span> <span class="n">Message</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="cm">/**
+     * 执行处理消息
+     *
+     * @param session 会话
+     * @param message 消息
+     */</span>
+    <span class="kt">void</span> <span class="nf">execute</span><span class="o">(</span><span class="n">Session</span> <span class="n">session</span><span class="o">,</span> <span class="n">T</span> <span class="n">message</span><span class="o">);</span>
+
+    <span class="cm">/**
+     * @return 消息类型，即每个 Message 实现类上的 TYPE 静态字段
+     */</span>
+    <span class="n">String</span> <span class="nf">getType</span><span class="o">();</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h4 id="authmessagehandler">AuthMessageHandler</h4>
+
+<p>创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-25/lab-websocket-25-01/src/main/java/cn/iocoder/springboot/lab25/springwebsocket/handler/AuthMessageHandler.java">AuthMessageHandler</a> 类，处理 AuthRequest 消息。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// AuthMessageHandler.java</span>
+
+<span class="nd">@Component</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">AuthMessageHandler</span> <span class="kd">implements</span> <span class="n">MessageHandler</span><span class="o">&lt;</span><span class="n">AuthRequest</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">execute</span><span class="o">(</span><span class="n">Session</span> <span class="n">session</span><span class="o">,</span> <span class="n">AuthRequest</span> <span class="n">message</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// 如果未传递 accessToken </span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">StringUtils</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">(</span><span class="n">message</span><span class="o">.</span><span class="na">getAccessToken</span><span class="o">()))</span> <span class="o">{</span>
+            <span class="n">WebSocketUtil</span><span class="o">.</span><span class="na">send</span><span class="o">(</span><span class="n">session</span><span class="o">,</span> <span class="n">AuthResponse</span><span class="o">.</span><span class="na">TYPE</span><span class="o">,</span>
+                    <span class="k">new</span> <span class="nf">AuthResponse</span><span class="o">().</span><span class="na">setCode</span><span class="o">(</span><span class="mi">1</span><span class="o">).</span><span class="na">setMessage</span><span class="o">(</span><span class="s">"认证 accessToken 未传入"</span><span class="o">));</span>
+            <span class="k">return</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="c1">// 添加到 WebSocketUtil 中</span>
+        <span class="n">WebSocketUtil</span><span class="o">.</span><span class="na">addSession</span><span class="o">(</span><span class="n">session</span><span class="o">,</span> <span class="n">message</span><span class="o">.</span><span class="na">getAccessToken</span><span class="o">());</span> <span class="c1">// 考虑到代码简化，先直接使用 accessToken 作为 User</span>
+
+        <span class="c1">// 判断是否认证成功。这里，假装直接成功</span>
+        <span class="n">WebSocketUtil</span><span class="o">.</span><span class="na">send</span><span class="o">(</span><span class="n">session</span><span class="o">,</span> <span class="n">AuthResponse</span><span class="o">.</span><span class="na">TYPE</span><span class="o">,</span> <span class="k">new</span> <span class="n">AuthResponse</span><span class="o">().</span><span class="na">setCode</span><span class="o">(</span><span class="mi">0</span><span class="o">));</span>
+
+        <span class="c1">// 通知所有人，某个人加入了。这个是可选逻辑，仅仅是为了演示</span>
+        <span class="n">WebSocketUtil</span><span class="o">.</span><span class="na">broadcast</span><span class="o">(</span><span class="n">UserJoinNoticeRequest</span><span class="o">.</span><span class="na">TYPE</span><span class="o">,</span>
+                <span class="k">new</span> <span class="nf">UserJoinNoticeRequest</span><span class="o">().</span><span class="na">setNickname</span><span class="o">(</span><span class="n">message</span><span class="o">.</span><span class="na">getAccessToken</span><span class="o">()));</span>
+        <span class="c1">// 考虑到代码简化，先直接使用 accessToken 作为 User</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getType</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">AuthRequest</span><span class="o">.</span><span class="na">TYPE</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h4 id="sendtoonerequest-1">SendToOneRequest</h4>
+
+<p>创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-25/lab-websocket-25-01/src/main/java/cn/iocoder/springboot/lab25/springwebsocket/handler/SendToOneHandler.java">SendToOneHandler</a> 类，处理 SendToOneRequest 消息。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SendToOneRequest.java</span>
+
+<span class="nd">@Component</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SendToOneHandler</span> <span class="kd">implements</span> <span class="n">MessageHandler</span><span class="o">&lt;</span><span class="n">SendToOneRequest</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">execute</span><span class="o">(</span><span class="n">Session</span> <span class="n">session</span><span class="o">,</span> <span class="n">SendToOneRequest</span> <span class="n">message</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// 这里，假装直接成功</span>
+        <span class="n">SendResponse</span> <span class="n">sendResponse</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SendResponse</span><span class="o">().</span><span class="na">setMsgId</span><span class="o">(</span><span class="n">message</span><span class="o">.</span><span class="na">getMsgId</span><span class="o">()).</span><span class="na">setCode</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+        <span class="n">WebSocketUtil</span><span class="o">.</span><span class="na">send</span><span class="o">(</span><span class="n">session</span><span class="o">,</span> <span class="n">SendResponse</span><span class="o">.</span><span class="na">TYPE</span><span class="o">,</span> <span class="n">sendResponse</span><span class="o">);</span>
+
+        <span class="c1">// 创建转发的消息</span>
+        <span class="n">SendToUserRequest</span> <span class="n">sendToUserRequest</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SendToUserRequest</span><span class="o">().</span><span class="na">setMsgId</span><span class="o">(</span><span class="n">message</span><span class="o">.</span><span class="na">getMsgId</span><span class="o">())</span>
+                <span class="o">.</span><span class="na">setContent</span><span class="o">(</span><span class="n">message</span><span class="o">.</span><span class="na">getContent</span><span class="o">());</span>
+        <span class="c1">// 广播发送</span>
+        <span class="n">WebSocketUtil</span><span class="o">.</span><span class="na">send</span><span class="o">(</span><span class="n">message</span><span class="o">.</span><span class="na">getToUser</span><span class="o">(),</span> <span class="n">SendToUserRequest</span><span class="o">.</span><span class="na">TYPE</span><span class="o">,</span> <span class="n">sendToUserRequest</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getType</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">SendToOneRequest</span><span class="o">.</span><span class="na">TYPE</span><span class="o">;</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h4 id="sendtoallhandler">SendToAllHandler</h4>
+
+<p>创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-25/lab-websocket-25-01/src/main/java/cn/iocoder/springboot/lab25/springwebsocket/handler/SendToAllHandler.java">SendToAllHandler</a> 类，处理 SendToAllRequest 消息。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SendToAllRequest.java</span>
+
+<span class="nd">@Component</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SendToAllHandler</span> <span class="kd">implements</span> <span class="n">MessageHandler</span><span class="o">&lt;</span><span class="n">SendToAllRequest</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">execute</span><span class="o">(</span><span class="n">Session</span> <span class="n">session</span><span class="o">,</span> <span class="n">SendToAllRequest</span> <span class="n">message</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// 这里，假装直接成功</span>
+        <span class="n">SendResponse</span> <span class="n">sendResponse</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SendResponse</span><span class="o">().</span><span class="na">setMsgId</span><span class="o">(</span><span class="n">message</span><span class="o">.</span><span class="na">getMsgId</span><span class="o">()).</span><span class="na">setCode</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+        <span class="n">WebSocketUtil</span><span class="o">.</span><span class="na">send</span><span class="o">(</span><span class="n">session</span><span class="o">,</span> <span class="n">SendResponse</span><span class="o">.</span><span class="na">TYPE</span><span class="o">,</span> <span class="n">sendResponse</span><span class="o">);</span>
+
+        <span class="c1">// 创建转发的消息</span>
+        <span class="n">SendToUserRequest</span> <span class="n">sendToUserRequest</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SendToUserRequest</span><span class="o">().</span><span class="na">setMsgId</span><span class="o">(</span><span class="n">message</span><span class="o">.</span><span class="na">getMsgId</span><span class="o">())</span>
+                <span class="o">.</span><span class="na">setContent</span><span class="o">(</span><span class="n">message</span><span class="o">.</span><span class="na">getContent</span><span class="o">());</span>
+        <span class="c1">// 广播发送</span>
+        <span class="n">WebSocketUtil</span><span class="o">.</span><span class="na">broadcast</span><span class="o">(</span><span class="n">SendToUserRequest</span><span class="o">.</span><span class="na">TYPE</span><span class="o">,</span> <span class="n">sendToUserRequest</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getType</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">SendToAllRequest</span><span class="o">.</span><span class="na">TYPE</span><span class="o">;</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="websocketutil">WebSocketUtil</h3>
+
+<p>创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-25/lab-websocket-25-01/src/main/java/cn/iocoder/springboot/lab25/springwebsocket/util/WebSocketUtil">WebSocketUtil</a> 工具类，主要提供两方面的功能：</p>
+
+<ul>
+  <li><strong>Session 会话的管理</strong></li>
+  <li>多种发送消息的方式</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// WebSocketUtil.java</span>
+
+<span class="nd">@Slf4j</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">WebSocketUtil</span> <span class="o">{</span>
+
+    <span class="c1">// ========== 会话相关 ==========</span>
+
+    <span class="cm">/**
+     * Session 与用户的映射
+     */</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">Session</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">SESSION_USER_MAP</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ConcurrentHashMap</span><span class="o">&lt;&gt;();</span>
+    <span class="cm">/**
+     * 用户与 Session 的映射
+     */</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Session</span><span class="o">&gt;</span> <span class="n">USER_SESSION_MAP</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ConcurrentHashMap</span><span class="o">&lt;&gt;();</span>
+
+    <span class="cm">/**
+     * 添加 Session 。在这个方法中，会添加用户和 Session 之间的映射
+     *
+     * @param session Session
+     * @param user 用户
+     */</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">addSession</span><span class="o">(</span><span class="n">Session</span> <span class="n">session</span><span class="o">,</span> <span class="n">String</span> <span class="n">user</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// 更新 USER_SESSION_MAP</span>
+        <span class="n">USER_SESSION_MAP</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">user</span><span class="o">,</span> <span class="n">session</span><span class="o">);</span>
+        <span class="c1">// 更新 SESSION_USER_MAP</span>
+        <span class="n">SESSION_USER_MAP</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">session</span><span class="o">,</span> <span class="n">user</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**
+     * 移除 Session
+     *
+     * @param session Session
+     */</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">removeSession</span><span class="o">(</span><span class="n">Session</span> <span class="n">session</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// 从 SESSION_USER_MAP 中移除</span>
+        <span class="n">String</span> <span class="n">user</span> <span class="o">=</span> <span class="n">SESSION_USER_MAP</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">session</span><span class="o">);</span>
+        <span class="c1">// 从 USER_SESSION_MAP 中移除</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">user</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">user</span><span class="o">.</span><span class="na">length</span><span class="o">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">USER_SESSION_MAP</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">user</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="c1">// ========== 消息相关 ==========</span>
+
+    <span class="cm">/**
+     * 广播发送消息给所有在线用户
+     *
+     * @param type 消息类型
+     * @param message 消息体
+     * @param &lt;T&gt; 消息类型
+     */</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="o">&lt;</span><span class="n">T</span> <span class="kd">extends</span> <span class="n">Message</span><span class="o">&gt;</span> <span class="kt">void</span> <span class="nf">broadcast</span><span class="o">(</span><span class="n">String</span> <span class="n">type</span><span class="o">,</span> <span class="n">T</span> <span class="n">message</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// 创建消息</span>
+        <span class="n">String</span> <span class="n">messageText</span> <span class="o">=</span> <span class="n">buildTextMessage</span><span class="o">(</span><span class="n">type</span><span class="o">,</span> <span class="n">message</span><span class="o">);</span>
+        <span class="c1">// 遍历 SESSION_USER_MAP ，进行逐个发送</span>
+        <span class="k">for</span> <span class="o">(</span><span class="n">Session</span> <span class="n">session</span> <span class="o">:</span> <span class="n">SESSION_USER_MAP</span><span class="o">.</span><span class="na">keySet</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">sendTextMessage</span><span class="o">(</span><span class="n">session</span><span class="o">,</span> <span class="n">messageText</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**
+     * 发送消息给单个用户的 Session
+     *
+     * @param session Session
+     * @param type 消息类型
+     * @param message 消息体
+     * @param &lt;T&gt; 消息类型
+     */</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="o">&lt;</span><span class="n">T</span> <span class="kd">extends</span> <span class="n">Message</span><span class="o">&gt;</span> <span class="kt">void</span> <span class="nf">send</span><span class="o">(</span><span class="n">Session</span> <span class="n">session</span><span class="o">,</span> <span class="n">String</span> <span class="n">type</span><span class="o">,</span> <span class="n">T</span> <span class="n">message</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// 创建消息</span>
+        <span class="n">String</span> <span class="n">messageText</span> <span class="o">=</span> <span class="n">buildTextMessage</span><span class="o">(</span><span class="n">type</span><span class="o">,</span> <span class="n">message</span><span class="o">);</span>
+        <span class="c1">// 遍历给单个 Session ，进行逐个发送</span>
+        <span class="n">sendTextMessage</span><span class="o">(</span><span class="n">session</span><span class="o">,</span> <span class="n">messageText</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**
+     * 发送消息给指定用户
+     *
+     * @param user 指定用户
+     * @param type 消息类型
+     * @param message 消息体
+     * @param &lt;T&gt; 消息类型
+     * @return 发送是否成功
+     */</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="o">&lt;</span><span class="n">T</span> <span class="kd">extends</span> <span class="n">Message</span><span class="o">&gt;</span> <span class="kt">boolean</span> <span class="nf">send</span><span class="o">(</span><span class="n">String</span> <span class="n">user</span><span class="o">,</span> <span class="n">String</span> <span class="n">type</span><span class="o">,</span> <span class="n">T</span> <span class="n">message</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// 获得用户对应的 Session</span>
+        <span class="n">Session</span> <span class="n">session</span> <span class="o">=</span> <span class="n">USER_SESSION_MAP</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">user</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">session</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="s">"[send][user({}) 不存在对应的 session]"</span><span class="o">,</span> <span class="n">user</span><span class="o">);</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="c1">// 发送消息</span>
+        <span class="n">send</span><span class="o">(</span><span class="n">session</span><span class="o">,</span> <span class="n">type</span><span class="o">,</span> <span class="n">message</span><span class="o">);</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**
+     * 构建完整的消息
+     *
+     * @param type 消息类型
+     * @param message 消息体
+     * @param &lt;T&gt; 消息类型
+     * @return 消息
+     */</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="o">&lt;</span><span class="n">T</span> <span class="kd">extends</span> <span class="n">Message</span><span class="o">&gt;</span> <span class="n">String</span> <span class="nf">buildTextMessage</span><span class="o">(</span><span class="n">String</span> <span class="n">type</span><span class="o">,</span> <span class="n">T</span> <span class="n">message</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">JSONObject</span> <span class="n">messageObject</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JSONObject</span><span class="o">();</span>
+        <span class="n">messageObject</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"type"</span><span class="o">,</span> <span class="n">type</span><span class="o">);</span>
+        <span class="n">messageObject</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"body"</span><span class="o">,</span> <span class="n">message</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">messageObject</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**
+     * 真正发送消息
+     *
+     * @param session Session
+     * @param messageText 消息
+     */</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">sendTextMessage</span><span class="o">(</span><span class="n">Session</span> <span class="n">session</span><span class="o">,</span> <span class="n">String</span> <span class="n">messageText</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">session</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="s">"[sendTextMessage][session 为 null]"</span><span class="o">);</span>
+            <span class="k">return</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="n">RemoteEndpoint</span><span class="o">.</span><span class="na">Basic</span> <span class="n">basic</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">getBasicRemote</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">basic</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="s">"[sendTextMessage][session 的  为 null]"</span><span class="o">);</span>
+            <span class="k">return</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="n">basic</span><span class="o">.</span><span class="na">sendText</span><span class="o">(</span><span class="n">messageText</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="s">"[sendTextMessage][session({}) 发送消息{}) 发生异常"</span><span class="o">,</span>
+                    <span class="n">session</span><span class="o">,</span> <span class="n">messageText</span><span class="o">,</span> <span class="n">e</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="完善-websocketserverendpoint">完善 WebsocketServerEndpoint</h3>
+
+<p>在本小节，会修改 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-25/lab-websocket-25-01/src/main/java/cn/iocoder/springboot/lab25/springwebsocket/config/WebSocketConfiguration.java">WebsocketServerEndpoint</a> 的代码，完善其功能。</p>
+
+<h4 id="初始化-messagehandler-集合">初始化 MessageHandler 集合</h4>
+
+<p>实现 <a href="https://github.com/spring-projects/spring-framework/blob/master/spring-beans/src/main/java/org/springframework/beans/factory/InitializingBean.java">InitializingBean</a> 接口，在 <code class="highlighter-rouge">#afterPropertiesSet()</code> 方法中，扫描所有 MessageHandler Bean ，添加到 MessageHandler 集合中。</p>
+
+<ul>
+  <li>通过这样的方式，可以<strong>避免手动配置</strong> MessageHandler 与消息类型的映射。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// WebsocketServerEndpoint.java</span>
+
+    <span class="cm">/**
+     * 消息类型与 MessageHandler 的映射
+     *
+     * 注意，这里设置成静态变量。虽然说 WebsocketServerEndpoint 是单例，但是 Spring Boot 还是会为每个 WebSocket 创建一个 WebsocketServerEndpoint Bean 。
+     */</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">MessageHandler</span><span class="o">&gt;</span> <span class="n">HANDLERS</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;();</span>
+
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="n">ApplicationContext</span> <span class="n">applicationContext</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">afterPropertiesSet</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+        <span class="c1">// 通过 ApplicationContext 获得所有 MessageHandler Bean</span>
+        <span class="n">applicationContext</span><span class="o">.</span><span class="na">getBeansOfType</span><span class="o">(</span><span class="n">MessageHandler</span><span class="o">.</span><span class="na">class</span><span class="o">).</span><span class="na">values</span><span class="o">()</span> <span class="c1">// 获得所有 MessageHandler Bean</span>
+                <span class="o">.</span><span class="na">forEach</span><span class="o">(</span><span class="n">messageHandler</span> <span class="o">-&gt;</span> <span class="n">HANDLERS</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">messageHandler</span><span class="o">.</span><span class="na">getType</span><span class="o">(),</span> <span class="n">messageHandler</span><span class="o">));</span> <span class="c1">// 添加到 handlers 中</span>
+        <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"[afterPropertiesSet][消息处理器数量：{}]"</span><span class="o">,</span> <span class="n">HANDLERS</span><span class="o">.</span><span class="na">size</span><span class="o">());</span>
+    <span class="o">}</span>
+</code></pre></div></div>
+
+<h4 id="onopen">onOpen</h4>
+
+<p>重新实现 <code class="highlighter-rouge">#onOpen(Session session, EndpointConfig config)</code> 方法，实现连接时，使用 <code class="highlighter-rouge">accessToken</code> 参数进行用户认证。</p>
+
+<ul>
+  <li><code class="highlighter-rouge">&lt;1&gt;</code> 处，解析 <code class="highlighter-rouge">ws://</code> 地址上的 <code class="highlighter-rouge">accessToken</code> 的请求参。例如说：<code class="highlighter-rouge">ws://127.0.0.1:8080?accessToken=你好</code> 。</li>
+  <li><code class="highlighter-rouge">&lt;2&gt;</code> 处，创建 AuthRequest 消息类型，并设置 <code class="highlighter-rouge">accessToken</code> 属性。</li>
+  <li><code class="highlighter-rouge">&lt;3&gt;</code> 处，获得 AuthRequest 消息类型对应的 MessageHandler 消息处理器，然后调用 <code class="highlighter-rouge">MessageHandler#execute(session, message)</code> 方法，执行处理用户认证请求。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// WebsocketServerEndpoint.java</span>
+
+<span class="nd">@OnOpen</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onOpen</span><span class="o">(</span><span class="n">Session</span> <span class="n">session</span><span class="o">,</span> <span class="n">EndpointConfig</span> <span class="n">config</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"[onOpen][session({}) 接入]"</span><span class="o">,</span> <span class="n">session</span><span class="o">);</span>
+    <span class="c1">// &lt;1&gt; 解析 accessToken</span>
+    <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">accessTokenValues</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">getRequestParameterMap</span><span class="o">().</span><span class="na">get</span><span class="o">(</span><span class="s">"accessToken"</span><span class="o">);</span>
+    <span class="n">String</span> <span class="n">accessToken</span> <span class="o">=</span> <span class="o">!</span><span class="n">CollectionUtils</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">(</span><span class="n">accessTokenValues</span><span class="o">)</span> <span class="o">?</span> <span class="n">accessTokenValues</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">)</span> <span class="o">:</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="c1">// &lt;2&gt; 创建 AuthRequest 消息类型</span>
+    <span class="n">AuthRequest</span> <span class="n">authRequest</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AuthRequest</span><span class="o">().</span><span class="na">setAccessToken</span><span class="o">(</span><span class="n">accessToken</span><span class="o">);</span>
+    <span class="c1">// &lt;3&gt; 获得消息处理器</span>
+    <span class="n">MessageHandler</span><span class="o">&lt;</span><span class="n">AuthRequest</span><span class="o">&gt;</span> <span class="n">messageHandler</span> <span class="o">=</span> <span class="n">HANDLERS</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">AuthRequest</span><span class="o">.</span><span class="na">TYPE</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">messageHandler</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">logger</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="s">"[onOpen][认证消息类型，不存在消息处理器]"</span><span class="o">);</span>
+        <span class="k">return</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="n">messageHandler</span><span class="o">.</span><span class="na">execute</span><span class="o">(</span><span class="n">session</span><span class="o">,</span> <span class="n">authRequest</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>打开三个浏览器创建，分别设置服务地址如下：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">ws://127.0.0.1:8080/?accessToken=芋艿</code></li>
+  <li><code class="highlighter-rouge">ws://127.0.0.1:8080/?accessToken=番茄</code></li>
+  <li><code class="highlighter-rouge">ws://127.0.0.1:8080/?accessToken=土豆</code></li>
+</ul>
+
+<p>然后，逐个点击「开启连接」按钮，进行 WebSocket 连接。最终效果如下图：</p>
+
+<p><img src="../assets/buildconnect02.png" alt="建立连接" /></p>
+
+<ul>
+  <li>在红圈中，可以看到 AuthResponse 的消息。</li>
+  <li>在黄圈中，可以看到 UserJoinNoticeRequest 的消息。</li>
+</ul>
+
+<h4 id="onmessage">onMessage</h4>
+
+<p>重新实现 <code class="highlighter-rouge">#onMessage(Session session, String message)</code> 方法，实现不同的消息，转发给不同的 MessageHandler 消息处理器。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// WebsocketServerEndpoint.java</span>
+
+<span class="nd">@OnMessage</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onMessage</span><span class="o">(</span><span class="n">Session</span> <span class="n">session</span><span class="o">,</span> <span class="n">String</span> <span class="n">message</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"[onOpen][session({}) 接收到一条消息({})]"</span><span class="o">,</span> <span class="n">session</span><span class="o">,</span> <span class="n">message</span><span class="o">);</span> <span class="c1">// 生产环境下，请设置成 debug 级别</span>
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="c1">// &lt;1&gt; 获得消息类型</span>
+        <span class="n">JSONObject</span> <span class="n">jsonMessage</span> <span class="o">=</span> <span class="n">JSON</span><span class="o">.</span><span class="na">parseObject</span><span class="o">(</span><span class="n">message</span><span class="o">);</span>
+        <span class="n">String</span> <span class="n">messageType</span> <span class="o">=</span> <span class="n">jsonMessage</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="s">"type"</span><span class="o">);</span>
+        <span class="c1">// &lt;2&gt; 获得消息处理器</span>
+        <span class="n">MessageHandler</span> <span class="n">messageHandler</span> <span class="o">=</span> <span class="n">HANDLERS</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">messageType</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">messageHandler</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">logger</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="s">"[onMessage][消息类型({}) 不存在消息处理器]"</span><span class="o">,</span> <span class="n">messageType</span><span class="o">);</span>
+            <span class="k">return</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="c1">// &lt;3&gt; 解析消息</span>
+        <span class="n">Class</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="n">Message</span><span class="o">&gt;</span> <span class="n">messageClass</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">getMessageClass</span><span class="o">(</span><span class="n">messageHandler</span><span class="o">);</span>
+        <span class="c1">// &lt;4&gt; 处理消息</span>
+        <span class="n">Message</span> <span class="n">messageObj</span> <span class="o">=</span> <span class="n">JSON</span><span class="o">.</span><span class="na">parseObject</span><span class="o">(</span><span class="n">jsonMessage</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="s">"body"</span><span class="o">),</span> <span class="n">messageClass</span><span class="o">);</span>
+        <span class="n">messageHandler</span><span class="o">.</span><span class="na">execute</span><span class="o">(</span><span class="n">session</span><span class="o">,</span> <span class="n">messageObj</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Throwable</span> <span class="n">throwable</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"[onMessage][session({}) message({}) 发生异常]"</span><span class="o">,</span> <span class="n">session</span><span class="o">,</span> <span class="n">throwable</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<ul>
+  <li>
+    <p><code class="highlighter-rouge">&lt;1&gt;</code> 处，获得消息类型，从 <code class="highlighter-rouge">"type"</code> 字段中。</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">&lt;2&gt;</code> 处，获得消息类型对应的 MessageHandler 消息处理器。</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">&lt;3&gt;</code> 处，调用 <code class="highlighter-rouge">#getMessageClass(MessageHandler handler)</code> 方法，通过 MessageHandler 中，通过解析其类上的泛型，获得消息类型对应的 Class 类。代码如下：</p>
+
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="c1">// WebsocketServerEndpoint.java</span>
+    
+  <span class="kd">private</span> <span class="n">Class</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="n">Message</span><span class="o">&gt;</span> <span class="nf">getMessageClass</span><span class="o">(</span><span class="n">MessageHandler</span> <span class="n">handler</span><span class="o">)</span> <span class="o">{</span>
+      <span class="c1">// 获得 Bean 对应的 Class 类名。因为有可能被 AOP 代理过。</span>
+      <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">targetClass</span> <span class="o">=</span> <span class="n">AopProxyUtils</span><span class="o">.</span><span class="na">ultimateTargetClass</span><span class="o">(</span><span class="n">handler</span><span class="o">);</span>
+      <span class="c1">// 获得接口的 Type 数组</span>
+      <span class="n">Type</span><span class="o">[]</span> <span class="n">interfaces</span> <span class="o">=</span> <span class="n">targetClass</span><span class="o">.</span><span class="na">getGenericInterfaces</span><span class="o">();</span>
+      <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">superclass</span> <span class="o">=</span> <span class="n">targetClass</span><span class="o">.</span><span class="na">getSuperclass</span><span class="o">();</span>
+      <span class="k">while</span> <span class="o">((</span><span class="n">Objects</span><span class="o">.</span><span class="na">isNull</span><span class="o">(</span><span class="n">interfaces</span><span class="o">)</span> <span class="o">||</span> <span class="mi">0</span> <span class="o">==</span> <span class="n">interfaces</span><span class="o">.</span><span class="na">length</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="n">Objects</span><span class="o">.</span><span class="na">nonNull</span><span class="o">(</span><span class="n">superclass</span><span class="o">))</span> <span class="o">{</span> <span class="c1">// 此处，是以父类的接口为准</span>
+          <span class="n">interfaces</span> <span class="o">=</span> <span class="n">superclass</span><span class="o">.</span><span class="na">getGenericInterfaces</span><span class="o">();</span>
+          <span class="n">superclass</span> <span class="o">=</span> <span class="n">targetClass</span><span class="o">.</span><span class="na">getSuperclass</span><span class="o">();</span>
+      <span class="o">}</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">Objects</span><span class="o">.</span><span class="na">nonNull</span><span class="o">(</span><span class="n">interfaces</span><span class="o">))</span> <span class="o">{</span>
+          <span class="c1">// 遍历 interfaces 数组</span>
+          <span class="k">for</span> <span class="o">(</span><span class="n">Type</span> <span class="n">type</span> <span class="o">:</span> <span class="n">interfaces</span><span class="o">)</span> <span class="o">{</span>
+              <span class="c1">// 要求 type 是泛型参数</span>
+              <span class="k">if</span> <span class="o">(</span><span class="n">type</span> <span class="k">instanceof</span> <span class="n">ParameterizedType</span><span class="o">)</span> <span class="o">{</span>
+                  <span class="n">ParameterizedType</span> <span class="n">parameterizedType</span> <span class="o">=</span> <span class="o">(</span><span class="n">ParameterizedType</span><span class="o">)</span> <span class="n">type</span><span class="o">;</span>
+                  <span class="c1">// 要求是 MessageHandler 接口</span>
+                  <span class="k">if</span> <span class="o">(</span><span class="n">Objects</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">parameterizedType</span><span class="o">.</span><span class="na">getRawType</span><span class="o">(),</span> <span class="n">MessageHandler</span><span class="o">.</span><span class="na">class</span><span class="o">))</span> <span class="o">{</span>
+                      <span class="n">Type</span><span class="o">[]</span> <span class="n">actualTypeArguments</span> <span class="o">=</span> <span class="n">parameterizedType</span><span class="o">.</span><span class="na">getActualTypeArguments</span><span class="o">();</span>
+                      <span class="c1">// 取首个元素</span>
+                      <span class="k">if</span> <span class="o">(</span><span class="n">Objects</span><span class="o">.</span><span class="na">nonNull</span><span class="o">(</span><span class="n">actualTypeArguments</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="n">actualTypeArguments</span><span class="o">.</span><span class="na">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+                          <span class="k">return</span> <span class="o">(</span><span class="n">Class</span><span class="o">&lt;</span><span class="n">Message</span><span class="o">&gt;)</span> <span class="n">actualTypeArguments</span><span class="o">[</span><span class="mi">0</span><span class="o">];</span>
+                      <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                          <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalStateException</span><span class="o">(</span><span class="n">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">"类型(%s) 获得不到消息类型"</span><span class="o">,</span> <span class="n">handler</span><span class="o">));</span>
+                      <span class="o">}</span>
+                  <span class="o">}</span>
+              <span class="o">}</span>
+          <span class="o">}</span>
+      <span class="o">}</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalStateException</span><span class="o">(</span><span class="n">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">"类型(%s) 获得不到消息类型"</span><span class="o">,</span> <span class="n">handler</span><span class="o">));</span>
+  <span class="o">}</span>
+</code></pre></div>    </div>
+
+    <ul>
+      <li>这是参考 <a href="https://github.com/apache/rocketmq-spring/"><code class="highlighter-rouge">rocketmq-spring</code></a> 项目的 <a href="https://github.com/apache/rocketmq-spring/blob/8b2426ea89d704d61c00497a1320b9b9ccd5a61e/rocketmq-spring-boot/src/main/java/org/apache/rocketmq/spring/support/DefaultRocketMQListenerContainer.java#L408-L435"><code class="highlighter-rouge">DefaultRocketMQListenerContainer#getMessageType()</code></a> 方法，进行略微修改。</li>
+    </ul>
+  </li>
+  <li>
+    <p>如果对 Java 的泛型机制没有做过一点了解，可能略微有点硬核。可以先暂时跳过，知道意图即可。</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">&lt;4&gt;</code> 处，调用 <code class="highlighter-rouge">MessageHandler#execute(session, message)</code> 方法，执行处理请求。</p>
+  </li>
+  <li>
+    <p>另外，这里增加了 <code class="highlighter-rouge">try-catch</code> 代码，避免整个执行的过程中，发生异常。如果在 onMessage 事件的处理中，发生异常，该消息对应的 Session 会话会被<strong>自动</strong>关闭。显然，这个不符合我们的要求。例如说，在 MessageHandler 处理消息的过程中，发生一些异常是无法避免的。</p>
+  </li>
+</ul>
+
+<p>继续基于上述创建的三个浏览器，先点击「清空消息」按钮，清空下消息，打扫下上次测试展示出来的接收得到的 Message 。当然，WebSocket 的连接，不需要去断开。</p>
+
+<p>在第一个浏览器中，分别发送两种聊天消息：</p>
+
+<ul>
+  <li>
+    <p>一条 SendToOneRequest 私聊消息</p>
+
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="o">{</span>
+      <span class="nl">type:</span> <span class="s">"SEND_TO_ONE_REQUEST"</span><span class="o">,</span>
+      <span class="nl">body:</span> <span class="o">{</span>
+          <span class="nl">toUser:</span> <span class="s">"番茄"</span><span class="o">,</span>
+          <span class="nl">msgId:</span> <span class="s">"eaef4a3c-35dd-46ee-b548-f9c4eb6396fe"</span><span class="o">,</span>
+          <span class="nl">content:</span> <span class="s">"我是一条单聊消息"</span>
+      <span class="o">}</span>
+  <span class="o">}</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>一条 SendToAllHandler 群聊消息：</p>
+
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="o">{</span>
+      <span class="nl">type:</span> <span class="s">"SEND_TO_ALL_REQUEST"</span><span class="o">,</span>
+      <span class="nl">body:</span> <span class="o">{</span>
+          <span class="nl">msgId:</span> <span class="s">"838e97e1-6ae9-40f9-99c3-f7127ed64747"</span><span class="o">,</span>
+          <span class="nl">content:</span> <span class="s">"我是一条群聊消息"</span>
+      <span class="o">}</span>
+  <span class="o">}</span>
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<p>最终结果如下图：</p>
+
+<p><img src="../assets/buildconnect03.png" alt="发送消息" /></p>
+
+<ul>
+  <li>在红圈中，可以看到一条 SendToUserRequest 的消息，仅有第二个浏览器（番茄）收到。</li>
+  <li>在黄圈中，可以看到三条 SendToUserRequest 的消息，所有浏览器都收到。</li>
+</ul>
+
+<h4 id="onclose">onClose</h4>
+
+<p>重新实现 <code class="highlighter-rouge">#onClose(Session session, CloseReason closeReason)</code> 方法，实现<strong>移除</strong>关闭的 Session 。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// WebsocketServerEndpoint.java</span>
+
+<span class="nd">@OnClose</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onClose</span><span class="o">(</span><span class="n">Session</span> <span class="n">session</span><span class="o">,</span> <span class="n">CloseReason</span> <span class="n">closeReason</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"[onClose][session({}) 连接关闭。关闭原因是({})}]"</span><span class="o">,</span> <span class="n">session</span><span class="o">,</span> <span class="n">closeReason</span><span class="o">);</span>
+    <span class="n">WebSocketUtil</span><span class="o">.</span><span class="na">removeSession</span><span class="o">(</span><span class="n">session</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h4 id="onerror">onError</h4>
+
+<p><code class="highlighter-rouge">#onError(Session session, Throwable throwable)</code> 方法，保持不变。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// WebsocketServerEndpoint.java</span>
+
+<span class="nd">@OnError</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onError</span><span class="o">(</span><span class="n">Session</span> <span class="n">session</span><span class="o">,</span> <span class="n">Throwable</span> <span class="n">throwable</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"[onClose][session({}) 发生异常]"</span><span class="o">,</span> <span class="n">session</span><span class="o">,</span> <span class="n">throwable</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h2 id="spring-websocket">Spring WebSocket</h2>
+
+<h3 id="websocketutil-1">WebSocketUtil</h3>
+
+<p>因为 Tomcat WebSocket 使用的是 <strong><a href="https://github.com/eclipse-ee4j/websocket-api/blob/master/api/client/src/main/java/javax/websocket/Session.java">Session</a> 作为会话</strong>，而 Spring WebSocket 使用的是 <strong><a href="https://github.com/spring-projects/spring-framework/blob/master/spring-websocket/src/main/java/org/springframework/web/socket/WebSocketSession.java">WebSocketSession</a> 作为会话</strong>，导致需要<strong>略微</strong>修改下 WebSocketUtil 工具类。</p>
+
+<p>改动非常略微，点击 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-25/lab-websocket-25-02/src/main/java/cn/iocoder/springboot/lab25/springwebsocket/util/WebSocketUtil.java">WebSocketUtil</a> 查看下，秒懂的噢。 主要有两点：</p>
+
+<ol>
+  <li>将所有使用 Session 类的地方，调整成 WebSocketSession 类。</li>
+  <li>将发送消息，从 Session 修改成 WebSocketSession 。</li>
+</ol>
+
+<h3 id="消息处理器-1">消息处理器</h3>
+
+<p>将 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-25/lab-websocket-25-02/src/main/java/cn/iocoder/springboot/lab25/springwebsocket/handler"><code class="highlighter-rouge">cn.iocoder.springboot.lab25.springwebsocket.handler</code></a> 包路径下的消息处理器们，使用到 Session 类的地方，调整成 WebSocketSession 类。</p>
+
+<h3 id="websocketsession">WebSocketSession</h3>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Slf4j</span>
+<span class="nd">@RequiredArgsConstructor</span>
+<span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">AbstractWebSocketMessageSender</span> <span class="kd">implements</span> <span class="n">WebSocketMessageSender</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">WebSocketSessionManager</span> <span class="n">sessionManager</span><span class="o">;</span>
+
+	<span class="cm">/**
+     * 发送消息
+     *
+     * @param sessionId Session 编号
+     * @param userType 用户类型
+     * @param userId 用户编号
+     * @param messageType 消息类型
+     * @param messageContent 消息内容
+     */</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">send</span><span class="o">(</span><span class="n">String</span> <span class="n">sessionId</span><span class="o">,</span> <span class="n">Integer</span> <span class="n">userType</span><span class="o">,</span> <span class="n">Long</span> <span class="n">userId</span><span class="o">,</span> <span class="n">String</span> <span class="n">messageType</span><span class="o">,</span> <span class="n">String</span> <span class="n">messageContent</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// 1. 获得 Session 列表</span>
+        <span class="o">...</span>
+        <span class="c1">// 2. 执行发送</span>
+        <span class="n">doSend</span><span class="o">(</span><span class="n">sessions</span><span class="o">,</span> <span class="n">messageType</span><span class="o">,</span> <span class="n">messageContent</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**
+     * 发送消息的具体实现
+     *
+     * @param sessions Session 列表
+     * @param messageType 消息类型
+     * @param messageContent 消息内容
+     */</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">doSend</span><span class="o">(</span><span class="n">Collection</span><span class="o">&lt;</span><span class="n">WebSocketSession</span><span class="o">&gt;</span> <span class="n">sessions</span><span class="o">,</span> <span class="n">String</span> <span class="n">messageType</span><span class="o">,</span> <span class="n">String</span> <span class="n">messageContent</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">JsonWebSocketMessage</span> <span class="n">message</span> <span class="o">=</span> <span class="k">new</span> <span class="n">JsonWebSocketMessage</span><span class="o">().</span><span class="na">setType</span><span class="o">(</span><span class="n">messageType</span><span class="o">).</span><span class="na">setContent</span><span class="o">(</span><span class="n">messageContent</span><span class="o">);</span>
+        <span class="n">String</span> <span class="n">payload</span> <span class="o">=</span> <span class="n">JsonUtils</span><span class="o">.</span><span class="na">toJsonString</span><span class="o">(</span><span class="n">message</span><span class="o">);</span> <span class="c1">// 关键，使用 JSON 序列化</span>
+        <span class="n">sessions</span><span class="o">.</span><span class="na">forEach</span><span class="o">(</span><span class="n">session</span> <span class="o">-&gt;</span> <span class="o">{</span>
+            <span class="c1">// 1. 各种校验，保证 Session 可以被发送</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">session</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">log</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="s">"[doSend][session 为空, message({})]"</span><span class="o">,</span> <span class="n">message</span><span class="o">);</span>
+                <span class="k">return</span><span class="o">;</span>
+            <span class="o">}</span>
+            <span class="k">if</span> <span class="o">(!</span><span class="n">session</span><span class="o">.</span><span class="na">isOpen</span><span class="o">())</span> <span class="o">{</span>
+                <span class="n">log</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="s">"[doSend][session({}) 已关闭, message({})]"</span><span class="o">,</span> <span class="n">session</span><span class="o">.</span><span class="na">getId</span><span class="o">(),</span> <span class="n">message</span><span class="o">);</span>
+                <span class="k">return</span><span class="o">;</span>
+            <span class="o">}</span>
+            <span class="c1">// 2. 执行发送</span>
+            <span class="k">try</span> <span class="o">{</span>
+                <span class="n">session</span><span class="o">.</span><span class="na">sendMessage</span><span class="o">(</span><span class="k">new</span> <span class="n">TextMessage</span><span class="o">(</span><span class="n">payload</span><span class="o">));</span>
+                <span class="n">log</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"[doSend][session({}) 发送消息成功，message({})]"</span><span class="o">,</span> <span class="n">session</span><span class="o">.</span><span class="na">getId</span><span class="o">(),</span> <span class="n">message</span><span class="o">);</span>
+            <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">IOException</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">log</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="s">"[doSend][session({}) 发送消息失败，message({})]"</span><span class="o">,</span> <span class="n">session</span><span class="o">.</span><span class="na">getId</span><span class="o">(),</span> <span class="n">message</span><span class="o">,</span> <span class="n">ex</span><span class="o">);</span>
+            <span class="o">}</span>
+        <span class="o">});</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h4 id="websocketsessionmanager">WebSocketSessionManager</h4>
+
+<h3 id="websocketmessage"><del>WebSocketMessage</del></h3>
+
+<h3 id="websocketmessagelistener">WebSocketMessageListener</h3>
+
+<ul>
+  <li>DemoReceiveMessage 示例：server -&gt; client 同步消息</li>
+  <li>DemoSendMessage 示例：client -&gt; server 发送消息</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="cm">/**
+ * WebSocket 示例：单发消息
+ */</span>
+<span class="nd">@Component</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">DemoWebSocketMessageListener</span> <span class="kd">implements</span> <span class="n">WebSocketMessageListener</span><span class="o">&lt;</span><span class="n">DemoSendMessage</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="nd">@SuppressWarnings</span><span class="o">(</span><span class="s">"SpringJavaAutowiredFieldsWarningInspection"</span><span class="o">)</span>
+    <span class="nd">@Autowired</span><span class="o">(</span><span class="n">required</span> <span class="o">=</span> <span class="kc">false</span><span class="o">)</span> <span class="c1">// 由于 yudao.websocket.enable 配置项，可以关闭 WebSocket 的功能，所以这里只能不强制注入</span>
+    <span class="kd">private</span> <span class="n">WebSocketMessageSender</span> <span class="n">webSocketMessageSender</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onMessage</span><span class="o">(</span><span class="n">WebSocketSession</span> <span class="n">session</span><span class="o">,</span> <span class="n">DemoSendMessage</span> <span class="n">message</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Long</span> <span class="n">fromUserId</span> <span class="o">=</span> <span class="n">WebSocketFrameworkUtils</span><span class="o">.</span><span class="na">getLoginUserId</span><span class="o">(</span><span class="n">session</span><span class="o">);</span>
+        <span class="c1">// 情况一：单发</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">message</span><span class="o">.</span><span class="na">getToUserId</span><span class="o">()</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">DemoReceiveMessage</span> <span class="n">toMessage</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DemoReceiveMessage</span><span class="o">().</span><span class="na">setFromUserId</span><span class="o">(</span><span class="n">fromUserId</span><span class="o">)</span>
+                    <span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="n">message</span><span class="o">.</span><span class="na">getText</span><span class="o">()).</span><span class="na">setSingle</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+            <span class="n">webSocketMessageSender</span><span class="o">.</span><span class="na">sendObject</span><span class="o">(</span><span class="n">UserTypeEnum</span><span class="o">.</span><span class="na">ADMIN</span><span class="o">.</span><span class="na">getValue</span><span class="o">(),</span> <span class="n">message</span><span class="o">.</span><span class="na">getToUserId</span><span class="o">(),</span> <span class="c1">// 给指定用户</span>
+                    <span class="s">"demo-message-receive"</span><span class="o">,</span> <span class="n">toMessage</span><span class="o">);</span>
+            <span class="k">return</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="c1">// 情况二：群发</span>
+        <span class="n">DemoReceiveMessage</span> <span class="n">toMessage</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DemoReceiveMessage</span><span class="o">().</span><span class="na">setFromUserId</span><span class="o">(</span><span class="n">fromUserId</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="n">message</span><span class="o">.</span><span class="na">getText</span><span class="o">()).</span><span class="na">setSingle</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
+        <span class="n">webSocketMessageSender</span><span class="o">.</span><span class="na">sendObject</span><span class="o">(</span><span class="n">UserTypeEnum</span><span class="o">.</span><span class="na">ADMIN</span><span class="o">.</span><span class="na">getValue</span><span class="o">(),</span> <span class="c1">// 给所有用户</span>
+                <span class="s">"demo-message-receive"</span><span class="o">,</span> <span class="n">toMessage</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">getType</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="s">"demo-message-send"</span><span class="o">;</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="websocketmessagesender">WebSocketMessageSender</h3>
+
+<p>RPC 服务调用的入口。</p>
+
+<h4 id="abstractwebsocketmessagesender">AbstractWebSocketMessageSender</h4>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Slf4j</span>
+<span class="nd">@RequiredArgsConstructor</span>
+<span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">AbstractWebSocketMessageSender</span> <span class="kd">implements</span> <span class="n">WebSocketMessageSender</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">WebSocketSessionManager</span> <span class="n">sessionManager</span><span class="o">;</span>
+
+</code></pre></div></div>
+
+<h4 id="rocketmqwebsocketmessagesender">RocketMQWebSocketMessageSender</h4>
+
+<p>RocketMQ 实现</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+ * 基于 RocketMQ 的 {@link WebSocketMessageSender} 实现类
+ */</span>
+<span class="nd">@Slf4j</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">RocketMQWebSocketMessageSender</span> <span class="kd">extends</span> <span class="n">AbstractWebSocketMessageSender</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">RocketMQTemplate</span> <span class="n">rocketMQTemplate</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">topic</span><span class="o">;</span>
+    <span class="o">....</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="websocketshakeinterceptor">WebSocketShakeInterceptor</h3>
+
+<p>在 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-25/lab-websocket-25-02/src/main/java/cn/iocoder/springboot/lab25/springwebsocket/websocket/"><code class="highlighter-rouge">cn.iocoder.springboot.lab25.springwebsocket.websocket</code></a> 包路径下，创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-25/lab-websocket-25-02/src/main/java/cn/iocoder/springboot/lab25/springwebsocket/websocket/DemoWebSocketShakeInterceptor.java">DemoWebSocketShakeInterceptor</a> 拦截器。</p>
+
+<p>因为 WebSocketSession 无法获得 ws 地址上的请求参数，所以只好通过该拦截器，获得 <code class="highlighter-rouge">accessToken</code> 请求参数，设置到 <code class="highlighter-rouge">attributes</code> 中。</p>
+
+<h3 id="demowebsockethandler">DemoWebSocketHandler</h3>
+
+<p>在 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-25/lab-websocket-25-02/src/main/java/cn/iocoder/springboot/lab25/springwebsocket/websocket/"><code class="highlighter-rouge">cn.iocoder.springboot.lab25.springwebsocket.websocket</code></a> 包路径下，创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-25/lab-websocket-25-02/src/main/java/cn/iocoder/springboot/lab25/springwebsocket/websocket/DemoWebSocketHandler.java">DemoWebSocketHandler</a> 处理器。</p>
+
+<ul>
+  <li>在类上，添加 <strong><code class="highlighter-rouge">@EnableWebSocket</code> 注解</strong>，开启 Spring WebSocket 功能。</li>
+  <li>实现 <strong>WebSocketConfigurer 接口</strong>，自定义 WebSocket 的配置。
+    <ul>
+      <li>具体的，可以看看 <code class="highlighter-rouge">#registerWebSocketHandlers(registry)</code> 方法，配置 <strong>WebSocket 处理器、拦截器</strong>，以及允许跨域。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="websocketconfiguration-1">WebSocketConfiguration</h3>
+
+<h2 id="im-消息送达保证机制">IM 消息送达保证机制</h2>
+
+<p>在上述的提供的 Tomcat WebSocket 和 Spring WebSocket 示例中，相当于在 WebSocket 实现了自定义的子协议，就是基于 <code class="highlighter-rouge">type</code> + <code class="highlighter-rouge">body</code> 的消息结构。</p>
+
+<blockquote>
+  <p><a href="http://www.52im.net/thread-294-1-1.html">《IM 消息送达保证机制实现》</a> 文章。</p>
+</blockquote>
+
+<p>实际场景下，在使用 WebSocket 还是原生 Socket 也好，都需要考虑，<strong>如何保证消息一定送达给用户</strong>？</p>
+
+<ul>
+  <li>如果用户不处于在线的时候，消息持久化到 MySQL、MongoDB 等数据库中。这个是正确，且是必须要做的。</li>
+</ul>
+
+<p>我们在一起考虑下边界场景，客户端网络环境较差，特别是在移动端场景下，出现网络<strong>闪断</strong>，可能会出现连接实际已经断开，而服务端以为客户端处于在线的情况。此时，服务端会将消息发给客户端，那么消息实际就发送到“空气”中，产生丢失的情况。</p>
+
+<p>要解决这种情况下的问题，需要引入客户端的 <strong>ACK 消息机制</strong>。目前，主流的有两种做法。</p>
+
+<h4 id="基于每条消息编号-ack"><del>基于<strong>每条消息编号 ACK</strong></del></h4>
+
+<p>第一种，基于<strong>每一条消息编号 ACK</strong> 。整体流程如下：</p>
+
+<ol>
+  <li>无论客户端是否在线，服务端都先把接收到的消息持久化到数据库中。如果客户端此时在线，服务端将<strong>完整消息</strong>推送给客户端。</li>
+  <li>客户端在接收到消息之后，发送 ACK 消息编号给服务端，告知已经收到该消息。服务端在收到 ACK 消息编号的时候，标记该消息已经发送成功。</li>
+  <li>服务端定时轮询，在线的客户端，是否有超过 N 秒未 ACK 的消息。如果有，则重新发送消息给对应的客户端。</li>
+</ol>
+
+<p>这种方案，因为客户端逐条 ACK 消息编号，所以会导致客户端和服务端交互次数过多。当然，客户端可以异步批量 ACK 多条消息，从而减少次数。</p>
+
+<p>不过因为服务端仍然需要<strong>定时轮询</strong>，也会导致服务端压力较大。所以，这种方案基本已经不采用了。</p>
+
+<h4 id="基于滑动窗口-ack">基于<strong>滑动窗口 ACK</strong></h4>
+
+<p>第二种，基于<strong>滑动窗口 ACK</strong> 。整体流程如下：</p>
+
+<ol>
+  <li>无论客户端是否在线，服务端都先把接收到的消息持久化到数据库中。如果客户端此时在线，服务端将<strong>消息编号</strong>推送给客户端。</li>
+  <li>客户端在接收到<strong>消息编号</strong>之后，和本地的消息编号进行比对。如果比本地的小，说明该消息已经收到，忽略不处理；如果比本地的大，使用<strong>本地的</strong>消息编号，向服务端拉取<strong>大于</strong>本地的消息编号的消息列表，即增量消息列表。拉取完成后，更新消息列表中最大的消息编号为<strong>新的本地的</strong>消息编号。</li>
+  <li>服务端在收到客户端拉取增量的消息列表时，将请求的编号记录到数据库中，用于知道客户端此时本地的最新消息编号。</li>
+  <li>考虑到服务端将<strong>消息编号</strong>推送给客户端，也会存在丢失的情况，所以客户端会每 N 秒定时向服务端拉取<strong>大于</strong>本地的消息编号的消息列表。</li>
+</ol>
+
+<p>这种方式，在业务被称为<strong>推拉结合</strong>的方案，在<strong>分布式消息队列、配置中心、注册中心</strong>实现实时的数据同步，经常被采用。</p>
+
+<p>并且，采用这种方案的情况下，客户端和服务端不一定需要使用<strong>长连接</strong>，也可以使用<strong>长轮询</strong>所替代。客户端发送带有消息版本号的 HTTP 请求到服务端。</p>
+
+<ul>
+  <li>如果服务端<strong>已有</strong>比客户端新的消息编号，则直接返回增量的消息列表。</li>
+  <li>如果服务端<strong>没有</strong>比客户端新的消息编号，则 HOLD 住请求，直到有新的消息列表可以返回，或者 HTTP 请求超时。</li>
+  <li>客户端在收到 HTTP 请求超时时，立即又重新发起带有消息版本号的 HTTP 请求到服务端。如此反复循环，通过消息编号作为<strong>增量标识</strong>，达到实时获取消息的目的。</li>
+</ul>
+

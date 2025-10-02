@@ -148,6 +148,20 @@
 
 <p>SingleInstance，某个类（单例类）有且只有一个实例。如：线程池、缓存、<strong>日志对象</strong>、对话框、注册表，充当打印机、显卡等设备驱动程序的对象。</p>
 
+<p>平常使用单例不外乎两种方式：</p>
+
+<ul>
+  <li>在对象里加个静态方法getInstance()来获取。此方式可以参考 <a href="http://my.oschina.net/looly/blog/152865">【转】线程安全的单例模式</a> 这篇博客，可分为<strong>饿汉和饱汉模式</strong>。</li>
+  <li>
+    <p>通过Spring这类容器统一管理对象，用的时候去<strong>对象池</strong>中拿。Spring也可以通过配置决定懒汉或者饿汉模式。</p>
+  </li>
+  <li>Hutool <a href="https://www.bookstack.cn/read/hutool/d736955b4d9ce914.md">单例工具-Singleton</a>：说实话我更倾向于第二种，但是Spring更注重的是注入，而不是拿，于是我想做Singleton这个类，维护一个单例的池，用这个单例对象的时候直接来拿就可以，这里我用的懒汉模式。我只是想把单例的管理方式换一种思路，我希望管理单例的是一个容器工具，而不是一个大大的框架，这样能大大减少单例使用的复杂性。
+    <ul>
+      <li>实现非常简单：一个HashMap用于做为单例对象池，通过newInstance()实例化对象（不支持带参数的构造方法），无论取还是创建对象都是<strong>线程安全</strong>的（在单例对象数量非常庞大、且单例对象实例化非常耗时时可能会出现瓶颈），考虑到在get的时候使双重检查锁，但是并不是线程安全的，故直接加了<code class="highlighter-rouge">synchronized</code>做为修饰符。</li>
+    </ul>
+  </li>
+</ul>
+
 <p>优点：</p>
 
 <ol>
@@ -263,11 +277,25 @@ Singleton sg = Singleton::getInstance();
 
 <h4 id="抽象工厂模式">抽象工厂模式</h4>
 
-<p>抽象工厂模式：提供一个接口 <code class="highlighter-rouge">public interface RouJiaMoYLFactroy</code>，用于创建相关的或依赖对象的家族 <code class="highlighter-rouge">public Meat createMeat(); public YuanLiao createYuanliao();</code>，而不需明确指定具体类。</p>
+<p>抽象工厂模式：提供一个接口，用于创建相关的或依赖对象的家族，而不需明确指定具体类。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">RouJiaMoYLFactroy</span> <span class="o">{}</span>
+
+<span class="kd">public</span> <span class="n">Meat</span> <span class="nf">createMeat</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">YuanLiao</span> <span class="nf">createYuanliao</span><span class="o">();</span>
+</code></pre></div></div>
 
 <h4 id="建造者模式">建造者模式</h4>
 
+<blockquote>
+  <p>构造者模式？</p>
+</blockquote>
+
 <p>又称生成器模式。将一个复杂对象的构建与它的表示分离，使得同样的构建过程可创建不同的表示。</p>
+
+<ul>
+  <li>Lombok 的 @Builder 注解。</li>
+</ul>
 
 <h4 id="原型模式"><del>原型模式</del></h4>
 

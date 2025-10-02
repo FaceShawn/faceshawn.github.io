@@ -4,7 +4,7 @@
 
 <!-- more -->
 
-<h2 id="目录">目录</h2>
+<h3 id="目录">目录</h3>
 
 <p>[TOC]</p>
 
@@ -49,6 +49,7 @@
   <li><strong>消息队列</strong>：<code class="highlighter-rouge">Redis </code>自带的 <code class="highlighter-rouge">list </code> 数据结构可作为简单的队列使用。
     <ul>
       <li>Redis 5.0 中增加的 <strong>Stream 类型</strong>的数据结构更适合用来做消息队列，类似于 <code class="highlighter-rouge">Kafka</code>。支持：发布 / 订阅模式、按照消费者组进行消费、消息持久化（ RDB 和 AOF）、ACK 机制。</li>
+      <li>主要用于高效地处理<strong>流式数据</strong>，特别适用于消息队列、日志记录和实时数据分析等场景。</li>
       <li>不过，和专业的消息队列相比，还是有很多欠缺的地方。比如<strong>消息丢失</strong>和<strong>堆积问题</strong>不好解决。</li>
       <li>因此，通常建议是<strong>不使用 Redis</strong> 来做消息队列，完全可以选择市面上比较成熟的一些消息队列，比如  <code class="highlighter-rouge">RocketMQ、Kafka</code> 等。</li>
     </ul>

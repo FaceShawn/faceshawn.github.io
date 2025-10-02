@@ -6,11 +6,11 @@
 
 <hr />
 
-<h2 id="目录">目录</h2>
+<h3 id="目录">目录</h3>
 
 <p>[TOC]</p>
 
-<h2 id="负载均衡">负载均衡</h2>
+<h3 id="负载均衡">负载均衡</h3>
 
 <p>高并发首选方案就是<strong>集群化</strong>部署，一台服务器承载的QPS有限，多台服务器叠加能应对高并发。</p>
 
@@ -468,7 +468,7 @@
 
 <ol>
   <li>通过<strong>注册中心</strong>（如 Nacos）将可用的服务列表拉取到本地（客户端），</li>
-  <li>再通过客户端负载均衡器（设置的负载均衡策略）获取到某个服务器的具体 ip 和端口，</li>
+  <li>再通过<strong>客户端</strong>（Consumer）负载均衡器（设置的负载均衡策略）获取到某个服务器（<strong>服务提供者</strong> Provider）的具体 ip 和端口，</li>
   <li>然后再通过 <strong>Http 框架</strong>请求服务并得到结果。</li>
 </ol>
 
@@ -476,12 +476,12 @@
 
 <p><img src="../assets/1644897836432-535fcbb2-992d-4c2a-b3de-b913d229bf3c.png" alt="image.png" style="zoom: 33%;" /></p>
 
-<p>Spring Cloud提供了<strong>Ribbon和Feign</strong>作为客户端的负载均衡。</p>
+<p>Spring Cloud提供了 <strong>Ribbon 和 Feign</strong> 作为客户端的负载均衡。</p>
 
 <ul>
-  <li>Spring Cloud Ribbon为客户端提供<strong>跨服务实例</strong>负载平衡的能力。
+  <li>Spring Cloud Ribbon 为客户端提供<strong>跨服务实例</strong>负载平衡的能力。
     <ul>
-      <li>在Spring Cloud下，使用Ribbon直接注入一个<strong>RestTemplate对象</strong>即可，此RestTemplate已做好负载均衡的配置；使用@LoadBalanced注解赋予RestTemplate负载均衡的能力</li>
+      <li>在 Spring Cloud 下，使用 Ribbon 直接注入一个 <strong>RestTemplate 对象</strong>即可，此RestTemplate已做好负载均衡的配置；使用 <strong>@LoadBalanced 注解</strong>赋予RestTemplate负载均衡的能力。</li>
       <li>可以看出使用Ribbon的负载均衡功能非常简单，和直接使用RestTemplate没什么两样，只需给RestTemplate添加一个@LoadBalanced即可。</li>
     </ul>
   </li>

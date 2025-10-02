@@ -90,7 +90,7 @@
   <li>空间复杂度用来衡量算法的内存消耗。</li>
 </ul>
 
-<h3 id="排序">排序</h3>
+<h2 id="排序">排序</h2>
 
 <blockquote>
   <p>排序算法总结和比较。注意写代码的流畅度。</p>
@@ -786,7 +786,7 @@ public static int[] getMinAndMax(List&lt;Integer&gt; arr) {
   <li>内存 1000M、文件 1G、10个出现次数最多的网址；</li>
 </ul>
 
-<h3 id="查找">查找</h3>
+<h2 id="查找">查找</h2>
 
 <h4 id="顺序查找">顺序查找</h4>
 
@@ -933,13 +933,13 @@ int binarySearch(int[] nums, int target) {
 
 <p><a href="#链表">KMP 字符串匹配算法</a></p>
 
-<h3 id="滑动窗口">滑动窗口</h3>
+<h2 id="滑动窗口">滑动窗口</h2>
 
 <blockquote>
   <p>见字符串中的<a href="#滑动窗口">滑动窗口</a></p>
 </blockquote>
 
-<h3 id="分治与递归">分治与递归</h3>
+<h2 id="分治与递归">分治与递归</h2>
 
 <h5 id="分治">分治</h5>
 
@@ -1031,7 +1031,7 @@ int dp(string&amp; ring, int i, string&amp; key, int j) {
   <li>汉诺塔</li>
 </ul>
 
-<h3 id="bfs-框架">BFS 框架</h3>
+<h2 id="bfs-框架">BFS 框架</h2>
 
 <p>BFS 也是一种暴力穷举算法，必须掌握。本质就是二叉树的层序遍历，适合解决最短路径问题。</p>
 
@@ -1098,7 +1098,7 @@ int BFSTree(Node start, Node target) {
 }
 </code></pre></div></div>
 
-<h3 id="dfs-框架回溯">DFS 框架、回溯</h3>
+<h2 id="dfs-框架回溯">DFS 框架、回溯</h2>
 
 <blockquote>
   <p>分类的稍微有点粗糙了，没有细分出回溯/分治来</p>
@@ -1243,7 +1243,7 @@ private void backtrack(int[] nums, 路径track, 选择列表) {
 }
 </code></pre></div></div>
 
-<h3 id="贪心">贪心</h3>
+<h2 id="贪心">贪心</h2>
 
 <p>贪心思路：每一步总是选取最优的操作，只看眼前，不考虑以后可能造成的影响。</p>
 
@@ -1271,7 +1271,7 @@ private void backtrack(int[] nums, 路径track, 选择列表) {
   <li><a href="#二叉树">哈夫曼编码</a></li>
 </ul>
 
-<h3 id="动态规划">动态规划</h3>
+<h2 id="动态规划">动态规划</h2>
 
 <p>核心思想：如何聪明地<strong>穷举求最值</strong>。本质上是穷举「状态」，做「选择」找最优解。</p>
 
@@ -1500,7 +1500,7 @@ int coinChange(int[] coins, int amount) {
 }
 </code></pre></div></div>
 
-<h3 id="位运算">位运算</h3>
+<h2 id="位运算">位运算</h2>
 
 <ul>
   <li><a href="https://leetcode.cn/problems/single-number/">136.只出现一次的数字</a>：异或 <code class="highlighter-rouge">^</code>【】</li>
@@ -1517,43 +1517,466 @@ int coinChange(int[] coins, int amount) {
   </li>
 </ul>
 
-<h3 id="缓存淘汰算法">缓存淘汰算法</h3>
+<h1 id="算法应用">算法应用</h1>
 
-<blockquote>
-  <p>见数据库文档中的 Redis 缓存淘汰策略、操作系统中的内存页面置换算法。</p>
-</blockquote>
-
-<h4 id="手撸-lru-算法">手撸 LRU 算法</h4>
-
-<p><strong>LRU</strong>（<code class="highlighter-rouge">Least Recently Used</code>）最近最久未使用策略：优先删除、淘汰<strong>最久未使用</strong>的数据，即上次被访问时间距离现在最久的数据。可以保证内存中的数据都是<strong>热点数据</strong>（经常被访问的数据），从而保证<strong>缓存命中率</strong>。</p>
-
-<p>基于 <strong>双向链表 + HashMap</strong> 的 LRU 算法实现：</p>
-
-<ol>
-  <li>访问某个节点时，将其从原来的位置删除，并重新插入到<strong>链表头部</strong>。这样就能保证<strong>链表尾部</strong>存储的就是最近最久未使用的节点，当节点数量大于缓存最大空间时就淘汰链表尾部的节点。</li>
-  <li>为了使<strong>删除操作</strong>时间复杂度为 O(1)，就不能采用遍历的方式找到某个节点。HashMap 存储着 Key 到节点的映射，通过 Key 就能以 O(1) 的时间得到节点，然后再以 O(1) 的时间将其从<strong>双向链表</strong>中删除。</li>
-</ol>
-
-<p>核心数据结构：哈希链表 <code class="highlighter-rouge">LinkedHashMap</code>（<strong>双向链表</strong>和哈希表的结合体）</p>
+<h2 id="缓存淘汰算法">缓存淘汰算法</h2>
 
 <ul>
-  <li>链表的有序性使元素维持插入顺序；每次默认从链表尾部添加元素，显然越靠尾部的元素就是最近使用的，越靠头部的元素就是最久未使用的。
+  <li>参考：<a href="https://mp.weixin.qq.com/s/r9TlYBlWuU74M50J9N0sCQ">字节二面挂！面试官追问 Redis 内存淘汰策略 LRU 和传统 LRU 差异，我答懵了</a></li>
+</ul>
+
+<p>应用：</p>
+
+<ol>
+  <li>Redis 缓存文档中的 #<strong>缓存淘汰策略</strong>、</li>
+  <li>操作系统中的 #内存管理 #<strong>页面置换算法</strong>。</li>
+</ol>
+
+<h4 id="总结本质区别与选择">总结：本质区别与选择</h4>
+
+<p>从本质上看，LRU 和 LFU 的核心差异是<strong>判断<code class="highlighter-rouge">价值</code>的维度不同</strong>：</p>
+
+<ul>
+  <li>LRU 用<strong>最近是否被使用</strong>衡量价值，适合短期热点；</li>
+  <li>LFU 用<strong>使用频率高低</strong>衡量价值，适合长期热点。</li>
+</ul>
+
+<p>在 Redis 中，两者都做了性能优化（近似实现），选择时不用纠结 理论完美性，</p>
+
+<ol>
+  <li>先看<strong>业务访问模式</strong>：短期集中访问用 LRU，长期高频访问用 LFU。</li>
+  <li>如果实在不确定，不妨先试 LRU（实现更简单，兼容性更好），再根据监控数据调整。</li>
+</ol>
+
+<h3 id="lru-基础算法">LRU 基础算法</h3>
+
+<p><strong>LRU</strong>（<code class="highlighter-rouge">Least Recently Used</code>）最近最少使用策略：优先删除、淘汰<strong>最久未使用</strong>的数据，即上次被访问时间<strong>距离现在</strong>最久的数据。</p>
+
+<ul>
+  <li>
+    <p>可以保证内存中的数据都是<strong>热点数据</strong>（经常被访问的数据），从而保证<strong>缓存命中率</strong>。</p>
+  </li>
+  <li>核心逻辑：<strong>最近没被用过的</strong>，下次也大概率用不上。</li>
+  <li>思路：保留最近使用的，淘汰最近最少使用的。</li>
+</ul>
+
+<h4 id="举例">举例</h4>
+
+<blockquote>
+  <p>例如：电脑桌面上放着常用的软件图标（微信、IDE），这些是最近常用的；而几个月没打开过的压缩工具，会被你拖到文件夹里。</p>
+</blockquote>
+
+<p>缓存：</p>
+
+<ol>
+  <li>假设缓存容量只有 3，依次存入 A、B、C，此时缓存是 [A,B,C]；</li>
+  <li>若此时访问 A（A 变成最近使用），缓存顺序变为 <code class="highlighter-rouge">[B,C,A]</code></li>
+  <li>若再存入D（缓存满了），需要淘汰<strong>最近最少使用的 B</strong>，最终缓存是 [C,A,D]</li>
+</ol>
+
+<h4 id="使用场景">使用场景</h4>
+
+<p>LRU 适合<strong>短期高频</strong>场景，比如：</p>
+
+<ol>
+  <li><strong>浏览器缓存</strong>：浏览器缓存网页时，会优先淘汰最近最少打开”的页面（比如一周没打开的网页，会被优先清理）；</li>
+  <li><strong>Redis 默认内存淘汰策略</strong>：Redis 的<code class="highlighter-rouge">allkeys-lru</code>和<code class="highlighter-rouge">volatile-lru</code>是基于 LRU 的（实际是 “近似 LRU”，性能更高），适合 “缓存访问具有<strong>短期局部性</strong>” 的场景（比如电商<strong>商品详情页</strong>，用户打开后短时间内可能再次刷新）；</li>
+  <li><strong>本地缓存基础版</strong>：如果业务中没有突发大量一次性访问，用 LRU 实现本地缓存足够满足需求（比如用 LinkedHashMap 快速开发）。</li>
+</ol>
+
+<h4 id="优缺点">优缺点</h4>
+
+<p>优点：</p>
+
+<ol>
+  <li><strong>逻辑简单</strong>：只关注使用时间，<strong>实现成本低</strong>，容易理解</li>
+  <li><strong>响应快</strong>：插入、删除、查询的时间复杂度可以做到 O (1)（用<strong>链表 + 哈希表</strong>实现）</li>
+  <li><strong>贴合短期局部性</strong>：很多业务场景中，最近用的数据，确实接下来更可能用（比如刚打开的文档，接下来大概率会继续编辑）。</li>
+</ol>
+
+<p>缺点：</p>
+
+<ol>
+  <li><strong>突发访问误淘汰</strong>：如果突然有<strong>大量一次性数据</strong>访问，会把原本常用的缓存挤掉。
+    <ul>
+      <li>比如缓存容量 3，原本缓存 [A,B,C]（A 是高频使用），突然连续访问 D、E、F，此时会淘汰 A、B、C，缓存变成 [D,E,F]；但后续再访问 A 时，A 已经被淘汰，需要重新从数据库加载，导致<strong>缓存命中率</strong>骤降。</li>
+    </ul>
+  </li>
+  <li><strong>不考虑使用频率</strong>：如果 A 每天用 100 次，B 每天用 1 次，但 B 是 1 分钟前刚用，A 是 2 分钟前用，LRU 会优先淘汰 A，这显然不合理（<strong>高频使用</strong>的 A 不该被淘汰）。</li>
+</ol>
+
+<h4 id="实现方案">实现方案</h4>
+
+<ol>
+  <li>方案一、基于 <strong>双向链表 + HashMap</strong> 的实现</li>
+  <li>方案二、基于哈希链表 <code class="highlighter-rouge">LinkedHashMap</code>的实现（双向链表和哈希表的结合体）</li>
+</ol>
+
+<p>淘汰尾部 or 头部？</p>
+
+<h5 id="基于双向链表--hashmap">基于<strong>双向链表 + HashMap</strong></h5>
+
+<ol>
+  <li>访问某个节点时，将其从原来的位置删除，并重新插入到<strong>链表头部</strong>。这样就能保证<strong>链表尾部</strong>存储的就是最近最久未使用的节点，（当<strong>节点数量</strong>大于缓存最大空间时）就<strong>淘汰链表尾部</strong>的节点。</li>
+  <li>为了使<strong>删除操作</strong>时间复杂度为 O(1)，就不能采用<strong>遍历</strong>的方式找到某个节点。而是用 <strong>HashMap</strong> 存储着 <strong>Key 到节点的映射</strong>，通过 Key 就能以 O(1) 的时间得到节点，然后再以 O(1) 的时间将其从<strong>双向链表</strong>中删除。</li>
+</ol>
+
+<p><code class="highlighter-rouge">LinkedHashMap</code>本质是哈希表 + 双向链表，但如果想深入理解 LRU 的实现原理，建议自己手写一个。</p>
+
+<ul>
+  <li>核心是用哈希表保证 O (1) 查询，用双向链表保证 O (1) 插入、删除（维护访问顺序）。</li>
+  <li>适用于高并发场景和面试。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">java.util.HashMap</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
+
+<span class="n">publicclass</span> <span class="n">LRUCache2</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span> <span class="n">V</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="c1">// 双向链表节点：存储key、value，以及前后指针</span>
+    <span class="n">staticclass</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span> <span class="n">V</span><span class="o">&gt;</span> <span class="o">{</span>
+        <span class="n">K</span> <span class="n">key</span><span class="o">;</span>
+        <span class="n">V</span> <span class="n">value</span><span class="o">;</span>
+        <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span> <span class="n">V</span><span class="o">&gt;</span> <span class="n">prev</span><span class="o">;</span>
+        <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span> <span class="n">V</span><span class="o">&gt;</span> <span class="n">next</span><span class="o">;</span>
+
+        <span class="kd">public</span> <span class="nf">Node</span><span class="o">(</span><span class="n">K</span> <span class="n">key</span><span class="o">,</span> <span class="n">V</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">this</span><span class="o">.</span><span class="na">key</span> <span class="o">=</span> <span class="n">key</span><span class="o">;</span>
+            <span class="k">this</span><span class="o">.</span><span class="na">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">maxCapacity</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span> <span class="n">V</span><span class="o">&gt;&gt;</span> <span class="n">map</span><span class="o">;</span> <span class="c1">// 哈希表：key→Node，O(1)查询</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span> <span class="n">V</span><span class="o">&gt;</span> <span class="n">head</span><span class="o">;</span> <span class="c1">// 虚拟头节点（简化链表操作）</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span> <span class="n">V</span><span class="o">&gt;</span> <span class="n">tail</span><span class="o">;</span> <span class="c1">// 虚拟尾节点</span>
+
+    <span class="kd">public</span> <span class="nf">LRUCache2</span><span class="o">(</span><span class="kt">int</span> <span class="n">maxCapacity</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">maxCapacity</span> <span class="o">=</span> <span class="n">maxCapacity</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">map</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;();</span>
+        <span class="c1">// 初始化虚拟头尾节点，避免处理null指针</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">head</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Node</span><span class="o">&lt;&gt;(</span><span class="kc">null</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">tail</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Node</span><span class="o">&lt;&gt;(</span><span class="kc">null</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+        <span class="n">head</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="n">tail</span><span class="o">;</span>
+        <span class="n">tail</span><span class="o">.</span><span class="na">prev</span> <span class="o">=</span> <span class="n">head</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="c1">// 1. 获取缓存：命中则把节点移到链表头部（标记为最近使用）</span>
+    <span class="kd">public</span> <span class="n">V</span> <span class="nf">get</span><span class="o">(</span><span class="n">K</span> <span class="n">key</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span> <span class="n">V</span><span class="o">&gt;</span> <span class="n">node</span> <span class="o">=</span> <span class="n">map</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">key</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">node</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">returnnull</span><span class="o">;</span> <span class="c1">// 未命中</span>
+        <span class="o">}</span>
+        <span class="c1">// 移除当前节点</span>
+        <span class="n">removeNode</span><span class="o">(</span><span class="n">node</span><span class="o">);</span>
+        <span class="c1">// 移到头部</span>
+        <span class="n">addToHead</span><span class="o">(</span><span class="n">node</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="na">value</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="c1">// 2. 存入缓存：不存在则新增，存在则更新并移到头部；满了则删除尾部节点</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">put</span><span class="o">(</span><span class="n">K</span> <span class="n">key</span><span class="o">,</span> <span class="n">V</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span> <span class="n">V</span><span class="o">&gt;</span> <span class="n">node</span> <span class="o">=</span> <span class="n">map</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">key</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">node</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="c1">// 新增节点</span>
+            <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span> <span class="n">V</span><span class="o">&gt;</span> <span class="n">newNode</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Node</span><span class="o">&lt;&gt;(</span><span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">);</span>
+            <span class="n">map</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">newNode</span><span class="o">);</span>
+            <span class="n">addToHead</span><span class="o">(</span><span class="n">newNode</span><span class="o">);</span>
+
+            <span class="c1">// 缓存满了，删除尾部节点（最近最少使用）</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">map</span><span class="o">.</span><span class="na">size</span><span class="o">()</span> <span class="o">&gt;</span> <span class="n">maxCapacity</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span> <span class="n">V</span><span class="o">&gt;</span> <span class="n">tailNode</span> <span class="o">=</span> <span class="n">removeTail</span><span class="o">();</span>
+                <span class="n">map</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">tailNode</span><span class="o">.</span><span class="na">key</span><span class="o">);</span> <span class="c1">// 同步删除哈希表中的key</span>
+            <span class="o">}</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="c1">// 更新节点值，并移到头部</span>
+            <span class="n">node</span><span class="o">.</span><span class="na">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">;</span>
+            <span class="n">removeNode</span><span class="o">(</span><span class="n">node</span><span class="o">);</span>
+            <span class="n">addToHead</span><span class="o">(</span><span class="n">node</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="c1">// 辅助：把节点添加到链表头部</span>
+    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">addToHead</span><span class="o">(</span><span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span> <span class="n">V</span><span class="o">&gt;</span> <span class="n">node</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">node</span><span class="o">.</span><span class="na">prev</span> <span class="o">=</span> <span class="n">head</span><span class="o">;</span>
+        <span class="n">node</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="n">head</span><span class="o">.</span><span class="na">next</span><span class="o">;</span>
+        <span class="n">head</span><span class="o">.</span><span class="na">next</span><span class="o">.</span><span class="na">prev</span> <span class="o">=</span> <span class="n">node</span><span class="o">;</span>
+        <span class="n">head</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="n">node</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="c1">// 辅助：移除指定节点</span>
+    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">removeNode</span><span class="o">(</span><span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span> <span class="n">V</span><span class="o">&gt;</span> <span class="n">node</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">node</span><span class="o">.</span><span class="na">prev</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="na">next</span><span class="o">;</span>
+        <span class="n">node</span><span class="o">.</span><span class="na">next</span><span class="o">.</span><span class="na">prev</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="na">prev</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="c1">// 辅助：移除尾部节点（最近最少使用）</span>
+    <span class="kd">private</span> <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span> <span class="n">V</span><span class="o">&gt;</span> <span class="nf">removeTail</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">Node</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span> <span class="n">V</span><span class="o">&gt;</span> <span class="n">tailNode</span> <span class="o">=</span> <span class="n">tail</span><span class="o">.</span><span class="na">prev</span><span class="o">;</span>
+        <span class="n">removeNode</span><span class="o">(</span><span class="n">tailNode</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">tailNode</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="c1">// 测试</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">LRUCache2</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">cache</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LRUCache2</span><span class="o">&lt;&gt;(</span><span class="mi">3</span><span class="o">);</span>
+        <span class="n">cache</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="s">"A"</span><span class="o">);</span>
+        <span class="n">cache</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="s">"B"</span><span class="o">);</span>
+        <span class="n">cache</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="s">"C"</span><span class="o">);</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">cache</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">1</span><span class="o">));</span> <span class="c1">// 输出A，此时1移到头部</span>
+        <span class="n">cache</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="s">"D"</span><span class="o">);</span> <span class="c1">// 淘汰3</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">cache</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">3</span><span class="o">));</span> <span class="c1">// 输出null（已被淘汰）</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h5 id="基于哈希链表-linkedhashmap">基于哈希链表 <code class="highlighter-rouge">LinkedHashMap</code></h5>
+
+<blockquote>
+  <p>（双向链表和哈希表的结合体）</p>
+</blockquote>
+
+<ul>
+  <li>Java 的<code class="highlighter-rouge">LinkedHashMap</code>自带<strong>按访问顺序排序</strong>的功能，只需重写<strong><code class="highlighter-rouge">removeEldestEntry</code>方法</strong>，就能实现 LRU 缓存。这是最简洁的实现方式，适合业务中不需要极致性能的场景，快速开发。</li>
+  <li>链表的<strong>有序性</strong>使元素维持插入顺序；每次默认<strong>从链表尾部添加</strong>元素，显然越靠尾部的元素就是最近使用的，越靠头部的元素就是最久未使用的。
     <ul>
       <li>双向链表：删除链表节点要得到前驱节点的指针，而双向链表支持直接查找前驱， O(1)。</li>
     </ul>
   </li>
-  <li>
-    <p>哈希映射的快速访问能力、可在 <code class="highlighter-rouge">O(1)</code> 时间访问链表的任意元素。定位到链表中的节点，从而取得对应 <code class="highlighter-rouge">val</code>、插入和删除。</p>
-  </li>
+  <li>哈希映射的快速访问能力、可在 <code class="highlighter-rouge">O(1)</code> 时间访问链表的任意元素。定位到链表中的节点，从而取得对应 <code class="highlighter-rouge">val</code>、插入和删除。</li>
   <li><a href="https://leetcode.cn/problems/lru-cache/">146.设计LRU 缓存的数据结构并实现 get()、put()</a></li>
 </ul>
 
-<p><img src="../assets/linked_hashmap.jpg" alt="img" style="zoom: 35%;" /><img src="../assets/90896.gif" alt="img" style="zoom:43%;" /></p>
+<p><img src="../assets/linked_hashmap.jpg" alt="img" style="zoom: 50%;" /></p>
 
-<h4 id="手撸-lfu-算法">手撸 LFU 算法</h4>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">java.util.LinkedHashMap</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
 
-<p>按访问频率来淘汰，用一个 <code class="highlighter-rouge">HashMap</code> 存储访问频率。</p>
+<span class="n">publicclass</span> <span class="n">LRUCache</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span> <span class="n">V</span><span class="o">&gt;</span> <span class="kd">extends</span> <span class="n">LinkedHashMap</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span> <span class="n">V</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="c1">// 缓存最大容量</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">maxCapacity</span><span class="o">;</span>
+
+    <span class="c1">// 构造函数：accessOrder=true 表示“按访问顺序排序”（核心）</span>
+    <span class="kd">public</span> <span class="nf">LRUCache</span><span class="o">(</span><span class="kt">int</span> <span class="n">maxCapacity</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">(</span><span class="n">maxCapacity</span><span class="o">,</span> <span class="mf">0.75f</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">maxCapacity</span> <span class="o">=</span> <span class="n">maxCapacity</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="c1">// 核心：当缓存大小超过maxCapacity时，自动删除“最老的 entry”（最近最少使用的）</span>
+    <span class="nd">@Override</span>
+    <span class="kd">protected</span> <span class="kt">boolean</span> <span class="nf">removeEldestEntry</span><span class="o">(</span><span class="n">Map</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">K</span><span class="o">,</span> <span class="n">V</span><span class="o">&gt;</span> <span class="n">eldest</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="nf">size</span><span class="o">()</span> <span class="o">&gt;</span> <span class="n">maxCapacity</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="c1">// 测试</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">LRUCache</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">cache</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LRUCache</span><span class="o">&lt;&gt;(</span><span class="mi">3</span><span class="o">);</span>
+        <span class="n">cache</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="s">"A"</span><span class="o">);</span>
+        <span class="n">cache</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="s">"B"</span><span class="o">);</span>
+        <span class="n">cache</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="s">"C"</span><span class="o">);</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">cache</span><span class="o">);</span> <span class="c1">// 输出：{1=A, 2=B, 3=C}（插入顺序）</span>
+
+        <span class="n">cache</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span> <span class="c1">// 访问1，1变成最近使用</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">cache</span><span class="o">);</span> <span class="c1">// 输出：{2=B, 3=C, 1=A}（按访问顺序排序）</span>
+
+        <span class="n">cache</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="s">"D"</span><span class="o">);</span> <span class="c1">// 缓存满了，淘汰最老的2</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">cache</span><span class="o">);</span> <span class="c1">// 输出：{3=C, 1=A, 4=D}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="lfu-基础算法">LFU 基础算法</h3>
+
+<p><strong>LFU</strong>（<code class="highlighter-rouge">Least Frequently Used</code>）最不经常使用策略：优先淘汰一段时间内<strong>使用次数最少</strong>的数据。</p>
 
 <ul>
+  <li>核心逻辑和 LRU 完全不同：<strong>用得少的，下次也大概率用不上</strong>，它关注的是<code class="highlighter-rouge">使用频率</code>，而不是<code class="highlighter-rouge">使用时间</code>。</li>
+  <li>按访问频率来淘汰，用一个 <code class="highlighter-rouge">HashMap</code> 存储访问频率。</li>
   <li><a href="https://leetcode.cn/problems/OrIXps/">剑指 Offer II 031.最近最少使用缓存</a>【】</li>
 </ul>
+
+<h4 id="举例-1">举例</h4>
+
+<p>生活例子：</p>
+
+<ul>
+  <li>
+    <p>手机里的 APP，微信、抖音是高频使用的（每天打开几十次），而指南针是低频使用的（几个月打开一次）。</p>
+  </li>
+  <li>
+    <p>当手机内存不足时，系统会优先卸载指南针这类低频 APP，这就是 LFU 的思路。</p>
+  </li>
+</ul>
+
+<p>缓存：</p>
+
+<ol>
+  <li>假设缓存容量 3，初始存入 A（使用 1 次）、B（使用 1 次）、C（使用 1 次），频率都是 1；</li>
+  <li>访问 A（A 频率变成 2），此时频率：A=2，B=1，C=1；</li>
+  <li>访问 A（A 频率变成 3），此时频率：A=3，B=1，C=1；</li>
+  <li>存入 D（缓存满了），需要淘汰 “频率最低” 的 B 或 C（若频率相同，淘汰 “最近最少使用” 的，即 LFU+LRU 结合），最终缓存是 A、C、D（频率分别为 3、1、1）。</li>
+</ol>
+
+<h4 id="优缺点-1"><strong>优缺点</strong></h4>
+
+<p>优点：</p>
+
+<ul>
+  <li><strong>更贴合长期高频场景</strong>：能保留使用频率高的数据，即使它不是 最近使用的（比如 A 每天用 100 次，即使 10 分钟前没⽤，也不该被淘汰）；</li>
+  <li><strong>避免突发访问误淘汰</strong>：面对一次性突发访问（比如访问 D、E、F），因为这些数据的频率低，不会把高频的 A、B、C 挤掉，缓存命中率更稳定。</li>
+</ul>
+
+<p>缺点：</p>
+
+<ul>
+  <li><strong>实现复杂</strong>：需要维护使用频率，还需要处理频率相同的情况（通常结合 LRU），时间复杂度比 LRU 高（插入、删除约 O (log n)）；</li>
+  <li><strong>冷启动问题</strong>：新存入的缓存频率低，容易被淘汰。比如一个新功能的接口，刚开始访问频率低，会被 LFU 优先淘汰，但其实后续会变成高频接口；</li>
+  <li><strong>频率老化问题</strong>：一个数据过去高频，但现在不再使用（比如活动结束后的活动页面），它的高频率会一直占用缓存，导致新的高频数据无法进入。</li>
+</ul>
+
+<h4 id="实现-lfu">实现 LFU</h4>
+
+<blockquote>
+  <p>基于哈希表 + 优先级队列</p>
+</blockquote>
+
+<p>LFU 的实现比 LRU 复杂，核心需要两个哈希表：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">cache</code>：key→Node（存储 value 和使用频率、最后使用时间）；</li>
+  <li><code class="highlighter-rouge">freqMap</code>：频率→LinkedHashSet（存储该频率下的所有 key，LinkedHashSet 保证<strong>插入顺序</strong>，用于处理频率相同的情况）；
+    <ul>
+      <li>再用一个变量<code class="highlighter-rouge">minFreq</code>记录当前最小频率，快速找到最该淘汰的 key。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="redis-中的-lru-和-lfu">Redis 中的 LRU 和 LFU</h3>
+
+<p>Redis 作为缓存数据库，当内存达到内存<code class="highlighter-rouge">maxmemory</code>限制时，会触发<strong>内存淘汰策略</strong>，其中<code class="highlighter-rouge">LRU</code>和<code class="highlighter-rouge">LFU</code>是最常用的两种。</p>
+
+<p>但 Redis 的实现并非 “严格版”，而是做了性能优化的 “近似版”， 这一点尤其需要注意。</p>
+
+<h4 id="redis-的-lru-实现"><strong>Redis 的 LRU 实现</strong></h4>
+
+<p>Redis 的 LRU 实现：近似 LRU（性能优先）</p>
+
+<p>Redis 没有采用 “双向链表 + 哈希表” 的标准 LRU 实现，因为会增加内存开销和操作复杂度，而是用<strong>随机采样 + 时间戳</strong>实现近似 LRU：</p>
+
+<ul>
+  <li><strong>核心原理</strong>：每个 key 在内存中记录<code class="highlighter-rouge">lru</code>字段（最后一次访问的时间戳），当需要淘汰 key 时，Redis 会从所有候选 key 中<strong>随机采样 N 个</strong>（默认 5 个，可通过<code class="highlighter-rouge">maxmemory-samples</code>配置），然后淘汰这 N 个中<code class="highlighter-rouge">lru</code>值最小（最久未使用）的 key。</li>
+  <li><strong>为什么近似</strong>：严格 LRU 需要维护全量 key 的访问顺序，在 Redis 高并发场景下会成为性能瓶颈；近似 LRU 通过控制采样数（N 越大越接近严格 LRU，但性能稍差），在 “命中率” 和 “性能” 之间做了平衡。</li>
+</ul>
+
+<p>相关配置：</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 淘汰所有key中最久未使用的</span>
+<span class="na">maxmemory-policy</span><span class="pi">:</span> <span class="s">allkeys-lru</span>
+<span class="c1"># 只淘汰设置了过期时间的key中最久未使用的</span>
+<span class="na">maxmemory-policy</span><span class="pi">:</span> <span class="s">volatile-lru</span>
+<span class="c1"># 采样数（默认5，范围3-10）</span>
+<span class="na">maxmemory-samples</span><span class="pi">:</span> <span class="s">5</span>
+</code></pre></div></div>
+
+<h4 id="redis-的-lfu-实现"><strong>Redis 的 LFU 实现</strong></h4>
+
+<p>Redis 的 LFU 实现，结合频率与时间衰减。</p>
+
+<p>Redis 4.0 引入了 LFU 策略，解决了标准 LFU 的频率老化问题，实现更贴合实际业务：</p>
+
+<p><strong>核心改进</strong>：</p>
+
+<ul>
+  <li><strong>频率计数</strong>：用<code class="highlighter-rouge">lfu_count</code>记录访问频率（但不是简单累加，而是用对数计数：访问次数越多，<code class="highlighter-rouge">lfu_count</code>增长越慢，避免数值过大）；</li>
+  <li><strong>时间衰减</strong>：用<code class="highlighter-rouge">lfu_decay_time</code>控制频率衰减（单位分钟），如果 key 在<code class="highlighter-rouge">lfu_decay_time</code>内没有被访问，<code class="highlighter-rouge">lfu_count</code>会随时间减少，避免<strong>过去高频但现在不用</strong>的 key 长期占用缓存。</li>
+  <li><strong>淘汰逻辑</strong>：当需要淘汰时，同样随机采样 N 个 key，淘汰<code class="highlighter-rouge">lfu_count</code>最小的（频率最低）；若频率相同，淘汰<strong>最久未使用</strong>的（结合 LRU 逻辑）。</li>
+</ul>
+
+<p>相关配置：</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 淘汰所有key中访问频率最低的</span>
+<span class="na">maxmemory-policy</span><span class="pi">:</span> <span class="s">allkeys-lfu</span>
+<span class="c1"># 只淘汰设置了过期时间的key中访问频率最低的</span>
+<span class="na">maxmemory-policy</span><span class="pi">:</span> <span class="s">volatile-lfu</span>
+<span class="c1"># 频率衰减时间（默认1分钟，0表示不衰减）</span>
+<span class="na">lfu-decay-time</span><span class="pi">:</span> <span class="s">1</span>
+<span class="c1"># 初始频率（新key的lfu_count，默认5，避免新key被立即淘汰）</span>
+<span class="na">lfu-log-factor</span><span class="pi">:</span> <span class="s">10</span>
+</code></pre></div></div>
+
+<h4 id="核心区别">核心区别</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">维度</th>
+      <th style="text-align: left">Redis LRU</th>
+      <th style="text-align: left">Redis LFU</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">判断依据</td>
+      <td style="text-align: left">最后访问时间（越久未用越可能被淘汰）</td>
+      <td style="text-align: left">访问频率（频率越低越可能被淘汰，结合时间衰减）</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>适用场景</strong></td>
+      <td style="text-align: left">短期局部性访问（如用户会话、临时数据）</td>
+      <td style="text-align: left">长期高频访问（如热点商品、基础配置）</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">应对<strong>突发访问</strong></td>
+      <td style="text-align: left">弱（易被一次性访问挤掉常用 key）</td>
+      <td style="text-align: left">强（低频的突发访问 key 不会淘汰高频 key）</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>冷启动</strong>友好度</td>
+      <td style="text-align: left">较好（新 key 只要最近访问就不会被淘汰）</td>
+      <td style="text-align: left">需配置<code class="highlighter-rouge">lfu-log-factor</code>（避免新 key 因初始频率低被淘汰）</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">内存 overhead</td>
+      <td style="text-align: left">低（只存时间戳）</td>
+      <td style="text-align: left">稍高（存频率和时间衰减信息）</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>典型业务案例</strong></td>
+      <td style="text-align: left">新闻 APP 的<strong>最近浏览</strong>列表</td>
+      <td style="text-align: left">电商首页的<strong>热销商品</strong>缓存</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="怎么选"><strong>怎么选？</strong></h4>
+
+<blockquote>
+  <p>看业务访问模式。</p>
+</blockquote>
+
+<p><strong>选 LRU</strong>：如果你的缓存访问具有<strong>短期集中性</strong>（比如用户打开一个页面后，短时间内会频繁刷新，但过几天可能再也不看），比如：</p>
+
+<ol>
+  <li>会话缓存（用户登录后 1 小时内频繁操作，之后可能下线）；</li>
+  <li>临时活动页面（活动期间访问集中，活动结束后很少访问）。</li>
+</ol>
+
+<p><strong>选 LFU</strong>：如果你的缓存访问具有 “长期高频性”（比如某些基础数据每天都被大量访问），比如：</p>
+
+<ol>
+  <li>商品类目、地区编码等基础配置数据；</li>
+  <li>首页 banner、热销榜单等高频访问数据。</li>
+  <li>排查技巧：可以先开启 Redis 的<code class="highlighter-rouge">INFO stats</code>监控<code class="highlighter-rouge">keyspace_hits</code>（缓存命中）和<code class="highlighter-rouge">keyspace_misses</code>（缓存未命中），如果切换策略后<code class="highlighter-rouge">keyspace_hits</code>提升，说明更适合当前业务。</li>
+</ol>
+
+<h2 id="负载均衡算法">负载均衡算法</h2>
+
+<blockquote>
+  <p>见负载均衡文档。</p>
+</blockquote>
+
+<h2 id="限流算法">限流算法</h2>
+
+<blockquote>
+  <p>见 限流、降级、熔断文档。</p>
+</blockquote>
+

@@ -151,7 +151,7 @@
   <li><strong><code class="highlighter-rouge">terminted</code> 终止、死亡</strong>：<code class="highlighter-rouge">run()</code> 线程执行完或因异常调用 <code class="highlighter-rouge">stop()</code>退出 <code class="highlighter-rouge">run()</code> 方法。</li>
 </ol>
 
-<p><img src="../assets/640.png" alt="Java 线程状态变迁图" style="zoom: 50%;" /></p>
+<p><img src="../assets/thread_status.png" alt="Java 线程状态变迁图" style="zoom: 50%;" /></p>
 
 <h3 id="线程调度通信阻塞">线程调度、通信、阻塞</h3>
 
@@ -639,15 +639,19 @@ try {
 
 <h5 id="threadlocal">ThreadLocal</h5>
 
-<p><code class="highlighter-rouge">ThreadLocal</code>（线程共享变量）：为每个线程维护一个本地 Map，key 为 ThreadLocal 对象，value 为对应线程的<strong>变量副本</strong>（Entry 对象）==&gt;用于查找；以空间换时间。</p>
+<p><code class="highlighter-rouge">ThreadLocal</code>（线程共享变量）：为<strong>每个线程</strong>维护一个本地 Map，key 为 ThreadLocal 对象，value 为对应线程的<strong>变量副本</strong>（Entry 对象）</p>
+
+<ul>
+  <li>==&gt;用于查找；以空间换时间。</li>
+</ul>
 
 <p>用途：</p>
 
 <ol>
-  <li>（主要）用于线程间的<strong>数据隔离</strong>，解决线程安全问题；填充的数据只属于当前线程；</li>
+  <li>（主要）用于线程间的<strong>数据隔离</strong>，解决线程安全问题；填充的数据<strong>只属于当前线程</strong>；</li>
   <li><strong>对象跨层传递</strong>时可避免多次传递，打破层次约束；</li>
-  <li>进行事务操作，用于存储线程事物信息；</li>
-  <li>数据库连接，Session会话管理。</li>
+  <li>进行<strong>事务</strong>操作，用于存储线程事物信息；</li>
+  <li>数据库连接，<strong>Session会话管理</strong>。</li>
 </ol>
 
 <p><img src="../assets/5.deed12c8.png" alt="img" style="zoom:100%;" /></p>
@@ -657,14 +661,20 @@ try {
 <p>避免：</p>
 
 <ul>
-  <li>用完 ThreadLocal 后调用 <code class="highlighter-rouge">remove()</code> 手动清空；必须回收自定义的 ThreadLocal 变量记录的当前线程的值，尤其在<strong>线程池</strong>场景下，线程经常会被复用。尽量用<code class="highlighter-rouge"> try-finally </code>块进行回收。</li>
+  <li>用完 ThreadLocal 后调用 <strong><code class="highlighter-rouge">remove()</code> 手动清空</strong>；必须回收自定义的 ThreadLocal 变量记录的当前线程的值，尤其在<strong>线程池</strong>场景下，线程经常会被复用。尽量用<code class="highlighter-rouge"> try-finally </code>块进行回收。</li>
   <li>用 <code class="highlighter-rouge">private static ThreadLocal</code> 修饰变量，任何时候都能访问 value，进而清除掉。
     <ul>
-      <li>是针对一个线程内所有操作共享的，故设置为 static，所有此类实例共享此静态变量。</li>
+      <li>是针对一个线程内<strong>所有操作共享</strong>的，故设置为 static，所有此类实例共享此静态变量。</li>
       <li>即，类第一次被使用时装载，只分配一块存储空间，所有（本线程内定义的）此类的对象都可操控这个变量。</li>
     </ul>
   </li>
 </ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+     * 订单编号
+     */</span>
+<span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">&gt;</span> <span class="n">ORDER_ID</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ThreadLocal</span><span class="o">&lt;&gt;();</span> 
+</code></pre></div></div>
 
 <h3 id="线程安全">线程安全</h3>
 
@@ -682,14 +692,17 @@ try {
   <li><strong>不可变</strong>（Immutable）：
     <ul>
       <li>对象一旦被创建，任何一个线程都改变不了它的状态（数据/属性值），除非新创建一个；</li>
-      <li>所有域都是 final 类型，且被正确创建（创建期间没有 this 引用的溢出）</li>
-      <li>==&gt;（保证了对象的内存可见性，）不需任何同步手段就可直接在多线程下使用。</li>
-      <li>如 String、包装类、BigInteger 和 BigDecimal 等。</li>
+      <li>所有域都是 <strong>final 类型</strong>，且被正确创建（创建期间没有 this 引用的溢出）</li>
+      <li>==&gt;（保证了对象的内存可见性，）不需任何同步手段就可直接在多线程下使用。
+        <ul>
+          <li>如 String、包装类、BigInteger 和 BigDecimal 等。</li>
+        </ul>
+      </li>
     </ul>
   </li>
   <li><strong>绝对线程安全</strong>：不管运行时环境如何，调用者都不需额外的同步措施。如
     <ul>
-      <li><code class="highlighter-rouge">CopyOnWriteArrayList</code></li>
+      <li><code class="highlighter-rouge">CopyOnWriteArrayList</code>：见<a href="#实现线程安全的方法">实现线程安全的方法</a></li>
       <li><code class="highlighter-rouge">CopyOnWriteArraySet</code></li>
     </ul>
   </li>
@@ -734,7 +747,7 @@ try {
 <h4 id="实现线程安全的方法">实现线程安全的方法</h4>
 
 <blockquote>
-  <p>线程安全工具，为了解决线程安全性问题，可以采用以下策略</p>
+  <p>线程安全工具，为了解决线程安全性问题，可以采用以下策略。</p>
 </blockquote>
 
 <p>实现线程安全的主要方法包括：</p>
@@ -762,9 +775,30 @@ try {
       <li>事件（Event)）：<strong>Wait()/Notify()</strong> 通过通知的方式来保持多线程同步，方便比较多线程优先级。</li>
     </ol>
   </li>
-  <li>使用<strong>线程安全的集合</strong>、并发容器类：<code class="highlighter-rouge">CopyOnWriteArrayList</code>、<code class="highlighter-rouge">ConcurrentLinkedQueue</code>、<code class="highlighter-rouge">BlockingQueue</code>、<code class="highlighter-rouge">ConcurrentHashMap</code>、<code class="highlighter-rouge">ConcurrentSkipListMap</code> 、<code class="highlighter-rouge">Collections.synchorizedList</code><strong>同步容器</strong>，见 Java 集合框架；</li>
+  <li>使用<strong>线程安全的集合</strong>、并发容器类：<code class="highlighter-rouge">CopyOnWriteArrayList</code>、<code class="highlighter-rouge">ConcurrentLinkedQueue</code>、<code class="highlighter-rouge">BlockingQueue</code>、<code class="highlighter-rouge">ConcurrentHashMap</code>、<code class="highlighter-rouge">ConcurrentSkipListMap</code> 、<code class="highlighter-rouge">Collections.synchorizedList</code><strong>同步容器</strong>。见 Java 集合框架。</li>
   <li>合理设计资源获取和释放：避免<strong>死锁</strong>情况的发生，考虑资源分配的顺序、避免循环等待等。</li>
 </ol>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+     * user 与 WebSocketSession 映射
+     *
+     * key1：用户类型
+     * key2：用户编号
+     */</span>
+<span class="kd">private</span> <span class="kd">final</span> <span class="n">ConcurrentMap</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">,</span> <span class="n">ConcurrentMap</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">,</span> <span class="n">CopyOnWriteArrayList</span><span class="o">&lt;</span><span class="n">WebSocketSession</span><span class="o">&gt;&gt;&gt;</span> <span class="n">userSessions</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ConcurrentHashMap</span><span class="o">&lt;&gt;();</span>
+
+<span class="nd">@Override</span>
+<span class="kd">public</span> <span class="n">Collection</span><span class="o">&lt;</span><span class="n">WebSocketSession</span><span class="o">&gt;</span> <span class="nf">getSessionList</span><span class="o">(</span><span class="n">Integer</span> <span class="n">userType</span><span class="o">,</span> <span class="n">Long</span> <span class="n">userId</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">ConcurrentMap</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">,</span> <span class="n">CopyOnWriteArrayList</span><span class="o">&lt;</span><span class="n">WebSocketSession</span><span class="o">&gt;&gt;</span> <span class="n">userSessionsMap</span> <span class="o">=</span> <span class="n">userSessions</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">userType</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">CollUtil</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">(</span><span class="n">userSessionsMap</span><span class="o">))</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
+    <span class="o">}</span>
+    <span class="n">CopyOnWriteArrayList</span><span class="o">&lt;</span><span class="n">WebSocketSession</span><span class="o">&gt;</span> <span class="n">sessions</span> <span class="o">=</span> <span class="n">userSessionsMap</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">userId</span><span class="o">);</span>
+    <span class="k">return</span> <span class="n">CollUtil</span><span class="o">.</span><span class="na">isNotEmpty</span><span class="o">(</span><span class="n">sessions</span><span class="o">)</span> <span class="o">?</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;(</span><span class="n">sessions</span><span class="o">)</span> <span class="o">:</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
+<span class="o">}</span>
+
+<span class="kd">private</span> <span class="kd">final</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">ExpressClientEnum</span><span class="o">,</span> <span class="n">ExpressClient</span><span class="o">&gt;</span> <span class="n">clientMap</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ConcurrentHashMap</span><span class="o">&lt;&gt;(</span><span class="mi">8</span><span class="o">);</span>
+</code></pre></div></div>
 
 <h5 id="同步容器collectionssynchorizedxxx">同步容器：<code class="highlighter-rouge">Collections.synchorizedXXX</code>；</h5>
 

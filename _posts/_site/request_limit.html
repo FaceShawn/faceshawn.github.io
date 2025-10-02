@@ -25,7 +25,7 @@
 
 <p>常用的流量控制和熔断降级框架是 <strong>Netflix 的 Hystrix</strong> 和 alibaba 的 Sentinel。</p>
 
-<h3 id="限流">限流</h3>
+<h2 id="限流">限流</h2>
 
 <p>限流：流量控制（flow control），限制对服务端接口<strong>接受请求的频率</strong>，对超过限制的请求丢弃或放到队列中等待处理。</p>
 
@@ -73,7 +73,7 @@
   <li>令牌桶、漏桶算法更适合<strong>阻塞式限流</strong>的场景，即后台任务类的限流。</li>
 </ul>
 
-<h3 id="降级">降级</h3>
+<h2 id="降级">降级</h2>
 
 <p>降级：当服务器<strong>压力剧增</strong>的情况下，（根据当前<strong>业务情况及流量</strong>）对一些服务和页面（有策略的）降低优先级，以此释放服务器资源<strong>保证核心任务</strong>的正常运行。目的在于应对<strong>系统自身的故障</strong>。</p>
 
@@ -81,7 +81,7 @@
   <li>比如<strong>电商大促</strong>，业务在峰值时刻，把商品评价、成交记录等功能临时关掉。<strong>弃车保帅</strong>，保证创建订单、支付等<strong>核心功能</strong>的正常使用。</li>
 </ul>
 
-<h3 id="熔断">熔断</h3>
+<h2 id="熔断">熔断</h2>
 
 <p>熔断机制：在系统<strong>濒临崩溃</strong>的时候，立即中断服务，从而保障系统稳定避免崩溃。类似于电器中的“<strong>保险丝</strong>”。目的在于应对依赖的<strong>外部系统</strong>或第三方系统的故障。</p>
 
@@ -90,9 +90,9 @@
   <li>例子：熔断触发条件往往跟系统节点的<strong>承载能力</strong>和服务质量有关，比如 CPU 的使用率超过 90%、请求错误率超过 5%、请求延迟超过 500ms。</li>
 </ul>
 
-<h3 id="spring-cloud-hystrix-断路器">Spring Cloud Hystrix 断路器</h3>
+<h2 id="spring-cloud-hystrix-断路器">Spring Cloud Hystrix 断路器</h2>
 
-<h3 id="sentinel">Sentinel</h3>
+<h2 id="sentinel">Sentinel</h2>
 
 <p>用于实现熔断与限流等一系列服务保护功能。</p>
 
@@ -672,7 +672,7 @@ java <span class="nt">-Dserver</span>.port<span class="o">=</span>8070 <span cla
 
 <p><img src="../assets/spingcloud_sentinel_11.png" alt="" /></p>
 
-<h3 id="circuitbreaker-断路器">CircuitBreaker 断路器</h3>
+<h2 id="circuitbreaker-断路器">CircuitBreaker 断路器</h2>
 
 <p>CircuitBreaker的目的是保护分布式系统免受故障和异常，提高系统的可用性和健壮性。</p>
 

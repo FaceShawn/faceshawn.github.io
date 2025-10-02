@@ -1,0 +1,290 @@
+<blockquote>
+  <p>摘要：ELK 是指 <code class="highlighter-rouge">Elasticsearch + Kibana + Logstash</code> 这三种服务搭建的日志处理系统。</p>
+</blockquote>
+
+<!-- more -->
+
+<h3 id="目录">目录</h3>
+
+<p>[TOC]</p>
+
+<h3 id="整合-elk-统一日志框架">整合 ELK 统一日志框架</h3>
+
+<blockquote>
+  <p>其中log4j和commons-logging都是apache软件基金会的开源项目。</p>
+</blockquote>
+
+<p>Java中给项目程序添加log主要有三种方式：</p>
+
+<ol>
+  <li>JDK中的<code class="highlighter-rouge">java.util.logging</code>包：JDK标准库中的类，是JDK 1.4 版本之后添加的日志记录的功能包。</li>
+  <li><code class="highlighter-rouge">log4j</code>：最强大的记录日志的方式。可以通过配置 .properties 或是 .xml 的文件， 配置日志的目的地，格式等。</li>
+  <li><code class="highlighter-rouge">commons-logging</code>：，最综合和常见的日志记录方式，是Java中的一个日志接口，一般会与log4j一起使用。自带SimpleLog可用于日志记录。</li>
+</ol>
+
+<h3 id="日志门面框架分类">日志门面（框架）分类</h3>
+
+<p>应用中不可直接用日志系统中的 API，而应使用门面模式的日志框架，（解耦）有利于维护各个类的日志处理方式统一。</p>
+
+<p>MyBatis 通过内置的日志工厂提供日志功能。</p>
+
+<p>日志系统：JUL、<del>Log4j、</del>Log4j2、<strong>Logback</strong> 等。</p>
+
+<p>日志门面（框架）：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">Spring Boot</code>：默认用 <strong>SLF4J 日志门面 + Logback 日志系统</strong>实现的组合来搭建日志系统，可通过配置整合 <strong>ELK</strong>；</li>
+  <li><code class="highlighter-rouge">Spring</code>：<code class="highlighter-rouge">Apache Commons Logging</code>，原名 JCL（Jakarta Commons Logging）；应用部署在一个类路径已包含 ACL 的环境中（如 Tomcat 和 WebShpere 应用服务器），MyBatis 会把它作为日志工具，而不是自定义的其它日志工具，需显式地在 MyBatis 配置文件（mybatis-config.xml）里用 <code class="highlighter-rouge">&lt;setting name="logImpl" value="LOG4J"/&gt;</code> 配置。</li>
+  <li><code class="highlighter-rouge">Hibernate</code>：<code class="highlighter-rouge">jboss-logging</code>。</li>
+</ol>
+
+<h3 id="elk">ELK</h3>
+
+<p>ELK 是指 <code class="highlighter-rouge">Elasticsearch + Kibana + Logstash</code> 这三种服务搭建的日志处理系统。</p>
+
+<ol>
+  <li><code class="highlighter-rouge">Logstash</code>：用于<strong>收集</strong>日志。SpringBoot 应用整合了 Logstash 以后、会把日志发送给Logstash，再把日志转发给Elasticsearch；
+    <ul>
+      <li>SpringBoot 通过配置 LogBack <code class="highlighter-rouge">logback-spring.xml</code> 的 <code class="highlighter-rouge">&lt;property&gt; &lt;appender&gt; &lt;logger&gt;</code> 标签，从定义的输入源 inputs（stdin、日志文件、数据库等）读取信息，经过 filters 过滤器处理，输入到定义好的 outputs 输出源（stdout、elesticsearch、HDFS等）。<a href="https://www.yisu.com/zixun/89177.html">springboot 集成 LogStash 的步骤</a></li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">Elasticsearch</code>：用于<strong>存储</strong>收集到的日志信息；以及生成索引数据，便于Kibana做检索。</li>
+  <li><code class="highlighter-rouge">Kibana</code>：通过 Web 端（的可视化）界面来<strong>展示分析、查询检索</strong>日志。</li>
+</ol>
+
+<p><img src="../assets/ELK.jpg" alt="springboot集成LogStash的步骤" style="zoom:60%;" /><img src="../assets/2729274-20230205171722024-1222796164.png" alt="img" style="zoom:40%;" /></p>
+
+<h5 id="用法">用法</h5>
+
+<p>安装 elasticsearch <strong>ik 中文分词</strong>：https://release.infinilabs.com/analysis-ik/stable/ 下载解压。</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>JAVA_HOME D:<span class="se">\D</span>evelop<span class="se">\J</span>ava<span class="se">\j</span>dk<span class="se">\j</span>dk1.8.0_311<span class="p">;</span>D:<span class="se">\D</span>evelop<span class="se">\J</span>ava<span class="se">\j</span>dk<span class="se">\j</span>dk-17
+
+<span class="c"># not use</span>
+<span class="nb">cd </span>elasticsearch-6.2.2/bin/
+elasticsearch-plugin install https://get.infini.cloud/elasticsearch/analysis-ik/6.2.2
+//elasticsearch-6.2.2<span class="se">\p</span>lugins<span class="se">\a</span>nalysis-ik
+</code></pre></div></div>
+
+<p><del>需要对Logstash配置单独的Java环境</del>，只需要分别在如下两个配置文件里面配置Java环境即可：</p>
+
+<ol>
+  <li>
+    <p>~/logstash-5.2.0/bin/logstash</p>
+  </li>
+  <li>
+    <p>~/logstash-5.2.0/bin/logstash.lib.sh</p>
+  </li>
+</ol>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#在行首添加
+export JAVA_HOME="D:\Develop\Java\jdk\jdk1.8.0_311"
+export PATH="$PATH:$JAVA_HOME\bin"
+</code></pre></div></div>
+
+<p>logstash 启动：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd </span>D:<span class="se">\D</span>evelop<span class="se">\E</span>nv<span class="se">\l</span>ogstash-6.2.2<span class="se">\b</span><span class="k">in</span>
+./logstash <span class="nt">-f</span> logstash.conf  &amp;
+</code></pre></div></div>
+
+<h3 id="lombok-注解">Lombok 注解</h3>
+
+<p><a href="https://github.com/rzwitserloot/lombok/blob/master/src/core/lombok/extern/apachecommons/CommonsLog.java"><code class="highlighter-rouge">@CommonsLog</code></a>、<a href="https://github.com/rzwitserloot/lombok/blob/master/src/core/lombok/extern/flogger/Flogger.java"><code class="highlighter-rouge">@Flogger</code></a>、<a href="https://github.com/rzwitserloot/lombok/blob/master/src/core/lombok/extern/java/Log.java"><code class="highlighter-rouge">@Log</code></a>、<a href="https://github.com/rzwitserloot/lombok/blob/master/src/core/lombok/extern/jbosslog/JBossLog.java"><code class="highlighter-rouge">@JBossLog</code></a>、<a href="https://github.com/rzwitserloot/lombok/blob/master/src/core/lombok/extern/log4j/Log4j.java">@Log4j</a>、<a href="https://github.com/rzwitserloot/lombok/blob/master/src/core/lombok/extern/log4j/Log4j2.java">@Log4j2</a>、<a href="https://github.com/rzwitserloot/lombok/blob/master/src/core/lombok/Slf4j.java">@Slf4j</a>、<a href="https://github.com/rzwitserloot/lombok/blob/master/src/core/lombok/Slf4jX.java">@Slf4jX</a> 注解，添加在<strong>类</strong>上，自动为类添加对应的日志支持。</p>
+
+<ul>
+  <li><code class="highlighter-rouge">@Log、@Log4j、@Slf4j</code>：根据不同的注解生成不同类型的 log 静态常量对象，但实例名称都是 log，有六种可选实现类：</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Creates 即 创建的类型，如 private static final java.util.logging.Logger </span>
+<span class="nd">@Log</span>
+<span class="n">Creates</span> <span class="n">log</span> <span class="o">=</span> <span class="n">java</span><span class="o">.</span><span class="na">util</span><span class="o">.</span><span class="na">logging</span><span class="o">.</span><span class="na">Logger</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="n">LogExample</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">getName</span><span class="o">());</span>
+<span class="nd">@CommonsLog</span>
+<span class="n">Creates</span> <span class="n">log</span> <span class="o">=</span> <span class="n">org</span><span class="o">.</span><span class="na">apache</span><span class="o">.</span><span class="na">commons</span><span class="o">.</span><span class="na">logging</span><span class="o">.</span><span class="na">LogFactory</span><span class="o">.</span><span class="na">getLog</span><span class="o">(</span><span class="n">LogExample</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+
+<span class="nd">@Log4j</span>
+<span class="n">Creates</span> <span class="n">log</span> <span class="o">=</span> <span class="n">org</span><span class="o">.</span><span class="na">apache</span><span class="o">.</span><span class="na">log4j</span><span class="o">.</span><span class="na">Logger</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="n">LogExample</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+<span class="nd">@Log4j2</span>
+<span class="n">Creates</span> <span class="n">log</span> <span class="o">=</span> <span class="n">org</span><span class="o">.</span><span class="na">apache</span><span class="o">.</span><span class="na">logging</span><span class="o">.</span><span class="na">log4j</span><span class="o">.</span><span class="na">LogManager</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="n">LogExample</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+
+<span class="c1">// Spring Boot 默认，最常用</span>
+<span class="nd">@Slf4j</span>
+<span class="n">Creates</span> <span class="n">log</span> <span class="o">=</span> <span class="n">org</span><span class="o">.</span><span class="na">slf4j</span><span class="o">.</span><span class="na">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="n">LogExample</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+<span class="nd">@XSlf4j</span>
+<span class="n">Creates</span> <span class="n">log</span> <span class="o">=</span> <span class="n">org</span><span class="o">.</span><span class="na">slf4j</span><span class="o">.</span><span class="na">ext</span><span class="o">.</span><span class="na">XLoggerFactory</span><span class="o">.</span><span class="na">getXLogger</span><span class="o">(</span><span class="n">LogExample</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">@Slf4j</code>注解：添加在<strong>类</strong>上，给该类创建 Slf4j Logger <strong>静态</strong>属性。Spring Boot 使用 Slf4j 日志门面框架，所以绝大多数情况下，都是使用 <code class="highlighter-rouge">@Slf4j</code> 注解。</p>
+
+<ul>
+  <li>是 <code class="highlighter-rouge">Simple Logging Facade for Java</code> 的缩写，意为Java 的简单日志门面</li>
+  <li>
+    <p>生成名为 <code class="highlighter-rouge">log</code> 的<strong>静态常量日志对象</strong>。</p>
+
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Slf4j</span> <span class="c1">//加在类上</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">GlobalExceptionHandler</span> <span class="o">{</span>
+  <span class="c1">// 等价于</span>
+  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">org</span><span class="o">.</span><span class="na">slf4j</span><span class="o">.</span><span class="na">Logger</span> <span class="n">log</span> <span class="o">=</span> <span class="n">org</span><span class="o">.</span><span class="na">slf4j</span><span class="o">.</span><span class="na">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="n">GlobalExceptionHandler</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+  <span class="c1">// 可以直接在类中调用</span>
+  <span class="n">log</span><span class="o">.</span><span class="na">warn</span><span class="o">(</span><span class="s">"[serviceExceptionHandler]\n\t{}"</span><span class="o">,</span> <span class="n">stackTrace</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<p><img src="../assets/lombok_slf4j.png" alt="@Slf4j 示例" /></p>
+
+<h3 id="logback-日志系统">Logback 日志系统</h3>
+
+<h5 id="spring-boot-配置文件">Spring Boot 配置文件</h5>
+
+<p>logging 部分配置</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># application-dev.yml</span>
+<span class="na">logging</span><span class="pi">:</span>
+  <span class="na">level</span><span class="pi">:</span>
+    <span class="na">root</span><span class="pi">:</span> <span class="s">info</span> <span class="c1"># 设置应用的日志打印级别</span>
+    <span class="s">com.macro.mall</span><span class="pi">:</span> <span class="s">debug</span>
+    
+<span class="na">logstash</span><span class="pi">:</span>
+  <span class="na">host</span><span class="pi">:</span> <span class="s">localhost</span>
+
+<span class="nn">---</span>
+<span class="c1"># application-prod.yml</span>
+<span class="na">logging</span><span class="pi">:</span>
+  <span class="na">file</span><span class="pi">:</span>
+    <span class="na">path</span><span class="pi">:</span> <span class="s">/var/logs</span>
+  <span class="na">level</span><span class="pi">:</span>
+    <span class="na">root</span><span class="pi">:</span> <span class="s">info</span>
+    <span class="s">com.macro.mall</span><span class="pi">:</span> <span class="s">info</span>
+    
+<span class="na">logstash</span><span class="pi">:</span>
+  <span class="na">host</span><span class="pi">:</span> <span class="s">logstash</span>
+
+<span class="nn">---</span>
+<span class="c1"># application.property格式</span>
+<span class="c1"># 设置应用的日志打印级别</span>
+<span class="s">logging.level.com.glmapper.spring.boot=INFO</span>
+<span class="c1"># 输出位置</span>
+<span class="s">logging.path=./logs</span>
+</code></pre></div></div>
+
+<h5 id="logbackxml-配置文件"><code class="highlighter-rouge">logback.xml</code> 配置文件</h5>
+
+<p>文件位置：<code class="highlighter-rouge">src/mian/resource/logback-spring.xml</code></p>
+
+<p>想用 Spring 扩展 profile 支持，要以 <strong><code class="highlighter-rouge">logback-spring.xml</code></strong> 命名，其他如 <code class="highlighter-rouge">property </code>需改为<code class="highlighter-rouge">springProperty</code>。</p>
+
+<p>文件中主要标签有：</p>
+
+<ol>
+  <li>
+    <p><code class="highlighter-rouge">&lt;configuration&gt;</code></p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">&lt;include&gt;</code>：导入其他项目配置的 logback.xml 文件，<a href="https://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#howto.logging.logback">Configure Logback for Logging console-appender.xml</a></p>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> &lt;!—引用默认日志配置—&gt;
+ &lt;include resource=”org/springframework/boot/logging/logback/defaults.xml“/&gt;
+ &lt;!—使用默认的控制台日志输出实现—&gt;
+ &lt;include resource=”org/springframework/boot/logging/logback/console-appender.xml“/&gt;
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">&lt;property name="" value=""&gt;</code>：用来定义变量，可用<code class="highlighter-rouge">${name}</code>变量占位符将值插入到<code class="highlighter-rouge">logger</code>上下文中。</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">&lt;springProperty name="" scope="" source="" defaultValue=""&gt;</code>：</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">&lt;appender name="" class=""&gt;</code>：<strong>日志打印组件</strong>。让应用知道<strong>怎么打</strong>、打印到哪里、打印成什么样。通过<code class="highlighter-rouge">logger</code>或<code class="highlighter-rouge">root</code>的<code class="highlighter-rouge">appender-ref</code>指定某个具体的<code class="highlighter-rouge">appender</code>；</p>
+
+    <ul>
+      <li><code class="highlighter-rouge">&lt;filter&gt;</code>：作为<strong>过滤器</strong>；可用任意条件对日志进行过滤。</li>
+    </ul>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">&lt;logger name="org.mybatis.example.BlogMapper"&gt;</code>：用来设置<strong>某个包</strong>、或具体<strong>某个类</strong>的日志打印级别、及指定<code class="highlighter-rouge">appender</code>。告诉应用哪些按照哪个appender 打印。</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">&lt;root level=""&gt;</code>：根 logger，设置<strong>日志打印级别</strong>。也是一种 logger，且只有一个level属性。</p>
+  </li>
+</ol>
+
+<h5 id="日志文件隔离">日志文件隔离</h5>
+
+<p>日志 LEVEL 分类：DEBUG、INFO、WARN、ERROR。</p>
+
+<p>logback 日志输出位置：</p>
+
+<ol>
+  <li>
+    <p>通过<strong>控制台</strong>打印日志</p>
+  </li>
+  <li>直接输出到<strong>日志文件</strong></li>
+  <li>输出到 <strong><code class="highlighter-rouge">LogStash</code></strong></li>
+</ol>
+
+<blockquote>
+  <p><a href="https://juejin.cn/post/6844903641535479821">看完这个不会配置 logback ，请你吃瓜！</a></p>
+</blockquote>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>private static final Logger LOGGER = LoggerFactory.getLogger(HelloController.class);
+
+@Autowired
+private TestLogService testLogService;
+
+//一、通过控制台打印日志
+@GetMapping("/hello")
+public String hello(){
+    LOGGER.info("this is info");
+    LOGGER.error("this is error");
+    testLogService.printLogToSpecialPackage();
+    return "hello spring boot";
+}
+</code></pre></div></div>
+
+<h3 id="用-aop-输出日志">用 AOP 输出日志</h3>
+
+<blockquote>
+  <p>结合项目说下，怎么用 AOP 输出日志。</p>
+</blockquote>
+
+<ol>
+  <li>定义 AOP <code class="highlighter-rouge">WebLogAspect</code> 统一日志处理切面类，并加 <code class="highlighter-rouge">@Aspect、@Component</code> 注解；</li>
+  <li>在连接点（方法）上加 <code class="highlighter-rouge">@Pointcut("execution(public * com.*.controller.*.*(..)))</code> 切点注解，通过切点表达式、指定日志切面的应用范围是所有 Controller 层的接口方法；</li>
+  <li>定义通知方法，描述了切面<strong>要完成的工作</strong>；</li>
+  <li>在通知方法上加注解 <code class="highlighter-rouge">@Around、@Before、@AfterReturning、@AfterThrowing</code> 指定通知<strong>何时</strong>执行。如，日志切面需在接口<strong>调用前后</strong>分别记录当前时间，取差值计算调用时长。</li>
+</ol>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">macro</span><span class="o">.</span><span class="na">mall</span><span class="o">.</span><span class="na">common</span><span class="o">.</span><span class="na">log</span><span class="o">;</span>
+
+<span class="cm">/**
+ * 统一日志处理切面
+ */</span>
+<span class="nd">@Aspect</span>
+<span class="nd">@Component</span>
+<span class="nd">@Order</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">WebLogAspect</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Logger</span> <span class="n">LOGGER</span> <span class="o">=</span> <span class="n">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="n">WebLogAspect</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+
+    <span class="nd">@Pointcut</span><span class="o">(</span><span class="s">"execution(public * com.macro.mall.controller.*.*(..))||execution(public * com.macro.mall.*.controller.*.*(..))"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">webLog</span><span class="o">()</span> <span class="o">{</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Before</span><span class="o">(</span><span class="s">"webLog()"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">doBefore</span><span class="o">(</span><span class="n">JoinPoint</span> <span class="n">joinPoint</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Throwable</span> <span class="o">{</span>
+    <span class="o">}</span>
+
+    <span class="nd">@AfterReturning</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">"webLog()"</span><span class="o">,</span> <span class="n">returning</span> <span class="o">=</span> <span class="s">"ret"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">doAfterReturning</span><span class="o">(</span><span class="n">Object</span> <span class="n">ret</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Throwable</span> <span class="o">{</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Around</span><span class="o">(</span><span class="s">"webLog()"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">Object</span> <span class="nf">doAround</span><span class="o">(</span><span class="n">ProceedingJoinPoint</span> <span class="n">joinPoint</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Throwable</span> <span class="o">{</span>
+        <span class="kt">long</span> <span class="n">startTime</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">();</span>
+        <span class="o">...</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+

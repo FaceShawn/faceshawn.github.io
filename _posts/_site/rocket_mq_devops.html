@@ -1,0 +1,2043 @@
+<blockquote>
+  <p>摘要：RocketMQ 运维管理。</p>
+</blockquote>
+
+<!-- more -->
+
+<hr />
+
+<h2 id="目录">目录</h2>
+
+<p>[TOC]</p>
+
+<h2 id="1---集群搭建">1   集群搭建</h2>
+
+<p>在 <code class="highlighter-rouge">conf</code> 目录下，RocketMQ 提供了多种 Broker 的配置文件：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">broker.conf</code> ：单主，异步刷盘。</li>
+  <li><code class="highlighter-rouge">2m/</code> ：双主，异步刷盘。</li>
+  <li><code class="highlighter-rouge">2m-2s-async/</code> ：两主两从，异步复制，异步刷盘。</li>
+  <li><code class="highlighter-rouge">2m-2s-sync/</code> ：两主两从，同步复制，异步刷盘。</li>
+  <li><code class="highlighter-rouge">dledger/</code> ：<a href="https://github.com/apache/rocketmq/blob/master/docs/cn/dledger/deploy_guide.md">Dledger 集群</a>，至少三节点。</li>
+</ul>
+
+<p>一般 RocketMQ 的集群部署方案推荐如下：</p>
+
+<ul>
+  <li>如果对<strong>高性能</strong>有比较强的诉求，使用<strong>两主两从，异步复制，异步刷盘</strong>。</li>
+  <li>如果对<strong>可靠性</strong>有比较强的诉求，建议使用 <a href="https://github.com/apache/rocketmq/blob/master/docs/cn/dledger/deploy_guide.md">Dledger 集群</a>，至少三节点。</li>
+</ul>
+
+<h3 id="11-单master模式">1.1 单Master模式</h3>
+
+<p>这种方式<strong>风险较大</strong>，一旦Broker重启或者宕机时，会导致整个服务不可用。</p>
+
+<ul>
+  <li>不建议线上环境使用，可以用于本地测试。</li>
+</ul>
+
+<h5 id="1启动-nameserver">1）启动 NameServer</h5>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">### 首先启动Name Server</span>
+<span class="nv">$ </span>nohup sh mqnamesrv &amp;
+ 
+<span class="c">### 验证Name Server 是否启动成功</span>
+<span class="nv">$ </span>tail <span class="nt">-f</span> ~/logs/rocketmqlogs/namesrv.log
+The Name Server boot success...
+</code></pre></div></div>
+
+<h5 id="2启动-broker">2）启动 Broker</h5>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">### 启动Broker</span>
+<span class="nv">$ </span>nohup sh bin/mqbroker <span class="nt">-n</span> localhost:9876 &amp;
+
+<span class="c">### 验证Broker是否启动成功，例如Broker的IP为：192.168.1.2，且名称为broker-a</span>
+<span class="nv">$ </span>tail <span class="nt">-f</span> ~/logs/rocketmqlogs/broker.log 
+The broker[broker-a, 192.169.1.2:10911] boot success...
+
+<span class="c"># conf/broker.conf</span>
+brokerClusterName <span class="o">=</span> DefaultCluster
+brokerName <span class="o">=</span> broker-a
+brokerId <span class="o">=</span> 0
+deleteWhen <span class="o">=</span> 04
+fileReservedTime <span class="o">=</span> 48
+brokerRole <span class="o">=</span> ASYNC_MASTER
+flushDiskType <span class="o">=</span> ASYNC_FLUSH
+
+<span class="nv">namesrvAddr</span><span class="o">=</span>localhost:9876   <span class="c">#nameSrv地址可以写localhost,因为nameSrv和broker在一个服务器</span>
+<span class="nv">autoCreateTopicEnable</span><span class="o">=</span><span class="nb">true</span>  <span class="c">#自动创建主题，不然需要手动创建出来</span>
+<span class="nv">brokerIP1</span><span class="o">=</span>192.168.0.104  <span class="c"># ifconfig地址</span>
+</code></pre></div></div>
+
+<h3 id="12-多master模式">1.2 多Master模式</h3>
+
+<p>一个集群无Slave，全是Master，例如2个Master或者3个Master，</p>
+
+<p>这种模式的优缺点如下：</p>
+
+<ul>
+  <li>
+    <p>优点：配置简单，单个Master宕机或重启维护对应用无影响，在磁盘配置为RAID10时，即使机器宕机不可恢复情况下，由于RAID10磁盘非常可靠，消息也不会丢（异步刷盘丢失少量消息，同步刷盘一条不丢），性能最高；</p>
+  </li>
+  <li>
+    <p>缺点：单台机器宕机期间，这台机器上未被消费的消息在机器<strong>恢复之前</strong>不可订阅，消息实时性会受到影响。</p>
+  </li>
+</ul>
+
+<h5 id="1启动nameserver">1）启动NameServer</h5>
+
+<p>NameServer需要先于Broker启动，且如果在生产环境使用，为了保证高可用，建议一般规模的集群启动3个NameServer，各节点的启动命令相同，如下：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">### 首先启动Name Server</span>
+<span class="nv">$ </span>nohup sh mqnamesrv &amp;
+ 
+<span class="c">### 验证Name Server 是否启动成功</span>
+<span class="nv">$ </span>tail <span class="nt">-f</span> ~/logs/rocketmqlogs/namesrv.log
+The Name Server boot success...
+</code></pre></div></div>
+
+<h5 id="2启动broker集群">2）启动Broker集群</h5>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">### 在机器A，启动第一个Master，例如NameServer的IP为：192.168.1.1</span>
+<span class="nv">$ </span>nohup sh mqbroker <span class="nt">-n</span> 192.168.1.1:9876 <span class="nt">-c</span> <span class="nv">$ROCKETMQ_HOME</span>/conf/2m-noslave/broker-a.properties &amp;
+ 
+<span class="c">### 在机器B，启动第二个Master，例如NameServer的IP为：192.168.1.1</span>
+<span class="nv">$ </span>nohup sh mqbroker <span class="nt">-n</span> 192.168.1.1:9876 <span class="nt">-c</span> <span class="nv">$ROCKETMQ_HOME</span>/conf/2m-noslave/broker-b.properties &amp;
+
+<span class="c"># conf/2m-noslave/broker-a.properties</span>
+<span class="nv">brokerClusterName</span><span class="o">=</span>DefaultCluster
+<span class="nv">brokerName</span><span class="o">=</span>broker-a
+<span class="nv">brokerId</span><span class="o">=</span>0
+<span class="nv">deleteWhen</span><span class="o">=</span>04
+<span class="nv">fileReservedTime</span><span class="o">=</span>48
+<span class="nv">brokerRole</span><span class="o">=</span>ASYNC_MASTER
+<span class="nv">flushDiskType</span><span class="o">=</span>ASYNC_FLUSH
+</code></pre></div></div>
+
+<ul>
+  <li>
+    <p>如上启动命令是在单个NameServer情况下使用的。</p>
+  </li>
+  <li>
+    <p>对于<strong>多个NameServer的集群</strong>，Broker启动命令中<code class="highlighter-rouge">-n</code>后面的地址列表用分号隔开即可，例如 <code class="highlighter-rouge">192.168.1.1:9876;192.161.2:9876</code>。</p>
+  </li>
+</ul>
+
+<h3 id="13-多master多slave模式-异步复制">1.3 多Master多Slave模式-异步复制</h3>
+
+<p>每个Master配置一个Slave，有多对Master-Slave，<strong>HA</strong>采用<strong>异步复制</strong>方式，主备有<strong>短暂消息延迟</strong>（毫秒级）。</p>
+
+<p>这种模式的优缺点如下：</p>
+
+<ul>
+  <li>
+    <p>优点：即使磁盘损坏，消息丢失的非常少，且消息实时性不会受影响。同时Master宕机后，消费者仍然可以从Slave消费，而且此过程对应用透明，不需要人工干预，性能同多Master模式几乎一样；</p>
+  </li>
+  <li>
+    <p>缺点：Master宕机，磁盘损坏情况下会丢失少量消息。</p>
+  </li>
+</ul>
+
+<h5 id="1启动nameserver-1">1）启动NameServer</h5>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">### 首先启动Name Server</span>
+<span class="nv">$ </span>nohup sh mqnamesrv &amp;
+ 
+<span class="c">### 验证Name Server 是否启动成功</span>
+<span class="nv">$ </span>tail <span class="nt">-f</span> ~/logs/rocketmqlogs/namesrv.log
+The Name Server boot success...
+</code></pre></div></div>
+
+<h5 id="2启动broker集群-1">2）启动Broker集群</h5>
+
+<blockquote>
+  <p>brokerRole=ASYNC_MASTER</p>
+</blockquote>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">### 在机器A，启动第一个Master，例如NameServer的IP为：192.168.1.1</span>
+<span class="nv">$ </span>nohup sh mqbroker <span class="nt">-n</span> 192.168.1.1:9876 <span class="nt">-c</span> <span class="nv">$ROCKETMQ_HOME</span>/conf/2m-2s-async/broker-a.properties &amp;
+ 
+<span class="c">### 在机器B，启动第二个Master，例如NameServer的IP为：192.168.1.1</span>
+<span class="nv">$ </span>nohup sh mqbroker <span class="nt">-n</span> 192.168.1.1:9876 <span class="nt">-c</span> <span class="nv">$ROCKETMQ_HOME</span>/conf/2m-2s-async/broker-b.properties &amp;
+
+<span class="c"># conf/2m-2s-async/broker-b.properties</span>
+<span class="nv">brokerClusterName</span><span class="o">=</span>DefaultCluster
+<span class="nv">brokerName</span><span class="o">=</span>broker-a
+<span class="nv">brokerId</span><span class="o">=</span>0
+<span class="nv">deleteWhen</span><span class="o">=</span>04
+<span class="nv">fileReservedTime</span><span class="o">=</span>48
+<span class="nv">brokerRole</span><span class="o">=</span>ASYNC_MASTER
+<span class="nv">flushDiskType</span><span class="o">=</span>ASYNC_FLUSH
+
+<span class="c">### 在机器C，启动第一个Slave，例如NameServer的IP为：192.168.1.1</span>
+<span class="nv">$ </span>nohup sh mqbroker <span class="nt">-n</span> 192.168.1.1:9876 <span class="nt">-c</span> <span class="nv">$ROCKETMQ_HOME</span>/conf/2m-2s-async/broker-a-s.properties &amp;
+ 
+<span class="c">### 在机器D，启动第二个Slave，例如NameServer的IP为：192.168.1.1</span>
+<span class="nv">$ </span>nohup sh mqbroker <span class="nt">-n</span> 192.168.1.1:9876 <span class="nt">-c</span> <span class="nv">$ROCKETMQ_HOME</span>/conf/2m-2s-async/broker-b-s.properties &amp;
+
+<span class="c"># conf/2m-2s-async/broker-b-s.properties</span>
+<span class="nv">brokerClusterName</span><span class="o">=</span>DefaultCluster
+<span class="nv">brokerName</span><span class="o">=</span>broker-a
+<span class="nv">brokerId</span><span class="o">=</span>1
+<span class="nv">deleteWhen</span><span class="o">=</span>04
+<span class="nv">fileReservedTime</span><span class="o">=</span>48
+<span class="nv">brokerRole</span><span class="o">=</span>SLAVE
+<span class="nv">flushDiskType</span><span class="o">=</span>ASYNC_FLUSH
+</code></pre></div></div>
+
+<h3 id="14-多master多slave模式-同步双写">1.4 多Master多Slave模式-同步双写</h3>
+
+<p>每个Master配置一个Slave，有多对Master-Slave，HA采用<strong>同步双写</strong>方式，即只有主备都写成功，才向应用返回成功。</p>
+
+<p>这种模式的优缺点如下：</p>
+
+<ul>
+  <li>
+    <p>优点：数据与服务都无<strong>单点故障</strong>，Master宕机情况下，消息无延迟，服务<strong>可用性</strong>与数据可用性都非常高；</p>
+  </li>
+  <li>
+    <p>缺点：<strong>性能</strong>比异步复制模式略低（大约低10%左右），发送单个消息的RT会略高，且目前版本在主节点宕机后，备机不能<strong>自动切换</strong>为主机。</p>
+  </li>
+</ul>
+
+<h5 id="1启动nameserver-2">1）启动NameServer</h5>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">### 首先启动Name Server</span>
+<span class="nv">$ </span>nohup sh mqnamesrv &amp;
+ 
+<span class="c">### 验证Name Server 是否启动成功</span>
+<span class="nv">$ </span>tail <span class="nt">-f</span> ~/logs/rocketmqlogs/namesrv.log
+The Name Server boot success...
+</code></pre></div></div>
+
+<h5 id="2启动broker集群-2">2）启动Broker集群</h5>
+
+<blockquote>
+  <p>brokerRole=SYNC_MASTER</p>
+</blockquote>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">### 在机器A，启动第一个Master，例如NameServer的IP为：192.168.1.1</span>
+<span class="nv">$ </span>nohup sh mqbroker <span class="nt">-n</span> 192.168.1.1:9876 <span class="nt">-c</span> <span class="nv">$ROCKETMQ_HOME</span>/conf/2m-2s-sync/broker-a.properties &amp;
+ 
+<span class="c">### 在机器B，启动第二个Master，例如NameServer的IP为：192.168.1.1</span>
+<span class="nv">$ </span>nohup sh mqbroker <span class="nt">-n</span> 192.168.1.1:9876 <span class="nt">-c</span> <span class="nv">$ROCKETMQ_HOME</span>/conf/2m-2s-sync/broker-b.properties &amp;
+
+<span class="c"># conf/2m-2s-sync/broker-a.properties</span>
+<span class="nv">brokerClusterName</span><span class="o">=</span>DefaultCluster
+<span class="nv">brokerName</span><span class="o">=</span>broker-a
+<span class="nv">brokerId</span><span class="o">=</span>0
+<span class="nv">deleteWhen</span><span class="o">=</span>04
+<span class="nv">fileReservedTime</span><span class="o">=</span>48
+<span class="nv">brokerRole</span><span class="o">=</span>SYNC_MASTER
+<span class="nv">flushDiskType</span><span class="o">=</span>ASYNC_FLUSH
+
+<span class="c">### 在机器C，启动第一个Slave，例如NameServer的IP为：192.168.1.1</span>
+<span class="nv">$ </span>nohup sh mqbroker <span class="nt">-n</span> 192.168.1.1:9876 <span class="nt">-c</span> <span class="nv">$ROCKETMQ_HOME</span>/conf/2m-2s-sync/broker-a-s.properties &amp;
+ 
+<span class="c">### 在机器D，启动第二个Slave，例如NameServer的IP为：192.168.1.1</span>
+<span class="nv">$ </span>nohup sh mqbroker <span class="nt">-n</span> 192.168.1.1:9876 <span class="nt">-c</span> <span class="nv">$ROCKETMQ_HOME</span>/conf/2m-2s-sync/broker-b-s.properties &amp;
+</code></pre></div></div>
+
+<ul>
+  <li>以上<strong>Broker与Slave配对</strong>是通过指定相同的BrokerName参数来配对，Master的BrokerId必须是0，Slave的BrokerId必须是大于0的数。</li>
+  <li>另外一个Master下面可以挂载多个Slave，同一Master下的多个Slave通过指定不同的BrokerId来区分。</li>
+  <li>$ROCKETMQ_HOME指的RocketMQ安装目录，需要用户自己设置此环境变量。</li>
+</ul>
+
+<h2 id="15--rocketmq-50-自动主从切换">1.5  RocketMQ 5.0 自动主从切换</h2>
+
+<p>RocketMQ 5.0 开始支持自动主从切换的模式，可参考以下文档</p>
+
+<p><a href="controller/quick_start.md">快速开始</a></p>
+
+<p><a href="controller/deploy.md">部署文档</a></p>
+
+<p><a href="controller/design.md">设计思想</a></p>
+
+<h3 id="自动主从切换快速开始">自动主从切换快速开始</h3>
+
+<h4 id="前言">前言</h4>
+
+<p><img src="../assets/controller_design_2.png" alt="架构图" style="zoom: 33%;" /></p>
+
+<p>该文档主要介绍如何快速构建<strong>自动主从切换</strong>的 RocketMQ 集群，其架构如上图所示。</p>
+
+<ul>
+  <li>主要增加支持自动主从切换的Controller组件，其可以独立部署也可以内嵌在NameServer中。</li>
+</ul>
+
+<p>详细设计思路请参考 <a href="design.md">设计思想</a>.</p>
+
+<p>详细的新集群部署和旧集群升级指南请参考 <a href="deploy.md">部署指南</a>。</p>
+
+<h4 id="编译-rocketmq-源码">编译 RocketMQ 源码</h4>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git clone https://github.com/apache/rocketmq.git
+
+<span class="nv">$ </span><span class="nb">cd </span>rocketmq
+
+<span class="nv">$ </span>mvn <span class="nt">-Prelease-all</span> <span class="nt">-DskipTests</span> clean install <span class="nt">-U</span>
+</code></pre></div></div>
+
+<h4 id="快速部署">快速部署</h4>
+
+<p>在构建成功后</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#{rocketmq-version} replace with rocketmq actual version. example: 5.0.0-SNAPSHOT</span>
+<span class="nv">$ </span><span class="nb">cd </span>distribution/target/rocketmq-<span class="o">{</span>rocketmq-version<span class="o">}</span>/rocketmq-<span class="o">{</span>rocketmq-version<span class="o">}</span>/
+
+<span class="nv">$ </span>sh bin/controller/fast-try.sh start
+</code></pre></div></div>
+
+<p>如果上面的步骤执行成功，可以通过<strong>运维命令</strong>查看Controller状态。</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>sh bin/mqadmin getControllerMetaData <span class="nt">-a</span> localhost:9878
+</code></pre></div></div>
+
+<p><strong>-a</strong> 代表集群中任意一个Controller的地址</p>
+
+<p>至此，启动成功，现在可以向集群收发消息，并进行切换测试了。</p>
+
+<p>如果需要关闭快速集群，可以执行：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>sh bin/controller/fast-try.sh stop
+</code></pre></div></div>
+
+<p>对于快速部署，默认配置在 <code class="highlighter-rouge">conf/controller/quick-start</code>里面，默认的存储路径在 /tmp/rmqstore，且会开启一个 Controller (嵌入在 Namesrv) 和两个 Broker。</p>
+
+<h5 id="查看-syncstateset">查看 SyncStateSet</h5>
+
+<p>可以通过运维工具查看 SyncStateSet：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>sh bin/mqadmin getSyncStateSet <span class="nt">-a</span> localhost:9878 <span class="nt">-b</span> broker-a
+</code></pre></div></div>
+
+<p>-a 代表的是任意一个 Controller 的地址</p>
+
+<p>如果顺利的话，可以看到以下内容：</p>
+
+<p><img src="../../Job2022-Project/rocketmq-master/docs/cn/image/controller/quick-start/syncstateset.png" alt="image-20220605205259913" /></p>
+
+<h5 id="查看-brokerepoch">查看 BrokerEpoch</h5>
+
+<p>可以通过运维工具查看 BrokerEpochEntry：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>sh bin/mqadmin getBrokerEpoch <span class="nt">-n</span> localhost:9876 <span class="nt">-b</span> broker-a
+</code></pre></div></div>
+
+<p><strong>-n</strong> 代表的是任意一个 Namesrv 的地址</p>
+
+<p>如果顺利的话，可以看到以下内容：</p>
+
+<p><img src="../../Job2022-Project/rocketmq-master/docs/cn/image/controller/quick-start/epoch.png" alt="image-20220605205247476" /></p>
+
+<h4 id="切换">切换</h4>
+
+<p>部署成功后，现在尝试进行 Master 切换。</p>
+
+<p>首先，kill 掉原 Master 的进程，在上文的例子中，就是使用<strong>端口 30911</strong> 的进程：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#查找端口:</span>
+<span class="nv">$ </span>ps <span class="nt">-ef</span>|grep java|grep BrokerStartup|grep ./conf/controller/quick-start/broker-n0.conf|grep <span class="nt">-v</span> <span class="nb">grep</span>|awk <span class="s1">'{print $2}'</span>
+<span class="c">#杀掉 master:</span>
+<span class="nv">$ </span><span class="nb">kill</span> <span class="nt">-9</span> PID
+</code></pre></div></div>
+
+<p>接着，用 SyncStateSet admin 脚本查看：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>sh bin/mqadmin getSyncStateSet <span class="nt">-a</span> localhost:9878 <span class="nt">-b</span> broker-a
+</code></pre></div></div>
+
+<p>可以发现 Master 已经发生了切换。</p>
+
+<p><img src="../../Job2022-Project/rocketmq-master/docs/cn/image/controller/quick-start/changemaster.png" alt="image-20220605211244128" /></p>
+
+<h4 id="controller内嵌namesvr集群部署">Controller内嵌Namesvr集群部署</h4>
+
+<p>Controller以插件方式内嵌Namesvr集群（3个Node组成）部署，快速启动：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>sh bin/controller/fast-try-namesrv-plugin.sh start
+</code></pre></div></div>
+
+<p>或者通过命令单独启动：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>nohup bin/mqnamesrv <span class="nt">-c</span> ./conf/controller/cluster-3n-namesrv-plugin/namesrv-n0.conf &amp;
+<span class="nv">$ </span>nohup bin/mqnamesrv <span class="nt">-c</span> ./conf/controller/cluster-3n-namesrv-plugin/namesrv-n1.conf &amp;
+<span class="nv">$ </span>nohup bin/mqnamesrv <span class="nt">-c</span> ./conf/controller/cluster-3n-namesrv-plugin/namesrv-n2.conf &amp;
+</code></pre></div></div>
+
+<p>如果上面的步骤执行成功，可以通过运维命令查看Controller集群状态。</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>sh bin/mqadmin getControllerMetaData <span class="nt">-a</span> localhost:9878
+</code></pre></div></div>
+
+<p>-a代表的是任意一个 <strong>Controller 的地址</strong></p>
+
+<p>如果controller启动成功可以看到以下内容：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#ControllerGroup        group1
+#ControllerLeaderId     n0
+#ControllerLeaderAddress        127.0.0.1:9878
+#Peer:  n0:127.0.0.1:9878
+#Peer:  n1:127.0.0.1:9868
+#Peer:  n2:127.0.0.1:9858
+</code></pre></div></div>
+
+<p>启动成功后Broker Controller模式部署就能使用Controller集群。</p>
+
+<p>如果需要快速停止集群：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>sh bin/controller/fast-try-namesrv-plugin.sh stop
+</code></pre></div></div>
+
+<p>使用 fast-try-namesrv-plugin.sh 脚本快速部署，默认配置在 conf/controller/cluster-3n-namesrv-plugin里面并且会启动3个Namesvr和3个Controller(内嵌Namesrv)。</p>
+
+<h4 id="controller独立集群部署">Controller独立集群部署</h4>
+
+<p>Controller独立集群(3个Node组成)部署，快速启动：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>sh bin/controller/fast-try-independent-deployment.sh start
+</code></pre></div></div>
+
+<p>或者通过命令单独启动：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>nohup bin/mqcontroller <span class="nt">-c</span> ./conf/controller/cluster-3n-independent/controller-n0.conf &amp;
+<span class="nv">$ </span>nohup bin/mqcontroller <span class="nt">-c</span> ./conf/controller/cluster-3n-independent/controller-n1.conf &amp;
+<span class="nv">$ </span>nohup bin/mqcontroller <span class="nt">-c</span> ./conf/controller/cluster-3n-independent/controller-n2.conf &amp;
+</code></pre></div></div>
+
+<p>如果上面的步骤执行成功，可以通过运维命令查看Controller集群状态。</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>sh bin/mqadmin getControllerMetaData <span class="nt">-a</span> localhost:9878
+</code></pre></div></div>
+
+<p>-a代表的是任意一个 Controller 的地址</p>
+
+<p>如果Controller启动成功可以看到以下内容：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#ControllerGroup        group1
+#ControllerLeaderId     n1
+#ControllerLeaderAddress        127.0.0.1:9868
+#Peer:  n0:127.0.0.1:9878
+#Peer:  n1:127.0.0.1:9868
+#Peer:  n2:127.0.0.1:9858
+</code></pre></div></div>
+
+<p>启动成功后Broker Controller模式部署就能使用Controller集群。</p>
+
+<p>如果需要快速停止集群：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>sh bin/controller/fast-try-independent-deployment.sh stop
+</code></pre></div></div>
+
+<p>使用fast-try-independent-deployment.sh 脚本快速部署，默认配置在 conf/controller/cluster-3n-independent里面并且会启动3个Controller(独立部署)组成一个集群。</p>
+
+<h4 id="注意说明">注意说明</h4>
+
+<ul>
+  <li>若需要保证Controller具备容错能力，Controller部署需要<strong>三副本</strong>及以上（遵循<strong>Raft的多数派协议</strong>）</li>
+  <li>Controller部署配置文件中配置参数<code class="highlighter-rouge">controllerDLegerPeers</code> 中的IP地址配置成其他节点能够访问的IP,在多机器部署的时候尤为重要。例子仅供参考需要根据实际情况进行修改调整。</li>
+</ul>
+
+<h3 id="部署和升级指南">部署和升级指南</h3>
+
+<h4 id="controller部署">Controller部署</h4>
+
+<p>若需要保证Controller具备容错能力，Controller部署需要三副本及以上（遵循Raft的多数派协议）。</p>
+
+<blockquote>
+  <p>Controller若只部署单副本也能完成Broker Failover，但若该单点Controller故障，会影响切换能力，但不会影响存量集群的正常收发。</p>
+</blockquote>
+
+<p>Controller部署有两种方式。</p>
+
+<ul>
+  <li>一种是嵌入于NameServer进行部署，可以通过配置enableControllerInNamesrv打开（可以选择性打开，并不强制要求每一台NameServer都打开）。
+    <ul>
+      <li>在该模式下，NameServer本身能力仍然是无状态的，也就是内嵌模式下若NameServer挂掉多数派，只影响切换能力，不影响原来路由获取等功能。</li>
+    </ul>
+  </li>
+  <li>另一种是独立部署，需要单独部署Controller组件。</li>
+</ul>
+
+<h5 id="嵌入nameserver部署">嵌入NameServer部署</h5>
+
+<p>嵌入NameServer部署时只需要在NameServer的配置文件中设置enableControllerInNamesrv=true，并填上Controller的配置即可。</p>
+
+<div class="language-conf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">enableControllerInNamesrv</span> = <span class="n">true</span>
+<span class="n">controllerDLegerGroup</span> = <span class="n">group1</span>
+<span class="n">controllerDLegerPeers</span> = <span class="n">n0</span>-<span class="m">127</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">1</span>:<span class="m">9877</span>;<span class="n">n1</span>-<span class="m">127</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">1</span>:<span class="m">9878</span>;<span class="n">n2</span>-<span class="m">127</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">1</span>:<span class="m">9879</span>
+<span class="n">controllerDLegerSelfId</span> = <span class="n">n0</span>
+<span class="n">controllerStorePath</span> = /<span class="n">home</span>/<span class="n">admin</span>/<span class="n">DledgerController</span>
+<span class="n">enableElectUncleanMaster</span> = <span class="n">false</span>
+<span class="n">notifyBrokerRoleChanged</span> = <span class="n">true</span>
+</code></pre></div></div>
+
+<p>参数解释：</p>
+
+<ul>
+  <li>enableControllerInNamesrv：Nameserver中是否开启controller，默认false。</li>
+  <li>controllerDLegerGroup：DLedger Raft Group的名字，同一个DLedger Raft Group保持一致即可。</li>
+  <li>controllerDLegerPeers：DLedger Group 内各节点的地址信息，同一个 Group 内的各个节点配置必须要保证一致。</li>
+  <li>controllerDLegerSelfId：节点 id，必须属于 controllerDLegerPeers 中的一个；同 Group 内各个节点要唯一。</li>
+  <li>controllerStorePath：controller日志存储位置。controller是有状态的，controller重启或宕机需要依靠日志来恢复数据，该目录非常重要，不可以轻易删除。</li>
+  <li>enableElectUncleanMaster：是否可以从SyncStateSet以外选举Master，若为true，可能会选取数据落后的副本作为Master而丢失消息，默认为false。</li>
+  <li>notifyBrokerRoleChanged：当broker副本组上角色发生变化时是否主动通知，默认为true。</li>
+  <li>
+    <p>scanNotActiveBrokerInterval：扫描 Broker是否存活的时间间隔。</p>
+  </li>
+  <li>其他一些参数可以参考ControllerConfig代码。</li>
+</ul>
+
+<blockquote>
+  <p>5.2.0 Controller 开始支持 jRaft 内核启动，不支持 DLedger 内核到 jRaft 内核原地升级</p>
+</blockquote>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>controllerType = jRaft
+jRaftGroupId = jRaft-Controller
+jRaftServerId = localhost:9880
+jRaftInitConf = localhost:9880,localhost:9881,localhost:9882
+jRaftControllerRPCAddr = localhost:9770,localhost:9771,localhost:9772
+jRaftSnapshotIntervalSecs = 3600
+</code></pre></div></div>
+
+<p>jRaft 版本相关参数</p>
+
+<ul>
+  <li>controllerType：controllerType=jRaft的时候内核启动使用jRaft，默认为DLedger。</li>
+  <li>jRaftGroupId：jRaft Group的名字，同一个jRaft Group保持一致即可。</li>
+  <li>jRaftServerId：标志自己节点的ServerId，必须出现在 jRaftInitConf 中。</li>
+  <li>jRaftInitConf：jRaft Group 内部通信各节点的地址信息，用逗号分隔，是 jRaft 内部通信来做选举和复制所用的地址。</li>
+  <li>jRaftControllerRPCAddr：Controller 外部通信的各节点的地址信息，用逗号分隔，比如 Controller 与 Broker 通信会使用该地址。</li>
+  <li>jRaftSnapshotIntervalSecs：Raft Snapshot 持久化时间间隔。</li>
+</ul>
+
+<p>参数设置完成后，指定配置文件启动Nameserver即可。</p>
+
+<h5 id="独立部署">独立部署</h5>
+
+<p>独立部署执行以下脚本即可</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sh bin/mqcontroller <span class="nt">-c</span> controller.conf
+</code></pre></div></div>
+
+<p>mqcontroller脚本在distribution/bin/mqcontroller，配置参数与内嵌模式相同。</p>
+
+<h4 id="broker-controller模式部署">Broker Controller模式部署</h4>
+
+<p>Broker启动方法与之前相同，增加以下参数</p>
+
+<ul>
+  <li>enableControllerMode：Broker controller模式的总开关，只有该值为true，controller模式才会打开。默认为false。</li>
+  <li>controllerAddr：controller的地址，两种方式填写。
+    <ul>
+      <li>直接填写多个Controller IP地址，多个controller中间用分号隔开，例如<code class="highlighter-rouge">controllerAddr = 127.0.0.1:9877;127.0.0.1:9878;127.0.0.1:9879</code>。注意由于Broker需要向所有controller发送心跳，因此请填上所有的controller地址。</li>
+      <li>填写域名，然后设置fetchControllerAddrByDnsLookup为true，则Broker去自动解析域名后面的多个真实controller地址。</li>
+    </ul>
+  </li>
+  <li>fetchControllerAddrByDnsLookup：controllerAddr填写域名时，如果设置该参数为true，会自动获取所有controller的地址。默认为false。</li>
+  <li>controllerHeartBeatTimeoutMills：Broker和controller之间心跳超时时间，心跳超过该时间判断Broker不在线。</li>
+  <li>syncBrokerMetadataPeriod：向controller同步Broker副本信息的时间间隔。默认5000（5s）。</li>
+  <li>checkSyncStateSetPeriod：检查SyncStateSet的时间间隔，检查SyncStateSet可能会shrink SyncState。默认5000（5s）。</li>
+  <li>syncControllerMetadataPeriod：同步controller元数据的时间间隔，主要是获取active controller的地址。默认10000（10s）。</li>
+  <li>haMaxTimeSlaveNotCatchup：表示slave没有跟上Master的最大时间间隔，若在SyncStateSet中的slave超过该时间间隔会将其从SyncStateSet移除。默认为15000（15s）。</li>
+  <li>storePathEpochFile：存储epoch文件的位置。epoch文件非常重要，不可以随意删除。默认在store目录下。</li>
+  <li>allAckInSyncStateSet：若该值为true，则一条消息需要复制到SyncStateSet中的每一个副本才会向客户端返回成功，可以保证消息不丢失。默认为false。</li>
+  <li>syncFromLastFile：若slave是空盘启动，是否从最后一个文件进行复制。默认为false。</li>
+  <li>asyncLearner：若该值为true，则该副本不会进入SyncStateSet，也就是不会被选举成Master，而是一直作为一个learner副本进行异步复制。默认为false。</li>
+  <li>inSyncReplicas：需保持同步的副本组数量，默认为1，allAckInSyncStateSet=true时该参数无效。</li>
+  <li>minInSyncReplicas：最小需保持同步的副本组数量，若SyncStateSet中副本个数小于minInSyncReplicas则putMessage直接返回PutMessageStatus.IN_SYNC_REPLICAS_NOT_ENOUGH，默认为1。</li>
+</ul>
+
+<p>在Controller模式下，Broker配置必须设置enableControllerMode=true，并填写controllerAddr。</p>
+
+<h5 id="重要参数解析">重要参数解析</h5>
+
+<h6 id="1写入副本参数">1.写入副本参数</h6>
+
+<p>其中inSyncReplicas、minInSyncReplicas等参数在普通Master-Salve部署、SlaveActingMaster模式、自动主从切换架构有重叠和不同含义，具体区别如下</p>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th>inSyncReplicas</th>
+      <th>minInSyncReplicas</th>
+      <th>enableAutoInSyncReplicas</th>
+      <th>allAckInSyncStateSet</th>
+      <th>haMaxGapNotInSync</th>
+      <th>haMaxTimeSlaveNotCatchup</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>普通Master-Salve部署</td>
+      <td>同步复制下需要ACK的副本数，异步复制无效</td>
+      <td>无效</td>
+      <td>无效</td>
+      <td>无效</td>
+      <td>无效</td>
+      <td>无效</td>
+    </tr>
+    <tr>
+      <td>开启SlaveActingMaster （slaveActingMaster=true）</td>
+      <td>不自动降级情况下同步复制下需要ACK的副本数</td>
+      <td>自动降级后，需要ACK最小副本数</td>
+      <td>是否开启自动降级，自动降级后，ACK最小副本数降级到minInSyncReplicas</td>
+      <td>无效</td>
+      <td>判断降级依据：Slave与Master Commitlog差距值，单位字节</td>
+      <td>无效</td>
+    </tr>
+    <tr>
+      <td>自动主从切换架构（enableControllerMode=true）</td>
+      <td>不开启allAckInSyncStateSet下，同步复制下需要ACK的副本数，开启allAckInSyncStateSet后该值无效</td>
+      <td>SyncStateSet可以降低到最小的副本数，如果SyncStateSet中副本个数小于minInSyncReplicas则直接返回副本数不足</td>
+      <td>无效</td>
+      <td>若该值为true，则一条消息需要复制到SyncStateSet中的每一个副本才会向客户端返回成功，该参数可以保证消息不丢失</td>
+      <td>无效</td>
+      <td>SyncStateSet收缩时，Slave最小未跟上Master的时间差，详见<a href="https://shimo.im/docs/N2A1Mz9QZltQZoAD">RIP-44</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>总结来说：</p>
+
+<ul>
+  <li>普通Master-Slave下无自动降级能力，除了inSyncReplicas其他参数均无效，inSyncReplicas表示同步复制下需要ACK的副本数。</li>
+  <li>slaveActingMaster模式下开启enableAutoInSyncReplicas有降级能力，最小可降级到minInSyncReplicas副本数，降级判断依据是主备Commitlog高度差（haMaxGapNotInSync）以及副本存活情况，参考<a href="../QuorumACK.md">slaveActingMaster模式自动降级</a>。</li>
+</ul>
+
+<blockquote>
+  <p>SlaveActingMaster为其他高可用部署方式，该模式下如果不使用可不参考</p>
+</blockquote>
+
+<ul>
+  <li>自动主从切换（Controller模式）依赖SyncStateSet的收缩进行自动降级，SyncStateSet副本数最小收缩到minInSyncReplicas仍能正常工作，小于minInSyncReplicas直接返回副本数不足，收缩依据之一是Slave跟上的时间间隔（haMaxTimeSlaveNotCatchup）而非Commitlog高度。</li>
+  <li>自动主从切换（Controller模式）正常情况是要求保证不丢消息的，只需设置allAckInSyncStateSet = true 即可，不需要考虑inSyncReplicas参数（该参数无效），如果副本较多、距离较远对延迟有要求，可以参考设置部分副本设置为asyncLearner。</li>
+</ul>
+
+<h6 id="2syncstateset收缩检查配置">2.SyncStateSet收缩检查配置</h6>
+
+<p>checkSyncStateSetPeriod 参数决定定时检查SyncStateSet是否需要收缩的时间间隔
+haMaxTimeSlaveNotCatchup 参数决定备跟不上主的时间</p>
+
+<p>当allAckInSyncState = true时（保证不丢消息），</p>
+
+<ul>
+  <li>haMaxTimeSlaveNotCatchup 值越小，对SyncStateSet收缩越敏感，比如主备之间网络抖动就可能导致SyncStateSet收缩，造成不必要的集群抖动。</li>
+  <li>haMaxTimeSlaveNotCatchup 值越大，对SyncStateSet收缩虽然不敏感，但是可能加大SyncStateSet收缩时的RTO时间。该RTO时间可以按照 checkSyncStateSetPeriod/2 + haMaxTimeSlaveNotCatchup 估算。</li>
+</ul>
+
+<h6 id="3消息可靠性配置">3.消息可靠性配置</h6>
+
+<p>保证 allAckInSyncStateSet = true 以及 enableElectUncleanMaster = false</p>
+
+<h6 id="4延迟">4.延迟</h6>
+
+<p>当 allAckInSyncStateSet = true 后，一条消息要复制到SyncStateSet所有副本才能确认返回，假设SyncStateSet有3副本，其中1副本距离较远，则会影响到消息延迟。可以设置延迟最高距离最远的副本为asyncLearner，该副本不会进入SyncStateSet，只会进行异步复制，该副本作为冗余副本。</p>
+
+<h4 id="兼容性">兼容性</h4>
+
+<p>该模式未对任何客户端层面 API 进行新增或修改，不存在客户端的兼容性问题。</p>
+
+<p>Nameserver本身能力未做任何修改，Nameserver不存在兼容性问题。如开启enableControllerInNamesrv且controller参数配置正确，则开启controller功能。</p>
+
+<p>Broker若设置enableControllerMode=false，则仍然以之前方式运行。若设置enableControllerMode=true，则需要部署controller且参数配置正确才能正常运行。</p>
+
+<p>具体行为如下表所示：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th>旧版Nameserver</th>
+      <th>旧版Nameserver+独立部署Controller</th>
+      <th>新版Nameserver开启controller功能</th>
+      <th>新版Nameserver关闭controller功能</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>旧版Broker</td>
+      <td>正常运行，无法切换</td>
+      <td>正常运行，无法切换</td>
+      <td>正常运行，无法切换</td>
+      <td>正常运行，无法切换</td>
+    </tr>
+    <tr>
+      <td>新版Broker开启Controller模式</td>
+      <td>无法正常上线</td>
+      <td>正常运行，可以切换</td>
+      <td>正常运行，可以切换</td>
+      <td>无法正常上线</td>
+    </tr>
+    <tr>
+      <td>新版Broker不开启Controller模式</td>
+      <td>正常运行，无法切换</td>
+      <td>正常运行，无法切换</td>
+      <td>正常运行，无法切换</td>
+      <td>正常运行，无法切换</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="升级注意事项">升级注意事项</h4>
+
+<p>从上述兼容性表述可以看出，NameServer正常升级即可，无兼容性问题。在不想升级Nameserver情况，可以独立部署Controller组件来获得切换能力。</p>
+
+<p>针对Broker升级，分为两种情况：</p>
+
+<p>（1）Master-Slave部署升级成Controller切换架构</p>
+
+<p>可以带数据进行原地升级，对于每组Broker，停机主、备Broker，<strong>保证主、备的Commitlog对齐</strong>（可以在升级前禁写该组Broker一段时间，或则通过拷贝方式保证一致），升级包后重新启动即可。</p>
+
+<blockquote>
+  <p>若主备commitlog不对齐，需要保证主上线以后再上线备，否则可能会因为数据截断而丢失消息。</p>
+</blockquote>
+
+<p>（2）原DLedger模式升级到Controller切换架构</p>
+
+<p>由于原DLedger模式消息数据格式与Master-Slave下数据格式存在区别，不提供带数据原地升级的路径。在部署多组Broker的情况下，可以禁写某一组Broker一段时间（只要确认存量消息被全部消费即可，比如根据消息的保存时间来决定），然后清空store目录下除config/topics.json、subscriptionGroup.json下（保留topic和订阅关系的元数据）的其他文件后，进行空盘升级。</p>
+
+<h5 id="持久化brokerid版本的升级注意事项">持久化BrokerID版本的升级注意事项</h5>
+
+<p>目前版本支持采用了新的持久化BrokerID版本，详情可以参考<a href="persistent_unique_broker_id.md">该文档</a>，从该版本前的5.x升级到当前版本需要注意如下事项。</p>
+
+<ul>
+  <li>4.x版本升级遵守上述正常流程即可。</li>
+  <li>5.x非持久化BrokerID版本升级到持久化BrokerID版本按照如下流程:</li>
+</ul>
+
+<h6 id="升级controller"><strong>升级Controller</strong></h6>
+
+<ol>
+  <li>将旧版本Controller组停机。</li>
+  <li>清除Controller数据，即默认在<code class="highlighter-rouge">~/DLedgerController</code>下的数据文件。</li>
+  <li>上线新版Controller组。</li>
+</ol>
+
+<blockquote>
+  <p>在上述升级Controller流程中，Broker仍可正常运行，但无法切换。</p>
+</blockquote>
+
+<h6 id="升级broker"><strong>升级Broker</strong></h6>
+
+<ol>
+  <li>将Broker从节点停机。</li>
+  <li>将Broker主节点停机。</li>
+  <li>将所有的Broker的Epoch文件删除，即默认为<code class="highlighter-rouge">~/store/epochFileCheckpoint</code>和<code class="highlighter-rouge">~/store/epochFileCheckpoint.bak</code>。</li>
+  <li>将原先的主Broker先上线，等待该Broker当选为master。(可使用<code class="highlighter-rouge">admin</code>命令的<code class="highlighter-rouge">getSyncStateSet</code>来观察)</li>
+  <li>将原来的从Broker全部上线。</li>
+</ol>
+
+<blockquote>
+  <p>建议停机时<strong>先停从再停主</strong>，上线时先上原先的主再上原先的从，这样可以保证原来的主备关系。
+若需要改变升级前后主备关系，则需要停机时保证主、备的CommitLog对齐，否则可能导致数据被截断而丢失。</p>
+</blockquote>
+
+<h3 id="设计思想架构">设计思想、架构</h3>
+
+<h4 id="背景">背景</h4>
+
+<p>当前 RocketMQ <strong>Raft 模式</strong>主要是利用 DLedger Commitlog 替换原来的 Commitlog，使 Commitlog 拥有选举复制能力，但这也造成了一些问题：</p>
+
+<ul>
+  <li>Raft 模式下，Broker组内副本数必须是三副本及以上，副本的<strong>ACK</strong>也必须遵循多数派协议。</li>
+  <li>RocketMQ 存在两套 <strong>HA 复制</strong>流程，且 Raft 模式下的复制无法利用 RocketMQ 原生的存储能力。</li>
+</ul>
+
+<p>因此我们希望利用 DLedger 实现一个基于 Raft 的一致性模块（DLedger Controller），并当作一个可选的选主组件，支持独立部署，也可以嵌入在 Nameserver 中，Broker 通过与 Controller 的交互完成 Master 的选举，从而解决上述问题，我们将该新模式称为 <strong>Controller 模式</strong>。</p>
+
+<h2 id="2-mqadmin管理工具">2 mqadmin管理工具</h2>
+
+<blockquote>
+  <p>注意：</p>
+
+  <ol>
+    <li>执行命令方法：<code class="highlighter-rouge">./mqadmin {command} {args}</code></li>
+    <li>几乎所有命令都需要配置-n表示NameServer地址，格式为ip:port</li>
+    <li>几乎所有命令都可以通过-h获取帮助</li>
+    <li>如果既有Broker地址（-b）配置项又有clusterName（-c）配置项，则优先以Broker地址执行命令，如果不配置Broker地址，则对集群中所有主机执行命令，只支持一个Broker地址。-b格式为ip:port，port默认是10911</li>
+    <li>在tools下可以看到很多命令，但并不是所有命令都能使用，只有在MQAdminStartup中初始化的命令才能使用，你也可以修改这个类，增加或自定义命令</li>
+    <li>由于版本更新问题，少部分命令可能未及时更新，遇到错误请直接阅读相关命令源码</li>
+  </ol>
+</blockquote>
+
+<h4 id="21-topic相关">2.1 Topic相关</h4>
+
+<p>&lt;table border=0 cellpadding=0 cellspacing=0 width=714&gt;
+ &lt;col width=20%&gt;
+ &lt;col width=20%&gt;
+ &lt;col width=10%&gt;
+ &lt;col width=40%&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl63 width=177 style=’height:17.0pt;width:133pt’&gt;名称&lt;/td&gt;
+  &lt;td class=xl64 width=175 style=’width:131pt’&gt;含义&lt;/td&gt;
+  &lt;td class=xl64 width=177 style=’width:133pt’&gt;命令选项&lt;/td&gt;
+  &lt;td class=xl64 width=185 style=’width:139pt’&gt;说明&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=132 style=’height:99.0pt’&gt;
+  &lt;td rowspan=8 height=593 class=xl68 width=163 style=’border-bottom:1.0pt;
+  height:444.0pt;border-top:none;width:122pt’&gt;updateTopic&lt;/td&gt;
+  &lt;td rowspan=8 class=xl70 width=135 style=’border-bottom:1.0pt;
+  border-top:none;width:101pt’&gt;创建更新Topic配置&lt;/td&gt;
+  &lt;td class=xl65 width=149 style=’width:112pt’&gt;-b&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;Broker 地址，表示 topic 所在
+  Broker，只支持单台Broker，地址为ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=132 style=’height:99.0pt’&gt;
+  &lt;td height=132 class=xl65 width=149 style=’height:99.0pt;width:112pt’&gt;-c&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;cluster 名称，表示 topic 所在集群（集群可通过
+  clusterList 查询）&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl65 width=149 style=’height:17.0pt;width:112pt’&gt;-h-&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl65 width=149 style=’height:43.0pt;width:112pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;NameServer服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=76 style=’height:57.0pt’&gt;
+  &lt;td height=76 class=xl65 width=149 style=’height:57.0pt;width:112pt’&gt;-p&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;指定新topic的读写权限( W=2|R=4|WR=6 )&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl65 width=149 style=’height:29.0pt;width:112pt’&gt;-r&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;可读队列数（默认为 8）&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl65 width=149 style=’height:29.0pt;width:112pt’&gt;-w&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;可写队列数（默认为 8）&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=95 style=’height:71.0pt’&gt;
+  &lt;td height=95 class=xl65 width=149 style=’height:71.0pt;width:112pt’&gt;-t&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;topic 名称（名称只能使用字符
+  ^[a-zA-Z0-9<em>-]+$ ）&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=132 style=’height:99.0pt’&gt;
+  &lt;td rowspan=4 height=307 class=xl68 width=163 style=’border-bottom:1.0pt;
+  height:230.0pt;border-top:none;width:122pt’&gt;deleteTopic&lt;/td&gt;
+  &lt;td rowspan=4 class=xl70 width=135 style=’border-bottom:1.0pt;
+  border-top:none;width:101pt’&gt;删除Topic&lt;/td&gt;
+  &lt;td class=xl65 width=149 style=’width:112pt’&gt;-c&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;cluster 名称，表示删除某集群下的某个 topic （集群
+  可通过 clusterList 查询）&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl65 width=149 style=’height:17.0pt;width:112pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl65 width=149 style=’height:43.0pt;width:112pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=95 style=’height:71.0pt’&gt;
+  &lt;td height=95 class=xl65 width=149 style=’height:71.0pt;width:112pt’&gt;-t&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;topic 名称（名称只能使用字符
+  ^[a-zA-Z0-9</em>-]+$ ）&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td rowspan=3 height=287 class=xl68 width=163 style=’border-bottom:1.0pt;
+  height:215.0pt;border-top:none;width:122pt’&gt;topicList&lt;/td&gt;
+  &lt;td rowspan=3 class=xl70 width=135 style=’border-bottom:1.0pt;
+  border-top:none;width:101pt’&gt;查看 Topic 列表信息&lt;/td&gt;
+  &lt;td class=xl65 width=149 style=’width:112pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=207 style=’height:155.0pt’&gt;
+  &lt;td height=207 class=xl65 width=149 style=’height:155.0pt;width:112pt’&gt;-c&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;不配置-c只返回topic列表，增加-c返回clusterName,
+  topic, consumerGroup信息，即topic的所属集群和订阅关系，没有参数&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl65 width=149 style=’height:43.0pt;width:112pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td rowspan=3 height=103 class=xl68 width=163 style=’border-bottom:1.0pt;
+  height:77.0pt;border-top:none;width:122pt’&gt;topicRoute&lt;/td&gt;
+  &lt;td rowspan=3 class=xl70 width=135 style=’border-bottom:1.0pt;
+  border-top:none;width:101pt’&gt;查看 Topic 路由信息&lt;/td&gt;
+  &lt;td class=xl65 width=149 style=’width:112pt’&gt;-t&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;topic 名称&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl65 width=149 style=’height:17.0pt;width:112pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl65 width=149 style=’height:43.0pt;width:112pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td rowspan=3 height=103 class=xl68 width=163 style=’border-bottom:1.0pt;
+  height:77.0pt;border-top:none;width:122pt’&gt;topicStatus&lt;/td&gt;
+  &lt;td rowspan=3 class=xl70 width=135 style=’border-bottom:1.0pt;
+  border-top:none;width:101pt’&gt;查看 Topic 消息队列offset&lt;/td&gt;
+  &lt;td class=xl65 width=149 style=’width:112pt’&gt;-t&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;topic 名称&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl65 width=149 style=’height:17.0pt;width:112pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl65 width=149 style=’height:43.0pt;width:112pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td rowspan=3 height=103 class=xl68 width=163 style=’border-bottom:1.0pt;
+  height:77.0pt;border-top:none;width:122pt’&gt;topicClusterList&lt;/td&gt;
+  &lt;td rowspan=3 class=xl70 width=135 style=’border-bottom:1.0pt;
+  border-top:none;width:101pt’&gt;查看 Topic 所在集群列表&lt;/td&gt;
+  &lt;td class=xl65 width=149 style=’width:112pt’&gt;-t&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;topic 名称&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl65 width=149 style=’height:17.0pt;width:112pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl65 width=149 style=’height:43.0pt;width:112pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td rowspan=6 height=518 class=xl68 width=163 style=’border-bottom:1.0pt;
+  height:380pt;border-top:none;width:122pt’&gt;updateTopicPerm&lt;/td&gt;
+  &lt;td rowspan=6 class=xl70 width=135 style=’border-bottom:1.0pt;
+  border-top:none;width:101pt’&gt;更新 Topic 读写权限&lt;/td&gt;
+  &lt;td class=xl65 width=149 style=’width:112pt’&gt;-t&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;topic 名称&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl65 width=149 style=’height:17.0pt;width:112pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl65 width=149 style=’height:43.0pt;width:112pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=132 style=’height:99.0pt’&gt;
+  &lt;td height=132 class=xl65 width=149 style=’height:99.0pt;width:112pt’&gt;-b&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;Broker 地址，表示 topic 所在
+  Broker，只支持单台Broker，地址为ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=76 style=’height:57.0pt’&gt;
+  &lt;td height=76 class=xl65 width=149 style=’height:57.0pt;width:112pt’&gt;-p&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;指定新 topic 的读写权限( W=2|R=4|WR=6 )&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=207 style=’height:155.0pt’&gt;
+  &lt;td height=207 class=xl65 width=149 style=’height:155.0pt;width:112pt’&gt;-c&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;cluster 名称，表示 topic 所在集群（集群可通过
+  clusterList 查询），-b优先，如果没有-b，则对集群中所有Broker执行命令&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td rowspan=5 height=199 class=xl68 width=163 style=’border-bottom:1.0pt;
+  height:149.0pt;border-top:none;width:122pt’&gt;updateOrderConf&lt;/td&gt;
+  &lt;td rowspan=5 class=xl70 width=135 style=’border-bottom:1.0pt;
+  border-top:none;width:101pt’&gt;从NameServer上创建、删除、获取特定命名空间的kv配置，目前还未启用&lt;/td&gt;
+  &lt;td class=xl65 width=149 style=’width:112pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl65 width=149 style=’height:43.0pt;width:112pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl65 width=149 style=’height:17.0pt;width:112pt’&gt;-t&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;topic，键&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl65 width=149 style=’height:29.0pt;width:112pt’&gt;-v&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;orderConf，值&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl65 width=149 style=’height:43.0pt;width:112pt’&gt;-m&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;method，可选get、put、delete&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td rowspan=4 height=198 class=xl68 width=163 style=’border-bottom:1.0pt;
+  height:140pt;border-top:none;width:122pt’&gt;allocateMQ&lt;/td&gt;
+  &lt;td rowspan=4 class=xl70 width=135 style=’border-bottom:1.0pt;
+  border-top:none;width:101pt’&gt;以平均负载算法计算消费者列表负载消息队列的负载结果&lt;/td&gt;
+  &lt;td class=xl65 width=149 style=’width:112pt’&gt;-t&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;topic 名称&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl65 width=149 style=’height:17.0pt;width:112pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl65 width=149 style=’height:43.0pt;width:112pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=95 style=’height:71.0pt’&gt;
+  &lt;td height=95 class=xl65 width=149 style=’height:71.0pt;width:112pt’&gt;-i&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;ipList，用逗号分隔，计算这些ip去负载Topic的消息队列&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td rowspan=4 height=142 class=xl68 width=163 style=’border-bottom:1.0pt solid black;
+  height:106.0pt;border-top:1.0pt;width:122pt’&gt;statsAll&lt;/td&gt;
+  &lt;td rowspan=4 class=xl70 width=135 style=’border-bottom:1.0pt;
+  border-top:none;width:101pt’&gt;打印Topic订阅关系、TPS、积累量、24h读写总量等信息&lt;/td&gt;
+  &lt;td class=xl65 width=149 style=’width:112pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl65 width=149 style=’height:43.0pt;width:112pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl65 width=149 style=’height:29.0pt;width:112pt’&gt;-a&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;是否只打印活跃topic&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl65 width=149 style=’height:17.0pt;width:112pt’&gt;-t&lt;/td&gt;
+  &lt;td class=xl66 width=159 style=’width:119pt’&gt;指定topic&lt;/td&gt;
+ &lt;/tr&gt;
+&lt;/table&gt;</p>
+
+<h4 id="22-集群相关">2.2 集群相关</h4>
+
+<p>&lt;table border=0 cellpadding=0 cellspacing=0 width=714&gt;
+ &lt;col width=20%&gt;
+ &lt;col width=20%&gt;
+ &lt;col width=10%&gt;
+ &lt;col width=40%&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl63 width=177 style=’height:17.0pt;width:133pt’&gt;名称&lt;/td&gt;
+  &lt;td class=xl64 width=175 style=’width:131pt’&gt;含义&lt;/td&gt;
+  &lt;td class=xl64 width=177 style=’width:133pt’&gt;命令选项&lt;/td&gt;
+  &lt;td class=xl64 width=185 style=’width:139pt’&gt;说明&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=207 style=’height:155.0pt’&gt;
+  &lt;td rowspan=4 height=326 class=xl67 width=177 style=’border-bottom:1.0pt;
+  height:244.0pt;border-top:none;width:133pt’&gt;<span style="mso-spacerun:yes"> </span>clusterList&lt;/td&gt;
+  &lt;td rowspan=4 class=xl70 width=175 style=’border-bottom:1.0pt;
+  border-top:none;width:131pt’&gt;查看集群信息，集群、BrokerName、BrokerId、TPS等信息&lt;/td&gt;
+  &lt;td class=xl65 width=177 style=’width:133pt’&gt;-m&lt;/td&gt;
+  &lt;td class=xl66 width=185 style=’width:139pt’&gt;打印更多信息 (增加打印出如下信息 #InTotalYest,
+  #OutTotalYest, #InTotalToday ,#OutTotalToday)&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl65 width=177 style=’height:17.0pt;width:133pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl66 width=185 style=’width:139pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl65 width=177 style=’height:43.0pt;width:133pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl66 width=185 style=’width:139pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl65 width=177 style=’height:29.0pt;width:133pt’&gt;-i&lt;/td&gt;
+  &lt;td class=xl66 width=185 style=’width:139pt’&gt;打印间隔，单位秒&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=95 style=’height:71.0pt’&gt;
+  &lt;td rowspan=8 height=391 class=xl67 width=177 style=’border-bottom:1.0pt;
+  height:292.0pt;border-top:none;width:133pt’&gt;clusterRT&lt;/td&gt;
+  &lt;td rowspan=8 class=xl70 width=175 style=’border-bottom:1.0pt;
+  border-top:none;width:131pt’&gt;发送消息检测集群各Broker RT。消息发往${BrokerName} Topic。&lt;/td&gt;
+  &lt;td class=xl65 width=177 style=’width:133pt’&gt;-a&lt;/td&gt;
+  &lt;td class=xl66 width=185 style=’width:139pt’&gt;amount，每次探测的总数，RT = 总时间 /
+  amount&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl65 width=177 style=’height:29.0pt;width:133pt’&gt;-s&lt;/td&gt;
+  &lt;td class=xl66 width=185 style=’width:139pt’&gt;消息大小，单位B&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl65 width=177 style=’height:17.0pt;width:133pt’&gt;-c&lt;/td&gt;
+  &lt;td class=xl66 width=185 style=’width:139pt’&gt;探测哪个集群&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=76 style=’height:57.0pt’&gt;
+  &lt;td height=76 class=xl65 width=177 style=’height:57.0pt;width:133pt’&gt;-p&lt;/td&gt;
+  &lt;td class=xl66 width=185 style=’width:139pt’&gt;是否打印格式化日志，以|分割，默认不打印&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl65 width=177 style=’height:17.0pt;width:133pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl66 width=185 style=’width:139pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl65 width=177 style=’height:29.0pt;width:133pt’&gt;-m&lt;/td&gt;
+  &lt;td class=xl66 width=185 style=’width:139pt’&gt;所属机房，打印使用&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl65 width=177 style=’height:29.0pt;width:133pt’&gt;-i&lt;/td&gt;
+  &lt;td class=xl66 width=185 style=’width:139pt’&gt;发送间隔，单位秒&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl65 width=177 style=’height:43.0pt;width:133pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl66 width=185 style=’width:139pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+&lt;/table&gt;</p>
+
+<h4 id="23-broker相关">2.3 Broker相关</h4>
+
+<p>&lt;table border=0 cellpadding=0 cellspacing=0 width=714&gt;
+ &lt;col width=177&gt;
+ &lt;col width=175&gt;
+ &lt;col width=177&gt;
+ &lt;col width=185&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl63 width=177 style=’height:17.0pt;width:133pt’&gt;名称&lt;/td&gt;
+  &lt;td class=xl64 width=175 style=’width:131pt’&gt;含义&lt;/td&gt;
+  &lt;td class=xl64 width=177 style=’width:133pt’&gt;命令选项&lt;/td&gt;
+  &lt;td class=xl64 width=185 style=’width:139pt’&gt;说明&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td rowspan=6 height=206 class=xl69 width=191 style=’border-bottom:1.0pt;
+  height:154.0pt;border-top:none;width:143pt’&gt;updateBrokerConfig&lt;/td&gt;
+  &lt;td rowspan=6 class=xl72 width=87 style=’border-bottom:1.0pt;
+  border-top:none;width:65pt’&gt;更新 Broker 配置文件，会修改Broker.conf&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-b&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;Broker 地址，格式为ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-c&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;cluster 名称&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-k&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;key 值&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-v&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;value 值&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td rowspan=3 height=137 class=xl69 width=191 style=’border-bottom:1.0pt;
+  height:103.0pt;border-top:none;width:143pt’&gt;brokerStatus&lt;/td&gt;
+  &lt;td rowspan=3 class=xl72 width=87 style=’border-bottom:1.0pt;
+  border-top:none;width:65pt’&gt;查看 Broker 统计信息、运行状态（你想要的信息几乎都在里面）&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-b&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;Broker 地址，地址为ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td rowspan=6 height=256 class=xl69 width=191 style=’border-bottom:1.0pt;
+  height:192.0pt;border-top:none;width:143pt’&gt;brokerConsumeStats&lt;/td&gt;
+  &lt;td rowspan=6 class=xl72 width=87 style=’border-bottom:1.0pt;
+  border-top:none;width:65pt’&gt;Broker中各个消费者的消费情况，按Message Queue维度返回Consume
+  Offset，Broker Offset，Diff，TImestamp等信息&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-b&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;Broker 地址，地址为ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-t&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;请求超时时间&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl67 width=87 style=’height:29.0pt;width:65pt’&gt;-l&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;diff阈值，超过阈值才打印&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-o&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;是否为顺序topic，一般为false&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td rowspan=2 height=114 class=xl69 width=191 style=’border-bottom:1.0pt;
+  height:86.0pt;border-top:none;width:143pt’&gt;getBrokerConfig&lt;/td&gt;
+  &lt;td rowspan=2 class=xl72 width=87 style=’border-bottom:1.0pt
+  border-top:none;width:65pt’&gt;获取Broker配置&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-b&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;Broker 地址，地址为ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td rowspan=3 height=137 class=xl69 width=191 style=’border-bottom:1.0pt;
+  height:103.0pt;border-top:none;width:143pt’&gt;wipeWritePerm&lt;/td&gt;
+  &lt;td rowspan=3 class=xl72 width=87 style=’border-bottom:1.0pt
+  border-top:none;width:65pt’&gt;从NameServer上清除 Broker写权限&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-b&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;BrokerName&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+   &lt;td rowspan=3 height=137 class=xl69 width=191 style=’border-bottom:1.0pt;
+   height:103.0pt;border-top:none;width:143pt’&gt;addWritePerm&lt;/td&gt;
+   &lt;td rowspan=3 class=xl72 width=87 style=’border-bottom:1.0pt
+   border-top:none;width:65pt’&gt;从NameServer上添加 Broker写权限&lt;/td&gt;
+   &lt;td class=xl67 width=87 style=’width:65pt’&gt;-b&lt;/td&gt;
+   &lt;td class=xl68 width=87 style=’width:65pt’&gt;BrokerName&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td rowspan=4 height=160 class=xl69 width=191 style=’border-bottom:1.0pt;
+  height:120.0pt;border-top:none;width:143pt’&gt;cleanExpiredCQ&lt;/td&gt;
+  &lt;td rowspan=4 class=xl72 width=87 style=’border-bottom:1.0pt
+  border-top:none;width:65pt’&gt;清理Broker上过期的Consume Queue，如果手动减少对列数可能产生过期队列&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-b&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;Broker 地址，地址为ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-c&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;集群名称&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td rowspan=4 height=160 class=xl69 width=191 style=’border-bottom:1.0pt;
+  height:120.0pt;border-top:none;width:143pt’&gt;deleteExpiredCommitLog&lt;/td&gt;
+  &lt;td rowspan=4 class=xl72 width=87 style=’border-bottom:1.0pt
+  border-top:none;width:65pt’&gt;清理Broker上过期的CommitLog文件，Broker最多会执行20次删除操作，每次最多删除10个文件&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-b&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;Broker 地址，地址为ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-c&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;集群名称&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=88 style=’mso-height-source:userset;height:66.0pt’&gt;
+  &lt;td rowspan=4 height=191 class=xl69 width=191 style=’border-bottom:1.0pt;
+  height:143.0pt;border-top:none;width:143pt’&gt;cleanUnusedTopic&lt;/td&gt;
+  &lt;td rowspan=4 class=xl72 width=87 style=’border-bottom:1.0pt
+  border-top:none;width:65pt’&gt;清理Broker上不使用的Topic，从内存中释放Topic的Consume
+  Queue，如果手动删除Topic会产生不使用的Topic&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-b&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;Broker 地址，地址为ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-c&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;集群名称&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td rowspan=5 height=199 class=xl69 width=191 style=’border-bottom:1.0pt;
+  height:149.0pt;border-top:none;width:143pt’&gt;sendMsgStatus&lt;/td&gt;
+  &lt;td rowspan=5 class=xl72 width=87 style=’border-bottom:1.0pt
+  border-top:none;width:65pt’&gt;向Broker发消息，返回发送状态和RT&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-b&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;BrokerName，注意不同于Broker地址&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl67 width=87 style=’height:29.0pt;width:65pt’&gt;-s&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;消息大小，单位B&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-c&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;发送次数&lt;/td&gt;
+ &lt;/tr&gt;
+&lt;/table&gt;</p>
+
+<h4 id="24-消息相关">2.4 消息相关</h4>
+
+<p>&lt;table border=0 cellpadding=0 cellspacing=0 width=714&gt;
+ &lt;col width=177&gt;
+ &lt;col width=175&gt;
+ &lt;col width=177&gt;
+ &lt;col width=185&gt;
+&lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl63 width=177 style=’height:17.0pt;width:133pt’&gt;名称&lt;/td&gt;
+  &lt;td class=xl64 width=175 style=’width:131pt’&gt;含义&lt;/td&gt;
+  &lt;td class=xl64 width=177 style=’width:133pt’&gt;命令选项&lt;/td&gt;
+  &lt;td class=xl64 width=185 style=’width:139pt’&gt;说明&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=128 style=’height:96.0pt’&gt;
+  &lt;td rowspan=3 height=208 class=xl69 width=87 style=’border-bottom:1.0pt;
+  height:156.0pt;border-top:none;width:65pt’&gt;queryMsgById&lt;/td&gt;
+  &lt;td rowspan=3 class=xl72 width=87 style=’border-bottom:1.0pt;
+  border-top:none;width:65pt’&gt;根据offsetMsgId查询msg，如果使用开源控制台，应使用offsetMsgId，此命令还有其他参数，具体作用请阅读QueryMsgByIdSubCommand。&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-i&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;msgId&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td rowspan=4 height=126 class=xl69 width=87 style=’border-bottom:1.0pt;
+  height:94.0pt;border-top:none;width:65pt’&gt;queryMsgByKey&lt;/td&gt;
+  &lt;td rowspan=4 class=xl72 width=87 style=’border-bottom:1.0pt;
+  border-top:none;width:65pt’&gt;根据消息 Key 查询消息&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-k&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;msgKey&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-t&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;Topic 名称&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=225 style=’height:169.0pt’&gt;
+  &lt;td rowspan=6 height=390 class=xl69 width=87 style=’border-bottom:1.0pt;
+  height:292.0pt;border-top:none;width:65pt’&gt;queryMsgByOffset&lt;/td&gt;
+  &lt;td rowspan=6 class=xl72 width=87 style=’border-bottom:1.0pt;
+  border-top:none;width:65pt’&gt;根据 Offset 查询消息&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-b&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;Broker 名称，（这里需要注意
+  填写的是 Broker 的名称，不是 Broker 的地址，Broker 名称可以在 clusterList 查到）&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl67 width=87 style=’height:29.0pt;width:65pt’&gt;-i&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;query 队列 id&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-o&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;offset 值&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-t&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;topic 名称&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=47&gt;
+  &lt;td rowspan=6 height=209 class=xl69 width=87 style=’border-bottom:1.0pt;
+  height:156.0pt;border-top:none;width:65pt’&gt;queryMsgByUniqueKey&lt;/td&gt;
+  &lt;td rowspan=6 class=xl72 width=87 style=’border-bottom:1.0pt;
+  border-top:none;width:65pt’&gt;根据msgId查询，msgId不同于offsetMsgId，区别详见常见运维问题。-g，-d配合使用，查到消息后尝试让特定的消费者消费消息并返回消费结果&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-i&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;uniqe msg id&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=36 style=’height:27.0pt’&gt;
+  &lt;td height=36 class=xl67 width=87 style=’height:27.0pt;width:65pt’&gt;-g&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;consumerGroup&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-d&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;clientId&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-t&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;topic名称&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td rowspan=5 height=149 class=xl69 width=87 style=’border-bottom:1.0pt
+  height:111.0pt;border-top:none;width:65pt’&gt;checkMsgSendRT&lt;/td&gt;
+  &lt;td rowspan=5 class=xl72 width=87 style=’border-bottom:1.0pt;
+  border-top:none;width:65pt’&gt;检测向topic发消息的RT，功能类似clusterRT&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-t&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;topic名称&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-a&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;探测次数&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-s&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;消息大小&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td rowspan=8 height=218 class=xl69 width=87 style=’border-bottom:1.0pt;
+  height:162.0pt;border-top:none;width:65pt’&gt;sendMessage&lt;/td&gt;
+  &lt;td rowspan=8 class=xl72 width=87 style=’border-bottom:1.0pt;
+  border-top:none;width:65pt’&gt;发送一条消息，可以根据配置发往特定Message Queue，或普通发送。&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-t&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;topic名称&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-p&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;body，消息体&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-k&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;keys&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-c&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;tags&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-b&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;BrokerName&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-i&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;queueId&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td rowspan=10 height=312 class=xl69 width=87 style=’border-bottom:1.0pt;
+  height:232.0pt;border-top:none;width:65pt’&gt;consumeMessage&lt;/td&gt;
+  &lt;td rowspan=10 class=xl72 width=87 style=’border-bottom:1.0pt;
+  border-top:none;width:65pt’&gt;消费消息。可以根据offset、开始&amp;结束时间戳、消息队列消费消息，配置不同执行不同消费逻辑，详见ConsumeMessageCommand。&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-t&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;topic名称&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-b&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;BrokerName&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl67 width=87 style=’height:29.0pt;width:65pt’&gt;-o&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;从offset开始消费&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-i&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;queueId&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-g&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;消费者分组&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl67 width=87 style=’height:29.0pt;width:65pt’&gt;-s&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;开始时间戳，格式详见-h&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-d&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;结束时间戳&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl67 width=87 style=’height:29.0pt;width:65pt’&gt;-c&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;消费多少条消息&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td rowspan=8 height=282 class=xl69 width=87 style=’border-bottom:1.0pt;
+  height:210.0pt;border-top:none;width:65pt’&gt;printMsg&lt;/td&gt;
+  &lt;td rowspan=8 class=xl72 width=87 style=’border-bottom:1.0pt;
+  border-top:none;width:65pt’&gt;从Broker消费消息并打印，可选时间段&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-t&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;topic名称&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl67 width=87 style=’height:29.0pt;width:65pt’&gt;-c&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;字符集，例如UTF-8&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl67 width=87 style=’height:29.0pt;width:65pt’&gt;-s&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;subExpress，过滤表达式&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl67 width=87 style=’height:29.0pt;width:65pt’&gt;-b&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;开始时间戳，格式参见-h&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-e&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;结束时间戳&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl67 width=87 style=’height:29.0pt;width:65pt’&gt;-d&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;是否打印消息体&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td rowspan=12 height=390 class=xl69 width=87 style=’border-bottom:1.0pt;
+  height:290.0pt;border-top:none;width:65pt’&gt;printMsgByQueue&lt;/td&gt;
+  &lt;td rowspan=12 class=xl72 width=87 style=’border-bottom:1.0pt;
+  border-top:none;width:65pt’&gt;类似printMsg，但指定Message Queue&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-t&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;topic名称&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-i&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;queueId&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-a&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;BrokerName&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl67 width=87 style=’height:29.0pt;width:65pt’&gt;-c&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;字符集，例如UTF-8&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl67 width=87 style=’height:29.0pt;width:65pt’&gt;-s&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;subExpress，过滤表达式&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl67 width=87 style=’height:29.0pt;width:65pt’&gt;-b&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;开始时间戳，格式参见-h&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-e&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;结束时间戳&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-p&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;是否打印消息&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl67 width=87 style=’height:29.0pt;width:65pt’&gt;-d&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;是否打印消息体&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl67 width=87 style=’height:29.0pt;width:65pt’&gt;-f&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;是否统计tag数量并打印&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td rowspan=7 height=410 class=xl69 width=87 style=’border-bottom:1.0pt;
+  height:307.0pt;border-top:none;width:65pt’&gt;resetOffsetByTime&lt;/td&gt;
+  &lt;td rowspan=7 class=xl72 width=87 style=’border-bottom:1.0pt;
+  border-top:none;width:65pt’&gt;按时间戳重置offset，Broker和consumer都会重置&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-g&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;消费者分组&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-t&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;topic名称&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-s&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;重置为此时间戳对应的offset&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=188 style=’height:141.0pt’&gt;
+  &lt;td height=188 class=xl67 width=87 style=’height:141.0pt;width:65pt’&gt;-f&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;是否强制重置，如果false，只支持回溯offset，如果true，不管时间戳对应offset与consumeOffset关系&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl67 width=87 style=’height:29.0pt;width:65pt’&gt;-c&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;是否重置c++客户端offset&lt;/td&gt;
+ &lt;/tr&gt;
+&lt;/table&gt;</p>
+
+<h4 id="25-消费者消费组相关">2.5 消费者、消费组相关</h4>
+
+<p>&lt;table border=0 cellpadding=0 cellspacing=0 width=714&gt;
+ &lt;col width=177&gt;
+ &lt;col width=175&gt;
+ &lt;col width=177&gt;
+ &lt;col width=185&gt;
+&lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl63 width=177 style=’height:17.0pt;width:133pt’&gt;名称&lt;/td&gt;
+  &lt;td class=xl64 width=175 style=’width:131pt’&gt;含义&lt;/td&gt;
+  &lt;td class=xl64 width=177 style=’width:133pt’&gt;命令选项&lt;/td&gt;
+  &lt;td class=xl64 width=185 style=’width:139pt’&gt;说明&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td rowspan=4 height=158 class=xl69 width=87 style=’border-bottom:1.0pt;
+  height:110pt;border-top:none;width:65pt’&gt;consumerProgress&lt;/td&gt;
+  &lt;td rowspan=4 class=xl72 width=87 style=’border-bottom:1.0pt;
+  border-top:none;width:65pt’&gt;查看订阅组消费状态，可以查看具体的client IP的消息积累量&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-g&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;消费者所属组名&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl67 width=87 style=’height:29.0pt;width:65pt’&gt;-s&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;是否打印client IP&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=105 style=’mso-height-source:userset;height:79.0pt’&gt;
+  &lt;td rowspan=5 height=260 class=xl69 width=87 style=’border-bottom:1.0pt;
+  height:195.0pt;border-top:none;width:65pt’&gt;consumerStatus&lt;/td&gt;
+  &lt;td rowspan=5 class=xl72 width=87 style=’border-bottom:1.0pt
+  border-top:none;width:65pt’&gt;查看消费者状态，包括同一个分组中是否都是相同的订阅，分析Process
+  Queue是否堆积，返回消费者jstack结果，内容较多，使用者参见ConsumerStatusSubCommand&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=36 style=’height:27.0pt’&gt;
+  &lt;td height=36 class=xl67 width=87 style=’height:27.0pt;width:65pt’&gt;-g&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;consumer group&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-i&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;clientId&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl67 width=87 style=’height:29.0pt;width:65pt’&gt;-s&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;是否执行jstack&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td rowspan=13 height=761 class=xl69 width=87 style=’border-bottom:1.0pt
+  height:569.0pt;border-top:none;width:65pt’&gt;updateSubGroup&lt;/td&gt;
+  &lt;td rowspan=13 class=xl72 width=87 style=’border-bottom:1.0pt
+  border-top:none;width:65pt’&gt;更新或创建订阅关系&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-b&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;Broker地址&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-c&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;集群名称&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl67 width=87 style=’height:29.0pt;width:65pt’&gt;-g&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;消费者分组名称&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl67 width=87 style=’height:29.0pt;width:65pt’&gt;-s&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;分组是否允许消费&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-m&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;是否从最小offset开始消费&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl67 width=87 style=’height:29.0pt;width:65pt’&gt;-d&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;是否是广播模式&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-q&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;重试队列数量&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-r&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;最大重试次数&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=207 style=’height:155.0pt’&gt;
+  &lt;td height=207 class=xl67 width=87 style=’height:155.0pt;width:65pt’&gt;-i&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;当slaveReadEnable开启时有效，且还未达到从slave消费时建议从哪个BrokerId消费，可以配置备机id，主动从备机消费&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=132 style=’height:99.0pt’&gt;
+  &lt;td height=132 class=xl67 width=87 style=’height:99.0pt;width:65pt’&gt;-w&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;如果Broker建议从slave消费，配置决定从哪个slave消费，配置BrokerId，例如1&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=76 style=’height:57.0pt’&gt;
+  &lt;td height=76 class=xl67 width=87 style=’height:57.0pt;width:65pt’&gt;-a&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;当消费者数量变化时是否通知其他消费者负载均衡&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td rowspan=5 height=165 class=xl69 width=87 style=’border-bottom:1.0pt
+  height:123.0pt;border-top:none;width:65pt’&gt;deleteSubGroup&lt;/td&gt;
+  &lt;td rowspan=5 class=xl72 width=87 style=’border-bottom:1.0pt
+  border-top:none;width:65pt’&gt;从Broker删除订阅关系&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-b&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;Broker地址&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-c&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;集群名称&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td height=39 class=xl67 width=87 style=’height:29.0pt;width:65pt’&gt;-g&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;消费者分组名称&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td rowspan=6 height=172 class=xl69 width=87 style=’border-bottom:1.0pt
+  height:120pt;border-top:none;width:65pt’&gt;cloneGroupOffset&lt;/td&gt;
+  &lt;td rowspan=6 class=xl72 width=87 style=’border-bottom:1.0pt
+  border-top:none;width:65pt’&gt;在目标群组中使用源群组的offset&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-s&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;源消费者组&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-d&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;目标消费者组&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-t&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;topic名称&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-o&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;暂未使用&lt;/td&gt;
+ &lt;/tr&gt;
+&lt;/table&gt;</p>
+
+<h4 id="26-连接相关">2.6 连接相关</h4>
+
+<p>&lt;table border=0 cellpadding=0 cellspacing=0 width=714&gt;
+ &lt;col width=177&gt;
+ &lt;col width=175&gt;
+ &lt;col width=177&gt;
+ &lt;col width=185&gt;
+&lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl63 width=177 style=’height:17.0pt;width:133pt’&gt;名称&lt;/td&gt;
+  &lt;td class=xl64 width=175 style=’width:131pt’&gt;含义&lt;/td&gt;
+  &lt;td class=xl64 width=177 style=’width:133pt’&gt;命令选项&lt;/td&gt;
+  &lt;td class=xl64 width=185 style=’width:139pt’&gt;说明&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td rowspan=3 height=119 class=xl69 width=87 style=’border-bottom:1.0pt
+  height:89.0pt;border-top:none;width:65pt’&gt;consumerConnection&lt;/td&gt;
+  &lt;td rowspan=3 class=xl72 width=87 style=’border-bottom:1.0pt
+  border-top:none;width:65pt’&gt;查询 Consumer 的网络连接&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-g&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;消费者所属组名&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=39 style=’height:29.0pt’&gt;
+  &lt;td rowspan=4 height=142 class=xl69 width=87 style=’border-bottom:1.0pt
+  height:106.0pt;border-top:none;width:65pt’&gt;producerConnection&lt;/td&gt;
+  &lt;td rowspan=4 class=xl72 width=87 style=’border-bottom:1.0pt
+  border-top:none;width:65pt’&gt;查询 Producer 的网络连接&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-g&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;生产者所属组名&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-t&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;主题名称&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+&lt;/table&gt;</p>
+
+<h4 id="27-nameserver相关">2.7 NameServer相关</h4>
+
+<p>&lt;table border=0 cellpadding=0 cellspacing=0 width=714&gt;
+ &lt;col width=177&gt;
+ &lt;col width=175&gt;
+ &lt;col width=177&gt;
+ &lt;col width=185&gt;
+&lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl63 width=177 style=’height:17.0pt;width:133pt’&gt;名称&lt;/td&gt;
+  &lt;td class=xl64 width=175 style=’width:131pt’&gt;含义&lt;/td&gt;
+  &lt;td class=xl64 width=177 style=’width:133pt’&gt;命令选项&lt;/td&gt;
+  &lt;td class=xl64 width=185 style=’width:139pt’&gt;说明&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=21 style=’height:16.0pt’&gt;
+  &lt;td rowspan=5 height=143 class=xl69 width=87 style=’border-bottom:1.0pt
+  height:100pt;border-top:none;width:65pt’&gt;updateKvConfig&lt;/td&gt;
+  &lt;td rowspan=5 class=xl72 width=87 style=’border-bottom:1.0pt
+  border-top:none;width:65pt’&gt;更新NameServer的kv配置，目前还未使用&lt;/td&gt;
+  &lt;td class=xl75 width=87 style=’width:65pt’&gt;-s&lt;/td&gt;
+  &lt;td class=xl76 width=87 style=’width:65pt’&gt;命名空间&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=21 style=’height:16.0pt’&gt;
+  &lt;td height=21 class=xl75 width=87 style=’height:16.0pt;width:65pt’&gt;-k&lt;/td&gt;
+  &lt;td class=xl75 width=87 style=’width:65pt’&gt;key&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=21 style=’height:16.0pt’&gt;
+  &lt;td height=21 class=xl75 width=87 style=’height:16.0pt;width:65pt’&gt;-v&lt;/td&gt;
+  &lt;td class=xl75 width=87 style=’width:65pt’&gt;value&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td rowspan=4 height=126 class=xl69 width=87 style=’border-bottom:1.0pt
+  height:94.0pt;border-top:none;width:65pt’&gt;deleteKvConfig&lt;/td&gt;
+  &lt;td rowspan=4 class=xl72 width=87 style=’border-bottom:1.0pt
+  border-top:none;width:65pt’&gt;删除NameServer的kv配置&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-s&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;命名空间&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-k&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;key&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td height=57 class=xl67 width=87 style=’height:43.0pt;width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td rowspan=2 height=80 class=xl69 width=87 style=’border-bottom:1.0pt
+  height:60.0pt;border-top:none;width:65pt’&gt;getNamesrvConfig&lt;/td&gt;
+  &lt;td rowspan=2 class=xl72 width=87 style=’border-bottom:1.0pt
+  border-top:none;width:65pt’&gt;获取NameServer配置&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td rowspan=4 height=126 class=xl69 width=87 style=’border-bottom:1.0pt
+  height:94.0pt;border-top:none;width:65pt’&gt;updateNamesrvConfig&lt;/td&gt;
+  &lt;td rowspan=4 class=xl72 width=87 style=’border-bottom:1.0pt
+  border-top:none;width:65pt’&gt;修改NameServer配置&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-k&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;key&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-v&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;value&lt;/td&gt;
+ &lt;/tr&gt;
+&lt;/table&gt;</p>
+
+<h4 id="28-其他">2.8 其他</h4>
+
+<p>&lt;table border=0 cellpadding=0 cellspacing=0 width=714&gt;
+ &lt;col width=177&gt;
+ &lt;col width=175&gt;
+ &lt;col width=177&gt;
+ &lt;col width=185&gt;
+&lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl63 width=177 style=’height:17.0pt;width:133pt’&gt;名称&lt;/td&gt;
+  &lt;td class=xl64 width=175 style=’width:131pt’&gt;含义&lt;/td&gt;
+  &lt;td class=xl64 width=177 style=’width:133pt’&gt;命令选项&lt;/td&gt;
+  &lt;td class=xl64 width=185 style=’width:139pt’&gt;说明&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=57 style=’height:43.0pt’&gt;
+  &lt;td rowspan=2 height=80 class=xl69 width=87 style=’border-bottom:1.0pt
+  height:60.0pt;border-top:none;width:65pt’&gt;startMonitoring&lt;/td&gt;
+  &lt;td rowspan=2 class=xl71 width=87 style=’border-bottom:1.0pt
+  border-top:none;width:65pt’&gt;开启监控进程，监控消息误删、重试队列消息数等&lt;/td&gt;
+  &lt;td class=xl67 width=87 style=’width:65pt’&gt;-n&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;NameServer 服务地址，格式 ip:port&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr height=23 style=’height:17.0pt’&gt;
+  &lt;td height=23 class=xl67 width=87 style=’height:17.0pt;width:65pt’&gt;-h&lt;/td&gt;
+  &lt;td class=xl68 width=87 style=’width:65pt’&gt;打印帮助&lt;/td&gt;
+ &lt;/tr&gt;
+&lt;/table&gt;</p>
+
+<h2 id="3---运维常见问题">3   运维常见问题</h2>
+
+<h4 id="31-rocketmq的mqadmin命令报错问题">3.1 RocketMQ的mqadmin命令报错问题</h4>
+
+<blockquote>
+  <p>问题描述：有时候在部署完RocketMQ集群后，尝试执行“mqadmin”一些运维命令，会出现下面的异常信息：</p>
+
+  <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="n">org</span><span class="o">.</span><span class="na">apache</span><span class="o">.</span><span class="na">rocketmq</span><span class="o">.</span><span class="na">remoting</span><span class="o">.</span><span class="na">exception</span><span class="o">.</span><span class="na">RemotingConnectException</span><span class="o">:</span> <span class="n">connect</span> <span class="n">to</span> <span class="o">&lt;</span><span class="kc">null</span><span class="o">&gt;</span> <span class="n">failed</span>
+</code></pre></div>  </div>
+</blockquote>
+
+<p>解决方法：可以在部署RocketMQ集群的虚拟机上执行<code class="highlighter-rouge">export NAMESRV_ADDR=ip:9876</code>（ip指的是集群中部署NameServer组件的机器ip地址）命令之后再使用“mqadmin”的相关命令进行查询，即可得到结果。</p>
+
+<h4 id="32-rocketmq生产端和消费端版本不一致导致不能正常消费的问题">3.2 RocketMQ生产端和消费端版本不一致导致不能正常消费的问题</h4>
+
+<blockquote>
+  <p>问题描述：同一个生产端发出消息，A消费端可消费，B消费端却无法消费，rocketMQ Console中出现：</p>
+
+  <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Not</span> <span class="n">found</span> <span class="n">the</span> <span class="n">consumer</span> <span class="n">group</span> <span class="n">consume</span> <span class="n">stats</span><span class="o">,</span> <span class="n">because</span> <span class="k">return</span> <span class="n">offset</span> <span class="n">table</span> <span class="n">is</span> <span class="n">empty</span><span class="o">,</span> <span class="n">maybe</span> <span class="n">the</span> <span class="n">consumer</span> <span class="n">not</span> <span class="n">consume</span> <span class="n">any</span> <span class="n">message</span><span class="err">的异常消息。</span>
+</code></pre></div>  </div>
+</blockquote>
+
+<p>解决方案：RocketMQ 的jar包：rocketmq-client等包应该保持生产端，消费端使用相同的version。</p>
+
+<h4 id="33--新增一个topic的消费组时无法消费历史消息的问题">3.3  新增一个topic的消费组时，无法消费历史消息的问题</h4>
+
+<blockquote>
+  <p>问题描述：当同一个topic的新增消费组启动时，消费的消息是当前的offset的消息，并未获取历史消息。</p>
+</blockquote>
+
+<p>解决方案：rocketmq默认策略是从消息队列尾部，即跳过历史消息。如果想消费历史消息，则需要设置：<code class="highlighter-rouge">org.apache.rocketmq.client.consumer.DefaultMQPushConsumer#setConsumeFromWhere</code>。常用的有以下三种配置：</p>
+
+<ul>
+  <li>默认配置，一个新的订阅组第一次启动从队列的最后位置开始消费，后续再启动接着上次消费的进度开始消费，即跳过历史消息；</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">consumer</span><span class="o">.</span><span class="na">setConsumeFromWhere</span><span class="o">(</span><span class="n">ConsumeFromWhere</span><span class="o">.</span><span class="na">CONSUME_FROM_LAST_OFFSET</span><span class="o">);</span>
+</code></pre></div></div>
+
+<ul>
+  <li>一个新的订阅组第一次启动从队列的最前位置开始消费，后续再启动接着上次消费的进度开始消费，即消费Broker未过期的历史消息；</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">consumer</span><span class="o">.</span><span class="na">setConsumeFromWhere</span><span class="o">(</span><span class="n">ConsumeFromWhere</span><span class="o">.</span><span class="na">CONSUME_FROM_FIRST_OFFSET</span><span class="o">);</span>
+</code></pre></div></div>
+
+<ul>
+  <li>一个新的订阅组第一次启动从指定时间点开始消费，后续再启动接着上次消费的进度开始消费，和consumer.setConsumeTimestamp()配合使用，默认是半个小时以前；</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">consumer</span><span class="o">.</span><span class="na">setConsumeFromWhere</span><span class="o">(</span><span class="n">ConsumeFromWhere</span><span class="o">.</span><span class="na">CONSUME_FROM_TIMESTAMP</span><span class="o">);</span>
+</code></pre></div></div>
+
+<h4 id="34-如何开启从slave读数据功能">3.4 如何开启从Slave读数据功能</h4>
+
+<p>在某些情况下，Consumer需要将消费位点重置到1-2天前，这时在内存有限的Master Broker上，CommitLog会承载比较重的IO压力，影响到该Broker的其它消息的读与写。可以开启<code class="highlighter-rouge">slaveReadEnable=true</code>，当Master Broker发现Consumer的消费位点与CommitLog的最新值的差值的容量超过该机器内存的百分比（<code class="highlighter-rouge">accessMessageInMemoryMaxRatio=40%</code>），会推荐Consumer从Slave Broker中去读取数据，降低Master Broker的IO。</p>
+
+<h4 id="35-性能调优问题">3.5 性能调优问题</h4>
+
+<p>异步刷盘建议使用自旋锁，同步刷盘建议使用重入锁，调整Broker配置项<code class="highlighter-rouge">useReentrantLockWhenPutMessage</code>，默认为false；异步刷盘建议开启<code class="highlighter-rouge">TransientStorePoolEnable</code>；建议关闭transferMsgByHeap，提高拉消息效率；同步刷盘建议适当增大<code class="highlighter-rouge">sendMessageThreadPoolNums</code>，具体配置需要经过压测。</p>
+
+<h4 id="36-在rocketmq中-msgid-和-offsetmsgid-的含义与区别">3.6 在RocketMQ中 msgId 和 offsetMsgId 的含义与区别</h4>
+
+<p>使用RocketMQ完成生产者客户端消息发送后，通常会看到如下日志打印信息：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">SendResult</span> <span class="o">[</span><span class="n">sendStatus</span><span class="o">=</span><span class="n">SEND_OK</span><span class="o">,</span> <span class="n">msgId</span><span class="o">=</span><span class="mi">0</span><span class="n">A42333A0DC818B4AAC246C290FD0000</span><span class="o">,</span> <span class="n">offsetMsgId</span><span class="o">=</span><span class="mi">0</span><span class="n">A42333A00002A9F000000000134F1F5</span><span class="o">,</span> <span class="n">messageQueue</span><span class="o">=</span><span class="n">MessageQueue</span> <span class="o">[</span><span class="n">topic</span><span class="o">=</span><span class="n">topicTest1</span><span class="o">,</span> <span class="n">BrokerName</span><span class="o">=</span><span class="n">mac</span><span class="o">.</span><span class="na">local</span><span class="o">,</span> <span class="n">queueId</span><span class="o">=</span><span class="mi">3</span><span class="o">],</span> <span class="n">queueOffset</span><span class="o">=</span><span class="mi">4</span><span class="o">]</span>
+</code></pre></div></div>
+
+<ul>
+  <li>msgId，对于客户端来说msgId是由客户端producer实例端生成的，具体来说，调用方法<code class="highlighter-rouge">MessageClientIDSetter.createUniqIDBuffer()</code>生成唯一的Id；</li>
+  <li>offsetMsgId，offsetMsgId是由Broker服务端在写入消息时生成的（采用”IP地址+Port端口”与“CommitLog的物理偏移量地址”做了一个字符串拼接），其中offsetMsgId就是在RocketMQ控制台直接输入查询的那个messageId。</li>
+</ul>
+
+<h4 id="持久化的唯一brokerid">持久化的唯一BrokerId</h4>
+
+<h5 id="现阶段问题">现阶段问题</h5>
+
+<p>在 RocketMQ 5.0.0 和 5.1.0 版本中，采用<code class="highlighter-rouge">BrokerAddress</code>作为Broker在Controller模式下的唯一标识。导致如下情景出现问题：</p>
+
+<ul>
+  <li>在容器或者K8s环境下，每次Broker的重启或升级都可能会导致IP发生变化，导致之前的<code class="highlighter-rouge">BrokerAddress</code>留下的记录没办法和重启后的Broker联系起来，比如说<code class="highlighter-rouge">ReplicaInfo</code>, <code class="highlighter-rouge">SyncStateSet</code>等数据。</li>
+</ul>
+

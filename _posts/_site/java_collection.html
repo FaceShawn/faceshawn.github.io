@@ -49,7 +49,18 @@
   <p>各种实现类的底层实现原理、实现类的优缺点。</p>
 </blockquote>
 
-<p>重写<code class="highlighter-rouge">toString()</code>来打印内容，否则默认打印地址。</p>
+<ul>
+  <li>
+    <p>重写<code class="highlighter-rouge">toString()</code>来打印内容，否则默认打印地址。</p>
+  </li>
+  <li>
+    <p>singleton() 方法：</p>
+  </li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Long</span> <span class="n">orderId</span><span class="o">;</span>
+<span class="n">Collection</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">&gt;</span> <span class="n">orderIds</span> <span class="o">=</span> <span class="n">singleton</span><span class="o">(</span><span class="n">orderId</span><span class="o">);</span>
+</code></pre></div></div>
 
 <h4 id="一list-接口">一、List 接口</h4>
 
@@ -58,7 +69,7 @@
     <ul>
       <li><code class="highlighter-rouge">CopyOnWrite（COW）</code>并发容器
         <ul>
-          <li><code class="highlighter-rouge">CopyOnWriteArrayList</code>：绝对线程安全，在读多写少的场合性能非常好，远远好于 <code class="highlighter-rouge">Vector</code>；</li>
+          <li><code class="highlighter-rouge">CopyOnWriteArrayList</code>：绝对<strong>线程安全</strong>，在读多写少的场合性能非常好，远远好于 <code class="highlighter-rouge">Vector</code>；</li>
           <li><code class="highlighter-rouge">CopyOnWriteArraySet</code></li>
         </ul>
       </li>
@@ -82,7 +93,7 @@
     </ul>
   </li>
   <li><code class="highlighter-rouge">Pri'orityQueue</code> 类，<strong>优先级队列</strong>、非阻塞式：用 Object[] 数组实现<strong>二叉堆</strong>；</li>
-  <li><code class="highlighter-rouge">BlockingQueue</code> <strong>阻塞队列</strong>：非常适合用于作为数据共享的通道；
+  <li><code class="highlighter-rouge">BlockingQueue</code> <strong>阻塞队列</strong>：非常适合用于作为数据共享的通道；<strong>并发</strong>
     <ol>
       <li>广泛用在生产者-消费者模式：提供了可阻塞的插入和移除方法。当队列容器已满，生产者线程会被阻塞，直到队列未满；当队列容器为空时，消费者线程会被阻塞，直至队列非空时为止。</li>
       <li>作为 <code class="highlighter-rouge">workqueue</code> 参数传入构造器 <code class="highlighter-rouge">ThreadPoolExecutor()</code> 创建线程池；</li>
@@ -94,7 +105,7 @@
       </li>
     </ol>
   </li>
-  <li><code class="highlighter-rouge">ConcurrentLinkedQueue</code> : 高效的并发队列，是非阻塞队列，用链表实现。可看做线程安全的 <code class="highlighter-rouge">LinkedList</code>。</li>
+  <li><code class="highlighter-rouge">ConcurrentLinkedQueue</code> : 高效的<strong>并发</strong>队列，是非阻塞队列，用链表实现。可看做线程安全的 <code class="highlighter-rouge">LinkedList</code>。</li>
 </ol>
 
 <h4 id="三set-接口">三、Set 接口</h4>
@@ -173,6 +184,10 @@
   <li>如果有，再去调用子类的同名方法。</li>
 </ul>
 
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//ConcurrentMap 中</span>
+<span class="n">putIfAbsent</span><span class="o">()</span> <span class="c1">// </span>
+</code></pre></div></div>
+
 <h4 id="线程不安全的集合">线程不安全的集合</h4>
 
 <p>注意，以下都是<strong>线程不安全</strong>的：</p>
@@ -183,9 +198,35 @@
   <li><code class="highlighter-rouge">HashMap, TreeMap</code></li>
 </ol>
 
+<h4 id="线程安全的集合">线程安全的集合</h4>
+
+<blockquote>
+  <p>见多线程文档中#实现线程安全的方法#使用<strong>线程安全的集合</strong>、并发容器类。</p>
+</blockquote>
+
+<p>使用<strong>线程安全的集合</strong>、并发容器类：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">CopyOnWriteArrayList</code></li>
+  <li><code class="highlighter-rouge">BlockingQueue</code>、<code class="highlighter-rouge">ConcurrentLinkedQueue</code>、</li>
+  <li><code class="highlighter-rouge">ConcurrentHashMap</code>、<code class="highlighter-rouge">ConcurrentSkipListMap</code> 、</li>
+  <li><code class="highlighter-rouge">Collections.synchorizedList</code><strong>同步容器</strong>。</li>
+</ul>
+
+<h4 id="collection-接口方法">Collection 接口方法</h4>
+
+<ul>
+  <li>removeIf()</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 获得订单列表</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">TradeOrderDO</span><span class="o">&gt;</span> <span class="n">orders</span> <span class="o">=</span> <span class="n">tradeOrderMapper</span><span class="o">.</span><span class="na">selectListByUserIdAndActivityId</span><span class="o">(</span><span class="n">userId</span><span class="o">,</span> <span class="n">activityId</span><span class="o">,</span> <span class="n">type</span><span class="o">);</span>
+<span class="n">orders</span><span class="o">.</span><span class="na">removeIf</span><span class="o">(</span><span class="n">order</span> <span class="o">-&gt;</span> <span class="n">TradeOrderStatusEnum</span><span class="o">.</span><span class="na">isCanceled</span><span class="o">(</span><span class="n">order</span><span class="o">.</span><span class="na">getStatus</span><span class="o">()));</span> <span class="c1">// 过滤掉【已取消】的订单</span>
+</code></pre></div></div>
+
 <h3 id="list">List</h3>
 
-<h5 id="arraylist-vs-linkedlist">ArrayList VS LinkedList</h5>
+<h4 id="arraylist-vs-linkedlist">ArrayList VS LinkedList</h4>
 
 <p>二者都不是线程安全的</p>
 
@@ -197,83 +238,112 @@
   <li><strong>内存空间</strong>：从单个元素说，LinkedList 空间开销大，需要保存前后节点的指针。</li>
 </ol>
 
-<h5 id="arraylist-常用方法">ArrayList 常用方法</h5>
+<h4 id="arraylist-常用方法">ArrayList 常用方法</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import java.util.ArrayList;
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">java.util.ArrayList</span><span class="o">;</span>
 
-// 经典代码，ArrayList几乎实现了List的所有接口
-List&lt;String&gt; list = new ArrayList&lt;&gt;();
-List&lt;String&gt; list = ["A", "B", "C"];
+<span class="c1">// 经典代码，ArrayList几乎实现了List的所有接口</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">=</span> <span class="o">[</span><span class="s">"A"</span><span class="o">,</span> <span class="s">"B"</span><span class="o">,</span> <span class="s">"C"</span><span class="o">];</span>
+<span class="c1">// 创建它的 OrderItem 属性</span>
+<span class="n">result</span><span class="o">.</span><span class="na">setItems</span><span class="o">(</span><span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;(</span><span class="n">param</span><span class="o">.</span><span class="na">getItems</span><span class="o">().</span><span class="na">size</span><span class="o">()));</span>
 
-List&lt;String&gt; list = new ArrayList&lt;String&gt;() ;
+<span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;()</span> <span class="o">;</span>
 
-list.add("hello");
-list.remove(0);
-list.set(1, "world");
-list.get(2);
-list.size();
+<span class="n">list</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"hello"</span><span class="o">);</span>
+<span class="n">list</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+<span class="n">list</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="s">"world"</span><span class="o">);</span>
+<span class="n">list</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">2</span><span class="o">);</span>
+<span class="n">list</span><span class="o">.</span><span class="na">size</span><span class="o">();</span>
 
-List&lt;String&gt; list = new ArrayList&lt;&gt;(2);
-list.add("guan");
-list.add("bao");
-String[] array = list.toArray([arr]); // 集合转数组, arr为用于存储元素的数组，如new String[0]
-// 直接使用 toArray 无参方法，返回值只能是 Object[]类，若强转其它类型数组将出现 ClassCastException
-// 使用 toArray 带参方法，数组空间大小的 length == 0时，动态创建与 size 相同的数组，性能最好
+<span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;(</span><span class="mi">2</span><span class="o">);</span>
+<span class="n">list</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"guan"</span><span class="o">);</span>
+<span class="n">list</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"bao"</span><span class="o">);</span>
+<span class="n">String</span><span class="o">[]</span> <span class="n">array</span> <span class="o">=</span> <span class="n">list</span><span class="o">.</span><span class="na">toArray</span><span class="o">([</span><span class="n">arr</span><span class="o">]);</span> <span class="c1">// 集合转数组, arr为用于存储元素的数组，如new String[0]</span>
+<span class="c1">// 直接使用 toArray 无参方法，返回值只能是 Object[]类，若强转其它类型数组将出现 ClassCastException</span>
+<span class="c1">// 使用 toArray 带参方法，数组空间大小的 length == 0时，动态创建与 size 相同的数组，性能最好</span>
 
-// 初始化一个包含元素 1, 3, 5 的 ArrayList nums
-ArrayList&lt;Integer&gt; nums = new ArrayList&lt;&gt;(Arrays.asList(1, 3, 5));
+<span class="c1">// 初始化一个包含元素 1, 3, 5 的 ArrayList nums</span>
+<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">nums</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;(</span><span class="n">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="mi">3</span><span class="o">,</span> <span class="mi">5</span><span class="o">));</span>
 
-工具类 Arrays.asList() 把数组转换成集合时，不能用其修改集合的方法， add/remove/clear，一般只用来遍历
+<span class="err">工具类</span> <span class="n">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">()</span> <span class="err">把数组转换成集合时，不能用其修改集合的方法，</span> <span class="n">add</span><span class="o">/</span><span class="n">remove</span><span class="o">/</span><span class="n">clear</span><span class="err">，一般只用来遍历</span>
 
-import java.util.Collections;
+<span class="kn">import</span> <span class="nn">java.util.Collections</span><span class="o">;</span>
 
-int n = 10;
-// 初始化 ArrayList，大小为 10，元素值都为 0
-ArrayList&lt;Integer&gt; nums = new ArrayList&lt;&gt;(Collections.nCopies(n, 0));
+<span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">10</span><span class="o">;</span>
+<span class="c1">// 初始化 ArrayList，大小为 10，元素值都为 0</span>
+<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">nums</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;(</span><span class="n">Collections</span><span class="o">.</span><span class="na">nCopies</span><span class="o">(</span><span class="n">n</span><span class="o">,</span> <span class="mi">0</span><span class="o">));</span>
 </code></pre></div></div>
 
-<h5 id="linkedlist-常用方法">LinkedList 常用方法</h5>
+<h4 id="linkedlist-常用方法">LinkedList 常用方法</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import java.util.Arrays;
-import java.util.LinkedList;
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">java.util.Arrays</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.LinkedList</span><span class="o">;</span>
 
-// 初始化链表
-LinkedList&lt;Integer&gt; lst = new LinkedList&lt;&gt;(Arrays.asList(1, 2, 3, 4, 5));
+<span class="c1">// 初始化链表</span>
+<span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">lst</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LinkedList</span><span class="o">&lt;&gt;(</span><span class="n">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">3</span><span class="o">,</span> <span class="mi">4</span><span class="o">,</span> <span class="mi">5</span><span class="o">));</span>
 
-lst.isEmpty());
-// 获取链表的大小
-lst.size()
+<span class="n">lst</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">());</span>
+<span class="c1">// 获取链表的大小</span>
+<span class="n">lst</span><span class="o">.</span><span class="na">size</span><span class="o">()</span>
 
-void addFirst(E e)/addLast(e)
-E getFirst()/getLast()
-E removeFirst()/removeLast()
-// 在链表中插入元素
-// 移动到第三个位置
-lst.add(2, 99);
-// 删除链表中某个元素
-lst.remove(1);
+<span class="kt">void</span> <span class="nf">addFirst</span><span class="o">(</span><span class="n">E</span> <span class="n">e</span><span class="o">)/</span><span class="n">addLast</span><span class="o">(</span><span class="n">e</span><span class="o">)</span>
+<span class="n">E</span> <span class="nf">getFirst</span><span class="o">()/</span><span class="n">getLast</span><span class="o">()</span>
+<span class="n">E</span> <span class="nf">removeFirst</span><span class="o">()/</span><span class="n">removeLast</span><span class="o">()</span>
+<span class="c1">// 在链表中插入元素</span>
+<span class="c1">// 移动到第三个位置</span>
+<span class="n">lst</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="mi">99</span><span class="o">);</span>
+<span class="c1">// 删除链表中某个元素</span>
+<span class="n">lst</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
 
-// 遍历链表
-// 输出：1 99 3 4 5
-for(int val : lst) {
-	System.out.print(val + " ");
-}
-//-------
+<span class="c1">// 遍历链表</span>
+<span class="c1">// 输出：1 99 3 4 5</span>
+<span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">val</span> <span class="o">:</span> <span class="n">lst</span><span class="o">)</span> <span class="o">{</span>
+	<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="n">val</span> <span class="o">+</span> <span class="s">" "</span><span class="o">);</span>
+<span class="o">}</span>
+<span class="c1">//-------</span>
 
-// 队列
-List&lt;String&gt; queue = new LinkedList&lt;&gt;();
-queue.addLast("hello");
-queue.removeFirst();
+<span class="c1">// 队列</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">queue</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LinkedList</span><span class="o">&lt;&gt;();</span>
+<span class="n">queue</span><span class="o">.</span><span class="na">addLast</span><span class="o">(</span><span class="s">"hello"</span><span class="o">);</span>
+<span class="n">queue</span><span class="o">.</span><span class="na">removeFirst</span><span class="o">();</span>
 
-// 栈
-LinkedList&lt;Integer&gt; stack = new LinkedList&lt;&gt;();
-stack.push("hello"); // top index=0
-stack.pop();
-stack.peek();
+<span class="c1">// 栈</span>
+<span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">stack</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LinkedList</span><span class="o">&lt;&gt;();</span>
+<span class="n">stack</span><span class="o">.</span><span class="na">push</span><span class="o">(</span><span class="s">"hello"</span><span class="o">);</span> <span class="c1">// top index=0</span>
+<span class="n">stack</span><span class="o">.</span><span class="na">pop</span><span class="o">();</span>
+<span class="n">stack</span><span class="o">.</span><span class="na">peek</span><span class="o">();</span>
 
-stack.addFirst("world");
-stack.removeFirst();
-int top = stack.getFirst(); // top index=0
+<span class="n">stack</span><span class="o">.</span><span class="na">addFirst</span><span class="o">(</span><span class="s">"world"</span><span class="o">);</span>
+<span class="n">stack</span><span class="o">.</span><span class="na">removeFirst</span><span class="o">();</span>
+<span class="kt">int</span> <span class="n">top</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="na">getFirst</span><span class="o">();</span> <span class="c1">// top index=0</span>
+</code></pre></div></div>
+
+<h4 id="sort">sort()</h4>
+
+<p>Comparator 排序比较器</p>
+
+<ul>
+  <li>Comparator.comparing()</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+     * 排序 dictType &gt; sort
+     */</span>
+<span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Comparator</span><span class="o">&lt;</span><span class="n">DictDataDO</span><span class="o">&gt;</span> <span class="n">COMPARATOR_TYPE_AND_SORT</span> <span class="o">=</span> <span class="n">Comparator</span>
+    <span class="o">.</span><span class="na">comparing</span><span class="o">(</span><span class="nl">DictDataDO:</span><span class="o">:</span><span class="n">getDictType</span><span class="o">)</span>
+    <span class="o">.</span><span class="na">thenComparingInt</span><span class="o">(</span><span class="nl">DictDataDO:</span><span class="o">:</span><span class="n">getSort</span><span class="o">);</span>
+
+<span class="nd">@Override</span>
+<span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">DictDataDO</span><span class="o">&gt;</span> <span class="nf">getDictDataList</span><span class="o">(</span><span class="n">Integer</span> <span class="n">status</span><span class="o">,</span> <span class="n">String</span> <span class="n">dictType</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">List</span><span class="o">&lt;</span><span class="n">DictDataDO</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">=</span> <span class="n">dictDataMapper</span><span class="o">.</span><span class="na">selectListByStatusAndDictType</span><span class="o">(</span><span class="n">status</span><span class="o">,</span> <span class="n">dictType</span><span class="o">);</span>
+    <span class="n">list</span><span class="o">.</span><span class="na">sort</span><span class="o">(</span><span class="n">COMPARATOR_TYPE_AND_SORT</span><span class="o">);</span>
+    <span class="k">return</span> <span class="n">list</span><span class="o">;</span>
+<span class="o">}</span>
+
+	<span class="c1">// 获得购物车的商品</span>
+    <span class="n">List</span><span class="o">&lt;</span><span class="n">CartDO</span><span class="o">&gt;</span> <span class="n">carts</span> <span class="o">=</span> <span class="n">cartMapper</span><span class="o">.</span><span class="na">selectListByUserId</span><span class="o">(</span><span class="n">userId</span><span class="o">);</span>
+    <span class="n">carts</span><span class="o">.</span><span class="na">sort</span><span class="o">(</span><span class="n">Comparator</span><span class="o">.</span><span class="na">comparing</span><span class="o">(</span><span class="nl">CartDO:</span><span class="o">:</span><span class="n">getId</span><span class="o">).</span><span class="na">reversed</span><span class="o">());</span> <span class="c1">//</span>
 </code></pre></div></div>
 
 <h3 id="queue">Queue</h3>
@@ -500,79 +570,144 @@ maps.putAll(maps2);
 bool b = Double.compare(d1,d2);
 </code></pre>
 
+<h4 id="multivaluemap">MultiValueMap</h4>
+
+<p>MultiValueMap可以让一个key对应多个value，感觉是value产生了链表结构，可以很好的解决一些不好处理的字符串问题。</p>
+
+<ul>
+  <li>当然也可以用<strong>stringBuffer</strong>去拼，我觉得这个效果更好，效率更高。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">MultiValueMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">mValueMap</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LinkedMultiValueMap</span><span class="o">&lt;&gt;();</span>
+
+ <span class="n">mValueMap</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"早班 9:00-11:00"</span><span class="o">,</span> <span class="s">"周一"</span><span class="o">);</span>
+ <span class="n">mValueMap</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"早班 9:00-11:00"</span><span class="o">,</span> <span class="s">"周二"</span><span class="o">);</span>
+ <span class="n">mValueMap</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"中班 13:00-16:00"</span><span class="o">,</span> <span class="s">"周三"</span><span class="o">);</span>
+ <span class="n">mValueMap</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"早班 9:00-11:00"</span><span class="o">,</span> <span class="s">"周四"</span><span class="o">);</span>
+ <span class="n">mValueMap</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"测试1天2次 09:00 - 12:00"</span><span class="o">,</span> <span class="s">"周五"</span><span class="o">);</span>
+ <span class="n">mValueMap</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"测试1天2次 09:00 - 12:00"</span><span class="o">,</span> <span class="s">"周六"</span><span class="o">);</span>
+ <span class="n">mValueMap</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"中班 13:00-16:00"</span><span class="o">,</span> <span class="s">"周日"</span><span class="o">);</span>
+ 
+<span class="c1">//打印所有值</span>
+<span class="n">Set</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">keySet</span> <span class="o">=</span> <span class="n">mValueMap</span><span class="o">.</span><span class="na">keySet</span><span class="o">();</span>
+<span class="k">for</span> <span class="o">(</span><span class="n">String</span> <span class="n">key</span> <span class="o">:</span> <span class="n">keySet</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// List</span>
+    <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">values</span> <span class="o">=</span> <span class="n">mValueMap</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">key</span><span class="o">);</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">StringUtils</span><span class="o">.</span><span class="na">join</span><span class="o">(</span><span class="n">values</span><span class="o">.</span><span class="na">toArray</span><span class="o">(),</span> <span class="s">" "</span><span class="o">)</span> <span class="o">+</span> <span class="s">":"</span> <span class="o">+</span> <span class="n">key</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+<p>output：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>周一 周二 周四:早班 9:00-11:00
+周三 周日:中班 13:00-16:00
+周五 周六:测试1天2次 09:00 - 12:00
+</code></pre></div></div>
+
 <h3 id="遍历集合">遍历集合</h3>
 
-<pre><code class="language-Java">// 1. For-Each 循环语句: JDK1.5 后推出，专门为集合**遍历（获取元素）**设计；效率最高
-for (char ch : str.toCharArray()) {
-}
+<ul>
+  <li>continue 语句只能用在 while 语句、for 语句或 foreach 语句的循环体中。</li>
+</ul>
 
-ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();
-for (String item : list) {
-    System.out.println(item);
-    // 不要在 foreach 循环里进行元素 remove/add 操作。
-    // remove 元素请用 iterator 方式，如果并发操作，需对 iterator 对象加锁。
-}
+<p>可以用三种方法遍历集合：</p>
 
-for (char ch : t.toCharArray()) { // not keysSet, need.keySet()
-    // 遍历T，初始化需要的字符及数量
-    int value = need.getOrDefault(ch, 0);
-    need.put(ch, value + 1); // t = “aba”
-}       
+<h4 id="1-for-each-循环语句">1. For-Each 循环语句</h4>
+
+<p>JDK1.5 后推出，专门为集合<strong>遍历（获取元素）</strong>设计；效率最高。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="o">(</span><span class="kt">char</span> <span class="n">ch</span> <span class="o">:</span> <span class="n">str</span><span class="o">.</span><span class="na">toCharArray</span><span class="o">())</span> <span class="o">{</span>
+<span class="o">}</span>
+
+<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
+<span class="k">for</span> <span class="o">(</span><span class="n">String</span> <span class="n">item</span> <span class="o">:</span> <span class="n">list</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">item</span><span class="o">);</span>
+    <span class="c1">// 不要在 foreach 循环里进行元素 remove/add 操作。</span>
+    <span class="c1">// remove 元素请用 iterator 方式，如果并发操作，需对 iterator 对象加锁。</span>
+<span class="o">}</span>
+
+<span class="k">for</span> <span class="o">(</span><span class="kt">char</span> <span class="n">ch</span> <span class="o">:</span> <span class="n">t</span><span class="o">.</span><span class="na">toCharArray</span><span class="o">())</span> <span class="o">{</span> <span class="c1">// not keysSet, need.keySet()</span>
+    <span class="c1">// 遍历T，初始化需要的字符及数量</span>
+    <span class="kt">int</span> <span class="n">value</span> <span class="o">=</span> <span class="n">need</span><span class="o">.</span><span class="na">getOrDefault</span><span class="o">(</span><span class="n">ch</span><span class="o">,</span> <span class="mi">0</span><span class="o">);</span>
+    <span class="n">need</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">ch</span><span class="o">,</span> <span class="n">value</span> <span class="o">+</span> <span class="mi">1</span><span class="o">);</span> <span class="c1">// t = “aba”</span>
+<span class="o">}</span>       
         
-// for-each 实现原理：通过迭代器 Iterator + has.next()
-// 反编译后，对应.class文件
-ArrayList&lt;String&gt; list = new ArrayList();
-Iterator var2 = list.iterator();
-while (var2.hasNext()) {
-    String item = (String)var2.next();
-    System.out.println(item);
-}
+<span class="c1">// for-each 实现原理：通过迭代器 Iterator + has.next()</span>
+<span class="c1">// 反编译后，对应.class文件</span>
+<span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">();</span>
+<span class="n">Iterator</span> <span class="n">var2</span> <span class="o">=</span> <span class="n">list</span><span class="o">.</span><span class="na">iterator</span><span class="o">();</span>
+<span class="k">while</span> <span class="o">(</span><span class="n">var2</span><span class="o">.</span><span class="na">hasNext</span><span class="o">())</span> <span class="o">{</span>
+    <span class="n">String</span> <span class="n">item</span> <span class="o">=</span> <span class="o">(</span><span class="n">String</span><span class="o">)</span><span class="n">var2</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">item</span><span class="o">);</span>
+<span class="o">}</span>
 
-// e.g. keySet() 打印key集合
-for (String key : map.keySet()) { // map.values() 打印值集合
-    System.out.println(key + " : "+ maps.get(key));
-}
+<span class="c1">// e.g. keySet() 打印key集合</span>
+<span class="k">for</span> <span class="o">(</span><span class="n">String</span> <span class="n">key</span> <span class="o">:</span> <span class="n">map</span><span class="o">.</span><span class="na">keySet</span><span class="o">())</span> <span class="o">{</span> <span class="c1">// map.values() 打印值集合</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">key</span> <span class="o">+</span> <span class="s">" : "</span><span class="o">+</span> <span class="n">maps</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">key</span><span class="o">));</span>
+<span class="o">}</span>
 
-// e.g. entrySet 集合迭代
-// 键值对整体作为Map.Entry&lt;String, String&gt;实体类型，Map转为Set集合
-Set&lt;Map.Entry&lt;String, String&gt; &gt; entries = map.entrySet();
-for (Map.Entry&lt;String, String&gt; entry : entries) {
-	String key = entry.getKey();
-	String value = entry.getValue();
-}
+<span class="c1">// e.g. entrySet 集合迭代</span>
+<span class="c1">// 键值对整体作为Map.Entry&lt;String, String&gt;实体类型，Map转为Set集合</span>
+<span class="n">Set</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">entries</span> <span class="o">=</span> <span class="n">map</span><span class="o">.</span><span class="na">entrySet</span><span class="o">();</span>
+<span class="k">for</span> <span class="o">(</span><span class="n">Map</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">entry</span> <span class="o">:</span> <span class="n">entries</span><span class="o">)</span> <span class="o">{</span>
+	<span class="n">String</span> <span class="n">key</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="na">getKey</span><span class="o">();</span>
+	<span class="n">String</span> <span class="n">value</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="na">getValue</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre></div></div>
 
-// 2. 迭代器
-// 定义：提供一种方法访问容器对象各个元素，而又不需暴露对象的内部细节。实质是实现了用于遍历容器的hasNext()和next()方法
-// map不同于set和list，不是继承自Collection接口，没有实现Collection的Iterator 方法，自身没有迭代器来遍历元素。
-Collection objs = new HashSet&lt;String&gt;();
-// 获取集合对应的迭代器
-Iterator&lt;String&gt; it = objs.iterator();
-while (it.hasNext()) {
-    // it.next()方法返回的数据类型是Object，因此需强制类型转换
-    String obj = (String) it.next();
-    System.out.println(obj);
-    if (obj.equals("C语言")) {
-        // 从集合中删除上一次next()返回的元素
-        it.remove();
-    }
-    // 对book变量赋值，不会改变集合元素本身
-    obj = "C语言";
-}
-System.out.println(objs);
-        
-// 3. lambda 表达式 JDK1.8后
-objs.forEach(s -&gt; {
+<h4 id="2-迭代器">2. 迭代器</h4>
+
+<ul>
+  <li>
+    <p>定义：提供一种方法访问容器对象各个元素，而又不需暴露对象的内部细节。实质是实现了用于遍历容器的hasNext()和next()方法</p>
+  </li>
+  <li>
+    <p>map不同于set和list，不是继承自Collection接口，没有实现Collection的Iterator 方法，自身没有迭代器来遍历元素。</p>
+  </li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Collection</span> <span class="n">objs</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashSet</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;();</span>
+<span class="c1">// 获取集合对应的迭代器</span>
+<span class="n">Iterator</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">it</span> <span class="o">=</span> <span class="n">objs</span><span class="o">.</span><span class="na">iterator</span><span class="o">();</span>
+<span class="k">while</span> <span class="o">(</span><span class="n">it</span><span class="o">.</span><span class="na">hasNext</span><span class="o">())</span> <span class="o">{</span>
+    <span class="c1">// it.next()方法返回的数据类型是Object，因此需强制类型转换</span>
+    <span class="n">String</span> <span class="n">obj</span> <span class="o">=</span> <span class="o">(</span><span class="n">String</span><span class="o">)</span> <span class="n">it</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">obj</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">obj</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="s">"C语言"</span><span class="o">))</span> <span class="o">{</span>
+        <span class="c1">// 从集合中删除上一次next()返回的元素</span>
+        <span class="n">it</span><span class="o">.</span><span class="na">remove</span><span class="o">();</span>
+    <span class="o">}</span>
+    <span class="c1">// 对book变量赋值，不会改变集合元素本身</span>
+    <span class="n">obj</span> <span class="o">=</span> <span class="s">"C语言"</span><span class="o">;</span>
+<span class="o">}</span>
+<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">objs</span><span class="o">);</span>
+</code></pre></div></div>
+
+<h4 id="3-lambda-表达式">3. Lambda 表达式</h4>
+
+<p>JDK1.8后</p>
+
+<pre><code class="language-Java">objs.forEach(s -&gt; {
   System.out.println(s);
 });
 
 maps.forEach((K, V) -&gt; {
   System.out.println(k + "=&gt;" + v);
 });
-</code></pre>
 
-<ul>
-  <li>continue 语句只能用在 while 语句、for 语句或 foreach 语句的循环体中</li>
-</ul>
+// 如果添加的是默认收件地址，则将原默认地址修改为非默认
+if (Boolean.TRUE.equals(createReqVO.getDefaultStatus())) {
+    List&lt;MemberAddressDO&gt; addresses = memberAddressMapper.selectListByUserIdAndDefaulted(userId, true);
+    addresses.forEach(
+        address -&gt; memberAddressMapper.updateById(new MemberAddressDO().setId(address.getId()).setDefaultStatus(false))
+    );
+}
+
+ // 4. 执行 TradeOrderHandler 的后置处理
+List&lt;TradeOrderItemDO&gt; orderItems = tradeOrderItemMapper.selectListByOrderId(id);
+tradeOrderHandlers.forEach(
+    handler -&gt; handler.afterPayOrder(order, orderItems)
+);
+</code></pre>
 
 <h4 id="fail-fast-机制">fail-fast 机制</h4>
 
@@ -620,39 +755,51 @@ maps.forEach((K, V) -&gt; {
   </li>
 </ol>
 
-<h3 id="collections工具类">Collections工具类</h3>
+<h3 id="collections-工具类">Collections 工具类</h3>
 
 <p>都是静态方法</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import java.util.Collections;
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">java.util.Collections</span><span class="o">;</span>
 
-//常用方法:
-List&lt;String&gt; names = new ArrayList&lt;&gt;();
+<span class="c1">//常用方法:</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">names</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
 
-Collections.addAll(names, "Tom")
-Collections.sort(names); //对 List排序
-Collections.singletonList();//创建不可变的单元素列表
+<span class="n">Collections</span><span class="o">.</span><span class="na">addAll</span><span class="o">(</span><span class="n">names</span><span class="o">,</span> <span class="s">"Tom"</span><span class="o">)</span>
+<span class="n">Collections</span><span class="o">.</span><span class="na">sort</span><span class="o">(</span><span class="n">names</span><span class="o">);</span> <span class="c1">//对 List排序</span>
+<span class="n">Collections</span><span class="o">.</span><span class="na">singletonList</span><span class="o">();</span><span class="c1">//创建不可变的单元素列表</span>
+<span class="c1">// 返回空 List</span>
+<span class="n">Collections</span><span class="o">.</span><span class="na">emptyList</span><span class="o">();</span>
 
-//排序：
-void reverse(List list)//反转
-void shuffle(List list)//随机排序
-void sort(List list)//按自然排序的升序排序
-void sort(List list, Comparator c)//定制排序，由Comparator控制排序逻辑
-void swap(List list, int i , int j)//交换两个索引位置的元素
-void rotate(List list, int distance)//旋转。当distance为正数时，将list后distance个元素整体移到前面。当d为负数时，将 list的前d个元素整体移到后面
+<span class="c1">// 1. 获得 Session 列表</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">WebSocketSession</span><span class="o">&gt;</span> <span class="n">sessions</span> <span class="o">=</span> <span class="n">Collections</span><span class="o">.</span><span class="na">emptyList</span><span class="o">();</span>
+<span class="k">if</span> <span class="o">(</span><span class="n">StrUtil</span><span class="o">.</span><span class="na">isNotEmpty</span><span class="o">(</span><span class="n">sessionId</span><span class="o">))</span> <span class="o">{</span>
+    <span class="n">WebSocketSession</span> <span class="n">session</span> <span class="o">=</span> <span class="n">sessionManager</span><span class="o">.</span><span class="na">getSession</span><span class="o">(</span><span class="n">sessionId</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">session</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">sessions</span> <span class="o">=</span> <span class="n">Collections</span><span class="o">.</span><span class="na">singletonList</span><span class="o">(</span><span class="n">session</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 
-//查找,替换
-int binarySearch(List list, Object key)//对List进行二分查找，返回索引，注意List必须有序
-boolean replaceAll(List list, Object oldVal, Object newVal)//用新元素替换旧元素
 
-int max(Collection coll, [Comparator c])//返回最大元素，排序规则由Comparatator类控制。
-int min(Collection coll, [Comparator c])
-int min = (int) Collections.min(Arrays.asList(numbers));
+<span class="c1">//排序：</span>
+<span class="kt">void</span> <span class="nf">reverse</span><span class="o">(</span><span class="n">List</span> <span class="n">list</span><span class="o">)</span><span class="c1">//反转</span>
+<span class="kt">void</span> <span class="nf">shuffle</span><span class="o">(</span><span class="n">List</span> <span class="n">list</span><span class="o">)</span><span class="c1">//随机排序</span>
+<span class="kt">void</span> <span class="nf">sort</span><span class="o">(</span><span class="n">List</span> <span class="n">list</span><span class="o">)</span><span class="c1">//按自然排序的升序排序</span>
+<span class="kt">void</span> <span class="nf">sort</span><span class="o">(</span><span class="n">List</span> <span class="n">list</span><span class="o">,</span> <span class="n">Comparator</span> <span class="n">c</span><span class="o">)</span><span class="c1">//定制排序，由Comparator控制排序逻辑</span>
+<span class="kt">void</span> <span class="nf">swap</span><span class="o">(</span><span class="n">List</span> <span class="n">list</span><span class="o">,</span> <span class="kt">int</span> <span class="n">i</span> <span class="o">,</span> <span class="kt">int</span> <span class="n">j</span><span class="o">)</span><span class="c1">//交换两个索引位置的元素</span>
+<span class="kt">void</span> <span class="nf">rotate</span><span class="o">(</span><span class="n">List</span> <span class="n">list</span><span class="o">,</span> <span class="kt">int</span> <span class="n">distance</span><span class="o">)</span><span class="c1">//旋转。当distance为正数时，将list后distance个元素整体移到前面。当d为负数时，将 list的前d个元素整体移到后面</span>
 
-void fill(List list, Object obj)//用指定元素代替list中的所有元素
-int n = 10;
-Collections.nCopies(n, 0);
-int frequency(Collection c, Object o)//统计元素出现次数
-int indexOfSubList(List list, List target)//统计target在list中第一次出现的索引，找不到则返回-1，类比int lastIndexOfSubList(List source, list target)
+<span class="c1">//查找,替换</span>
+<span class="kt">int</span> <span class="nf">binarySearch</span><span class="o">(</span><span class="n">List</span> <span class="n">list</span><span class="o">,</span> <span class="n">Object</span> <span class="n">key</span><span class="o">)</span><span class="c1">//对List进行二分查找，返回索引，注意List必须有序</span>
+<span class="kt">boolean</span> <span class="nf">replaceAll</span><span class="o">(</span><span class="n">List</span> <span class="n">list</span><span class="o">,</span> <span class="n">Object</span> <span class="n">oldVal</span><span class="o">,</span> <span class="n">Object</span> <span class="n">newVal</span><span class="o">)</span><span class="c1">//用新元素替换旧元素</span>
+
+<span class="kt">int</span> <span class="nf">max</span><span class="o">(</span><span class="n">Collection</span> <span class="n">coll</span><span class="o">,</span> <span class="o">[</span><span class="n">Comparator</span> <span class="n">c</span><span class="o">])</span><span class="c1">//返回最大元素，排序规则由Comparatator类控制。</span>
+<span class="kt">int</span> <span class="nf">min</span><span class="o">(</span><span class="n">Collection</span> <span class="n">coll</span><span class="o">,</span> <span class="o">[</span><span class="n">Comparator</span> <span class="n">c</span><span class="o">])</span>
+<span class="kt">int</span> <span class="n">min</span> <span class="o">=</span> <span class="o">(</span><span class="kt">int</span><span class="o">)</span> <span class="n">Collections</span><span class="o">.</span><span class="na">min</span><span class="o">(</span><span class="n">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span><span class="n">numbers</span><span class="o">));</span>
+
+<span class="kt">void</span> <span class="nf">fill</span><span class="o">(</span><span class="n">List</span> <span class="n">list</span><span class="o">,</span> <span class="n">Object</span> <span class="n">obj</span><span class="o">)</span><span class="c1">//用指定元素代替list中的所有元素</span>
+<span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">10</span><span class="o">;</span>
+<span class="n">Collections</span><span class="o">.</span><span class="na">nCopies</span><span class="o">(</span><span class="n">n</span><span class="o">,</span> <span class="mi">0</span><span class="o">);</span>
+<span class="kt">int</span> <span class="nf">frequency</span><span class="o">(</span><span class="n">Collection</span> <span class="n">c</span><span class="o">,</span> <span class="n">Object</span> <span class="n">o</span><span class="o">)</span><span class="c1">//统计元素出现次数</span>
+<span class="kt">int</span> <span class="nf">indexOfSubList</span><span class="o">(</span><span class="n">List</span> <span class="n">list</span><span class="o">,</span> <span class="n">List</span> <span class="n">target</span><span class="o">)</span><span class="c1">//统计target在list中第一次出现的索引，找不到则返回-1，类比int lastIndexOfSubList(List source, list target)</span>
 </code></pre></div></div>
 

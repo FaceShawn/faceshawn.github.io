@@ -261,6 +261,14 @@ net start mysql
   </thead>
   <tbody>
     <tr>
+      <td> </td>
+      <td>bit</td>
+      <td> </td>
+      <td>Boolean</td>
+      <td> </td>
+      <td>默认值 b’0’</td>
+    </tr>
+    <tr>
       <td>整型</td>
       <td><code class="highlighter-rouge">tinyint</code></td>
       <td>TINYINT</td>
@@ -390,7 +398,7 @@ net start mysql
     </tr>
     <tr>
       <td> </td>
-      <td><code class="highlighter-rouge">year</code></td>
+      <td><code class="highlighter-rouge">year</code>/<code class="highlighter-rouge">LocalDate</code></td>
       <td><strong>DATE</strong></td>
       <td><code class="highlighter-rouge">Date</code></td>
       <td> </td>
@@ -398,7 +406,7 @@ net start mysql
     </tr>
     <tr>
       <td> </td>
-      <td><code class="highlighter-rouge">time</code></td>
+      <td><code class="highlighter-rouge">time</code>/<code class="highlighter-rouge">LocalTime</code></td>
       <td>TIME</td>
       <td><code class="highlighter-rouge">Date</code></td>
       <td> </td>
@@ -406,11 +414,11 @@ net start mysql
     </tr>
     <tr>
       <td> </td>
-      <td><code class="highlighter-rouge">datetime</code></td>
-      <td><strong>TIMESTAMP</strong></td>
+      <td><code class="highlighter-rouge">datetime</code><br />/<code class="highlighter-rouge">LocalDateTime</code></td>
+      <td><strong>datetime</strong><br />/<strong>TIMESTAMP</strong></td>
       <td><code class="highlighter-rouge">Date</code></td>
       <td>8 Byte</td>
-      <td>YYYY-MM-DD HH:MM:SS</td>
+      <td>YYYY-MM-DD HH:MM:SS，DEFAULT CURRENT_TIMESTAMP</td>
     </tr>
     <tr>
       <td> </td>
@@ -1304,8 +1312,8 @@ SELECT column_name(s) FROM table2;
   <li><code class="highlighter-rouge">DESC</code>：降序</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT * FROM products
-ORDER BY prod_price DESC, prod_name ASC;
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">products</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">prod_price</span> <span class="k">DESC</span><span class="p">,</span> <span class="n">prod_name</span> <span class="k">ASC</span><span class="p">;</span>
 </code></pre></div></div>
 
 <h5 id="limit-限制结果数量">LIMIT 限制结果数量</h5>
@@ -1333,22 +1341,37 @@ SELECT * FROM mytable LIMIT 2 OFFSET 3;
 
 <h4 id="插入记录">插入记录</h4>
 
-<p><code class="highlighter-rouge">INSERT INTO `ums_admin` VALUES (‘张三’, 18, NULL);</code></p>
+<p><code class="highlighter-rouge">INSERT INTO </code>ums_admin<code class="highlighter-rouge"> VALUES (‘张三’, 18, NULL);</code></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-- 指定名称插入、完整语句：（使用）id可不传值，使用了自增
-insert into emp(ename, hiredate, sal, deptno) values ('zhangsan', '2018-01-01', '2000', 1);
-INSERT [INTO] `user_info` name="Tom", age=21;
+<p>CRUD 前先<code class="highlighter-rouge"> validatePropertyExists(id)</code> 校验是否存在。</p>
 
--- 不指定名称插入、省略名称：需要指定所有的值，包括必须指定id，无法使用自增
-insert into emp values ('lisi', '2018-01-01', '2000', 1);
-INSERT INTO `ums_admin` VALUES ('1', 'test', 'pwd', 'timg.jpg', 'test@qq.com', '测试账号', null, '2018-09-29 13:55:30', '2018-09-29 13:55:39', '1');
+<ul>
+  <li>检查表中是否已经存在这样的一条记录， 如果存在则更新或者不做操作， 如果没有存在记录，则需要插入一条新的记录。</li>
+  <li>Mysql提供了SQL语句实现上述逻辑的支持：
+    <ul>
+      <li><code class="highlighter-rouge">INSERT ... SELECT</code></li>
+      <li><code class="highlighter-rouge">INSERT ... ON DUPLICATE KEY UPDATE</code></li>
+      <li><code class="highlighter-rouge">INSERT ... ON DUPLICATE REPLACE</code></li>
+    </ul>
+  </li>
+  <li>比如想往表中插入一条数据，如果表中没有该条数据才插入，如果已经存在该条数据就不插入。</li>
+  <li>首先，在创建表时，将不需要重复的字段设置为unique，然后在插入时，使用insert ignore语句。</li>
+</ul>
 
--- 批量插入数据：
-insert into dept values(1,'dept1'),(2,'dept2');
-INSERT [INTO] `user_info` ([name, age]) VALUES ("Tom", 21), ("Jack", 13);
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">--</span> <span class="err">指定名称插入、完整语句：（使用）</span><span class="n">id</span><span class="err">可不传值，使用了自增</span>
+<span class="n">insert</span> <span class="n">into</span> <span class="nf">emp</span><span class="o">(</span><span class="n">ename</span><span class="o">,</span> <span class="n">hiredate</span><span class="o">,</span> <span class="n">sal</span><span class="o">,</span> <span class="n">deptno</span><span class="o">)</span> <span class="n">values</span> <span class="o">(</span><span class="err">'</span><span class="n">zhangsan</span><span class="err">'</span><span class="o">,</span> <span class="err">'</span><span class="mi">2018</span><span class="o">-</span><span class="mo">01</span><span class="o">-</span><span class="mo">01</span><span class="err">'</span><span class="o">,</span> <span class="err">'</span><span class="mi">2000</span><span class="err">'</span><span class="o">,</span> <span class="mi">1</span><span class="o">);</span>
+<span class="n">INSERT</span> <span class="o">[</span><span class="n">INTO</span><span class="o">]</span> <span class="err">`</span><span class="n">user_info</span><span class="err">`</span> <span class="n">name</span><span class="o">=</span><span class="s">"Tom"</span><span class="o">,</span> <span class="n">age</span><span class="o">=</span><span class="mi">21</span><span class="o">;</span>
 
--- 插入，如果已存在则更新
-INSERT INTO students (id, name, gender, score) VALUES (1, '小明', 'F', 99) ON DUPLICATE KEY UPDATE name='小明', gender='F', score=99;
+<span class="o">--</span> <span class="err">不指定名称插入、省略名称：需要指定所有的值，包括必须指定</span><span class="n">id</span><span class="err">，无法使用自增</span>
+<span class="n">insert</span> <span class="n">into</span> <span class="n">emp</span> <span class="nf">values</span> <span class="o">(</span><span class="err">'</span><span class="n">lisi</span><span class="err">'</span><span class="o">,</span> <span class="err">'</span><span class="mi">2018</span><span class="o">-</span><span class="mo">01</span><span class="o">-</span><span class="mo">01</span><span class="err">'</span><span class="o">,</span> <span class="err">'</span><span class="mi">2000</span><span class="err">'</span><span class="o">,</span> <span class="mi">1</span><span class="o">);</span>
+<span class="n">INSERT</span> <span class="n">INTO</span> <span class="err">`</span><span class="n">ums_admin</span><span class="err">`</span> <span class="n">VALUES</span> <span class="o">(</span><span class="sc">'1'</span><span class="o">,</span> <span class="err">'</span><span class="n">test</span><span class="err">'</span><span class="o">,</span> <span class="err">'</span><span class="n">pwd</span><span class="err">'</span><span class="o">,</span> <span class="err">'</span><span class="n">timg</span><span class="o">.</span><span class="na">jpg</span><span class="err">'</span><span class="o">,</span> <span class="err">'</span><span class="n">test</span><span class="nd">@qq</span><span class="o">.</span><span class="na">com</span><span class="err">'</span><span class="o">,</span> <span class="err">'测试账号'</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="err">'</span><span class="mi">2018</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">29</span> <span class="mi">13</span><span class="o">:</span><span class="mi">55</span><span class="o">:</span><span class="mi">30</span><span class="err">'</span><span class="o">,</span> <span class="err">'</span><span class="mi">2018</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">29</span> <span class="mi">13</span><span class="o">:</span><span class="mi">55</span><span class="o">:</span><span class="mi">39</span><span class="err">'</span><span class="o">,</span> <span class="sc">'1'</span><span class="o">);</span>
+
+<span class="o">--</span> <span class="err">批量插入数据：</span>
+<span class="n">insert</span> <span class="n">into</span> <span class="n">dept</span> <span class="nf">values</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span><span class="err">'</span><span class="n">dept1</span><span class="err">'</span><span class="o">),(</span><span class="mi">2</span><span class="o">,</span><span class="err">'</span><span class="n">dept2</span><span class="err">'</span><span class="o">);</span>
+<span class="n">INSERT</span> <span class="o">[</span><span class="n">INTO</span><span class="o">]</span> <span class="err">`</span><span class="n">user_info</span><span class="err">`</span> <span class="o">([</span><span class="n">name</span><span class="o">,</span> <span class="n">age</span><span class="o">])</span> <span class="n">VALUES</span> <span class="o">(</span><span class="s">"Tom"</span><span class="o">,</span> <span class="mi">21</span><span class="o">),</span> <span class="o">(</span><span class="s">"Jack"</span><span class="o">,</span> <span class="mi">13</span><span class="o">);</span>
+
+<span class="o">--</span> <span class="err">插入，如果已存在则更新</span>
+<span class="n">INSERT</span> <span class="n">INTO</span> <span class="nf">students</span> <span class="o">(</span><span class="n">id</span><span class="o">,</span> <span class="n">name</span><span class="o">,</span> <span class="n">gender</span><span class="o">,</span> <span class="n">score</span><span class="o">)</span> <span class="n">VALUES</span> <span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="err">'小明'</span><span class="o">,</span> <span class="sc">'F'</span><span class="o">,</span> <span class="mi">99</span><span class="o">)</span> <span class="n">ON</span> <span class="n">DUPLICATE</span> <span class="n">KEY</span> <span class="n">UPDATE</span> <span class="n">name</span><span class="o">=</span><span class="err">'小明'</span><span class="o">,</span> <span class="n">gender</span><span class="o">=</span><span class="sc">'F'</span><span class="o">,</span> <span class="n">score</span><span class="o">=</span><span class="mi">99</span><span class="o">;</span>
 </code></pre></div></div>
 
 <h4 id="删除记录">删除记录</h4>
@@ -1507,9 +1530,14 @@ where (a.peopleId,a.seq) in (select peopleId,seq from vitae
 <p>方式有：</p>
 
 <ol>
-  <li>直接 <code class="highlighter-rouge">delete from T limit 10000</code>：缺点是单条语句执行时间过长，会导致<strong>长事务</strong>，导致<strong>锁的时间变长</strong>、主从延迟等问题。</li>
+  <li>直接 <code class="highlighter-rouge">delete from T limit 10000</code>：缺点是单条语句执行时间过长，会导致<strong>长事务</strong>，导致<strong>锁的时间变长</strong>、<strong>主从延迟</strong>等问题。</li>
   <li>在一个连接中<strong>循环执行</strong>20次 <code class="highlighter-rouge">delete from T limit 500</code>：多个<strong>短事务串行</strong>执行，每次短暂执行就释放锁资源，相对更好一些；可优化为第3种并发执行。</li>
-  <li>在20个连接中<strong>并发</strong>（同时）<strong>执行</strong> <code class="highlighter-rouge">delete from T limit 500</code>：会人为导致<strong>锁冲突</strong>。但如果能将1W条数据<strong>先查出来</strong>，<strong>分片</strong>后分配给20个连接，通过<strong>id=xxx</strong>精确删除，各连接就不会相互竞争。</li>
+  <li>在20个连接中<strong>并发</strong>（同时）<strong>执行</strong> <code class="highlighter-rouge">delete from T limit 500</code>：会人为导致<strong>锁冲突</strong>。
+    <ul>
+      <li>但如果能将1W条数据<strong>先查出来</strong>，<strong>分片</strong>后分配给20个连接，通过<strong>id=xxx</strong>精确删除，各连接就不会相互竞争。</li>
+      <li>参考<a href="#启用慢查询日志定位低效率的SQL语句并优化">慢查询</a>、<a href="避免大型事务">大事务</a>。</li>
+    </ul>
+  </li>
 </ol>
 
 <h2 id="索引视图触发器存储过程">索引、视图、触发器、存储过程</h2>
@@ -2022,7 +2050,7 @@ for each row              -- 触发器的执行间隔，通知触发器每隔一
   <p>启用慢查询标志，识别、分析和调整执行时间超过阈值的 SQL 查询语句以提高性能。</p>
 </blockquote>
 
-<p>慢查询：SQL语句响应时间超过阀值、查询的 SQL语句耗费较长的时间（超过阈值）。</p>
+<p><strong>慢查询</strong>：SQL语句响应时间超过阀值、查询的 SQL语句<strong>耗费较长的时间</strong>（超过阈值）。</p>
 
 <p>慢查询日志：是MySQL提供的一种日志记录，用来记录在MySQL中<strong>响应时间超过阀值</strong>的语句。</p>
 
@@ -2035,18 +2063,35 @@ for each row              -- 触发器的执行间隔，通知触发器每隔一
 <ol>
   <li>用户体验差；</li>
   <li><strong>占用内存</strong>，影响性能、性能变差；</li>
-  <li>造成DDL操作阻塞：InnoDB引擎默认加的是<strong>行锁</strong>，但锁其实都是加在<strong>索引上</strong>的，如果筛选条件没有建立索引，会降级到<strong>表锁</strong>。而慢查询有一大部分原因都是因为没加索引导致的，所以慢查询时间过长，就会导致表锁的时间也很长，如果这时候执行DDL就会造成阻塞。</li>
+  <li>造成DDL操作阻塞：InnoDB引擎默认加的是<strong>行锁</strong>，但锁其实都是加在<strong>索引上</strong>的，如果筛选条件没有建立索引，会降级到<strong>表锁</strong>。
+    <ul>
+      <li>而慢查询有一大部分原因都是因为没加索引导致的，所以慢查询时间过长，就会导致表锁的时间也很长，如果这时候执行DDL就会造成阻塞。</li>
+    </ul>
+  </li>
 </ol>
 
 <p>原因、常见场景：</p>
 
 <ol>
-  <li><strong>没加索引</strong>会造成<strong>全表扫描</strong>，又或者没利用好索引、没走到索引、走的不是<strong>最优索引</strong>，都会导致<strong>扫描行数</strong>增多，从而查询时间变慢。</li>
-  <li>单表数据量太大：可能超千万，或者达到亿级别，加了索引之后，还是存在慢查询的情况，需要查看索引设置得对不对，或者<strong>分表</strong>。</li>
-  <li><strong>排序字段</strong>没加索引。</li>
-  <li><strong>Limit 深分页</strong>：即从比较后面的位置开始进行分页，比如每页有10条，然后我要看第十万页的数据，这时候的分页就会比较“深”。在这种情况下，即使字段加了索引，查询速度可能还是很慢（和不加差不多），因为二级索引树存的是主键ID，查到数据还需要进行<strong>回表</strong>才能决定是否丢弃。
+  <li>
+    <p><strong>没加索引</strong>会造成<strong>全表扫描</strong>，又或者没利用好索引、没走到索引、走的不是<strong>最优索引</strong>，都会导致<strong>扫描行数</strong>增多，从而查询时间变慢。</p>
+  </li>
+  <li>
+    <p>单表数据量太大：可能超千万，或者达到亿级别，加了索引之后，还是存在慢查询的情况，需要查看索引设置得对不对，或者<strong>分表</strong>。</p>
+  </li>
+  <li>
+    <p><strong>排序字段</strong>没加索引。</p>
+  </li>
+  <li>
+    <p><strong>Limit 深分页</strong>：即从比较后面的位置开始进行分页，比如每页有10条，然后我要看第十万页的数据，这时候的分页就会比较“深”。</p>
+
     <ul>
-      <li>解决思路：都是先查出主键字段（id），避免<strong>回表</strong>，再根据主键查出所有字段。</li>
+      <li>
+        <p>在这种情况下，即使字段加了<strong>索引</strong>，查询速度可能还是很慢（和不加差不多），因为二级索引树存的是主键ID，查到数据还需要进行<strong>回表</strong>才能决定是否丢弃。</p>
+      </li>
+      <li>
+        <p>解决思路：都是<strong>先查出</strong>主键字段（id），避免<strong>回表</strong>，再根据主键<strong>查出（/删除）</strong>所有字段。</p>
+      </li>
     </ul>
   </li>
 </ol>
@@ -2170,7 +2215,7 @@ for each row              -- 触发器的执行间隔，通知触发器每隔一
 
 <h4 id="避免大型事务">避免大型事务</h4>
 
-<p>在单个事务中对记录进行过多（更新、删除、插入）将占用过多记录的资源（锁、缓冲区）。</p>
+<p>在单个事务中对记录进行<strong>过多</strong>（更新、删除、插入）将占用过多记录的资源（锁、缓冲区）。</p>
 
 <ul>
   <li>会导致<strong>缓冲区池</strong>中的数据过多，从而阻止进一步使用缓冲区池。可能会溢出日志缓冲区，从而导致磁盘 IO。</li>
@@ -2178,7 +2223,7 @@ for each row              -- 触发器的执行间隔，通知触发器每隔一
   <li>大型事务的<strong>回滚</strong>也会降低数据库的性能。</li>
 </ul>
 
-<p>为克服此问题，建议将大型事务拆分为多个小型且运行速度更快的事务。</p>
+<p>为克服此问题，建议将大型事务拆分为<strong>多个小型</strong>且运行速度更快的事务。</p>
 
 <h4 id="定期备份和优化">定期备份和优化</h4>
 

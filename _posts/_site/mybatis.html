@@ -6,24 +6,436 @@
 
 <hr />
 
-<h3 id="目录">目录</h3>
+<h2 id="目录">目录</h2>
 
 <p>[TOC]</p>
 
-<h2 id="整合-mybatis">整合 MyBatis</h2>
+<h2 id="数据访问与-orm-框架">数据访问与 ORM 框架</h2>
+
+<p>参考：</p>
 
 <ul>
-  <li><a href="https://snailclimb.gitee.io/springboot-guide/#/./docs/basis/springboot-mybatis">优雅整合 SpringBoot+Mybatis</a></li>
-  <li><del><a href="https://snailclimb.gitee.io/springboot-guide/#/./docs/basis/springboot-mybatis-mutipledatasource">优雅整合 SpringBoot+Mybatis 多数据源</a></del></li>
-  <li><a href="https://mybatis.org/mybatis-3/zh_CN/index.html">MyBatis 3 手册</a></li>
-  <li><a href="https://github.com/CodingDocs/springboot-guide">SpringBoot Guide</a></li>
+  <li><a href="https://snailclimb.gitee.io/springboot-guide/#/./docs/basis/springboot-jpa">Spring Boot JPA 基础：常见操作解析</a></li>
+  <li><a href="https://snailclimb.gitee.io/springboot-guide/#/./docs/basis/springboot-jpa-lianbiao">JPA 中非常重要的连表查询就是这么简单</a></li>
 </ul>
+
+<h3 id="jdbcormjpa">JDBC、ORM、JPA</h3>
+
+<p><img src="../assets/v2-7f8d57795eeab6d98d3f956d2d050366_r.jpg" alt="img" style="zoom:50%;" /></p>
+
+<ol>
+  <li><strong>JDBC</strong>（<code class="highlighter-rouge">Java DataBase Connectivity</code>）<strong>API</strong>：是 Java 连接数据库操作的（底层的、原生的）<strong>统一接口标准</strong>。
+    <ul>
+      <li><del>JDBC 对 <code class="highlighter-rouge">Java </code>程序员而言是API，为数据库访问提供<strong>统一接口标准</strong>。</del>由各个<strong>数据库厂商</strong>及第三方中间件厂商依照<strong>JDBC规范</strong>（为数据库连接）提供的标准方法。</li>
+      <li>通过对应的 <code class="highlighter-rouge">DriverManager</code>（<code class="highlighter-rouge">MySQL JDBC Driver</code>、<code class="highlighter-rouge">Oracle JDBC Driver</code>等）去操作具体的数据库。</li>
+      <li><del><strong>JdbcTemplate</strong></del>：是Spring的一部分，是Spring<strong>对JDBC的封装</strong>，目的是使JDBC更加易于使用。处理了资源的建立和释放。帮助我们避免一些常见的错误，比如忘了总要关闭、连接。</li>
+    </ul>
+  </li>
+  <li><strong>ORM</strong>（<code class="highlighter-rouge">Object Relational Mapping</code>）<strong>框架</strong>：对象–关系映射，用于建立 Java Object <strong>实体类</strong>和数据库表之间的映射，从而达到<strong>操作</strong>实体类就相当于操作数据库表的目的。
+    <ul>
+      <li>ORM框架中贯穿着 JAVA 面向对象编程的思想；是对象持久化的核心。</li>
+      <li>常见的 ORM 框架有：<code class="highlighter-rouge">Hibernate</code>、<code class="highlighter-rouge">spring data jpa</code>、<code class="highlighter-rouge">open jpa</code>。</li>
+    </ul>
+  </li>
+  <li><strong>JPA</strong>（<code class="highlighter-rouge">Java Persistence API</code>）<strong>API</strong>：Java 持久化 API，是 Java 应用程序访问 ORM 框架的<strong>统一接口标准</strong>/规范），实现用<strong>同样的方式</strong>访问不同的 ORM 框架。</li>
+  <li><strong>Spring Data JPA</strong>：是<code class="highlighter-rouge">Spring</code>提供的一套简化<code class="highlighter-rouge">JPA</code>开发的框架。按照约定好的<strong>方法命名规则</strong>写<code class="highlighter-rouge">DAO</code>层接口，就可以在<strong>不写接口实现</strong>的情况下，实现对数据库的访问和操作，提供了CRUD、分页、排序、复杂查询等功能。
+    <ul>
+      <li>可以理解为是对<code class="highlighter-rouge">JPA</code>规范的<strong>再次封装</strong>抽象。不是一个<strong>完整JPA规范</strong>的实现，只是一个代码抽象层，主要用于减少为各种持久层存储实现数据访问层所需的代码量。其底层依旧是 <strong><code class="highlighter-rouge">Hibernate</code> 框架</strong>。</li>
+    </ul>
+  </li>
+</ol>
+
+<p>关系：</p>
+
+<ol>
+  <li>JDBC、ORM 框架、JPA 均属于持久化层，介于业务层和数据库之间。</li>
+  <li>jdbc 是<strong>数据库</strong>的统一接口标准；jpa是orm框架的统一接口标准。</li>
+  <li>jdbc更注重数据库，orm则更注重于java代码，但是实际上jpa实现的框架底层还是用jdbc去和数据库打交道。</li>
+</ol>
+
+<p>参考：</p>
+
+<ul>
+  <li><a href="https://www.cnblogs.com/softwarearch/p/16396480.html">JDBC、ORM、JPA、Spring Data JPA，傻傻分不清楚？</a></li>
+</ul>
+
+<h4 id="hibernate-与-mybatis">Hibernate 与 MyBatis</h4>
+
+<ol>
+  <li><strong>Hibernate</strong>：是一个开源、<strong>全自动</strong>化的（标准的）ORM 框架，将 <code class="highlighter-rouge">POJO</code> 实体类与数据库表建立<strong>映射关系</strong>，可自动生成 SQL 语句并执行。对 JDBC 进行了非常轻量级的对象封装，封装了基本的 DAO 层操作，有较好的数据库移植性。
+    <ul>
+      <li><strong>面向对象</strong>，着力于对象（与对象）间的关系，用于解决计算机逻辑问题，考虑的是对象的整个生命周期（包括对象的创建、持久化、状态的改变和行为等），持久化只是对象的一种状态。</li>
+    </ul>
+  </li>
+  <li><strong>MyBatis</strong>：是一个持久化、<strong>半自动</strong>化的<code class="highlighter-rouge">ORM</code>框架， <del>只支持将数据库<strong>查询结果</strong>映射到 <code class="highlighter-rouge">POJO</code> 实体类</del>，而 <code class="highlighter-rouge">POJO</code> 到数据库的映射则需手动编写 <code class="highlighter-rouge">SQL</code> 语句实现。
+    <ol>
+      <li>是一个持久化框架，不是依照的<code class="highlighter-rouge">JPA</code> 规范。</li>
+      <li><strong>面向关系模型</strong>，着力于 <code class="highlighter-rouge">POJO</code> 与 <code class="highlighter-rouge">SQL</code> 间的映射关系，用于解决<strong>数据的高效存取</strong>问题。</li>
+      <li>可用简单的 XML 或注解来配置和映射原生信息，将接口和 <code class="highlighter-rouge">POJO</code> 映射成数据库中的记录。<strong>主要依赖于</strong> <code class="highlighter-rouge">SQL</code> 的编写与 <code class="highlighter-rouge">ResultMap</code> 查询结果集的映射，需额外维护。</li>
+      <li><del>支持定制化 <code class="highlighter-rouge">SQL</code> 优化、存储过程及高级映射。避免了几乎所有的 <code class="highlighter-rouge">JDBC</code> 代码和手动设置参数及获取结果集。</del></li>
+    </ol>
+  </li>
+</ol>
+
+<p><strong>区别</strong>：查询关联对象（或关联集合对象）时，</p>
+
+<ol>
+  <li><code class="highlighter-rouge">Hibernate</code> 可根据 ORM 对象关系模型直接获取，所以是<strong>全自动</strong>的。</li>
+  <li>而 <code class="highlighter-rouge">MyBatis</code> 需<strong>手动编写 SQL</strong> 来完成，所以称为<strong>半自动</strong>的。</li>
+</ol>
+
+<p>选型：</p>
+
+<ol>
+  <li>进行<strong>底层</strong>编程，对<strong>性能</strong>要求高，直接用 <code class="highlighter-rouge">JDBC</code>；</li>
+  <li>直接操作数据库表，没有过多的定制，用 <code class="highlighter-rouge">Hibernate</code>；</li>
+  <li>灵活使用 SQL 语句，用 <code class="highlighter-rouge">MyBatis</code>；</li>
+</ol>
+
+<h4 id="jdbc-访问数据库">JDBC 访问数据库</h4>
+
+<p>JDBC操作的几个关键环节：</p>
+
+<ol>
+  <li>引入依赖，配置数据库连接；</li>
+  <li>根据使用的DB类型不同，加载对应的 JdbcDriver 驱动；</li>
+  <li>连接 DB；</li>
+  <li>编写SQL语句；</li>
+  <li>发送到DB中执行，并接收结果返回；</li>
+  <li>对结果进行处理解析；</li>
+  <li>释放过程中的连接资源。</li>
+</ol>
+
+<p>如：</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">&lt;!-- pom.xml 中引入依赖 --&gt;</span>
+<span class="c">&lt;!-- 1. 导入JDBC的场景启动器 --&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-data-jdbc<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+
+<span class="c">&lt;!-- 2. 导入mysql数据库驱动 --&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>mysql<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>mysql-connector-java<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>runtime<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">application.yml</code> 中：</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 3. 配置数据源/数据库连接</span>
+<span class="na">spring</span><span class="pi">:</span>
+  <span class="na">datasource</span><span class="pi">:</span>
+    <span class="na">url</span><span class="pi">:</span> <span class="s">jdbc:mysql://localhost:3306/campusdate? \</span>
+        <span class="s">useUnicode=true&amp;characterEncoding=UTF-8 \</span> <span class="c1"># 表示用Unicode字符集，指定字符从数据库取出后和存入前的编码、解码格式</span>
+        <span class="nl">&amp;serverTimezone</span><span class="s">=Asia/Shanghai</span>
+        <span class="s">&amp;useSSL=false \</span> <span class="c1"># 表示在高版本禁用SSL</span>
+        <span class="nl">&amp;autoReconnect</span><span class="s">=true\</span>  <span class="c1"># 表示当数据库连接异常中断时自动重连；用来配置数据源连接池，控制重连特性</span>
+        <span class="nl">&amp;failOverReadOnly</span><span class="s">=false</span> <span class="c1"># 表示自动重连成功后，连接不设置为只读</span>
+        <span class="s">//&amp;allowPublicKeyRetrieval=true</span> <span class="c1"># 允许客户端从服务器获取公钥；但是可能会导致恶意的代理通过中间人攻击(MITM)获取到明文密码</span>
+        <span class="s">//&amp;nullCatalogMeansCurrent=true</span> <span class="c1"># 当DatabaseMetadataMethods请求“目录”参数时，值“Null”是否意味着使用当前目录？ </span>
+        <span class="s">//&amp;rewriteBatchedStatements=true</span> <span class="c1"># </span>
+<span class="err">	</span><span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
+<span class="err">	</span><span class="na">password</span><span class="pi">:</span> <span class="s">root</span>
+<span class="err">	</span><span class="na">driver-class-name</span><span class="pi">:</span> <span class="s">com.mysql.jdbc.Driver</span> <span class="c1">## **</span>
+  <span class="na">jpa</span><span class="pi">:</span>
+    <span class="na">hibernate</span><span class="pi">:</span>
+      <span class="na">ddl-auto</span><span class="pi">:</span> <span class="s">update</span>
+    <span class="na">show-sql</span><span class="pi">:</span> <span class="no">true</span> <span class="c1"># hibernate在操作时在控制台打印真实的sql语句，方便调试</span>
+<span class="err">	</span><span class="na">properties</span><span class="pi">:</span>
+<span class="err">	</span>  <span class="na">hibernate</span><span class="pi">:</span>
+<span class="err">	</span>    <span class="na">dialect</span><span class="pi">:</span> <span class="s">org.hibernate.dialect.MySQL5Dialect</span> <span class="c1"># 表示格式化输出的json字符串</span>
+<span class="err">	</span>    <span class="c1">#hbm2ddl:</span>
+<span class="err">	</span>      <span class="c1">#auto: update</span>
+<span class="c1">## 自动建表（实体类维护数据表）方式</span>
+<span class="c1"># create 表示每次重启项目（加载 hibernate）时，根据实体类重新生成新表结构，会导致数据丢失；</span>
+<span class="c1"># create-drop 表示每次加载  hibernate 时，根据实体类生成新表，当 sessionFactory（项目）关闭时自动删除表结构；hsqldb, h2, derby等内嵌数据库默认设置</span>
+<span class="c1"># update 表示第一次加载 hibernate 时，根据实体类自动建表；以后加载 hibernate 时，表结构随实体类自动更新，且保留数据库中的数据；</span>
+<span class="c1"># validate 表示每次加载 hibernate 时，只验证实体类和数据表是否一致，不对数据库进行任何更改。</span>
+<span class="c1"># none 表示啥都不做；其它非内嵌数据库默认设置</span>
+</code></pre></div></div>
+
+<h3 id="jpa">JPA</h3>
+
+<p><a href="http://perfy315.iteye.com/blog/1460226">Repository（资源库）接口介绍</a></p>
+
+<h4 id="各层常用注解">各层常用注解</h4>
+
+<p>控制层：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">@Controller</code></li>
+  <li><code class="highlighter-rouge">@Autowired</code>：属性上</li>
+</ul>
+
+<p>业务层：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">@Service</code>：<a href="#分页">Pageable 接口、PageHelper 分页插件</a></li>
+</ul>
+
+<p>Repository 数据接口层：<a href="https://segmentfault.com/a/1190000012346333">Spring Boot 中 Repository 的使用</a></p>
+
+<ol>
+  <li><code class="highlighter-rouge">@Repository</code>： 见<a href="#声明/注册 Bean 的注解">声明/注册 Bean 的注解</a>；</li>
+  <li><code class="highlighter-rouge">@CrudRepository</code>：继承了 <code class="highlighter-rouge">Repository</code> 接口，并新支持对实体类的增删改查等方法；</li>
+  <li><code class="highlighter-rouge">@PagingAndSortingRepository</code>：继承了 <code class="highlighter-rouge">CrudRepository</code> 接口，并新支持分页、排序及根据条件查询等方法；</li>
+  <li><code class="highlighter-rouge">@JpaRepository</code> 对应接口：包括 JPA 提供的增删改、分页查询及排序查询等。</li>
+</ol>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Repository</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">PersonRepository</span> <span class="kd">extends</span> <span class="n">JpaRepository</span><span class="o">&lt;</span><span class="n">Person</span><span class="o">,</span> <span class="n">Long</span><span class="o">&gt;</span> <span class="o">{</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p><a href="http://www.imooc.com/wiki/springbootlesson/jpa.html">Spring Boot 使用 JPA</a> 测试类</p>
+
+<h4 id="entity-层">Entity 层</h4>
+
+<p><a href="http://conkeyn.iteye.com/blog/602463">JPA 注解（一） id table entity</a></p>
+
+<p>Entity 数据持久层：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">@Entity</code>：标注在类上，表示数据库持久化类，对应一个数据库实体。
+    <ul>
+      <li><code class="highlighter-rouge">[name]</code>可选属性，默认为所标注的实体类名。因为用类反射机制 <code class="highlighter-rouge">Class.newInstance()</code> 方法创建实例的需要，至少有一个无参构造方法。也可标注抽象类。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">@NamedQuery</code>：标注在接口的<strong>自定义查询方法</strong>上，指定要执行的查询语句；</li>
+  <li><code class="highlighter-rouge">@NamedQueries</code>：定义多个；</li>
+  <li><code class="highlighter-rouge">serialVersionUID</code>：适用于JAVA序列化机制。简单来说，通过判断类的<code class="highlighter-rouge">serialVersionUID</code>来验证版本一致。
+    <ul>
+      <li>在进行反序列化时，JVM会把传来的字节流中的<code class="highlighter-rouge">serialVersionUID</code>与本地相应实体类的<code class="highlighter-rouge">serialVersionUID</code>进行比较。</li>
+      <li>如果相同说明是一致的，可以进行反序列化，否则会出现反序列化版本一致的异常，即是<code class="highlighter-rouge">InvalidCastException</code>。</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Entity</span>
+<span class="nd">@NamedQuery</span><span class="o">(</span><span class="n">name</span><span class="o">=</span><span class="s">"UserEntity.findAll"</span><span class="o">,</span> <span class="n">query</span><span class="o">=</span><span class="s">"SELECT u FROM UserEntity u"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">UserEntity</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{}</span>
+
+<span class="c1">// 在自己实现的DAO的xxxRepository接口里定义同名方法，先找是否有同名的NamedQuery，</span>
+<span class="c1">// 如果有，则不按照接口定义的方法解析。</span>
+<span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">UserModel</span><span class="o">&gt;</span> <span class="nf">findByAge</span><span class="o">(</span><span class="kt">int</span> <span class="n">age</span><span class="o">);</span>
+
+<span class="nd">@NamedQueries</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="o">{</span> 
+	<span class="nd">@NamedQuery</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="na">QUERY_FIND_BY_LOGIN</span><span class="o">,</span> <span class="n">query</span> <span class="o">=</span> <span class="s">"select u from User u where u."</span> <span class="o">+</span> <span class="n">User</span><span class="o">.</span><span class="na">PROP_LOGIN</span> <span class="o">+</span> <span class="s">" = :username"</span><span class="o">),</span> 
+	<span class="nd">@NamedQuery</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"getUsernamePasswordToken"</span><span class="o">,</span> <span class="n">query</span> <span class="o">=</span> <span class="s">"select new com.weibo.vo.TokenBO(u.username, u.password) from User u where u."</span> <span class="o">+</span> <span class="n">User</span><span class="o">.</span><span class="na">PROP_LOGIN</span> <span class="o">+</span> <span class="s">" = :username"</span><span class="o">)</span>
+<span class="o">})</span> 
+</code></pre></div></div>
+
+<ul>
+  <li><code class="highlighter-rouge">@Query</code>：标注在（继承 <code class="highlighter-rouge">JpaRepository</code> 接口的）自定义查询方法上，指定要执行的查询语句；</li>
+  <li><code class="highlighter-rouge">@Modifying</code>：支持更新类的 Query 语句，配合 <code class="highlighter-rouge">@Transactional</code> <a href="#Spring 事务">Spring 事务</a> 使用；</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// like后的参数需在前、后加“%”
+// nativeQuery=true表示指定本地查询
+@Query(value="select * from tbl_user where name like %?1", nativeQuery=true)
+public List&lt;UserModel&gt; findByUidOrAge(String name);
+
+@Modifying
+@Query(value = "update UserModel o set o.name=:newName where o.name like %:nn")
+public int findByUidOrAge(@Param("nn") String name, @Param("newName") String newName);
+</code></pre></div></div>
+
+<ul>
+  <li><code class="highlighter-rouge">@Table</code>：标注在类名前，设置数据库表名；
+    <ul>
+      <li><code class="highlighter-rouge">name </code>属性：表示实体对应表名，默认为实体名；</li>
+      <li><code class="highlighter-rouge">catalog </code>和 <code class="highlighter-rouge">schema</code>（思gay玛）属性：表示目录名或数据库名，根据不同的数据类型有所不同；</li>
+      <li><code class="highlighter-rouge">uniqueConstraints</code> 属性：表示该实体所关联的唯一约束条件，可有多个唯一约束；默认没有，需配合<code class="highlighter-rouge">@UniqueContraint</code>用。</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Entity
+@Table(name = "tb_contact", schema = "test", uniqueConstraints = {   
+        @UniqueConstraint(columnNames = {"name", "email" }),  
+        @UniqueConstraint(columnNames = {"col1", "col2" })  
+}) 
+
+public class ContactEO implements Serializable {}
+</code></pre></div></div>
+
+<ul>
+  <li><code class="highlighter-rouge">@Temporal</code>：时间；</li>
+  <li><code class="highlighter-rouge">@Column</code>：表示持久化属性映射表中的字段。标注在 <code class="highlighter-rouge">getter()</code> 或属性前。
+    <ol>
+      <li><code class="highlighter-rouge">unique </code>属性：字段为<strong>唯一标识</strong>，默认为 false。也可用<code class="highlighter-rouge">@Table</code> 中的<code class="highlighter-rouge">@UniqueConstraint</code>，如上。</li>
+      <li><code class="highlighter-rouge">nullable </code>属性：字段可为 null，默认为 true（允许为 null）。</li>
+      <li><code class="highlighter-rouge">insertable </code>属性：在用 “INSERT” SQL 脚本插入数据时，需插入该字段的值。多用于只读属性，如主键和外键等。这些字段值通常是自动生成的。</li>
+      <li><code class="highlighter-rouge">updatable</code>，同上。</li>
+      <li><code class="highlighter-rouge">columnDefinition </code>属性：创建表时，字段对应创建的 SQL 语句，一般用于通过 Entity 生成表<strong>定义</strong>时。如<code class="highlighter-rouge">@Column(columnDefinition = "tinyint(1) default 1")</code>，设置<strong>字段类型和默认值</strong>。</li>
+      <li><code class="highlighter-rouge">table </code>属性：当映射多个表时，指定表中的字段。默认值为主表名。</li>
+      <li><code class="highlighter-rouge">length </code>属性：字段长度，当字段的类型为 varchar 时才有效，默认为255个字符。</li>
+      <li><code class="highlighter-rouge">precision</code> 和 <code class="highlighter-rouge">scale</code> 属性：精度；当字段类型为 double 时，precision 表示数值的总长度，scale 表示小数点所占的位数。</li>
+    </ol>
+  </li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Temporal(TemporalType.TIMESTAMP)
+@Column(name = "create_time", unique = false)
+private Date createTime;
+</code></pre></div></div>
+
+<ul>
+  <li><code class="highlighter-rouge">@Id</code>：标注在<strong>属性上</strong>，表示该字段对应数据库中的列为主键。<a href="#数据类型转换">数据类型转换</a>。能标识为主键的属性类型有：
+    <ol>
+      <li>基本数据类型及其对应的封装类：<code class="highlighter-rouge">Character、Byte、Short、Integer、Long</code>；</li>
+      <li>大数值类型：<code class="highlighter-rouge">java.math.BigInteger</code>；</li>
+      <li>字符串类型：<code class="highlighter-rouge">java.lang.String</code>；</li>
+      <li>时间日期型：
+        <ol>
+          <li><code class="highlighter-rouge">java.util.Date</code></li>
+          <li><del><code class="highlighter-rouge">java.sql.Date</code></del></li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">@GeneratedValue</code>：指定主键生成策略。
+    <ul>
+      <li><strong><code class="highlighter-rouge">strategy</code></strong> 属性：表示生成主键的策略，有：
+        <ol>
+          <li>GenerationType.<strong>TABLE</strong>：用一个特定的数据库表格来保存主键；</li>
+          <li>GenerationType.<strong>SEQUENCE</strong>：用序列机制生成主键，不支持主键自增长，如 Oracle、PostgreSQL；</li>
+          <li>GenerationType.<strong>IDENTITY</strong>：主键自增长，如 MySQL ；</li>
+          <li>GenerationType.<strong>AUTO</strong>：默认，把主键生成策略交给持久化引擎，以上三种选一。</li>
+        </ol>
+      </li>
+      <li><code class="highlighter-rouge">generator </code>属性：为不同策略类型所对应的生成规则名。与<code class="highlighter-rouge">@GenericGenerator</code>搭配使用。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">@TableGenerator</code></li>
+  <li><code class="highlighter-rouge">@SequenceGenerator</code></li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Id
+@GeneratedValue(strategy=GenerationType.AUTO)
+private String id;
+</code></pre></div></div>
+
+<ul>
+  <li><strong><code class="highlighter-rouge">@Transient</code></strong>：声明不与数据库映射的字段，<strong>不需保存</strong>进数据库 。</li>
+  <li><code class="highlighter-rouge">@Basic</code>
+    <ul>
+      <li><code class="highlighter-rouge">fetch</code> 属性：表示获取值的方式，默认为 EAGER（即时/非延迟加载），LAZY（惰性/延迟加载）。</li>
+      <li><code class="highlighter-rouge">optional</code> 属性：表示是否可为 null，不能用于 Java 基本数据类型。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">@Lob</code>：声明为大字段。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Lob</span>
+<span class="c1">// 指定 Lob 类型数据的获取策略</span>
+<span class="nd">@Basic</span><span class="o">(</span><span class="n">fetch</span> <span class="o">=</span> <span class="n">FetchType</span><span class="o">.</span><span class="na">EAGER</span><span class="o">)</span>
+<span class="c1">// columnDefinition 属性指定数据表对应的 Lob 字段类型</span>
+<span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"content"</span><span class="o">,</span> <span class="n">columnDefinition</span> <span class="o">=</span> <span class="s">"LONGTEXT NOT NULL"</span><span class="o">)</span>
+<span class="kd">private</span> <span class="n">String</span> <span class="n">content</span><span class="o">;</span>
+</code></pre></div></div>
+
+<ul>
+  <li><code class="highlighter-rouge">@Enumerated(EnumType.STRING)</code>：枚举类型的字段；</li>
+  <li><code class="highlighter-rouge">@CreatedDate</code>、<code class="highlighter-rouge">@CreatedBy</code>：表示为创建<strong>时间</strong>字段、创建人，在实体被 insert 时会设置值；
+    <ul>
+      <li><code class="highlighter-rouge">@LastModifiedDate</code>、<code class="highlighter-rouge">@LastModifiedBy</code>同理；</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">@EnableJpaAuditing</code>：开启 JPA 审计功能。</li>
+  <li>两个注解在程序运行的过程中不会起任何作用，只会在IDE、编译器、FindBugs检查、<strong>生成文档</strong>时有做提示。
+    <ul>
+      <li><code class="highlighter-rouge">@NonNull</code>可以标注在方法、字段、参数之上，表示对应的值不可以为空</li>
+      <li><code class="highlighter-rouge">@Nullable</code>注解可以标注在方法、字段、参数之上，表示对应的值可以为空</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="sql-数据类型转换">SQL 数据类型转换</h3>
+
+<p>Java 数据类型与数据库中的类型转换由 JPA 实现框架<strong>自动转换</strong>，所以转换规则也不太一样。如 MySQL 中，varchar 和 char 类型都转化为 String 类型，Blob 和 Clob 类型可转化成 Byte[] 类型。</p>
+
+<ol>
+  <li>基本数据类型及其对应的封装类：<code class="highlighter-rouge">Character、Byte、Short、Integer、Long</code>；</li>
+  <li>大数值类型
+    <ol>
+      <li><code class="highlighter-rouge">java.math.BigInteger</code></li>
+      <li><code class="highlighter-rouge">java.math.BigDecimal</code></li>
+    </ol>
+  </li>
+  <li>字节和字符型数组：<code class="highlighter-rouge">byte[]、Byte[]、char[]、Character[]</code></li>
+  <li>字符串类型：<code class="highlighter-rouge">java.lang.String</code></li>
+  <li>日期时间类型
+    <ol>
+      <li><code class="highlighter-rouge">java.util.Date</code></li>
+      <li><code class="highlighter-rouge">java.util.Calendar</code></li>
+      <li><code class="highlighter-rouge">java.sql.Date</code></li>
+      <li><code class="highlighter-rouge">java.sql.Time</code></li>
+      <li><code class="highlighter-rouge">java.sql.Timestamp</code></li>
+    </ol>
+  </li>
+  <li>用户自定义的枚举型</li>
+  <li>Entity类型：标注为 <code class="highlighter-rouge">@Entity</code> 的类</li>
+  <li>包含Entity类型的集合Collection类
+    <ol>
+      <li><code class="highlighter-rouge">java.util.Collection</code></li>
+      <li><code class="highlighter-rouge">java.util.Set</code></li>
+      <li><code class="highlighter-rouge">java.util.List</code></li>
+      <li><code class="highlighter-rouge">java.util.Map</code></li>
+    </ol>
+  </li>
+  <li>嵌入式（embeddable）类</li>
+</ol>
+
+<h2 id="数据持久层演化">数据持久层演化</h2>
+
+<ol>
+  <li>MVC：
+    <ol>
+      <li>直接用 JDBC，model 实体层 （@Entity + @NamedQuery 写 SQL）</li>
+      <li>JPA 数据接口层（extends JpaRepository + @Repository 注解）</li>
+    </ol>
+  </li>
+  <li>Spring MVC：
+    <ol>
+      <li>Service 层 + ServiceImpl（剥离重复的业务逻辑，@Autowired 注入 Bean）</li>
+      <li>DAO 数据持久层
+        <ol>
+          <li>POJO：DO + VO + DTO，Lombok（实体类 Getter/Settor 注解）</li>
+          <li>MyBatis 实现 Mapper 接口
+            <ol>
+              <li>全注解实现 Mapper（SQL 不够灵活）</li>
+              <li>XML 实现 Mapper。工作量大。（MyBatis Generator 生成）</li>
+              <li>MyBatis Plus 增强 + MapStruct（DO转VO） + Easy Trans 翻译</li>
+            </ol>
+          </li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+  <li>升华：不断封装，每个模块负责自己专业的领域，面向对象的思想</li>
+</ol>
+
+<h2 id="mybatis">MyBatis</h2>
 
 <p>MyBatis 是一款优秀的<strong>持久层框架</strong>，它支持<strong>自定义 SQL</strong>、存储过程以及高级映射。</p>
 
 <ul>
   <li>用于简化复杂的 JDBC 代码。</li>
   <li>避免了几乎所有的 <strong>JDBC 代码</strong>、手工设置参数、及获取结果集的工作，通过<strong>简单的 XML 或注解</strong>来配置、映射<del>原始类型、接口和</del> Java POJO 对象为数据库中的记录。</li>
+</ul>
+
+<p>参考：</p>
+
+<ul>
+  <li><a href="https://snailclimb.gitee.io/springboot-guide/#/./docs/basis/springboot-mybatis">优雅整合 SpringBoot+Mybatis</a></li>
+  <li><del><a href="https://snailclimb.gitee.io/springboot-guide/#/./docs/basis/springboot-mybatis-mutipledatasource">优雅整合 SpringBoot+Mybatis 多数据源</a></del></li>
+  <li><a href="https://mybatis.org/mybatis-3/zh_CN/index.html">MyBatis 3 手册</a></li>
+  <li><a href="https://github.com/CodingDocs/springboot-guide">SpringBoot Guide</a></li>
+  <li>MyBatis  <a href="https://www.iocoder.cn/MyBatis/good-collection/?yudao">《芋道 MyBatis 源码解析》 (opens new window)</a>系列</li>
 </ul>
 
 <h3 id="优缺点">优缺点</h3>
@@ -53,9 +465,9 @@
   <li><strong>二级缓存机制</strong>不佳。</li>
 </ol>
 
-<h3 id="配置-mybatis">配置 MyBatis</h3>
+<h3 id="依赖和配置">依赖和配置</h3>
 
-<h5 id="引入依赖">引入依赖</h5>
+<h4 id="引入依赖">引入依赖</h4>
 
 <div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">&lt;!-- MyBatis--&gt;</span>
 <span class="nt">&lt;dependency&gt;</span>
@@ -65,7 +477,9 @@
 <span class="nt">&lt;/dependency&gt;</span>
 </code></pre></div></div>
 
-<h5 id="spring-boot-配置文件中指定扫描-mapperxml-的位置">Spring Boot 配置文件中指定扫描 mapper.xml 的位置</h5>
+<h4 id="配置文件">配置文件</h4>
+
+<p>Spring Boot 配置文件中指定扫描 mapper.xml 的位置。</p>
 
 <blockquote>
   <p>Spring Boot 在配置文件（application.properties/yml）中配置 MyBatis，用来指定 mapper.xml 的位置（映射器接口的 xml 实现所在的项目路径）。</p>
@@ -88,9 +502,9 @@
     <span class="na">map-underscore-to-camel-case</span><span class="pi">:</span> <span class="no">true</span>   <span class="c1"># 开启驼峰命名法</span>
 </code></pre></div></div>
 
-<h5 id="mybatis-配置类设置包路径">MyBatis 配置类设置包路径</h5>
+<h4 id="配置类">配置类</h4>
 
-<p>位置见 resources <a href="#分层目录">配置文件</a>；</p>
+<p>MyBatis 配置类设置包路径。位置见 resources <a href="#分层目录">配置文件</a>；</p>
 
 <p><code class="highlighter-rouge">@MapperScan</code>：</p>
 
@@ -398,37 +812,77 @@
   <p>注意，几种方式可以组合使用。</p>
 </blockquote>
 
-<h4 id="绑定实现方式">绑定实现方式：</h4>
+<h4 id="绑定实现方式">绑定实现方式</h4>
 
 <ol>
-  <li>注解： 用来映射简单语句，代码更简洁。大多数情况下，并不推荐使用注解的方式编写 SQL ：
+  <li>注解： 用来映射简单语句，代码更简洁。大多数情况下，并<strong>不推荐</strong>使用注解的方式编写 SQL ：
     <ol>
+      <li>注解中的 SQL 语句只能对应<strong>某一种数据库</strong>，与代码<strong>混编</strong>在一起。</li>
       <li>SQL 无法很好的排版；</li>
       <li>会导致 Mapper 接口很长很乱；</li>
       <li>SQL 有变化时需重新编译代码。</li>
     </ol>
   </li>
-  <li><code class="highlighter-rouge">XxxMapper.xml</code> 映射文件：用 XML 来映射复杂语句（如：嵌套联合语句映射）。与映射器接口同名，MyBatis 会自动查找并加载。最终使用 XML 的方式，因为 XML 便于可以看到每个表使用到的 SQL ，方便做优化和管理。
+  <li>
+    <p><code class="highlighter-rouge">XxxMapper.xml</code> 映射文件：用 XML 来映射复杂语句（如：嵌套联合语句映射）。与映射器接口同名，MyBatis 会<strong>自动查找并加载</strong>。</p>
+
+    <blockquote>
+      <p>最终使用 XML 的方式，因为 XML 便于可以看到每个表使用到的 SQL ，方便做优化和管理。</p>
+    </blockquote>
+
     <ol>
-      <li><del><a href="https://github.com/gejun123456/MyBatisCodeHelper-Pro">MyBatisCodeHelper-Pro</a> 插件</del>。在没有使用 MyBatis-Plus 之前，使用过蛮长一段时间，我以前的老大也在用。</li>
-      <li><strong>MyBatis-Plus</strong>：是一个 <code class="highlighter-rouge">MyBatis</code> 的增强工具，在<code class="highlighter-rouge">MyBatis</code>的基础上只做增强不做改变，为简化开发、提高效率而生。
-        <ul>
-          <li>后来，考虑到<strong>提高开发效率</strong>，很多<strong>标准的数据库的 CRUD 操作</strong>，编写还是比较枯燥乏味浪费时间，所以使用 MyBatis-Plus 简化。当然，一些相对复杂的 SQL ，还是会考虑使用 XML 。</li>
-        </ul>
-      </li>
-      <li>也可以考虑使用 <a href="https://github.com/mybatis/generator">MyBatis Generator (MBG)</a> 。
+      <li>使用 <a href="https://github.com/mybatis/generator">MyBatis Generator (MBG)</a> 。
         <ol>
           <li>在 Spring 配置文件中<a href="#配置 MyBatis">指定扫描映射文件的位置</a>；</li>
           <li>在 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-12-mybatis/lab-12-mybatis-xml/src/main/resources/mapper"><code class="highlighter-rouge">resources/mapper</code></a> 路径下，使用 MBG 创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-12-mybatis/lab-12-mybatis-xml/src/main/resources/mapper/UserMapper.xml"><code class="highlighter-rouge">UserMapper.xml</code></a> 文件。</li>
           <li>在 MyBatis 配置文件中通过 <code class="highlighter-rouge">&lt;Mappers&gt;</code> 指定位置。</li>
         </ol>
       </li>
+      <li><del><a href="https://github.com/gejun123456/MyBatisCodeHelper-Pro">MyBatisCodeHelper-Pro</a> 插件</del>。在没有使用 MyBatis-Plus 之前，使用过蛮长一段时间，我以前的老大也在用。</li>
+      <li><strong>MyBatis-Plus</strong>：是一个 <code class="highlighter-rouge">MyBatis</code> 的增强工具，在<code class="highlighter-rouge">MyBatis</code>的基础上<strong>只做增强</strong>不做改变，为简化开发、提高效率而生。
+        <ul>
+          <li><strong>提高开发效率</strong>：很多<strong>标准的数据库 CRUD 操作</strong>，编写还是比较枯燥乏味浪费时间，可以使用 MyBatis-Plus 简化。当然，一些相对复杂的 SQL ，还是会考虑使用 XML 。</li>
+        </ul>
+      </li>
       <li><a href="http://www.iocoder.cn/Spring-Boot/MyBatis/">tkmybatis</a></li>
     </ol>
   </li>
 </ol>
 
-<h4 id="语句参数映射-vs-">语句参数映射：<code class="highlighter-rouge">#{}</code> VS <code class="highlighter-rouge">${}</code></h4>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Mapper</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">ApiAccessLogMapper</span> <span class="kd">extends</span> <span class="n">BaseMapperX</span><span class="o">&lt;</span><span class="n">ApiAccessLogDO</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="k">default</span> <span class="n">PageResult</span><span class="o">&lt;</span><span class="n">ApiAccessLogDO</span><span class="o">&gt;</span> <span class="nf">selectPage</span><span class="o">(</span><span class="n">ApiAccessLogPageReqVO</span> <span class="n">reqVO</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="nf">selectPage</span><span class="o">(</span><span class="n">reqVO</span><span class="o">,</span> <span class="k">new</span> <span class="n">LambdaQueryWrapperX</span><span class="o">&lt;</span><span class="n">ApiAccessLogDO</span><span class="o">&gt;()</span>
+                <span class="o">.</span><span class="na">eqIfPresent</span><span class="o">(</span><span class="nl">ApiAccessLogDO:</span><span class="o">:</span><span class="n">getUserId</span><span class="o">,</span> <span class="n">reqVO</span><span class="o">.</span><span class="na">getUserId</span><span class="o">())</span>
+                <span class="o">.</span><span class="na">eqIfPresent</span><span class="o">(</span><span class="nl">ApiAccessLogDO:</span><span class="o">:</span><span class="n">getUserType</span><span class="o">,</span> <span class="n">reqVO</span><span class="o">.</span><span class="na">getUserType</span><span class="o">())</span>
+                <span class="o">.</span><span class="na">eqIfPresent</span><span class="o">(</span><span class="nl">ApiAccessLogDO:</span><span class="o">:</span><span class="n">getApplicationName</span><span class="o">,</span> <span class="n">reqVO</span><span class="o">.</span><span class="na">getApplicationName</span><span class="o">())</span>
+                <span class="o">.</span><span class="na">likeIfPresent</span><span class="o">(</span><span class="nl">ApiAccessLogDO:</span><span class="o">:</span><span class="n">getRequestUrl</span><span class="o">,</span> <span class="n">reqVO</span><span class="o">.</span><span class="na">getRequestUrl</span><span class="o">())</span>
+                <span class="o">.</span><span class="na">betweenIfPresent</span><span class="o">(</span><span class="nl">ApiAccessLogDO:</span><span class="o">:</span><span class="n">getBeginTime</span><span class="o">,</span> <span class="n">reqVO</span><span class="o">.</span><span class="na">getBeginTime</span><span class="o">())</span>
+                <span class="o">.</span><span class="na">geIfPresent</span><span class="o">(</span><span class="nl">ApiAccessLogDO:</span><span class="o">:</span><span class="n">getDuration</span><span class="o">,</span> <span class="n">reqVO</span><span class="o">.</span><span class="na">getDuration</span><span class="o">())</span>
+                <span class="o">.</span><span class="na">eqIfPresent</span><span class="o">(</span><span class="nl">ApiAccessLogDO:</span><span class="o">:</span><span class="n">getResultCode</span><span class="o">,</span> <span class="n">reqVO</span><span class="o">.</span><span class="na">getResultCode</span><span class="o">())</span>
+                <span class="o">.</span><span class="na">orderByDesc</span><span class="o">(</span><span class="nl">ApiAccessLogDO:</span><span class="o">:</span><span class="n">getId</span><span class="o">)</span>
+        <span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**
+     * 物理删除指定时间之前的日志
+     *
+     * @param createTime 最大时间
+     * @param limit      删除条数，防止一次删除太多
+     * @return 删除条数
+     */</span>
+    <span class="nd">@Delete</span><span class="o">(</span><span class="s">"DELETE FROM infra_api_access_log WHERE create_time &lt; #{createTime} LIMIT #{limit}"</span><span class="o">)</span>
+    <span class="n">Integer</span> <span class="nf">deleteByCreateTimeLt</span><span class="o">(</span><span class="nd">@Param</span><span class="o">(</span><span class="s">"createTime"</span><span class="o">)</span> <span class="n">LocalDateTime</span> <span class="n">createTime</span><span class="o">,</span> <span class="nd">@Param</span><span class="o">(</span><span class="s">"limit"</span><span class="o">)</span> <span class="n">Integer</span> <span class="n">limit</span><span class="o">);</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h4 id="占位符-vs-">占位符：<code class="highlighter-rouge">#{}</code> VS <code class="highlighter-rouge">${}</code></h4>
+
+<blockquote>
+  <p>语句参数映射</p>
+</blockquote>
 
 <p><code class="highlighter-rouge">#{}</code>：是 SQL 的<strong>参数占位符</strong>，（<strong>预编译处理时</strong> ）MyBatis 会将其替换为 <code class="highlighter-rouge">?</code>，在 SQL 执行前，调用<del><code class="highlighter-rouge">JDBC</code>中的</del> <code class="highlighter-rouge">PreparedStatement</code> 的 set <del>参数设置</del>方法，按序、安全地设置参数值。比如 <code class="highlighter-rouge">ps.setInt(0, parameterValue)</code>。</p>
 
@@ -478,26 +932,28 @@
   <li>一般用于传入数据库对象，如传入表名。</li>
 </ol>
 
-<h4 id="一全注解方式">一、全注解方式</h4>
+<h4 id="一全注解方式不推荐">一、全注解方式（不推荐）</h4>
 
 <p>在<strong>映射器类中</strong>用注解标识 <code class="highlighter-rouge">SqlSession</code> 方法：</p>
 
+<h5 id="select">@Select</h5>
+
+<blockquote>
+  <p>同 <code class="highlighter-rouge">@Insert</code>、<code class="highlighter-rouge">@Update</code>、<code class="highlighter-rouge">@Delete</code></p>
+</blockquote>
+
+<p><code class="highlighter-rouge">@Select</code>：用于方法上，对应 XML 中的 <code class="highlighter-rouge">&lt;select&gt;</code> 标签。</p>
+
 <ol>
-  <li><code class="highlighter-rouge">@Select</code>：用于方法上，对应 XML 中的 <code class="highlighter-rouge">&lt;select&gt;</code> 标签。
-    <ol>
-      <li><code class="highlighter-rouge">@Param</code>：声明变量名。用于（两个或以上的<strong>方法参数</strong>）向映射器（通过动态 SQL 参数占位符 <code class="highlighter-rouge">#{}</code>、变量占位符<code class="highlighter-rouge">${}</code>）传参。
-        <ul>
-          <li>在方法为单参数时，非必须。</li>
-          <li>在方法有<strong>两个或以上</strong>的参数时，<strong>必须</strong>要加，不然 Mybatis 识别不了。自己的编程习惯，<strong>禁止</strong>使用 Map 作为查询参数，因为无法通过方法的定义，很直观的看懂具体的用途。</li>
-        </ul>
-      </li>
-      <li><code class="highlighter-rouge">@ResultType</code>：返回类型是 void 时，用结果处理器；</li>
-      <li><code class="highlighter-rouge">@ResultMap</code>：指定 XML 映射文件中 <code class="highlighter-rouge">&lt;resultMap&gt;</code> 元素的 id。</li>
-    </ol>
+  <li><code class="highlighter-rouge">@Param</code>：声明变量名、<strong>给参数命名</strong>。用于向<strong>映射器</strong>（通过动态 SQL 参数占位符 <code class="highlighter-rouge">#{}</code>、变量占位符<code class="highlighter-rouge">${}</code>）传参。是为SQL语句中<strong>参数赋值</strong>而服务的。
+    <ul>
+      <li>在方法为单参数时，非必须。在方法有<strong>两个或以上</strong>的参数时，<strong>必须</strong>要加，不然 Mybatis 识别不了。</li>
+      <li>比如在mapper里面某方法添加注解后，<code class="highlighter-rouge">findUserByName(@Param("userId") int id)</code>。通过<code class="highlighter-rouge">#{userId}</code>将参数值传入SQL语句中（给SQL的参数赋值）。</li>
+      <li>通常，<strong>禁止</strong>使用 Map 作为查询参数，因为无法通过方法的定义，很直观的看懂具体的用途。</li>
+    </ul>
   </li>
-  <li><code class="highlighter-rouge">@Insert</code></li>
-  <li><code class="highlighter-rouge">@Update</code></li>
-  <li><code class="highlighter-rouge">@Delete</code></li>
+  <li><code class="highlighter-rouge">@ResultType</code>：返回类型是 void 时，用结果处理器；</li>
+  <li><code class="highlighter-rouge">@ResultMap</code>：指定 XML 映射文件中 <code class="highlighter-rouge">&lt;resultMap&gt;</code> 元素的 id。</li>
 </ol>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 1. Dao 层开发，UserDao.java</span>
@@ -519,6 +975,34 @@
 <span class="c1">// 2. Service 层开发</span>
 <span class="c1">// 3. Controller 层开发</span>
 </code></pre></div></div>
+
+<h5 id="返回值处理">返回值处理</h5>
+
+<p>SQL 查询的返回值可以是单个对象、多个对象的列表或简单的原始类型（如 <code class="highlighter-rouge">int</code>、<code class="highlighter-rouge">String</code> 等）。</p>
+
+<ul>
+  <li>
+    <p><strong>单个对象</strong>：</p>
+
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="nd">@Select</span><span class="o">(</span><span class="s">"SELECT * FROM users WHERE id = #{id}"</span><span class="o">)</span>
+  <span class="n">User</span> <span class="nf">selectById</span><span class="o">(</span><span class="nd">@Param</span><span class="o">(</span><span class="s">"id"</span><span class="o">)</span> <span class="n">Integer</span> <span class="n">id</span><span class="o">);</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p><strong>列表</strong>：</p>
+
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="nd">@Select</span><span class="o">(</span><span class="s">"SELECT * FROM users"</span><span class="o">)</span>
+  <span class="n">List</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span> <span class="nf">selectAll</span><span class="o">();</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p><strong>原始类型</strong>：</p>
+
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="nd">@Select</span><span class="o">(</span><span class="s">"SELECT COUNT(*) FROM users"</span><span class="o">)</span>
+  <span class="kt">int</span> <span class="nf">countUsers</span><span class="o">();</span>
+</code></pre></div>    </div>
+  </li>
+</ul>
 
 <h4 id="二xml-映射文件">二、XML 映射文件</h4>
 
@@ -1124,305 +1608,6 @@
 <span class="n">myBatisGenerator</span><span class="o">.</span><span class="na">generate</span><span class="o">(</span><span class="kc">null</span><span class="o">);</span>
 </code></pre></div></div>
 
-<h3 id="mybatis-plus">MyBatis Plus</h3>
-
-<p>MyBatis-Plus 是基于 MyBatis 框架的一个增强工具，主要目的是简化 MyBatis 的开发过程，提供更加简洁、方便的 CRUD 操作。在保留 MyBatis 强大功能的基础上，通过<strong>封装和优化</strong>一些常见操作来提高开发效率。</p>
-
-<p>提供了许多开箱即用的功能，包括自动 CRUD 代码生成 、分页查询、性能优化、以及支持多种数据库。部分核心特性包括：</p>
-
-<ol>
-  <li><strong>无侵入设计</strong>：不会改变 MyBatis 原有的 API 和使用方式，可以自由选择 MyBatis 和 MyBatis-Plus 的功能。</li>
-  <li><strong>自动 CRUD 代码生成</strong>：通过 <code class="highlighter-rouge">BaseMapper</code> 和 <code class="highlighter-rouge">ServiceImpl</code> 接口，提供了一系列 CRUD 操作的方法，如 <code class="highlighter-rouge">insert</code>、<code class="highlighter-rouge">delete</code>、<code class="highlighter-rouge">update</code> 和 <code class="highlighter-rouge">select</code>，减少了重复的 SQL 编写工作。</li>
-  <li><strong>条件构造器</strong>：如 <code class="highlighter-rouge">QueryWrapper</code>，可以通过链式编程方式轻松构建复杂的查询条件。</li>
-</ol>
-
-<p>总的来说，MyBatis-Plus 给日常开发还是提供了蛮多便利性的。</p>
-
-<ul>
-  <li>参考：<a href="https://www.cnblogs.com/xxctx/p/18404560">mybatis plus 常用知识汇总（保姆级教程！~） </a></li>
-</ul>
-
-<h5 id="引入依赖-1">引入依赖</h5>
-
-<p>在 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-12-mybatis/lab-12-mybatis-plus/pom.xml"><code class="highlighter-rouge">pom.xml</code></a> 文件中，引入相关依赖。</p>
-
-<ul>
-  <li>相比来说，将 <code class="highlighter-rouge">mybatis-spring-boot-starter</code> 替换成 <code class="highlighter-rouge">mybatis-plus-boot-starter</code> 。</li>
-</ul>
-
-<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">&lt;!-- 实现对数据库连接池的自动化配置 --&gt;</span>
-<span class="nt">&lt;dependency&gt;</span>
-    <span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
-    <span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-jdbc<span class="nt">&lt;/artifactId&gt;</span>
-<span class="nt">&lt;/dependency&gt;</span>
-<span class="nt">&lt;dependency&gt;</span> <span class="c">&lt;!-- 本示例，我们使用 MySQL --&gt;</span>
-    <span class="nt">&lt;groupId&gt;</span>mysql<span class="nt">&lt;/groupId&gt;</span>
-    <span class="nt">&lt;artifactId&gt;</span>mysql-connector-java<span class="nt">&lt;/artifactId&gt;</span>
-    <span class="nt">&lt;version&gt;</span>5.1.48<span class="nt">&lt;/version&gt;</span>
-<span class="nt">&lt;/dependency&gt;</span>
-
-<span class="c">&lt;!-- 实现对 MyBatis Plus 的自动化配置 --&gt;</span>
-<span class="nt">&lt;dependency&gt;</span>
-    <span class="nt">&lt;groupId&gt;</span>com.baomidou<span class="nt">&lt;/groupId&gt;</span>
-    <span class="nt">&lt;artifactId&gt;</span>mybatis-plus-boot-starter<span class="nt">&lt;/artifactId&gt;</span>
-    <span class="nt">&lt;version&gt;</span>3.2.0<span class="nt">&lt;/version&gt;</span>
-<span class="nt">&lt;/dependency&gt;</span>
-</code></pre></div></div>
-
-<h5 id="java-配置类">Java 配置类</h5>
-
-<p>创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-12-mybatis/lab-12-mybatis-plus/src/main/java/cn/iocoder/springboot/lab12/mybatis/Application.java"><code class="highlighter-rouge">Application.java</code></a> 类，配置 <code class="highlighter-rouge">@MapperScan</code> 注解，扫描对应 Mapper 接口所在的包路径。</p>
-
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// MyBatisPlusConfig.java</span>
-
-<span class="nd">@MapperScan</span><span class="o">(</span><span class="n">basePackages</span> <span class="o">=</span> <span class="s">"cn.iocoder.springboot.lab12.mybatis.mapper"</span><span class="o">)</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyBatisPlusConfig</span> <span class="o">{</span>
-<span class="o">}</span>
-</code></pre></div></div>
-
-<h5 id="应用配置文件">应用配置文件</h5>
-
-<p><a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-12-mybatis/lab-12-mybatis-plus/src/main/resources/application.yaml"><code class="highlighter-rouge">resource/application.yaml</code></a> 配置文件。</p>
-
-<ul>
-  <li>将 <code class="highlighter-rouge">mybatis</code> 替换成 <code class="highlighter-rouge">mybatis-plus</code> 配置项目。实际上，如果老项目在用 <code class="highlighter-rouge">mybatis-spring-boot-starter</code> 的话，直接将 <code class="highlighter-rouge">mybatis</code> 修改成 <code class="highlighter-rouge">mybatis-plus</code> 即可。</li>
-  <li>相比 <code class="highlighter-rouge">mybatis</code> 配置项来说，<code class="highlighter-rouge">mybatis-plus</code> 增加了更多配置项，也因此无需在配置 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-12-mybatis/lab-12-mybatis-xml/src/main/resources/mybatis-config.xml"><code class="highlighter-rouge">mybatis-config.xml</code></a> 配置文件。更多的 MyBatis-Plus 配置项，可以看看 <a href="https://mybatis.plus/config/#mapperlocations">MyBatis-Plus 使用配置</a> 。</li>
-  <li>配置 <code class="highlighter-rouge">logging</code> 的原因是，方便看到 MyBatis-Plus 自动生成的 SQL 。生产环境下，记得关闭噢。</li>
-</ul>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spring</span><span class="pi">:</span>
-  <span class="c1"># datasource 数据源配置内容</span>
-  <span class="na">datasource</span><span class="pi">:</span>
-    <span class="na">url</span><span class="pi">:</span> <span class="s">jdbc:mysql://47.112.193.81:3306/testb5f4?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8</span>
-    <span class="na">driver-class-name</span><span class="pi">:</span> <span class="s">com.mysql.jdbc.Driver</span>
-    <span class="na">username</span><span class="pi">:</span> <span class="s">testb5f4</span>
-    <span class="na">password</span><span class="pi">:</span> <span class="s">F4df4db0ed86@11</span>
-
-<span class="c1"># mybatis-plus 配置内容</span>
-<span class="na">mybatis-plus</span><span class="pi">:</span>
-  <span class="na">configuration</span><span class="pi">:</span>
-    <span class="na">map-underscore-to-camel-case</span><span class="pi">:</span> <span class="no">true</span> <span class="c1"># 虽然默认为 true ，但是还是显示去指定下。</span>
-  <span class="na">global-config</span><span class="pi">:</span>
-    <span class="na">db-config</span><span class="pi">:</span>
-      <span class="na">id-type</span><span class="pi">:</span> <span class="s">auto</span> <span class="c1"># ID 主键自增</span>
-      <span class="na">logic-delete-value</span><span class="pi">:</span> <span class="s">1</span> <span class="c1"># 逻辑已删除值(默认为 1)</span>
-      <span class="na">logic-not-delete-value</span><span class="pi">:</span> <span class="s">0</span> <span class="c1"># 逻辑未删除值(默认为 0)</span>
-  <span class="na">mapper-locations</span><span class="pi">:</span> <span class="s">classpath*:mapper/*.xml</span>
-  <span class="na">type-aliases-package</span><span class="pi">:</span> <span class="s">cn.iocoder.springboot.lab12.mybatis.dataobject</span>
-
-<span class="c1"># logging</span>
-<span class="na">logging</span><span class="pi">:</span>
-  <span class="na">level</span><span class="pi">:</span>
-    <span class="c1"># dao 开启 debug 模式 mybatis 输入 sql</span>
-    <span class="na">cn</span><span class="pi">:</span>
-      <span class="na">iocoder</span><span class="pi">:</span>
-        <span class="na">springboot</span><span class="pi">:</span>
-          <span class="na">lab12</span><span class="pi">:</span>
-            <span class="na">mybatis</span><span class="pi">:</span>
-              <span class="na">mapper</span><span class="pi">:</span> <span class="s">debug</span>
-</code></pre></div></div>
-
-<h5 id="在-cniocodermybatis-包路径下">在 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-12-mybatis/lab-12-mybatis-plus/src/main/java/cn/iocoder/springboot/lab12/mybatis/dataobject"><code class="highlighter-rouge">cn.iocoder.mybatis</code></a> 包路径下</h5>
-
-<h6 id="douserdo">DO/UserDO</h6>
-
-<p>创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-12-mybatis/lab-12-mybatis-plus/src/main/java/cn/iocoder/springboot/lab12/mybatis/dataobject/UserDO.java">DO/UserDO.java</a> 类 。相比 <a href="https://www.iocoder.cn/Spring-Boot/MyBatis/#">「2.5 UserDO」</a> 来说，主要有两点差别。</p>
-
-<ul>
-  <li>增加了 <a href="https://mybatis.plus/guide/annotation.html#tablename"><code class="highlighter-rouge">@TableName</code></a> 注解，设置了 UserDO 对应的表名是 <code class="highlighter-rouge">users</code> 。毕竟，要使用 MyBatis-Plus 给自动生成 CRUD 操作。</li>
-  <li>增加了 deleted 字段，并添加了<code class="highlighter-rouge">@TableLogic</code>注解，设置该字段为逻辑删除的标记。
-    <ul>
-      <li>在 <code class="highlighter-rouge">application.yaml</code> 配置文件中，配置了删除（<code class="highlighter-rouge">logic-delete-value = 1</code>）和未删除（<code class="highlighter-rouge">0</code>）。当然，也可以通过注解的 <code class="highlighter-rouge">value</code> 和 <code class="highlighter-rouge">delval</code> 来定义未删除和删除。</li>
-      <li>具体关于 MyBatis-Plus 的逻辑删除功能，看下 <a href="https://mybatis.plus/guide/logic-delete.html">逻辑删除</a> 部分的文档。</li>
-    </ul>
-  </li>
-</ul>
-
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// UserDO.java</span>
-<span class="nd">@TableName</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">"users"</span><span class="o">)</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">UserDO</span> <span class="o">{</span>
-
-    <span class="cm">/**
-     * 用户编号
-     */</span>
-    <span class="kd">private</span> <span class="n">Integer</span> <span class="n">id</span><span class="o">;</span>
-
-    <span class="kd">private</span> <span class="n">String</span> <span class="n">username</span><span class="o">;</span>
-    <span class="kd">private</span> <span class="n">String</span> <span class="n">password</span><span class="o">;</span>
-    <span class="kd">private</span> <span class="n">Date</span> <span class="n">createTime</span><span class="o">;</span>
-
-    <span class="cm">/**
-     * 是否删除
-     */</span>
-    <span class="nd">@TableLogic</span>
-    <span class="kd">private</span> <span class="n">Integer</span> <span class="n">deleted</span><span class="o">;</span>
-
-    <span class="c1">// ... 省略 setting/getting 方法</span>
-
-<span class="o">}</span>
-</code></pre></div></div>
-
-<p>对应的创建表的 SQL 如下：</p>
-
-<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="nv">`users`</span> <span class="p">(</span>
-  <span class="nv">`id`</span> <span class="n">int</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span> <span class="n">AUTO_INCREMENT</span> <span class="k">COMMENT</span> <span class="s1">'用户编号'</span><span class="p">,</span>
-  <span class="nv">`username`</span> <span class="n">varchar</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span> <span class="k">COLLATE</span> <span class="n">utf8mb4_bin</span> <span class="k">DEFAULT</span> <span class="k">NULL</span> <span class="k">COMMENT</span> <span class="s1">'账号'</span><span class="p">,</span>
-  <span class="nv">`password`</span> <span class="n">varchar</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span> <span class="k">COLLATE</span> <span class="n">utf8mb4_bin</span> <span class="k">DEFAULT</span> <span class="k">NULL</span> <span class="k">COMMENT</span> <span class="s1">'密码'</span><span class="p">,</span>
-  <span class="nv">`create_time`</span> <span class="n">datetime</span> <span class="k">DEFAULT</span> <span class="k">NULL</span> <span class="k">COMMENT</span> <span class="s1">'创建时间'</span><span class="p">,</span>
-  <span class="nv">`deleted`</span> <span class="n">bit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="k">NULL</span> <span class="k">COMMENT</span> <span class="s1">'是否删除。0-未删除；1-删除'</span><span class="p">,</span>
-  <span class="k">PRIMARY</span> <span class="k">KEY</span> <span class="p">(</span><span class="nv">`id`</span><span class="p">),</span>
-  <span class="k">UNIQUE</span> <span class="k">KEY</span> <span class="nv">`idx_username`</span> <span class="p">(</span><span class="nv">`username`</span><span class="p">)</span>
-<span class="p">)</span> <span class="n">ENGINE</span><span class="o">=</span><span class="n">InnoDB</span> <span class="n">AUTO_INCREMENT</span><span class="o">=</span><span class="mi">7</span> <span class="k">DEFAULT</span> <span class="n">CHARSET</span><span class="o">=</span><span class="n">utf8mb4</span> <span class="k">COLLATE</span><span class="o">=</span><span class="n">utf8mb4_bin</span><span class="p">;</span>
-</code></pre></div></div>
-
-<h6 id="usermapper">UserMapper</h6>
-
-<p>在 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-12-mybatis/lab-12-mybatis-plus/src/main/java/cn/iocoder/springboot/lab12/mybatis/mapper"><code class="highlighter-rouge">cn.iocoder.mybatis.mapper</code></a> 包路径下，创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-12-mybatis/lab-12-mybatis-plus/src/main/java/cn/iocoder/springboot/lab12/mybatis/mapper/UserMapper.java">UserMapper</a> 接口。</p>
-
-<ol>
-  <li>继承了 <code class="highlighter-rouge">com.baomidou.mybatisplus.core.mapper.BaseMapper&lt;T&gt;</code> 接口，这样常规的 CRUD 操作，MyBatis-Plus 就可以替我们自动生成。一般来说，开发 CRUD 业务的时候，最枯燥的就是要写 CRUD 的常用 SQL。
-    <ul>
-      <li>因为继承了 BaseMapper 接口，所以删除了 <code class="highlighter-rouge">#insert(UserDO user)</code>、<code class="highlighter-rouge">#updateById(UserDO user)</code>、<code class="highlighter-rouge">#deleteById(@Param("id") Integer id)</code>、<code class="highlighter-rouge">#selectById(@Param("id") Integer id)</code> 四个 CRUD 方法。</li>
-      <li>更多 BaseMapper 提供的接口方法，可看看 <a href="https://mybatis.plus/guide/crud-interface.html#mapper-crud-接口">《MyBatis-Plus 文档 —— CRUD 接口》</a> 。</li>
-    </ul>
-  </li>
-  <li>对于<code class="highlighter-rouge">#selectByUsername(@Param("username") String username)</code>方法，使用了<code class="highlighter-rouge">com.baomidou.mybatisplus.core.conditions.query.QueryWrapper&lt;T&gt;</code>构造相对灵活的条件，这样一些动态 SQL 就无需在 XML 中编写。
-    <ul>
-      <li>建议 1 ：不要在 Service 中，使用 QueryWrapper 拼接动态条件（如用<code class="highlighter-rouge">#selectList(Wrapper&lt;T&gt; queryWrapper)</code> 等方法）。
-        <ul>
-          <li>否则会导致逻辑里遍布了各种查询，无法<strong>统一管理</strong>实际有哪些查询条件。</li>
-          <li>建议封装到对应的 Mapper 中，这样会更加简洁干净可管理。</li>
-        </ul>
-      </li>
-      <li>建议 2 ：因为 QueryWrapper 暂时不支持一些类似 <code class="highlighter-rouge">&lt;if /&gt;</code> 等 MyBatis 的 OGNL 表达式，可以通过继承 QueryWrapper 类，封装 <a href="https://github.com/YunaiV/onemall/blob/master/common/common-framework/src/main/java/cn/iocoder/common/framework/mybatis/QueryWrapperX.java">QueryWrapperX</a> 类。</li>
-      <li>更多 <code class="highlighter-rouge">QueryWrapper </code>提供的拼接方法，可以看 <a href="https://mybatis.plus/guide/wrapper.html#abstractwrapper">《MyBatis-Plus 文档 —— 条件构造器》</a> 。</li>
-    </ul>
-  </li>
-  <li>对于 <code class="highlighter-rouge">#selectByIds(@Param("ids")</code> 方法，实际也可以使用 MyBatis-Plus 的 QueryWrapper 很方便的实现，这里仅仅是为了演示在 MyBatis-Plus 混合使用 XML 。</li>
-  <li>对于<code class="highlighter-rouge">#selectPageByCreateTime(IPage&lt;UserDO&gt; page, @Param("createTime") Date createTime)</code>方法，是额外添加的，用于演示 MyBatis-Plus 提供的分页插件。
-    <ul>
-      <li>更多 IPage 的内容，可以看 <a href="https://mybatis.plus/guide/page.html">《MyBatis-Plus 文档 —— 分页插件》</a> 。</li>
-    </ul>
-  </li>
-</ol>
-
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// UserMapper.java</span>
-
-<span class="nd">@Repository</span>
-<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">UserMapper</span> <span class="kd">extends</span> <span class="n">BaseMapper</span><span class="o">&lt;</span><span class="n">UserDO</span><span class="o">&gt;</span> <span class="o">{</span>
-
-    <span class="k">default</span> <span class="n">UserDO</span> <span class="nf">selectByUsername</span><span class="o">(</span><span class="nd">@Param</span><span class="o">(</span><span class="s">"username"</span><span class="o">)</span> <span class="n">String</span> <span class="n">username</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">return</span> <span class="nf">selectOne</span><span class="o">(</span><span class="k">new</span> <span class="n">QueryWrapper</span><span class="o">&lt;</span><span class="n">UserDO</span><span class="o">&gt;().</span><span class="na">eq</span><span class="o">(</span><span class="s">"username"</span><span class="o">,</span> <span class="n">username</span><span class="o">));</span>
-    <span class="o">}</span>
-
-    <span class="n">List</span><span class="o">&lt;</span><span class="n">UserDO</span><span class="o">&gt;</span> <span class="nf">selectByIds</span><span class="o">(</span><span class="nd">@Param</span><span class="o">(</span><span class="s">"ids"</span><span class="o">)</span> <span class="n">Collection</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">ids</span><span class="o">);</span>
-
-    <span class="k">default</span> <span class="n">IPage</span><span class="o">&lt;</span><span class="n">UserDO</span><span class="o">&gt;</span> <span class="nf">selectPageByCreateTime</span><span class="o">(</span><span class="n">IPage</span><span class="o">&lt;</span><span class="n">UserDO</span><span class="o">&gt;</span> <span class="n">page</span><span class="o">,</span> <span class="nd">@Param</span><span class="o">(</span><span class="s">"createTime"</span><span class="o">)</span> <span class="n">Date</span> <span class="n">createTime</span><span class="o">)</span> <span class="o">{</span>
-        <span class="k">return</span> <span class="nf">selectPage</span><span class="o">(</span><span class="n">page</span><span class="o">,</span>
-                <span class="k">new</span> <span class="n">QueryWrapper</span><span class="o">&lt;</span><span class="n">UserDO</span><span class="o">&gt;().</span><span class="na">gt</span><span class="o">(</span><span class="s">"create_time"</span><span class="o">,</span> <span class="n">createTime</span><span class="o">));</span>
-    <span class="o">}</span>
-
-<span class="o">}</span>
-</code></pre></div></div>
-
-<p>在 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-12-mybatis/lab-12-mybatis-plus/src/main/resources/mapper"><code class="highlighter-rouge">resources/mapper</code></a> 路径下，创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-12-mybatis/lab-12-mybatis-plus/src/main/resources/mapper/UserMapper.xml"><code class="highlighter-rouge">UserMapper.xml</code></a> 配置文件。</p>
-
-<ul>
-  <li>是不是一下子，瘦了！</li>
-</ul>
-
-<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
-<span class="cp">&lt;!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"&gt;</span>
-<span class="nt">&lt;mapper</span> <span class="na">namespace=</span><span class="s">"cn.iocoder.springboot.lab12.mybatis.mapper.UserMapper"</span><span class="nt">&gt;</span>
-
-    <span class="nt">&lt;sql</span> <span class="na">id=</span><span class="s">"FIELDS"</span><span class="nt">&gt;</span>
-        id, username, password, create_time
-    <span class="nt">&lt;/sql&gt;</span>
-
-    <span class="nt">&lt;select</span> <span class="na">id=</span><span class="s">"selectByIds"</span> <span class="na">resultType=</span><span class="s">"UserDO"</span><span class="nt">&gt;</span>
-        SELECT
-            <span class="nt">&lt;include</span> <span class="na">refid=</span><span class="s">"FIELDS"</span> <span class="nt">/&gt;</span>
-        FROM users
-        WHERE id IN
-            <span class="nt">&lt;foreach</span> <span class="na">item=</span><span class="s">"id"</span> <span class="na">collection=</span><span class="s">"ids"</span> <span class="na">separator=</span><span class="s">","</span> <span class="na">open=</span><span class="s">"("</span> <span class="na">close=</span><span class="s">")"</span> <span class="na">index=</span><span class="s">""</span><span class="nt">&gt;</span>
-                #{id}
-            <span class="nt">&lt;/foreach&gt;</span>
-    <span class="nt">&lt;/select&gt;</span>
-
-<span class="nt">&lt;/mapper&gt;</span>
-</code></pre></div></div>
-
-<h5 id="mybatis-plus-自动生成">MyBatis Plus 自动生成</h5>
-
-<p><a href="#https://blog.csdn.net/SoulNone/article/details/126445011">三种方式</a>不用纠结，对于使用的人来说不分优劣，只分好用不好用。</p>
-
-<ol>
-  <li>AutoGenerator：可以快速生成 <code class="highlighter-rouge">Entity、Mapper、Mapper XML、Service、Controller</code>等各个模块的代码，极大的提升了开发效率。</li>
-  <li>自定义模板，使用的是Velocity模板引擎（也可使用Freemarker）</li>
-  <li>插件EasyCode</li>
-  <li>mybatis-plus-generator</li>
-</ol>
-
-<h5 id="简单测试">简单测试</h5>
-
-<p>创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-12-mybatis/lab-12-mybatis-plus/src/test/java/cn/iocoder/springboot/lab12/mybatis/mapper/UserMapperTest.java">UserMapperTest</a> 测试类，来测试一下简单的 UserMapper 的每个操作。</p>
-
-<ul>
-  <li>多了一个分页的单元测试方法。</li>
-</ul>
-
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// UserMapperTest.java</span>
-
-<span class="nd">@RunWith</span><span class="o">(</span><span class="n">SpringRunner</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
-<span class="nd">@SpringBootTest</span><span class="o">(</span><span class="n">classes</span> <span class="o">=</span> <span class="n">Application</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">UserMapperTest</span> <span class="o">{</span>
-
-    <span class="nd">@Autowired</span>
-    <span class="kd">private</span> <span class="n">UserMapper</span> <span class="n">userMapper</span><span class="o">;</span>
-
-    <span class="nd">@Test</span>
-    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testInsert</span><span class="o">()</span> <span class="o">{</span>
-        <span class="n">UserDO</span> <span class="n">user</span> <span class="o">=</span> <span class="k">new</span> <span class="n">UserDO</span><span class="o">().</span><span class="na">setUsername</span><span class="o">(</span><span class="n">UUID</span><span class="o">.</span><span class="na">randomUUID</span><span class="o">().</span><span class="na">toString</span><span class="o">())</span>
-                <span class="o">.</span><span class="na">setPassword</span><span class="o">(</span><span class="s">"nicai"</span><span class="o">).</span><span class="na">setCreateTime</span><span class="o">(</span><span class="k">new</span> <span class="n">Date</span><span class="o">())</span>
-                <span class="o">.</span><span class="na">setDeleted</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span> <span class="c1">// 一般情况下，是否删除，可以全局枚举下。</span>
-        <span class="n">userMapper</span><span class="o">.</span><span class="na">insert</span><span class="o">(</span><span class="n">user</span><span class="o">);</span>
-    <span class="o">}</span>
-
-    <span class="nd">@Test</span>
-    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testUpdateById</span><span class="o">()</span> <span class="o">{</span>
-        <span class="n">UserDO</span> <span class="n">updateUser</span> <span class="o">=</span> <span class="k">new</span> <span class="n">UserDO</span><span class="o">().</span><span class="na">setId</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span>
-                <span class="o">.</span><span class="na">setPassword</span><span class="o">(</span><span class="s">"wobucai"</span><span class="o">);</span>
-        <span class="n">userMapper</span><span class="o">.</span><span class="na">updateById</span><span class="o">(</span><span class="n">updateUser</span><span class="o">);</span>
-    <span class="o">}</span>
-
-    <span class="nd">@Test</span>
-    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testDeleteById</span><span class="o">()</span> <span class="o">{</span>
-        <span class="n">userMapper</span><span class="o">.</span><span class="na">deleteById</span><span class="o">(</span><span class="mi">2</span><span class="o">);</span>
-    <span class="o">}</span>
-
-
-    <span class="nd">@Test</span>
-    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testSelectByUsername</span><span class="o">()</span> <span class="o">{</span>
-        <span class="n">userMapper</span><span class="o">.</span><span class="na">selectByUsername</span><span class="o">(</span><span class="s">"yunai"</span><span class="o">);</span>
-    <span class="o">}</span>
-
-    <span class="nd">@Test</span>
-    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testSelectByIds</span><span class="o">()</span> <span class="o">{</span>
-        <span class="n">List</span><span class="o">&lt;</span><span class="n">UserDO</span><span class="o">&gt;</span> <span class="n">users</span> <span class="o">=</span> <span class="n">userMapper</span><span class="o">.</span><span class="na">selectByIds</span><span class="o">(</span><span class="n">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="mi">3</span><span class="o">));</span>
-        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"users："</span> <span class="o">+</span> <span class="n">users</span><span class="o">.</span><span class="na">size</span><span class="o">());</span>
-    <span class="o">}</span>
-
-    <span class="nd">@Test</span>
-    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testSelectPageByCreateTime</span><span class="o">()</span> <span class="o">{</span>
-        <span class="n">IPage</span><span class="o">&lt;</span><span class="n">UserDO</span><span class="o">&gt;</span> <span class="n">page</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Page</span><span class="o">&lt;&gt;(</span><span class="mi">1</span><span class="o">,</span> <span class="mi">10</span><span class="o">);</span>
-        <span class="n">Date</span> <span class="n">createTime</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Date</span><span class="o">(</span><span class="mi">2018</span> <span class="o">-</span> <span class="mi">1990</span><span class="o">,</span> <span class="n">Calendar</span><span class="o">.</span><span class="na">FEBRUARY</span><span class="o">,</span> <span class="mi">24</span><span class="o">);</span> <span class="c1">// 临时 Demo ，实际不建议这么写</span>
-        <span class="n">page</span> <span class="o">=</span> <span class="n">userMapper</span><span class="o">.</span><span class="na">selectPageByCreateTime</span><span class="o">(</span><span class="n">page</span><span class="o">,</span> <span class="n">createTime</span><span class="o">);</span>
-        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"users："</span> <span class="o">+</span> <span class="n">page</span><span class="o">.</span><span class="na">getRecords</span><span class="o">().</span><span class="na">size</span><span class="o">());</span>
-    <span class="o">}</span>
-
-<span class="o">}</span>
-</code></pre></div></div>
-
 <h3 id="tkmybatis">tkMyBatis</h3>
 
 <p>tkmybatis 对自己的定位是 mybatis 的工具的意思，那么 tk 猜测是 toolkit 的缩写。也因此，tkmybatis 是多个开源项目组合起来的：</p>
@@ -1520,7 +1705,11 @@
   <li>理论上通过example类可以构造任何筛选条件。</li>
 </ul>
 
-<p>在<code class="highlighter-rouge">mybatis-generator</code>中加以配置，配置数据表的生成操作就可以自动生成example了。 会为每个字段产生Criterion，为底层的mapper.xml创建动态 SQL。</p>
+<p>在<code class="highlighter-rouge">mybatis-generator</code>中加以配置，配置数据表的生成操作就可以自动生成example了。</p>
+
+<ul>
+  <li>会为每个字段产生Criterion，为底层的mapper.xml创建动态 SQL。</li>
+</ul>
 
 <p>常见用法：</p>
 
@@ -1528,7 +1717,7 @@
   <li></li>
 </ul>
 
-<h4 id="example类的生成">Example类的生成</h4>
+<h4 id="example-类的生成">Example 类的生成</h4>
 
 <p>在<code class="highlighter-rouge">generatorConfig.xml</code> 配置文件中，用表名生成对应的实体类时，生成Example的信息<strong>默认</strong>为<code class="highlighter-rouge">true</code>。</p>
 
@@ -1540,34 +1729,38 @@
 <span class="nt">&lt;/table&gt;</span>
 </code></pre></div></div>
 
-<h4 id="mapper-接口中的-example-方法">Mapper 接口中的 example 方法</h4>
+<h4 id="example-方法">example 方法</h4>
 
-<p>比如example是根据user表生成的，UserMapper属于dao层，UserMapper.xml是对应的映射文件。</p>
+<blockquote>
+  <p>比如example是根据user表生成的，UserMapper属于dao层，UserMapper.xml是对应的映射文件。</p>
+</blockquote>
 
-<p>UserMapper接口中有：</p>
+<p><strong>Mapper 接口中</strong>的方法、及example 方法有：</p>
 
 <ul>
   <li>String/Integer insert(User record)：插入数据（返回值为ID）</li>
   <li>int deleteByPrimaryKey(Integer id)：按主键删除
-  int <code class="highlighter-rouge">deleteByExample</code>(<code class="highlighter-rouge">UserExample </code> example)：按条件查询</li>
+  int <code class="highlighter-rouge">deleteByExample</code>(<code class="highlighter-rouge">UserExample </code> example)：按条件删除</li>
   <li>int updateByPrimaryKey(User record)：按主键更新
   int updateByPrimaryKeySelective(User record)：按主键更新值不为null的字段
   int <code class="highlighter-rouge">updateByExample</code>(User record, <code class="highlighter-rouge">UserExample</code> example)：按条件更新
   int <code class="highlighter-rouge">updateByExampleSelective</code>(User record, <code class="highlighter-rouge">UserExample</code> example)：按条件更新<strong>值不为null</strong>的字段</li>
   <li>int <code class="highlighter-rouge">countByExample</code>(<code class="highlighter-rouge">UserExample</code> example)：按条件计数</li>
   <li>User selectByPrimaryKey(Integer id)：按主键查询
-  List <code class="highlighter-rouge">selectByExample</code>(<code class="highlighter-rouge">UserExample</code> example)：按条件查询
+  List <code class="highlighter-rouge">selectByExample</code>(<code class="highlighter-rouge">UserExample</code> example)：<strong>按条件查询</strong>
   List <code class="highlighter-rouge">selectByExampleWithBLOGs</code>(<code class="highlighter-rouge">UserExample </code> example)：按条件查询（包括BLOB字段）。只有当数据表中的字段类型有为二进制的才会产生。</li>
 </ul>
 
 <h5 id="selectbyexample">selectByExample</h5>
 
-<p><code class="highlighter-rouge">Example</code>用于添加条件，相当于<code class="highlighter-rouge">where</code>后的部分。<code class="highlighter-rouge">selectByExample</code>几乎可以解决所有的查询，<code class="highlighter-rouge">select</code>和<code class="highlighter-rouge">selectByPrimaryKey</code>是简化的针对特定情况的解决方法。</p>
+<p><code class="highlighter-rouge">Example</code>用于<strong>添加条件</strong>，相当于<code class="highlighter-rouge">where</code>后的部分。</p>
+
+<p><code class="highlighter-rouge">selectByExample</code>几乎可以解决所有的查询，<code class="highlighter-rouge">select</code>和<code class="highlighter-rouge">selectByPrimaryKey</code>是简化的针对特定情况的解决方法。</p>
 
 <ol>
   <li>当有<strong>主键</strong>时，优先用 <code class="highlighter-rouge">selectByPrimaryKey</code>，</li>
   <li>当根据<strong>实体类属性</strong>查询时用<code class="highlighter-rouge">select</code>，</li>
-  <li>当有<strong>复杂查询</strong>时，如模糊查询、条件判断、条件组合时使用<code class="highlighter-rouge">selectByExample</code>。</li>
+  <li>当有<strong>复杂查询</strong>时，如模糊查询、条件判断、条件组合时，使用<code class="highlighter-rouge">selectByExample</code>。</li>
 </ol>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 1. selectBtPrimaryKey</span>
@@ -1596,7 +1789,7 @@
 <span class="n">example</span><span class="o">.</span><span class="na">createCriteria</span><span class="o">().</span><span class="na">andIn</span><span class="o">(</span><span class="s">"skuId"</span><span class="o">,</span> <span class="n">ids</span><span class="o">);</span>
 <span class="k">this</span><span class="o">.</span><span class="na">stockMapper</span><span class="o">.</span><span class="na">deleteByExample</span><span class="o">(</span><span class="n">example</span><span class="o">);</span>
 
-<span class="err">方法说明：</span>
+<span class="c1">// 方法说明：</span>
 <span class="c1">// 1.添加升序排列条件，DESC为降序</span>
 <span class="n">example</span><span class="o">.</span><span class="na">setOrderByClause</span><span class="o">(</span><span class="s">"字段名ASC"</span><span class="o">)</span>
 <span class="c1">// 2.去除重复，boolean类型，true为选择不重复的记录</span>
@@ -1616,11 +1809,13 @@
 <span class="n">criteria</span><span class="o">.</span><span class="na">andXxxLike</span><span class="o">(</span><span class="sc">'%'</span> <span class="o">+</span> <span class="n">str</span> <span class="o">+</span> <span class="sc">'%'</span><span class="o">)</span>
 </code></pre></div></div>
 
-<h5 id="updatebyprimarykeyselective-和-updatebyprimarykey-的区别">updateByPrimaryKeySelective() 和 updateByPrimaryKey() 的区别</h5>
+<h5 id="xxxselective">xxxSelective()</h5>
+
+<p>updateByPrimaryKeySelective() 和 updateByPrimaryKey() 的区别：</p>
 
 <ul>
-  <li><code class="highlighter-rouge">updateByPrimaryKeySelective() </code>智能更新非空字段；</li>
-  <li><code class="highlighter-rouge"> updateByPrimaryKey()</code> 则全字段更新，包括将空字段设为NULL。</li>
+  <li><code class="highlighter-rouge">updateByPrimaryKeySelective() </code>：<strong>更新非空字段</strong>；</li>
+  <li><code class="highlighter-rouge"> updateByPrimaryKey()</code>：<strong>全字段更新</strong>，包括将空字段设为NULL。</li>
 </ul>
 
 <h4 id="example-对象">Example 对象</h4>
@@ -1630,12 +1825,16 @@
 <p>属性：</p>
 
 <ul>
-  <li><code class="highlighter-rouge">orderByClause</code>：用于指定ORDER BY条件，这个条件没有构造方法，直接通过传递字符串值指定。</li>
+  <li><code class="highlighter-rouge">orderByClause</code>：用于<strong>指定ORDER BY条件</strong>。这个条件没有构造方法，直接通过传递字符串值指定。</li>
   <li><code class="highlighter-rouge">distinct</code>：用来指定是否要<strong>去重</strong>查询的，true为去重。</li>
   <li><code class="highlighter-rouge">oredCriteria</code>：是用来指定查询条件的。</li>
 </ul>
 
-<p>static 内部类 Criteria()：主要是定义 SQL 语 句where后的查询条件，Criterion是最基本的Where条件，针对字段进行筛选。</p>
+<p>static 内部类 <code class="highlighter-rouge">Criteria()</code>：主要是定义 SQL 语 句where后的查询条件。</p>
+
+<ul>
+  <li>Criterion是最基本的Where条件，针对字段进行筛选。</li>
+</ul>
 
 <h5 id="example-类的成员方法">Example 类的成员方法</h5>
 
@@ -1644,11 +1843,11 @@
 <p>example实例方法：</p>
 
 <ul>
-  <li>example.<code class="highlighter-rouge">setOrderByClause</code>(“字段名 ASC”);	添加<strong>升序</strong>排列条件，DESC为降序
+  <li>example.<code class="highlighter-rouge">setOrderByClause</code>(“字段名 ASC”);	添加<strong>升序</strong>排列条件，DESC为降序。
   example.<code class="highlighter-rouge">setDistinct</code>(false)	去除重复，boolean型，true为选择不重复的记录。</li>
-  <li>example.and(Criteria criteria)	为example添加criteria查询条件，关系为与
-  example.or(Criteria criteria)	为example添加criteria查询条件，关系为或</li>
-  <li><code class="highlighter-rouge">example.createCriteria() </code>或者 <code class="highlighter-rouge">or()</code>    创建 <strong>Criteria 对象</strong></li>
+  <li>example.and(Criteria criteria)	为example添加criteria查询条件，关系为与。
+  example.or(Criteria criteria)	为example添加criteria查询条件，关系为或。</li>
+  <li><code class="highlighter-rouge">example.createCriteria() </code>或者 <code class="highlighter-rouge">or()</code>    创建 <strong>Criteria 对象</strong>。</li>
 </ul>
 
 <p>criteria 方法：</p>
@@ -1821,3 +2020,4 @@ public static PageRequest(int page,int size,Sort sort)</p>
   <li>而Hutools分页就类似于很早以前的分页方式，可理解为绿色简易版<strong>JSP分页</strong>，只需在服务层使用一个工具类分页即可。</li>
   <li>既灵活又便于阅读，简直是分页的神器。</li>
 </ul>
+

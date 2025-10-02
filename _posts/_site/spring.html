@@ -8,9 +8,7 @@
 
 <p>[TOC]</p>
 
-<h2 id="spring">Spring</h2>
-
-<h3 id="spring-概述">Spring 概述</h3>
+<h2 id="spring-概述">Spring 概述</h2>
 
 <p>Spring 是<strong>轻量</strong>级的开源 J2EE（容器）框架和中间层框架（万能胶）。</p>
 
@@ -18,7 +16,7 @@
 
 <p>两大核心：IoC/DI（控制反转/依赖注入）和AOP（面向切面编程）。</p>
 
-<h5 id="优点">优点</h5>
+<h3 id="优点">优点</h3>
 
 <ol>
   <li>轻量：Spring 是轻量的，基本的版本大约 2MB；</li>
@@ -45,7 +43,7 @@
   <li>对<strong>单元测试</strong>支持比较好：框架中包含测试环境；支持 JUnit4，可用注解方便地测试。</li>
 </ol>
 
-<h5 id="spring-framework-八大模块">Spring Framework 八大模块</h5>
+<h3 id="spring-framework-八大模块">Spring Framework 八大模块</h3>
 
 <p><img src="../assets/spring-overview.png" alt="img" style="zoom:60%;" /></p>
 
@@ -82,17 +80,17 @@
   <li><code class="highlighter-rouge">Test</code>：支持 Junit 和 TestNG 测试框架，模拟 Http 请求的功能。</li>
 </ol>
 
-<h4 id="spring-启动过程分哪些步骤">Spring 启动过程？分哪些步骤</h4>
+<h3 id="spring-启动过程分哪些步骤">Spring 启动过程？分哪些步骤</h3>
 
 <blockquote>
   <p>https://www.cnblogs.com/lgx211/p/18535984</p>
 </blockquote>
 
-<h3 id="ioc-设计思想">IoC 设计思想</h3>
+<h2 id="ioc-设计思想">IoC 设计思想</h2>
 
-<h4 id="ioc-设计思想-1">IoC 设计思想</h4>
+<h3 id="ioc-设计思想-1">IoC 设计思想</h3>
 
-<h5 id="ioc-和-di">IoC 和 DI</h5>
+<h4 id="ioc-和-di">IoC 和 DI</h4>
 
 <p>在传统的 Java 应用中，一个类（调用者）想要调用（依赖）另一个类（被调用者）的成员变量或成员方法，通常会先通过 <code class="highlighter-rouge">new Object()</code> 创建对象。</p>
 
@@ -112,7 +110,7 @@
   <li>IOC 容器支持加载服务时的<strong>饿汉式</strong>初始化和<strong>懒加载</strong>。</li>
 </ol>
 
-<h5 id="ioc-容器">IoC 容器</h5>
+<h4 id="ioc-容器">IoC 容器</h4>
 
 <p>IoC 容器：管理（Bean）对象（从创建到销毁的）整个生命周期，管理<strong>对象间的依赖</strong>及注入。</p>
 
@@ -156,7 +154,7 @@
   <li><code class="highlighter-rouge">ApplicationContext</code> 在初始化时就自动检测所依赖的属性是否注入。</li>
 </ol>
 
-<h5 id="ioc-工作原理">IoC 工作原理</h5>
+<h4 id="ioc-工作原理">IoC 工作原理</h4>
 
 <p>IoC 底层通过工厂模式、XML 解析、Java 的反射机制等技术，降低代码<strong>耦合度</strong>，主要步骤有：</p>
 
@@ -190,7 +188,7 @@ class UserFactory {
 UserDao dao = UserFactory.getDao();
 </code></pre></div></div>
 
-<h5 id="循环依赖">循环依赖</h5>
+<h4 id="循环依赖">循环依赖</h4>
 
 <p>循环依赖：是指 Bean 对象<strong>循环引用</strong>，是两个或多个 Bean 之间相互持有对方的引用，</p>
 
@@ -232,21 +230,27 @@ UserDao dao = UserFactory.getDao();
   <li>在导致循环依赖的 Bean 上添加 <strong><code class="highlighter-rouge">@Lazy</code> 注解</strong>，比较推荐。<code class="highlighter-rouge">@Lazy</code> 用来标识类是否需要懒加载/延迟加载，可以作用在类上、方法上、构造器上、方法参数上、成员变量中。</li>
 </ul>
 
-<h5 id="依赖注入的方式">依赖注入的方式</h5>
+<h4 id="依赖注入的方式">依赖注入的方式</h4>
 
 <p>依赖注入本质上是 Spring Bean 属性注入的一种，只不过这个属性是一个对象。</p>
 
-<h4 id="spring-配置">Spring 配置</h4>
+<h2 id="spring-配置">Spring 配置</h2>
 
 <blockquote>
-  <p>见 Spring Boot 中。</p>
+  <p>见 Spring Boot 文档中。</p>
 </blockquote>
 
-<h4 id="spring-bean-定义">Spring Bean 定义</h4>
+<h2 id="spring-bean-定义">Spring Bean 定义</h2>
+
+<h3 id="spring-bean-定义-1">Spring Bean 定义</h3>
 
 <p>Bean：由 IoC 容器创建并管理的对象。</p>
 
-<h5 id="bean-属性注入的方式">Bean 属性注入的方式</h5>
+<ul>
+  <li>把一个拥有对属性进行set和get方法的类，就可以称之为JavaBean。</li>
+</ul>
+
+<h4 id="bean-属性注入的方式">Bean 属性注入的方式</h4>
 
 <ol>
   <li>构造器注入：XML 配置文件中，用 <code class="highlighter-rouge">&lt;constructor-arg&gt;</code> 标签给构造方法的<strong>参数</strong>赋值；
@@ -270,7 +274,7 @@ UserDao dao = UserFactory.getDao();
   <li><del>基于Groovy DSL 配置（很少见）</del></li>
 </ol>
 
-<h5 id="基于-xml-配置文件的属性注入">基于 XML 配置文件的属性注入</h5>
+<h4 id="基于-xml-配置文件的属性注入">基于 XML 配置文件的属性注入</h4>
 
 <p>配置文件：描述<strong>如何创建对象</strong>和哪些组件需要哪些服务。用于定义 Bean 的属性值、作用域、依赖关系。</p>
 
@@ -336,7 +340,7 @@ public Orders(String oname) {
 }
 </code></pre></div></div>
 
-<h5 id="bean-作用域">Bean 作用域</h5>
+<h4 id="bean-作用域">Bean 作用域</h4>
 
 <p>Bean 作用域：指 Spring IoC 容器<strong>创建</strong>的 Bean 对象相对于其他 Bean 的<strong>请求可见范围</strong>。在装配 Bean 时就必须指明，可通过 XML 或注解方式配置。</p>
 
@@ -371,7 +375,7 @@ public Person personPrototype() {
   <li><del><code class="highlighter-rouge">websocket</code></del>：作用域是 WebSocket。</li>
 </ol>
 
-<h5 id="bean-生命周期">Bean 生命周期</h5>
+<h4 id="bean-生命周期">Bean 生命周期</h4>
 
 <p><img src="../assets/bean_life_cycle.png" alt="img" style="zoom: 60%;" /></p>
 
@@ -405,7 +409,7 @@ public Person personPrototype() {
   </li>
 </ol>
 
-<h5 id="同名-bean-的优先级">同名 Bean 的优先级</h5>
+<h4 id="同名-bean-的优先级">同名 Bean 的优先级</h4>
 
 <ol>
   <li>同一个配置文件内，以最早定义的为准；</li>
@@ -413,11 +417,11 @@ public Person personPrototype() {
   <li>同文件中 <code class="highlighter-rouge">@Bean</code>的优先级（最先注册）&gt; <code class="highlighter-rouge">@ComponentScan</code>；</li>
 </ol>
 
-<h4 id="bean-自动装配">Bean 自动装配</h4>
+<h3 id="bean-自动装配">Bean 自动装配</h3>
 
 <p>Bean 装配/依赖注入（<strong>装配方式即依赖注入方式</strong>）：在 IoC 容器中，Bean 与 Bean 间建立依赖关系。</p>
 
-<h5 id="装配方式">装配方式</h5>
+<h4 id="装配方式">装配方式</h4>
 
 <ol>
   <li><a href="#基于 XML 配置文件的属性注入">手动装配 Bean</a>：XML 配置文件中，通过 <code class="highlighter-rouge">&lt;constructor-arg&gt;</code>和 <code class="highlighter-rouge">&lt;property&gt;</code> 中的 <code class="highlighter-rouge">ref</code> 属性，手动维护 Bean 间的依赖关系。</li>
@@ -429,7 +433,7 @@ public Person personPrototype() {
   </li>
 </ol>
 
-<h5 id="自动装配的五种规则">自动装配的五种规则</h5>
+<h4 id="自动装配的五种规则">自动装配的五种规则</h4>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;!-- 通过 autowire 属性设置自动装配的规则--&gt;
 &lt;bean id="employee" class="net.bian.Employee" autowire="byName" ref=""&gt;
@@ -443,7 +447,7 @@ public Person personPrototype() {
   <li><code class="highlighter-rouge">autodetect</code>：自动探测，如果 Bean 中<strong>有默认</strong>的构造方法，则用 <code class="highlighter-rouge">constructor</code> 模式，否则用 <code class="highlighter-rouge">byType</code> 模式。</li>
 </ol>
 
-<h5 id="基于-xml-自动装配-bean">基于 XML 自动装配 Bean</h5>
+<h4 id="基于-xml-自动装配-bean">基于 XML 自动装配 Bean</h4>
 
 <p><code class="highlighter-rouge">applicationContext.xml</code> 配置文件</p>
 
@@ -460,7 +464,7 @@ public Person personPrototype() {
   <li>不精确。</li>
 </ol>
 
-<h5 id="声明注册-bean-的注解">声明/注册 Bean 的注解</h5>
+<h4 id="声明注册-bean-的注解">声明/注册 Bean 的注解</h4>
 
 <p>Spring Boot 彻底抛弃了 XML 配置，推荐基于 Java API 配置 Bean，在 Java 类中用注解设置依赖关系。</p>
 
@@ -493,26 +497,30 @@ public Person personPrototype() {
   <li><code class="highlighter-rouge">@Bean</code> <strong>自定义性</strong>更强，多处只能用 @Bean 来注册 Bean。如引用<strong>第三方库中的类</strong>需装配到 Spring 容器时。</li>
 </ol>
 
-<h5 id="基于注解装配注入-bean">基于注解装配/注入 Bean</h5>
+<h4 id="基于注解装配注入-bean">基于注解装配/注入 Bean</h4>
 
 <p>注入 Bean 的注解：</p>
 
 <ol>
   <li><code class="highlighter-rouge">@Autowired</code>：用于 setter()、构造函数或<strong>字段</strong>上。步骤：
     <ol>
-      <li><strong>默认</strong>用 <code class="highlighter-rouge">byType</code> 的方式（根据对象属性所属的<strong>类型</strong>）自动注入 Bean 到（同样被 Spring 容器管理的）当前 Bean 中（即自动导入对象到类中），如：<strong>Service 对象</strong>作为属性注入到当前 Controller 类中；</li>
+      <li><strong>默认</strong>用 <code class="highlighter-rouge">byType</code> 的方式（根据对象属性所属的<strong>类型</strong>）<strong>自动注入 Bean</strong> 到（<del>同样被 Spring 容器管理的</del>）当前 Bean 中（即自动导入对象到类中），如：<strong>Service 对象</strong>作为属性注入到当前 Controller 类中；</li>
       <li>同一个实体类<strong>有多个实现类</strong>（配置多个 Bean）时<strong>类型相同</strong>，IoC 不知该注入哪个实现类，这时改为 <code class="highlighter-rouge">byName</code> 的方式注入；默认根据标注的<strong>成员变量名</strong>作为 id，查找 Bean、进行装配；</li>
-      <li>仍失败，则通过 <code class="highlighter-rouge">@Qualifier</code> <strong>手动指定</strong>目标 Bean 的 id（变量名）；</li>
+      <li>仍失败，则通过 <code class="highlighter-rouge">@Qualifier</code> <strong>手动指定</strong>目标 Bean 的 <strong>id（变量名）</strong>；</li>
       <li>检查属性是否正常装配（设置），无法找到匹配的 Bean 装配会抛出异常；设置 <code class="highlighter-rouge">required=false</code> 允许属性不被设置，则不抛出异常。</li>
       <li><a href="https://blog.csdn.net/weixin_44296929/article/details/109527112">@Autowired注解使用的自动装配方式</a></li>
     </ol>
   </li>
-  <li><code class="highlighter-rouge">@Resource</code>：<strong>默认</strong>（指定值）是 <code class="highlighter-rouge">byName</code>，找不到与名称匹配的 Bean（或该属性为空、不指定值）时用 <code class="highlighter-rouge">byType</code>，自动用标注处的变量或方法名作为 Bean 名；相同类型在 IoC 容器中<strong>只能有一个</strong>。</li>
-  <li><code class="highlighter-rouge">@Autowired</code> 加载的 Bean 相同类型可能有多个，通过 <code class="highlighter-rouge">ByName</code> 加载并区分； <code class="highlighter-rouge">@Resource</code> 加载的 Bean 相同类型在 IoC 容器中<strong>只能有一个</strong>。</li>
+  <li><code class="highlighter-rouge">@Resource</code>：<strong>默认</strong>值是 <code class="highlighter-rouge">byName</code>，自动用<strong>标注处的变量或方法名</strong>作为 Bean 名，找不到与名称匹配的 Bean（或该属性为空、不指定值）时用 <code class="highlighter-rouge">byType</code>；相同类型在 IoC 容器中<strong>只能有一个</strong>。如，<code class="highlighter-rouge">PermissionService、RoleService</code> 属性注入时。
+    <ul>
+      <li><code class="highlighter-rouge">@Autowired</code> 加载的 Bean 相同类型<strong>可能有多个</strong>，通过 <code class="highlighter-rouge">ByName</code> 加载并区分；</li>
+      <li><code class="highlighter-rouge">@Resource</code> 加载的 Bean 相同类型在 IoC 容器中<strong>只能有一个</strong>。</li>
+    </ul>
+  </li>
   <li><code class="highlighter-rouge">@Qualifier("userDAO")</code>：限定要自动注入的 Bean 的 id，一般和 <code class="highlighter-rouge">@Autowired</code> 联用，指定 Bean的名称。</li>
 </ol>
 
-<h5 id="controller">@Controller</h5>
+<h4 id="controller">@Controller</h4>
 
 <p>用于控制器类上。</p>
 
@@ -528,7 +536,7 @@ public Person personPrototype() {
   <li><code class="highlighter-rouge">@RestController</code> = <code class="highlighter-rouge">@Controller</code> + <code class="highlighter-rouge">@ResponseBody</code>：表示 <a href="#REST 常用注解">REST 风格</a>的控制器 Bean。Springboot 会把这个类当成 controller 进行处理，把所有返回的参数放到 ResponseBody 中。返回 JSON 或 XML 格式（由客户端的 <code class="highlighter-rouge">ACCEPT</code> 请求头决定）的对象数据，并直接写入 HTTP 响应体中。属于 <code class="highlighter-rouge">RESTful Web/API</code> 服务，最常用的<strong>前后端分离</strong>框架的情况。</li>
 </ol>
 
-<h3 id="aop">AOP</h3>
+<h2 id="aop">AOP</h2>
 
 <p>AOP（面向切面编程）：将与<strong>业务无关</strong>却被业务模块<strong>所共同调用</strong>的（交叉业务）逻辑封装成切面。</p>
 
@@ -543,7 +551,7 @@ public Person personPrototype() {
 
 <p><img src="../assets/f599114dd06c6a14afe9f64a5396f9de.png" alt="img" style="zoom:50%;" /></p>
 
-<h5 id="aop-实现原理">AOP 实现原理</h5>
+<h4 id="aop-实现原理">AOP 实现原理</h4>
 
 <p>基于<strong>代理</strong>模式，主要分为两种方式：</p>
 
@@ -570,7 +578,7 @@ public Person personPrototype() {
 
 <p><a href="https://www.cnblogs.com/xuwc/p/13889490.html">AOP 实现原理代码示例</a></p>
 
-<h5 id="声明式-aspectj">声明式 AspectJ</h5>
+<h4 id="声明式-aspectj">声明式 AspectJ</h4>
 
 <ol>
   <li>
@@ -587,19 +595,19 @@ public Person personPrototype() {
       <li>
         <p>用 <code class="highlighter-rouge">@Configuration</code> 和 <code class="highlighter-rouge">@EnableAspectJAutoProxy</code> 注解；</p>
 
-        <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> @Configuration
- @EnableAspectJAutoProxy
- public class Appconfig {}
+        <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nd">@Configuration</span>
+ <span class="nd">@EnableAspectJAutoProxy</span>
+ <span class="kd">public</span> <span class="kd">class</span> <span class="nc">Appconfig</span> <span class="o">{}</span>
 </code></pre></div>        </div>
       </li>
       <li>
-        <p><code class="highlighter-rouge">@EnableAspectJAutoProxy</code> 注解也不是必须的，如果引入了 <code class="highlighter-rouge">spring-boot-starter-web</code> <strong>依赖</strong>则会自动启用AOP。</p>
+        <p><strong><code class="highlighter-rouge">@EnableAspectJAutoProxy</code> 注解</strong>也不是必须的，如果引入了 <code class="highlighter-rouge">spring-boot-starter-web</code> <strong>依赖</strong>则会自动启用AOP。</p>
       </li>
     </ol>
   </li>
 </ol>
 
-<h5 id="代理工厂静态方法">代理工厂（静态方法）</h5>
+<h4 id="代理工厂静态方法">代理工厂（静态方法）</h4>
 
 <ol>
   <li>把 AOP 加入 IoC 容器中；</li>
@@ -607,7 +615,7 @@ public Person personPrototype() {
   <li>在配置文件中<strong>开启注解扫描</strong>，用静态工厂方法来创建代理类对象。</li>
 </ol>
 
-<h4 id="通知">通知</h4>
+<h3 id="通知">通知</h3>
 
 <p><img src="../assets/aspect_flow.awebp" alt="img" style="zoom:70%;" /></p>
 
@@ -629,10 +637,10 @@ public Person personPrototype() {
   </li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    // execution(方法修饰符 返回类型 方法所属的包.类名.方法名称(方法参数)
-    @Pointcut("execution(public * com.macro.mall.controller.*.*(..)) || execution(public * com.macro.mall.*.controller.*.*(..))")
-    public void webLog() {
-    }
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="c1">// execution(方法修饰符 返回类型 方法所属的包.类名.方法名称(方法参数)</span>
+    <span class="nd">@Pointcut</span><span class="o">(</span><span class="s">"execution(public * com.macro.mall.controller.*.*(..)) || execution(public * com.macro.mall.*.controller.*.*(..))"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">webLog</span><span class="o">()</span> <span class="o">{</span>
+    <span class="o">}</span>
 </code></pre></div></div>
 
 <ul>
@@ -656,7 +664,7 @@ public Person personPrototype() {
   </li>
 </ul>
 
-<h5 id="常见的通知类型">常见的通知类型</h5>
+<h4 id="常见的通知类型">常见的通知类型</h4>
 
 <ul>
   <li><code class="highlighter-rouge">@Around</code>：环绕通知，通知<strong>包裹</strong>了目标方法，在目标方法<strong>调用前和调用后</strong>执行。通知方法会将目标方法封装起来。</li>
@@ -669,7 +677,7 @@ public Person personPrototype() {
   </li>
 </ul>
 
-<h5 id="aspectj-切入点语法">AspectJ 切入点语法</h5>
+<h4 id="aspectj-切入点语法">AspectJ 切入点语法</h4>
 
 <p>切入点指示符：用来指示切入点表达式目的，在Spring AOP中目前只有<strong>执行方法</strong>这一个连接点。</p>
 
@@ -712,14 +720,59 @@ public Person personPrototype() {
   <li><code class="highlighter-rouge"> +</code>：匹配指定类型的子类型；仅能作为后缀放在类型模式后边。</li>
 </ol>
 
-<h4 id="创建切面的步骤">创建切面的步骤</h4>
+<h3 id="创建切面的步骤">创建切面的步骤</h3>
 
 <ol>
   <li>添加<strong>日志信息封装类</strong> <code class="highlighter-rouge">WebLog</code>（POJO）：用于封装需记录的日志信息，包括操作的描述、时间、消耗时间、URL、请求参数和返回结果等信息。</li>
   <li>添加<strong>切面类</strong> <code class="highlighter-rouge">WebLogAspect</code>：定义了一个日志切面，在<strong>环绕通知</strong>中获取日志需要的信息，并应用到 Controller 层中所有的 public 方法中。</li>
 </ol>
 
-<h3 id="异常">异常</h3>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Component</span>
+<span class="nd">@Aspect</span>
+<span class="nd">@Slf4j</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">TradeOrderLogAspect</span> <span class="o">{</span>
+
+    <span class="cm">/**
+     * 用户编号
+     * 目前的使用场景：支付回调时，需要强制设置下用户编号
+     */</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">&gt;</span> <span class="n">USER_ID</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ThreadLocal</span><span class="o">&lt;&gt;();</span>
+ 	<span class="o">....</span>
+
+    <span class="nd">@Resource</span>
+    <span class="kd">private</span> <span class="n">TradeOrderLogService</span> <span class="n">orderLogService</span><span class="o">;</span>
+
+    <span class="nd">@AfterReturning</span><span class="o">(</span><span class="s">"@annotation(orderLog)"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">doAfterReturning</span><span class="o">(</span><span class="n">JoinPoint</span> <span class="n">joinPoint</span><span class="o">,</span> <span class="n">TradeOrderLog</span> <span class="n">orderLog</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="c1">// 1.1 操作用户</span>
+            <span class="n">Integer</span> <span class="n">userType</span> <span class="o">=</span> <span class="n">getUserType</span><span class="o">();</span>
+            <span class="n">Long</span> <span class="n">userId</span> <span class="o">=</span> <span class="n">getUserId</span><span class="o">();</span>
+            <span class="c1">// 1.2 订单信息</span>
+            <span class="n">Long</span> <span class="n">orderId</span> <span class="o">=</span> <span class="n">ORDER_ID</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">orderId</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// 如果未设置，只有注解，说明不需要记录日志</span>
+                <span class="k">return</span><span class="o">;</span>
+            <span class="o">}</span>
+            <span class="n">Integer</span> <span class="n">beforeStatus</span> <span class="o">=</span> <span class="n">BEFORE_STATUS</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+            <span class="n">Integer</span> <span class="n">afterStatus</span> <span class="o">=</span> <span class="n">AFTER_STATUS</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+            <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">exts</span> <span class="o">=</span> <span class="n">ObjectUtil</span><span class="o">.</span><span class="na">defaultIfNull</span><span class="o">(</span><span class="n">EXTS</span><span class="o">.</span><span class="na">get</span><span class="o">(),</span> <span class="n">emptyMap</span><span class="o">());</span>
+            <span class="n">String</span> <span class="n">content</span> <span class="o">=</span> <span class="n">StrUtil</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="n">orderLog</span><span class="o">.</span><span class="na">operateType</span><span class="o">().</span><span class="na">getContent</span><span class="o">(),</span> <span class="n">exts</span><span class="o">);</span>
+
+            <span class="c1">// 2. 记录日志</span>
+            <span class="n">TradeOrderLogCreateReqBO</span> <span class="n">createBO</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TradeOrderLogCreateReqBO</span><span class="o">()</span>
+                    <span class="o">.</span><span class="na">setUserId</span><span class="o">(</span><span class="n">userId</span><span class="o">).</span><span class="na">setUserType</span><span class="o">(</span><span class="n">userType</span><span class="o">)</span>
+                    <span class="o">.</span><span class="na">setOrderId</span><span class="o">(</span><span class="n">orderId</span><span class="o">).</span><span class="na">setBeforeStatus</span><span class="o">(</span><span class="n">beforeStatus</span><span class="o">).</span><span class="na">setAfterStatus</span><span class="o">(</span><span class="n">afterStatus</span><span class="o">)</span>
+                    <span class="o">.</span><span class="na">setOperateType</span><span class="o">(</span><span class="n">orderLog</span><span class="o">.</span><span class="na">operateType</span><span class="o">().</span><span class="na">getType</span><span class="o">()).</span><span class="na">setContent</span><span class="o">(</span><span class="n">content</span><span class="o">);</span>
+            <span class="n">orderLogService</span><span class="o">.</span><span class="na">createOrderLog</span><span class="o">(</span><span class="n">createBO</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">log</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="s">"[doAfterReturning][orderLog({}) 订单日志错误]"</span><span class="o">,</span> <span class="n">toJsonString</span><span class="o">(</span><span class="n">orderLog</span><span class="o">),</span> <span class="n">ex</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+            <span class="n">clear</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+</code></pre></div></div>
+
+<h2 id="异常">异常</h2>
 
 <h4 id="常见-web-请求和参数异常">常见 web 请求和参数异常</h4>
 
@@ -893,7 +946,7 @@ public Person personPrototype() {
 
 <p><img src="../assets/listener_example.png" alt="在这里插入图片描述" style="zoom:50%;" /></p>
 
-<h3 id="spring-事务">Spring 事务</h3>
+<h2 id="spring-事务">Spring 事务</h2>
 
 <p>事务管理：按照给定的<strong>事务规则</strong>来执行提交或回滚操作。</p>
 
@@ -901,35 +954,37 @@ public Person personPrototype() {
   <p>见数据库文档中的事务。</p>
 </blockquote>
 
-<h4 id="事务实现">事务实现</h4>
+<h3 id="事务实现">事务实现</h3>
 
 <blockquote>
   <p>AOP</p>
 </blockquote>
 
-<h4 id="事务分类">事务分类</h4>
+<h3 id="事务分类">事务分类</h3>
 
 <ol>
   <li>编程式事务：使用 <code class="highlighter-rouge">TransactionTemplate</code> 编写代码（硬编码）实现管理事务，有极大灵活性，难维护；</li>
   <li><strong>声明式事务</strong>：分离事务管理和业务逻辑代码，本质是通过 <strong>AOP</strong>，对方法前后进行拦截，将事务处理（开启、提交或回滚操作）的功能<strong>编织</strong>到拦截的方法中（即在目标方法开始前加入一个事务，在执行完方法后根据执行情况提交或回滚事务）。不需编程，只需通过在 XML 文件中配置、或直接<strong>基于注解</strong>实现。实现声明式事务的方式：
     <ol>
       <li>基于 XML（<code class="highlighter-rouge">&lt;tx&gt;</code> 和 <code class="highlighter-rouge">&lt;aop&gt;</code> 命名空间）的声明式事务管理：推荐，最大特点是与 Spring AOP 结合紧密，可充分利用切点表达式的强大支持，更灵活。</li>
-      <li>基于 <code class="highlighter-rouge">@Transactional</code> 的全注解方式的：简化，使用最多。
-        <ol>
-          <li>作用于类：表示该类所有的 <strong>public 方法</strong>都配置相同的事务属性信息；</li>
-          <li>只能作用于 <code class="highlighter-rouge">public</code> 方法：方法的事务会覆盖类的事务配置信息。如 <code class="highlighter-rouge">Service </code>层方法。</li>
-        </ol>
-      </li>
+      <li>基于 <code class="highlighter-rouge">@Transactional</code> 的全注解方式的：简化，使用最多。</li>
     </ol>
   </li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public interface PmsProductService {
-    /**
+<h3 id="transactional">@Transactional</h3>
+
+<ol>
+  <li>作用于类：表示该类所有的 <strong>public 方法</strong>都配置相同的事务属性信息；</li>
+  <li>只能作用于 <strong><code class="highlighter-rouge">public</code> 方法</strong>：方法的事务会覆盖类的事务配置信息。如 <strong><code class="highlighter-rouge">Service </code>层</strong>方法。</li>
+</ol>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">PmsProductService</span> <span class="o">{</span>
+    <span class="cm">/**
      * 创建商品
-     */
-    @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, rollbackFor = {Exception.class, 其它异常})
-    int create(PmsProductParam productParam);
+     */</span>
+    <span class="nd">@Transactional</span><span class="o">(</span><span class="n">isolation</span> <span class="o">=</span> <span class="n">Isolation</span><span class="o">.</span><span class="na">DEFAULT</span><span class="o">,</span> <span class="n">propagation</span> <span class="o">=</span> <span class="n">Propagation</span><span class="o">.</span><span class="na">REQUIRED</span><span class="o">,</span> <span class="n">rollbackFor</span> <span class="o">=</span> <span class="o">{</span><span class="n">Exception</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="err">其它异常</span><span class="o">})</span>
+    <span class="kt">int</span> <span class="nf">create</span><span class="o">(</span><span class="n">PmsProductParam</span> <span class="n">productParam</span><span class="o">);</span>
 </code></pre></div></div>
 
 <p><code class="highlighter-rouge">@Transactional</code> 的可选属性有：</p>
@@ -939,14 +994,14 @@ public Person personPrototype() {
   <li><code class="highlighter-rouge">isolation</code>：</li>
   <li><code class="highlighter-rouge">rollbackFor</code>：需要回滚的异常类。默认情况下，遇到 <code class="highlighter-rouge">RuntimeException</code> 时会<strong>回滚</strong>，遇到<strong>受检查的异常</strong>不会回滚。
     <ul>
-      <li>要想所有异常都回滚，要加上 <code class="highlighter-rouge">@Transactional(rollbackFor = {Exception.class, 其它异常}) </code>。</li>
+      <li>要想<strong>所有异常</strong>都回滚，要加上 <code class="highlighter-rouge">@Transactional(rollbackFor = {Exception.class, 其它异常}) </code>。</li>
     </ul>
   </li>
 </ul>
 
 <p><img src="../assets/image-20221009222037746.png" alt="image-20221009222037746" style="zoom:70%;" /></p>
 
-<h4 id="事务传播行为规则属性">事务传播行为/规则/属性</h4>
+<h3 id="事务传播行为规则属性">事务传播行为/规则/属性</h3>
 
 <p>Spring 事务的传播行为：当多个事务同时存在时，Spring 如何处理这些事务的行为。</p>
 
@@ -962,7 +1017,7 @@ public Person personPrototype() {
   <li><del><code class="highlighter-rouge">NESTED</code></del>：如果当前存在事务，则在<strong>嵌套</strong>事务内执行。如果当前没有事务，进行与 <code class="highlighter-rouge">REQUIRED</code>类似的操作。</li>
 </ol>
 
-<h4 id="事务隔离级别">事务隔离级别</h4>
+<h3 id="事务隔离级别">事务隔离级别</h3>
 
 <p>见数据库 MySQL 中。</p>
 
@@ -978,23 +1033,167 @@ SERIALIZABLE(8);
 </code></pre></div></div>
 
 <ol>
-  <li>
-    <p><code class="highlighter-rouge">ISOLATION_DEFAULT</code>：<strong>默认</strong>的隔离级别，使用<strong>数据库默认</strong>的事务隔离级别。MYSQL 默认为 <code class="highlighter-rouge">REPEATABLE_READ</code>，SQLSERVER、Oracle 默认为 <code class="highlighter-rouge">READ_COMMITTED</code>。</p>
-  </li>
+  <li><code class="highlighter-rouge">ISOLATION_DEFAULT</code>：<strong>默认</strong>的隔离级别，使用<strong>数据库默认</strong>的事务隔离级别。MYSQL 默认为 <code class="highlighter-rouge">REPEATABLE_READ</code>，SQLSERVER、Oracle 默认为 <code class="highlighter-rouge">READ_COMMITTED</code>。</li>
   <li><code class="highlighter-rouge">ISOLATION_READ_UNCOMMITTED</code>：读未提交，允许另外一个事务可看到这个事务<strong>未提交的数据</strong>；最低级别，可能有<strong>脏读、不可重复读、幻读</strong>；</li>
   <li><code class="highlighter-rouge">ISOLATION_READ_COMMITTED</code>：读已提交，保证一个事务修改的数据<strong>提交后</strong>才能被另一事务读取，而且能看到该事务<strong>对已有记录的更新</strong>；新解决了<strong>脏读</strong>；</li>
   <li><code class="highlighter-rouge">ISOLATION_REPEATABLE_READ</code>：可重复读，保证一个事务修改的数据<strong>提交后</strong>才能被另一事务读取，但不能看到该事务<strong>对已有记录的更新</strong>；新解决了<strong>不可重复读</strong>；</li>
   <li><code class="highlighter-rouge">ISOLATION_SERIALIZABLE</code>：一个事务在执行的过程中<strong>完全看不到</strong>其他事务对数据库所做的更新。新解决<strong>幻读</strong>。</li>
 </ol>
 
-<h3 id="spring-框架中的设计模式">Spring 框架中的设计模式</h3>
+<h3 id="spring-事务管理">Spring 事务管理</h3>
+
+<p>Spring框架提供了强大的事务管理功能，允许在应用程序中轻松<strong>管理数据库事务</strong>。</p>
+
+<ul>
+  <li>
+    <p>在Spring的事务管理中，<code class="highlighter-rouge">TransactionSynchronizationManager</code>类扮演着重要的角色，而<code class="highlighter-rouge">registerSynchronization</code>方法是其中一个关键方法。</p>
+  </li>
+  <li>
+    <p>通过<strong>注册事务同步回调</strong>可以确保在事务的不同阶段执行特定的操作，从而更好地管理资源、记录日志、发送通知等。</p>
+  </li>
+</ul>
+
+<h4 id="transactionsynchronizationmanager">TransactionSynchronizationManager</h4>
+
+<p>事务同步管理器是Spring框架中用于<strong>管理事务同步</strong>的工具类。让我们能监听 Spring 的事务操作。</p>
+
+<ul>
+  <li>在一个事务中，可能涉及到多个资源，如数据库连接、消息队列等。</li>
+  <li><code class="highlighter-rouge">TransactionSynchronizationManager</code>允许注册事务同步回调，以便在事务提交、回滚或完成时执行特定的操作。</li>
+  <li>registerSynchronization方法：用于向事务中注册一个同步回调对象，以便在事务的不同生命周期阶段执行特定的逻辑。</li>
+</ul>
+
+<p>为什么要使用？</p>
+
+<ul>
+  <li>主要目的是在事务管理中执行与事务状态相关的操作。</li>
+</ul>
+
+<p>以下是一些常见的使用情景：</p>
+
+<ol>
+  <li>清理资源：在事务提交后，清理一些资源，如关闭数据库连接、释放文件句柄等。注册一个事务同步回调可以确保这些<strong>清理操作</strong>在事务成功提交后执行，而不会在事务回滚时执行。</li>
+  <li>发送通知：可以在<strong>事务成功提交后</strong>发送通知，通知其他系统或服务，事务已成功完成。</li>
+  <li>记录日志：在事务完成后，记录一些事务相关的日志信息，以便后续的审计或故障排除。</li>
+  <li>资源协调：在某些情况下，<strong>协调多个资源</strong>的操作，例如在事务提交后触发消息发布。</li>
+</ol>
+
+<p>总之提供了一种在Spring事务中<strong>注册自定义操作</strong>的机制，以便更好地管理事务的生命周期。</p>
+
+<h4 id="方法">方法</h4>
+
+<blockquote>
+  <p>TransactionSynchronizationManager.registerSynchronization方法</p>
+</blockquote>
+
+<ol>
+  <li><code class="highlighter-rouge">.registerSynchronization()</code>：注册一个监听器，需要传入一个对象TransactionSynchronization。</li>
+  <li><code class="highlighter-rouge">.isSynchronizationActive()</code>：获取到当前是否存在事务。</li>
+</ol>
+
+<h4 id="回调方法">回调方法</h4>
+
+<p>TransactionSynchronization接口定义了不同类型的回调方法，允许在不同的<strong>事务生命周期</strong>阶段执行操作。</p>
+
+<ol>
+  <li><code class="highlighter-rouge">beforeCommit(boolean readOnly)</code>：在事务<strong>提交前</strong>执行。可以在这里执行一些与事务相关的操作，也可以根据<strong>readOnly参数</strong>判断事务是否为只读。</li>
+  <li><code class="highlighter-rouge">beforeCompletion()</code>：在事务<strong>完成前</strong>执行。提供了一个在事务最后一刻执行操作的机会，可以用来执行一些<strong>清理工作</strong>或其他必要的操作。</li>
+  <li><code class="highlighter-rouge">afterCommit()</code>：在事务<strong>成功提交后</strong>执行。是执行一些<strong>清理操作或发送通知</strong>的好地方。</li>
+  <li><code class="highlighter-rouge">afterCompletion(int status)</code>：在事务<strong>完成后</strong>执行，参数status表示事务的状态。可以根据不同的状态执行不同的操作，如<strong>记录日志</strong>或触发其他业务逻辑。</li>
+</ol>
+
+<h4 id="使用示例">使用示例</h4>
+
+<p>下面的示例包含多个回调方法，展示了如何在Spring事务管理中注册和使用事务同步回调：</p>
+
+<ul>
+  <li>首先使用<strong>@Transactional注解</strong>标记了一个方法，表示这个方法是一个事务方法。</li>
+  <li>在方法内部，执行了一些数据库操作，</li>
+  <li>然后通过<code class="highlighter-rouge">TransactionSynchronizationManager.registerSynchronization</code>方法注册了一个<strong>事务同步回调对象</strong>。</li>
+  <li>这个回调对象实现了<code class="highlighter-rouge">TransactionSynchronization</code>接口，并在不同的回调方法中定义了在不同事务生命周期阶段要执行的逻辑。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Transactional</span>
+<span class="nd">@Service</span>
+<span class="nd">@Valid</span>
+<span class="nd">@Slf4j</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MemberUserServiceImpl</span> <span class="kd">implements</span> <span class="n">MemberUserService</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">performSomeDatabaseOperations</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">// 执行数据库操作</span>
+        
+        <span class="c1">// 注册事务同步回调</span>
+        <span class="n">TransactionSynchronizationManager</span><span class="o">.</span><span class="na">registerSynchronization</span><span class="o">(</span><span class="k">new</span> <span class="n">TransactionSynchronization</span><span class="o">()</span> <span class="o">{</span>
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">afterCommit</span><span class="o">()</span> <span class="o">{</span>
+                <span class="c1">// 在事务提交后执行的逻辑</span>
+                <span class="c1">// 可以进行一些清理工作或发送通知</span>
+            <span class="o">}</span>
+
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">afterCompletion</span><span class="o">(</span><span class="kt">int</span> <span class="n">status</span><span class="o">)</span> <span class="o">{</span>
+                <span class="c1">// 在事务完成后执行的逻辑</span>
+                <span class="c1">// status表示事务的状态，可以根据不同状态执行不同的操作</span>
+            <span class="o">}</span>
+
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">beforeCommit</span><span class="o">(</span><span class="kt">boolean</span> <span class="n">readOnly</span><span class="o">)</span> <span class="o">{</span>
+                <span class="c1">// 在事务提交前执行的逻辑</span>
+                <span class="c1">// readOnly表示事务是否为只读</span>
+            <span class="o">}</span>
+
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">beforeCompletion</span><span class="o">()</span> <span class="o">{</span>
+                <span class="c1">// 在事务完成前执行的逻辑</span>
+            <span class="o">}</span>
+        <span class="o">});</span>
+    <span class="o">}</span>
+    
+    <span class="c1">//当前事务提交后方可进行异步任务，防止异步任务先于未提交的事务执行</span>
+    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">callBack</span><span class="o">(</span><span class="n">Invoice</span> <span class="n">invoice</span><span class="o">){</span> <span class="c1">// private</span>
+        <span class="kt">boolean</span> <span class="n">synchronizationActive</span> <span class="o">=</span> <span class="n">TransactionSynchronizationManager</span><span class="o">.</span><span class="na">isSynchronizationActive</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">synchronizationActive</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// 当前存在事务，在事务提交后执行</span>
+            <span class="n">TransactionSynchronizationManager</span><span class="o">.</span><span class="na">registerSynchronization</span><span class="o">(</span>
+                    <span class="k">new</span> <span class="nf">TransactionSynchronizationAdapter</span><span class="o">()</span> <span class="o">{</span>
+                        <span class="nd">@Override</span>
+                        <span class="kd">public</span> <span class="kt">void</span> <span class="nf">afterCommit</span><span class="o">()</span> <span class="o">{</span> <span class="c1">// 监听事务提交完成</span>
+                            <span class="n">doCall</span><span class="o">(</span><span class="n">invoice</span><span class="o">);</span>
+                        <span class="o">}</span>
+                    <span class="o">}</span>
+            <span class="o">);</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+             <span class="c1">// 当前不存在事务，直接执行</span>
+            <span class="n">doCall</span><span class="o">(</span><span class="n">invoice</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    
+    <span class="nd">@Override</span>
+    <span class="nd">@Transactional</span><span class="o">(</span><span class="n">rollbackFor</span> <span class="o">=</span> <span class="n">Exception</span><span class="o">.</span><span class="na">class</span><span class="o">)</span> <span class="c1">//</span>
+    <span class="kd">public</span> <span class="n">MemberUserDO</span> <span class="nf">createUserIfAbsent</span><span class="o">(</span><span class="n">String</span> <span class="n">mobile</span><span class="o">,</span> <span class="n">String</span> <span class="n">registerIp</span><span class="o">,</span> <span class="n">Integer</span> <span class="n">terminal</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// 用户已经存在</span>
+        <span class="n">MemberUserDO</span> <span class="n">user</span> <span class="o">=</span> <span class="n">memberUserMapper</span><span class="o">.</span><span class="na">selectByMobile</span><span class="o">(</span><span class="n">mobile</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">user</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">user</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="c1">// 用户不存在，则进行创建</span>
+        <span class="k">return</span> <span class="nf">createUser</span><span class="o">(</span><span class="n">mobile</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="n">registerIp</span><span class="o">,</span> <span class="n">terminal</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h2 id="spring-框架中的设计模式">Spring 框架中的设计模式</h2>
 
 <ol>
   <li><strong>工厂模式</strong>：<a href="#IoC 容器">IoC 容器的两种实现</a>：通过 <code class="highlighter-rouge">BeanFactory</code>、<code class="highlighter-rouge">ApplicationContext</code> 接口创建 Bean 对象。</li>
-  <li><strong>单例模式</strong>：Bean 默认为单例模式，只有一个实例；Spring 中 Bean 的默认作用域就是 singleton。Spring 可通过 XML 或注解方式<a href="#Bean 作用域">配置 Bean 的作用域</a>来实现单例。Spring 通过 <code class="highlighter-rouge">ConcurrentHashMap</code> （线程安全）实现<strong>单例注册表</strong>的特殊方式实现单例模式。
+  <li><strong>单例模式</strong>：Bean 默认为单例模式，只有一个实例；Spring 中 Bean 的默认作用域就是 singleton。Spring 可通过 XML 或注解方式<a href="#Bean 作用域">配置 Bean 的作用域</a>来实现单例。
     <ol>
-      <li>xml : <code class="highlighter-rouge">&lt;bean id="userService" class="top.UserService" scope="singleton"/&gt;</code></li>
-      <li>注解：<code class="highlighter-rouge">@Scope(value = "singleton")</code></li>
+      <li>Spring 通过 <code class="highlighter-rouge">ConcurrentHashMap</code> （线程安全）实现<strong>单例注册表</strong>的特殊方式实现单例模式。
+        <ol>
+          <li>xml : <code class="highlighter-rouge">&lt;bean id="userService" class="top.UserService" scope="singleton"/&gt;</code></li>
+          <li>注解：<code class="highlighter-rouge">@Scope(value = "singleton")</code></li>
+        </ol>
+      </li>
+      <li><code class="highlighter-rouge">private final static AreaUtils INSTANCE = new AreaUtils();</code></li>
     </ol>
   </li>
   <li><strong>代理模式</strong>：<strong>AOP 的实现</strong>用到 <strong>JDK 动态代理</strong>和 CGLIB 字节码生成技术；</li>

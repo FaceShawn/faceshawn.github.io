@@ -91,27 +91,48 @@ alert(/xss/);
 
 <h2 id="二csrf-跨站请求伪造">二、CSRF 跨站请求伪造</h2>
 
-<h3 id="概念-1">概念</h3>
+<h3 id="概念简介">概念简介</h3>
 
-<p>跨站请求伪造（Cross-site request forgery，<strong>CSRF</strong>），是攻击者通过一些技术手段<strong>欺骗用户的浏览器</strong>去访问一个自己<strong>曾经认证过</strong>的网站并执行一些操作（如发邮件，发消息，甚至财产操作如转账和购买商品）。</p>
-
-<p>由于浏览器曾经认证过，所以被访问的网站会认为是真正的用户操作而去执行。</p>
+<p>跨站请求伪造（<code class="highlighter-rouge">Cross-site request forgery</code>，<strong>CSRF</strong>）：通过（Cookie）<strong>伪造用户请求</strong>（让用户<strong>误点击非法链接</strong>、骗用户的浏览器）去访问<strong>曾经认证过</strong>的网站，让其<strong>以用户的名义</strong>执行操作（如发邮件，发消息，甚至财产操作如转账和购买商品）。</p>
 
 <ul>
-  <li>XSS 利用的是用户对指定网站的信任，</li>
-  <li>CSRF 利用的是网站对用户浏览器的信任。</li>
+  <li>
+    <p>由于浏览器曾经认证过，登录信息<strong>尚未过期</strong>，所以被访问的网站会认为是真正的用户操作而去执行。</p>
+  </li>
+  <li>
+    <p>也被称为“<code class="highlighter-rouge">One Click Attack</code>” 或者<strong>Session Riding</strong>。</p>
+  </li>
+  <li>
+    <p><strong>跨域</strong>：只要网络协议、域名、端口中任何一个不相同就是跨域请求。</p>
+  </li>
+</ul>
+
+<p>XSS 对比 CSRF：</p>
+
+<ul>
+  <li>XSS 利用的是<strong>用户对指定网站的信任</strong>，受信任站点</li>
+  <li>CSRF 利用的是<strong>网站对用户浏览器的信任</strong>。是欺骗用户浏览器，让其以用户的名义执行操作。</li>
 </ul>
 
 <h3 id="攻击原理-1">攻击原理</h3>
 
+<p>过程：</p>
+
+<ol>
+  <li>客户端与服务端进行交互时，由于http协议本身是<strong>无状态</strong>协议，所以引入了cookie进行记录客户端身份。</li>
+  <li>在cookie中会存放session id用来<strong>识别客户端身份</strong>。</li>
+  <li>在<strong>跨域</strong>的情况下，session id 可能被<strong>第三方恶意劫持</strong>，通过这个session id 向服务端发起请求时，服务端会认为这个请求是合法的。</li>
+</ol>
+
 <p>假如一家银行用以执行转账操作的 URL 地址如下：</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://www.examplebank.com/withdraw?account=AccoutName&amp;amount=1000&amp;for=PayeeName。
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://www.examplebank.com/withdraw?account=AccoutName<span class="err">&amp;</span>amount=1000<span class="err">&amp;</span>for=PayeeName
 </code></pre></div></div>
 
-<p>那么，一个恶意攻击者可以在另一个网站上放置如下代码：</p>
+<p>那么，恶意攻击者可以在<strong>另一个网站</strong>上放置如下代码：</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;img src="http://www.examplebank.com/withdraw?account=Alice&amp;amount=1000&amp;for=Badman"&gt;。
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">"http://www.examplebank.com/withdraw?account=Alice&amp;amount=1000&amp;for=Badman"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;a</span> <span class="na">src=</span><span class="s">http://www.mybank.com/Transfer?bankId=11&amp;money=10000</span><span class="nt">&gt;</span>科学理财，年盈利率过万<span class="nt">&lt;/&gt;</span>
 </code></pre></div></div>
 
 <p>如果有账户名为 Alice 的用户访问了恶意站点，而她之前刚访问过银行不久，<strong>登录信息尚未过期</strong>，那么她就会损失 1000 美元。</p>
@@ -126,11 +147,13 @@ alert(/xss/);
 
 <p>Referer 首部字段位于 <strong>HTTP 报文</strong>中，用于标识<strong>请求来源</strong>的地址。检查这个首部字段并要求请求来源的地址在<strong>同一个域名</strong>下，可以极大的防止 CSRF 攻击。</p>
 
-<p>仅需要在关键访问处增加一步校验。但也有局限性，因其完全依赖浏览器发送正确的 Referer 字段。虽然 HTTP 协议对此字段的内容有明确的规定，但并无法保证来访的浏览器的具体实现，亦无法保证浏览器没有安全漏洞影响到此字段。并且也存在攻击者攻击某些浏览器，<strong>篡改</strong>其 Referer 字段的可能。</p>
+<ul>
+  <li>局限性：因其完全依赖浏览器发送<strong>正确的 Referer 字段</strong>。虽然 HTTP 协议对此字段的内容有明确的规定，但并无法保证来访的浏览器的具体实现，亦无法保证浏览器没有安全漏洞影响到此字段。并且也存在攻击者攻击某些浏览器，<strong>篡改</strong>其 Referer 字段的可能。</li>
+</ul>
 
 <h4 id="2-添加校验-token">2. 添加校验 Token</h4>
 
-<p>在访问敏感数据请求时，要求用户浏览器提供不保存在 Cookie 中，并且攻击者无法伪造的数据作为校验。例如服务器生成<strong>随机数</strong>并附加在表单中，并要求客户端传回这个随机数。</p>
+<p>在访问敏感数据请求时，要求用户浏览器提供不保存在 Cookie 中、并且攻击者无法伪造的数据作为校验。例如服务器生成<strong>随机数</strong>并附加在表单中，并要求客户端<strong>传回</strong>这个随机数。</p>
 
 <h4 id="3-输入验证码">3. 输入验证码</h4>
 
@@ -138,7 +161,7 @@ alert(/xss/);
 
 <h2 id="三sql-注入攻击">三、SQL 注入攻击</h2>
 
-<h3 id="概念-2">概念</h3>
+<h3 id="概念-1">概念</h3>
 
 <p>服务器上的数据库运行非法的 SQL 语句，主要通过<strong>拼接</strong>来完成。</p>
 

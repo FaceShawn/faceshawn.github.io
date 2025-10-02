@@ -611,25 +611,25 @@ B-to-S:	ACK ( ACK = y+1			 )
       <td><code class="highlighter-rouge">400 </code></td>
       <td>Bad Request</td>
       <td>客户端请求有<strong>语法错误</strong>，不能被服务器所理解。</td>
-      <td>如果将 Content-Type 或 Accept 标头设置为 application/json 以外的值（如 text/plain），收到 400 响应。</td>
+      <td>请求参数不正确。如果将 Content-Type 或 Accept 标头设置为 application/json 以外的值（如 text/plain），收到 400 响应。</td>
     </tr>
     <tr>
       <td><strong><code class="highlighter-rouge">401 </code></strong></td>
       <td>Unauthorized</td>
       <td><strong>请求未经授权</strong>，必须和 <code class="highlighter-rouge">WWW-Authenticate</code> 头域一起使用。</td>
-      <td>常见于用户未登录的情况。  使用 JWT 时，用户未登录、token 不对、已过期。<code class="highlighter-rouge">Authorization Bearer Token</code>。</td>
+      <td>常见于<strong>用户未登录</strong>的情况。  使用 JWT 时，用户未登录、token 不对、已过期。<code class="highlighter-rouge">Authorization Bearer Token</code>。</td>
     </tr>
     <tr>
       <td><code class="highlighter-rouge">403 </code></td>
       <td>Forbidden</td>
       <td>服务器<strong>拒绝请求</strong>，禁止访问资源。常见于机密信息或复制其它登录用户链接访问服务器的情况。</td>
-      <td> </td>
+      <td>没有该操作权限。</td>
     </tr>
     <tr>
       <td><code class="highlighter-rouge">404 </code></td>
       <td>NotFound</td>
       <td>服务器<strong>无法取得所请求的网页</strong>，请求资源不存在。如输入错误的URL。</td>
-      <td> </td>
+      <td>请求未找到。</td>
     </tr>
     <tr>
       <td><strong><code class="highlighter-rouge">405</code></strong></td>
@@ -653,7 +653,7 @@ B-to-S:	ACK ( ACK = y+1			 )
       <td><code class="highlighter-rouge">5XX</code></td>
       <td> </td>
       <td><strong>服务器端</strong>错误。</td>
-      <td> </td>
+      <td>系统异常</td>
     </tr>
     <tr>
       <td><strong><code class="highlighter-rouge">500</code></strong></td>
@@ -820,7 +820,7 @@ B-to-S:	ACK ( ACK = y+1			 )
 <h4 id="session-和-cookie">Session 和 Cookie</h4>
 
 <blockquote>
-  <p>见</p>
+  <p>见 Spring Security 文档。</p>
 </blockquote>
 
 <h3 id="uri-和-url-的区别是什么">URI 和 URL 的区别是什么?</h3>
@@ -1195,28 +1195,28 @@ baidu.com	220.114.23.56 	80
   </li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>spring: 
-  cloud:
-    gateway:
-      globalcors:
-        cors-configurations:
-          '[/**]':
-            # 允许跨域的源(网站域名/ip)，设置*为全部
-            # 允许跨域请求里的head字段，设置*为全部
-            # 允许跨域的method， 默认为GET和OPTIONS，设置*为全部
-            allow-credentials: true
-            allowed-origins:
-              - "http://xb.abc.com"
-              - "http://sf.xx.com"
-            allowed-headers: "*"
-            allowed-methods:
-              - OPTIONS
-              - GET
-              - POST
-              - DELETE
-              - PUT
-              - PATCH
-            max-age: 3600
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spring</span><span class="pi">:</span> 
+  <span class="na">cloud</span><span class="pi">:</span>
+    <span class="na">gateway</span><span class="pi">:</span>
+      <span class="na">globalcors</span><span class="pi">:</span>
+        <span class="na">cors-configurations</span><span class="pi">:</span>
+          <span class="s1">'</span><span class="s">[/**]'</span><span class="pi">:</span>
+            <span class="c1"># 允许跨域的源(网站域名/ip)，设置*为全部</span>
+            <span class="c1"># 允许跨域请求里的head字段，设置*为全部</span>
+            <span class="c1"># 允许跨域的method， 默认为GET和OPTIONS，设置*为全部</span>
+            <span class="na">allow-credentials</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">allowed-origins</span><span class="pi">:</span>
+              <span class="pi">-</span> <span class="s2">"</span><span class="s">http://xb.abc.com"</span>
+              <span class="pi">-</span> <span class="s2">"</span><span class="s">http://sf.xx.com"</span>
+            <span class="na">allowed-headers</span><span class="pi">:</span> <span class="s2">"</span><span class="s">*"</span>
+            <span class="na">allowed-methods</span><span class="pi">:</span>
+              <span class="pi">-</span> <span class="s">OPTIONS</span>
+              <span class="pi">-</span> <span class="s">GET</span>
+              <span class="pi">-</span> <span class="s">POST</span>
+              <span class="pi">-</span> <span class="s">DELETE</span>
+              <span class="pi">-</span> <span class="s">PUT</span>
+              <span class="pi">-</span> <span class="s">PATCH</span>
+            <span class="na">max-age</span><span class="pi">:</span> <span class="s">3600</span>
 </code></pre></div></div>
 
 <p>参考：<a href="https://cloud.tencent.com/developer/article/1668879">Java 解决跨域问题</a></p>

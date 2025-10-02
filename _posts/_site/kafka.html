@@ -12,33 +12,14 @@
 
 <h2 id="kafka">Kafka</h2>
 
-<p>Kafka：是一个基于<strong>发布订阅模式</strong>的消息队列中间件。由 Producer, Consumer, Broker 和 Partition 几个组成。</p>
-
-<ol>
-  <li><strong>Partition</strong>：为了提高消费的性能，引入的，实际上可对应成消息队列中的队列。Kafka 里面的每一个消息都<strong>属于</strong>一个主题，每一个<code class="highlighter-rouge">topic</code>可以（有）划分为多个<code class="highlighter-rouge">partition</code>。
-    <ol>
-      <li>同一 Topic 下的这些 Partition 均匀<strong>分布在</strong>（横跨）多个不同的 Broker 上，使用<strong>主从复制</strong>模式同步，以保证<strong>高可用</strong>。</li>
-      <li>每一个 Partition 内消息是<strong>有序的</strong>，即分区顺序性。（引出如何<strong>保证消息有序性</strong>）。由于一个主题一般包含几个分区，因此无法在整个主题范围内保证消息的顺序，但可以保证消息在单个分区内的顺序。</li>
-    </ol>
-  </li>
-  <li><strong>Producer</strong>：依据<strong>负载均衡</strong>设置，将消息发送到 Topic 的特定 Partition 下。</li>
-  <li>Consumer 之间组成了 <strong>Consumer Group</strong>：可以有多个 Consumer Group 消费同一个 Topic（中一份完整的消息），（即同一个  Topic  可以被多个 Consumer Group 消费），互相之间不会有影响。通过多消费者，这样消费的性能就提高了。
-    <ul>
-      <li>不过同组内的消费者是竞争关系，同组内一个消息只能被同组内的一个消费者消费。</li>
-      <li>Kafka 强制要求每个 Partition 只能有一个 Consumer 消费，并且 Consumer 采取<strong>拉模式</strong>（拉模型），消费完一批消息之后再拉取一批。</li>
-    </ul>
-  </li>
-  <li><strong>Broker</strong> ：一个 Kafka <strong>集群</strong>由多个 Broker 组成，每个 Broker 上存放着不同 Topic 的 Partition。</li>
-</ol>
-
-<p><img src="../assets/v2-17a2d36445a764081b45e012397291bd_720w.jpg" alt="Topic，Broker 和 Partition" style="zoom: 80%;" /></p>
+<p>Kafka：是一个基于<strong>发布订阅模式</strong>的消息队列中间件。</p>
 
 <p>Kafka 有三个关键功能：</p>
 
 <ol>
-  <li>发布和订阅消息流，类似于消息队列。</li>
-  <li>容错的<strong>持久方式</strong>存储记录消息流： Kafka 会把消息持久化到磁盘，有效避免了<strong>消息丢失</strong>的风险。</li>
-  <li>流式处理平台： 在消息发布时进行处理，Kafka 提供了一个完整的流式处理类库。</li>
+  <li>发布和订阅消息流：类似于消息队列。</li>
+  <li>容错的<strong>持久化方式</strong>存储消息流： Kafka 会把消息持久化到磁盘，有效避免了<strong>消息丢失</strong>的风险。</li>
+  <li><strong>流式处理平台</strong>： 在消息发布时进行处理，Kafka 提供了一个完整的流式处理类库。</li>
 </ol>
 
 <p>主要有两大应用场景：</p>
@@ -57,17 +38,49 @@
 <p>与 RocketMQ 的消息模型基本一样，唯一区别是没有<strong>队列</strong>这个概念，对应的是 <code class="highlighter-rouge">Partition</code>（分区）。</p>
 
 <ul>
-  <li>还引入了 <strong>broker、Consumer Group（消费者组）</strong>。</li>
+  <li>还引入了 <strong>broker、Consumer Group</strong>。</li>
 </ul>
 
-<p><img src="../assets/mq-kafka-pubsub.png" alt="mq" style="zoom: 67%;" /></p>
+<p><img src="../assets/mq-kafka-pubsub.png" alt="mq" style="zoom: 80%;" /></p>
+
+<p>由 Producer、Consumer、Broker 和 Partition 几个组成。</p>
+
+<ol>
+  <li>
+    <p><strong>Producer</strong>：依据<strong>负载均衡</strong>设置，将消息发送到 Topic 的特定 Partition 下。</p>
+  </li>
+  <li>
+    <p><strong>Broker</strong> ：一个 Kafka <strong>集群</strong>由多个 Broker 组成，每个 Broker 上存放着<strong>不同 Topic 的 Partition</strong>。</p>
+  </li>
+  <li>
+    <p><strong>Partition</strong>：为了提高消费的性能而引入，实际上可对应成消息队列中的<strong>队列</strong>。Kafka 里面的每一个消息都<strong>属于</strong>一个主题，每一个<code class="highlighter-rouge">topic</code>可以（有）划分为多个<code class="highlighter-rouge">partition</code>。</p>
+
+    <ol>
+      <li>同一 Topic 下的这些 Partition 均匀<strong>分布在</strong>（横跨）多个不同的 Broker 上，使用<strong>主从复制</strong>模式同步，以保证<strong>高可用</strong>。</li>
+      <li>每一个 Partition 内消息是<strong>有序的</strong>，即分区顺序性。（引出如何<strong>保证消息有序性</strong>）。由于一个主题一般包含几个分区，因此无法在整个主题范围内保证消息的顺序，但可以保证消息在单个分区内的顺序。</li>
+    </ol>
+  </li>
+  <li>
+    <p>Consumer 之间组成了 <strong>Consumer Group</strong>：可以有多个 Consumer Group 消费同一个 Topic（中一份完整的消息），（即同一个  Topic  可以被多个 Consumer Group 消费），互相之间不会有影响。</p>
+
+    <ul>
+      <li>
+        <p>通过多消费者，这样消费的性能就提高了。</p>
+      </li>
+      <li>不过同组内的消费者是竞争关系，同组内一个消息只能被同组内的一个消费者消费。</li>
+      <li>Kafka 强制要求每个 Partition 只能有一个 Consumer 消费，并且 Consumer 采取<strong>拉模式</strong>（拉模型），消费完一批消息之后再拉取一批。</li>
+    </ul>
+  </li>
+</ol>
+
+<p><img src="../assets/v2-17a2d36445a764081b45e012397291bd_720w.jpg" alt="Topic，Broker 和 Partition" style="zoom: 80%;" /></p>
 
 <h3 id="broker-代理服务器">Broker （代理服务器）</h3>
 
 <ol>
-  <li><del>接收生产者的信息，为消息设置<strong>偏移量</strong>，并且保存的磁盘中。</del></li>
-  <li><del>broker 为消费者提供服务，对读取分区的请求作出响应，返回已经提交到磁盘上的消息。</del></li>
-  <li><del>同时 broker 也会对生产者和消费者进行消息的<strong>确认</strong>，没有收到会重新发送这条消息。</del></li>
+  <li>接收生产者的信息，为消息设置<strong>偏移量</strong>，并且保存的磁盘中。</li>
+  <li>broker 为消费者提供服务，对读取分区的请求作出响应，返回已经提交到磁盘上的消息。</li>
+  <li>同时 broker 也会对生产者和消费者进行消息的<strong>确认</strong>，没有收到会重新发送这条消息。</li>
 </ol>
 
 <h3 id="consumer-group消费者组">Consumer Group（消费者组）</h3>
@@ -79,24 +92,34 @@
   <li>消费者会把每个分区读取的消息偏移量保存在 Zookeeper 或 Kafka 上，如果消费者关闭或重启，它的读取状态不会丢失。</li>
 </ul>
 
+<h3 id="topic主题">Topic（主题）</h3>
+
+<h3 id="partition分区">Partition（分区）</h3>
+
+<ul>
+  <li>Kafka 的基础集群架构，由多个<code class="highlighter-rouge">broker</code>组成，每个<code class="highlighter-rouge">broker</code>都是一个节点。</li>
+  <li>当创建一个<code class="highlighter-rouge">topic</code>时，它可以划分为多个<code class="highlighter-rouge">partition</code>，而每个<code class="highlighter-rouge">partition</code>放一部分数据，分别存在于不同的 <code class="highlighter-rouge">broker</code> 上。</li>
+  <li>也就是说，一个 <code class="highlighter-rouge">topic </code>的数据，是分散放在多个机器上的，每个机器就放一部分数据。</li>
+</ul>
+
 <h2 id="高性能">高性能</h2>
 
 <p>Kafka 高性能依赖于非常多的手段：</p>
 
 <ol>
   <li><strong>零拷贝</strong>（重点）：在 Linux 上 Kafka 使用了两种手段，<code class="highlighter-rouge">mmap</code> （内存映射）和 <code class="highlighter-rouge">sendfile</code>，前者用于解决 <code class="highlighter-rouge">Producer </code>写入数据，后者用于 <code class="highlighter-rouge">Consumer</code> 读取数据；</li>
-  <li><strong>顺序写</strong>：Kafka 的数据，可以看做是 AOF （append only file），只允许追加数据，而不允许修改已有的数据。消息以追加的方式写入Partition，然后以先入先出的顺序读取。
+  <li><strong>顺序写</strong>：Kafka 的数据，可以看做是 <strong>AOF</strong> （<code class="highlighter-rouge">append only file</code>），只允许追加数据，而不允许修改已有的数据。消息以追加的方式写入Partition，然后以<strong>先入先出</strong>的顺序读取。
     <ul>
       <li>AOF 在数据库（如 MySQL，Redis）上也很常见，这也是为什么一般说 Kafka 用机械硬盘就可以了。 和 SSD Kafka 在性能上差距不大；</li>
     </ul>
   </li>
-  <li><strong>Page Cache</strong>：Kafka 允许<strong>落盘</strong>的时候，是写到 Page Cache的时候就返回，还是一定要刷新到磁盘（主要就是mmap之后要不要强制刷新磁盘）。
+  <li><strong>Page Cache</strong>（系统缓存）：Kafka 允许<strong>落盘</strong>的时候，是写到 Page Cache 时就返回，还是一定要刷新到磁盘（主要就是mmap 之后要不要强制刷新磁盘）。
     <ul>
       <li>类似的机制在 MySQL, Redis上也是常见，（简要评价一下两种方式的区别）</li>
       <li>如果写到 Page Cache 就返回，那么会存在数据丢失的可能。</li>
     </ul>
   </li>
-  <li><strong>批量操作</strong>：包括 Producer 批量发送，也包括 Broker 批量落盘。批量能够<strong>放大</strong>顺序写的优势，比如说 Producer 还没攒够一批数据发送就宕机，就会导致<strong>数据丢失</strong>；
+  <li><strong>批量操作</strong>：包括 Producer 批量发送、Broker 批量落盘。批量能够<strong>放大</strong>顺序写的优势，比如说 Producer 还没攒够一批数据发送就宕机，就会导致<strong>数据丢失</strong>；
     <ol>
       <li>批量发送和数据压缩，在处理大数据的中间件中比较常见。比如说分布式追踪系统 CAT 和 skywalking 都有类似的技术。代价就是存在<strong>数据丢失</strong>的风险；</li>
     </ol>
@@ -125,14 +148,14 @@
   <li>DMA 拷贝：内核缓冲区到网络（NIC）缓冲</li>
 </ol>
 
-<p>零拷贝：并不是说完全没有拷贝，而是指<strong>没有CPU参与</strong>（红色的第二和第三步）的拷贝，DMA的还在。</p>
+<p>零拷贝：并不是说完全没有拷贝，而是指<strong>没有 CPU 参与</strong>（红色的第二和第三步）的拷贝，<strong>DMA 拷贝</strong>还在。</p>
 
 <p><img src="../assets/four_zero_copy.png" alt="四次拷贝" style="zoom: 90%;" /></p>
 
 <p>Kafka 利用了两项零拷贝技术：</p>
 
 <ol>
-  <li><code class="highlighter-rouge">mmap</code>：是用于解决网络数据落盘的，Kafka 直接利用<strong>内存映射</strong>，完成了“写入操作”，对于 Kafka 来说，完成了网络缓冲区到磁盘缓冲区的“写入”，之后强制调用<code class="highlighter-rouge">flush</code>或者等操作系统（有参数控制）。
+  <li><code class="highlighter-rouge">mmap</code>：用于解决网络数据落盘的，Kafka 直接利用<strong>内存映射</strong>，完成了“写入操作”，对于 Kafka 来说，完成了网络缓冲区到磁盘缓冲区的“写入”，之后强制调用<code class="highlighter-rouge">flush</code>或者等操作系统（有参数控制）。
     <ol>
       <li>Java 提供了<code class="highlighter-rouge">FileChannel</code>和<code class="highlighter-rouge">MappedByteBuffer</code>两项技术来实现 mmap。</li>
     </ol>
@@ -142,106 +165,111 @@
 
 <h3 id="为什么顺序写那么快">为什么顺序写那么快？</h3>
 
+<p>AOF</p>
+
+<h3 id="page-cache系统缓存"><strong>Page Cache</strong>（系统缓存）</h3>
+
 <h2 id="高可用">高可用</h2>
 
 <ol>
   <li>分区分布</li>
-  <li>主从复制</li>
-  <li>ISR</li>
+  <li>主从复制：复制多副本机制</li>
+  <li>ISR 同步副本集</li>
 </ol>
 
-<h3 id="isr-的基本机制">ISR 的基本机制</h3>
+<h3 id="分区分布">分区分布</h3>
+
+<h4 id="分区数量过多">分区数量过多</h4>
+
+<blockquote>
+  <p>注意这里说的分区过多，一般都是指 <strong>Topic 中分区很多</strong>，而不是指一个主分区有一千个从分区。</p>
+
+  <p>后者，要从 ISR 的角度去分析。不过基本上不会面这个问题，面到了就怼回去，谁家的主分区会有一千个从分区。</p>
+</blockquote>
+
+<p>能不能通过增加分区数量来提高 Kafka 性能？</p>
+
+<ul>
+  <li>注意，这个是可以的，但是要注意把握度，就是不能无限增加。</li>
+</ul>
+
+<h5 id="topic-分区过多会引起什么问题">Topic 分区过多会引起什么问题？</h5>
 
 <blockquote>
   <ul>
-    <li>Kafka GC 时间过长会导致什么问题？可能导致分区被踢出去 ISR。</li>
-    <li>Kafka 是如何保证可靠性的？（除了 ISR 以外，还要强调一下 Partition 是分布在不同 Broker 上，以避免 Broker 宕机导致 Topic 不可用</li>
-    <li>如何提高 Kafka 的可靠性</li>
-    <li>如何提高 Kafka 吞吐量？可靠性和吞吐量在这里就是互斥的，调整参数只能提高一个，降低另外一个。</li>
+    <li>分区数量是不是越多越好？显然不是；</li>
+    <li>Topic 过多会引起什么问题？其实差不多是同一个问题，Topic 多意味着分区多，而且通常伴随的是每个 Topic 的数据量都不大；</li>
   </ul>
 </blockquote>
 
-<p>ISR（<code class="highlighter-rouge">In-Sync Replicas </code>）同步副本集：是<strong>分区同步</strong>的概念，是一种主从同步机制。ISR 动态维护了一个和 leader 副本<strong>保持同步</strong>的所有副本的集合，ISR 中的副本全部都和 leader 的数据保持同步。</p>
-
-<ul>
-  <li>Kafka 为每个主分区维护了一个 ISR，处于 ISR 的分区意味着与主分区保持了同步（所以主分区也在 ISR 里面）。</li>
-</ul>
-
-<p>当 Producer 写入消息的时候，需要等 ISR 里面分区的确认，当 ISR 确认之后，就被认为消息已经提交成功了。</p>
-
-<ul>
-  <li>ISR 里面的分区会定时从主分区里面拉取数据，如果长时间未拉取，或者数据落后太多<strong>，分区会被移出 ISR</strong>。</li>
-  <li>ISR 里面分区已经同步的<strong>偏移量</strong>被称为 <strong>LEO</strong>（<code class="highlighter-rouge">Log End Offset</code>），最小的 LEO 称为 <strong>HW</strong>（高水位，high water），也就是消费者可以消费的最新消息。</li>
-  <li>如果 ISR 里面的<strong>分区已同步消息</strong>是木桶的木板的话，高水位就取决于最短的那个木板，也就是同步最落后的。</li>
-</ul>
-
-<p><img src="../assets/20200706235345430.png" alt="LEO 和 HW" style="zoom: 67%;" /></p>
-
-<p>当主分区挂掉的时候，会从 ISR 里面选举一个新的主分区出来。</p>
-
-<p>在 Producer 里面可以控制 ACK 机制写入消息。Producer 可以配置成三种：</p>
+<p>要从 Producer、Consumer 和 Broker 三者考虑：</p>
 
 <ol>
-  <li>Producer 发出去就算成功；</li>
-  <li>Producer 发出去，主分区写入本地磁盘就算成功；</li>
-  <li>Producer 发出去，ISR 所有的分区都写入磁盘，就算成功；</li>
-</ol>
-
-<p>其性能依次下降，但是可靠性依次上升。</p>
-
-<p>因为 ISR 里面包含了主分区，也就是说，如果整个 ISR 只有主分区，那么全部写入就退化为主分区写入。所以在可靠性要求非常高的情况下，我们要求 ISR 中分区<strong>不能少于三个</strong>。通过在 Broker 中配置<code class="highlighter-rouge">min.insync.replicas</code> 参数。</p>
-
-<h3 id="其它中间件主从同步机制">其它中间件主从同步机制</h3>
-
-<p>ISR 的同步机制和其它中间件机制也是类似的，在涉及<strong>主从同步</strong>的时候都要在性能和可靠性之间做取舍。通常的选项都是：</p>
-
-<ol>
-  <li>主写入就认为成功</li>
-  <li>主写入，至少一个从写入就认为成功；</li>
-  <li>主写入，大部分从库写入就认为成功（一般“大部分”是可以配置的，从这个意义上来说，2和3可以合并为一点）；</li>
-  <li>主写入，所有从库写入就认为成功；</li>
-</ol>
-
-<p>而“写入”也会有不同语义：</p>
-
-<ol>
-  <li>中间件写到日志缓存就认为写入了；</li>
-  <li>中间件写入到系统缓存（page cache）就认为写入了；</li>
-  <li>中间件强制刷新到磁盘（发起了 fsync）就认为写入了；</li>
-</ol>
-
-<p>都是性能到可靠性的取舍。</p>
-
-<h3 id="什么时候分区会被移出-isr">什么时候分区会被移出 ISR？</h3>
-
-<blockquote>
-  <p>Kafka 如何维护 ISR 的。</p>
-</blockquote>
-
-<p>答案：通过两个参数控制维护 ISR。当分区触发两个条件中的任何一个时，都会被移除出 ISR。</p>
-
-<ol>
-  <li>消息落后太多：由参数 <code class="highlighter-rouge">replica.lag.max.messages</code>控制。<a href="http://kafka.apache.org/documentation/#upgrade_9_breaking">0.9.0后被移除</a></li>
-  <li>分区长时间没有发起<code class="highlighter-rouge">fetch</code>请求：由参数<code class="highlighter-rouge">replica.lag.time.max.ms</code>控制。</li>
-</ol>
-
-<p>刷亮点：</p>
-
-<ol>
-  <li>这些因素怎么影响的：基本上，除非是新的 Broker，否则几乎都是由网络、磁盘IO和GC引起的，大多数情况下，是负载过高导致的。</li>
-  <li>过大过小的影响：这两个参数，过小会导致 ISR 频繁变化，过大会导致可靠性降低，存在数据丢失的风险。</li>
-</ol>
-
-<p>补充： 为什么kafka要将<code class="highlighter-rouge">replica.lag.max.messages</code>删除？</p>
-
-<ul>
-  <li>因为这个参数本身很难给出一个合适的值。
+  <li>对于 <code class="highlighter-rouge">Producer </code>来说：采用的是<strong>批量发送</strong>的机制，那么分区数量多的话，就需要<strong>消耗大量的内存</strong>来维护这些缓存的消息。同时，也增大了<strong>数据丢失</strong>的风险。</li>
+  <li>对于 <code class="highlighter-rouge">Consumer</code> 来说：分区数量多意味着要么部署非常多的实例，要么开启非常多的线程，无论是哪一种方案，都是<strong>开销巨大</strong>。</li>
+  <li>对于 <code class="highlighter-rouge">Broker</code> 来说：分区特别多而对应的 Broker 数量又不足的话，那么意味着一个 Broker 上分布着大量的分区，那么一次宕机就会引起 Kafka <strong>延时猛增</strong>。
     <ol>
-      <li>以默认的值4000为例，对于消息流入速度很低的主题（比如TPS为10），这个参数就没什么用；</li>
-      <li>对于消息流入速度很高的主题（比如TPS为2000），这个参数的取值又会引入ISR的频繁变动(ISR 需要在Zookeeper中维护)。</li>
+      <li>同时，每一个分区都要求 Broker 开启三个句柄，那么会引起 Broker 上的文件句柄被急速消耗，可能导致程序崩溃。</li>
+      <li>还要考虑到，Kafka 虽然采用了<strong>顺序写</strong>，但是这是指在一个分区内部顺序写，在多个分区之间，是无法做到顺序写的。</li>
     </ol>
   </li>
-  <li>所以从0.9x版本开始，Kafka就彻底移除了这一个参数。</li>
+</ol>
+
+<h5 id="解决方法">解决方法</h5>
+
+<ol>
+  <li>增加 Broker，确保 Broker 上不会存在很多的分区。这可以避免 Broker 上文件句柄数量过多，顺序写<strong>退化</strong>为随机写，以及宕机影响范围太大的问题。</li>
+  <li>其次可以考虑<strong>拆分 Topic</strong> 并且<strong>部署到不同的集群</strong>。（注意，Topic 如果拆了但是没有增加 Broker，也没有部署额外的 Kafka 集群，那么其实还是没啥用）</li>
+  <li>当然，如果分区的写入负载其实并不大，那么可以考虑<strong>削减分区</strong>的。（kafka本身不支持削减分区）</li>
+</ol>
+
+<h5 id="不支持减少分区">不支持减少分区</h5>
+
+<p>Kafka 增加分区是可以的，但是减少分区是不能的。</p>
+
+<p>原因：</p>
+
+<ul>
+  <li>实现减少分区的核心难点在于，难以处理分区上的数据。</li>
+  <li>比如，减少的这个分区上的数据怎么处理？
+    <ul>
+      <li>大多数情况下，不能直接丢掉，那么只能考虑重新分配给其它的分区。</li>
+      <li>于是就涉及到，如何分配，对应的消费者怎么处理？以及对其余分区的影响。</li>
+    </ul>
+  </li>
+  <li>总体来说，减少分区的复杂度，远比增加分区的复杂度大，但是收益是小的。
+    <ul>
+      <li>一方面，有别的手段来解决类似的问题，</li>
+      <li>另一方面，大多数的场景，都是<strong>增加分区</strong>，而不是减少分区。</li>
+    </ul>
+  </li>
+</ul>
+
+<p>假如要实现类似的功能，可以考虑两种方案：</p>
+
+<ol>
+  <li>创建一个完全一样的 Topic，然后分区数量少一点，等老的 Topic 消费完就直接下线，只留下这个新的 Topic；</li>
+  <li>考虑在写入分区时，不再写入特定的分区，可以通过业务来控制，也可以通过负载均衡机制来控制；
+    <ul>
+      <li>缺点是：这个没用的分区会长期存在，并没有在事实上删除它。</li>
+    </ul>
+  </li>
+</ol>
+
+<h5 id="确定合适的分区消费者数量">确定合适的分区、消费者数量</h5>
+
+<blockquote>
+  <p>如何确定消费者数量？</p>
+
+  <p>要注意，消费者最多最多就是和分区数量一样，其它就是压测了。</p>
+</blockquote>
+
+<p>答：使用 Kafka 提供的<strong>压测工具</strong>来测试。</p>
+
+<ul>
+  <li>一般来说，我们对于某个特定的 Topic，其消息大小是能够从业务上推断出来的，也就是我们不存在说一个 Topic，某些消息特别长，某些消息特别短。大部分的消息长度都在相差不多的范围内。</li>
+  <li>因此我们可以控制写入一个分区的 <strong>TPS</strong>，观察<strong>同步延时</strong>和消息是否积压（消费端的消费数据，例如99线等也可以）。</li>
+  <li>分区数量会影响两端，因此要同时考虑 Producer 的效率和 Consumer 的效率。</li>
 </ul>
 
 <h3 id="复制多副本机制">复制多副本机制</h3>
@@ -253,7 +281,7 @@
 <p>Kafka 0.8 之后，提供了<strong>复制多副本机制</strong>来保证高可用，即：</p>
 
 <ol>
-  <li>每个 partition 的数据都会同步到其它机器上，形成多个<strong>副本</strong>。</li>
+  <li>每个 <code class="highlighter-rouge">partition</code> 的数据都会同步到其它机器上，形成多个<strong>副本</strong>。</li>
   <li>所有的副本会选举一个 <code class="highlighter-rouge">leader </code>出来，让<code class="highlighter-rouge">leader</code>去跟生产和消费者打交道，其他副本都是<code class="highlighter-rouge">follower</code>。</li>
   <li>写数据时，<code class="highlighter-rouge">leader </code>负责把数据同步给所有的<code class="highlighter-rouge">follower</code>，读消息时，直接读 <code class="highlighter-rouge">leader </code>上的数据即可。
     <ul>
@@ -265,7 +293,7 @@
 <p>如何保证高可用的？</p>
 
 <ol>
-  <li>假设某个 <code class="highlighter-rouge">broker </code>宕机，这个<code class="highlighter-rouge">broker</code>上的<code class="highlighter-rouge">partition</code> 在其他机器上都有<strong>副本</strong>的。</li>
+  <li>假设某个 <code class="highlighter-rouge">broker </code>宕机，这个<code class="highlighter-rouge">broker</code>上的<code class="highlighter-rouge">partition</code> 在其他机器上都有<strong>副本</strong>。</li>
   <li>如果挂的是<code class="highlighter-rouge">leader</code>的<code class="highlighter-rouge">broker</code>呢？其他<code class="highlighter-rouge">follower</code>会<strong>重新选一个<code class="highlighter-rouge">leader</code></strong>出来。</li>
 </ol>
 
@@ -276,11 +304,152 @@
 <ol>
   <li>首先是 Kafka 自身的限制：即 Kafka 强制要求一个 Partition 只能有一个 Consumer，因此 Consumer 天然只需要消费<strong>主 Partition</strong> 就可以。
     <ul>
-      <li>假如说 Kafka 放开这种限制，允许读从 Partition 的数据。比如说有多个 Consumer，分别从主 Partition 和从 Partition 上读取数据，那么会出现一个问题：即偏移量如何同步的问题。而这是分布式一致性的问题，难以解决。</li>
+      <li>假如说 Kafka 放开这种限制，允许读从 Partition 的数据。比如说有多个 Consumer，分别从主 Partition 和从 Partition 上读取数据，那么会出现一个问题：即<strong>偏移量如何同步</strong>的问题。而这是分布式一致性的问题，难以解决。</li>
     </ul>
   </li>
   <li>消费者消费特点：而从另外一个角度来说，Kafka 的读取压力是远小于 MySQL 的，毕竟一个 Topic，是不会有特别多的消费者的。并且 Kafka 也不需要支持复杂查询，所以完全没必要读取从 Partition 的数据。</li>
 </ol>
+
+<h3 id="isr--同步副本集">ISR  同步副本集</h3>
+
+<blockquote>
+  <p>主从复制</p>
+</blockquote>
+
+<h4 id="基本机制">基本机制</h4>
+
+<p>ISR（<code class="highlighter-rouge">In-Sync Replicas </code>）同步副本集：是<strong>分区同步</strong>的概念，是一种<strong>主从同步机制</strong>。</p>
+
+<ul>
+  <li>
+    <p>ISR 动态维护了一个和 leader 副本<strong>保持同步</strong>的所有副本的集合，ISR 中的副本全部都和 leader 的数据保持同步。</p>
+  </li>
+  <li>
+    <p>Kafka 为每个主分区维护了一个 ISR，处于 ISR 的分区意味着与主分区保持了同步（所以主分区也在 ISR 里面）。</p>
+  </li>
+</ul>
+
+<p>当 Producer 写入消息的时候，需要等 ISR 里面分区的确认，当 ISR 确认之后，就被认为消息已经提交成功了。</p>
+
+<ul>
+  <li>ISR 里面的分区会定时从主分区里面拉取数据。如果长时间未拉取，或者数据落后太多<strong>，分区会被移出 ISR</strong>。</li>
+  <li>ISR 里面分区已经同步的<strong>偏移量</strong>被称为 <strong>LEO</strong>（<code class="highlighter-rouge">Log End Offset</code>），最小的 LEO 称为 <strong>HW</strong>（高水位，<code class="highlighter-rouge">high water</code>），也就是消费者可以消费的最新消息。</li>
+  <li>如果 ISR 里面的<strong>分区已同步消息</strong>是木桶的木板的话，高水位就取决于最短的那个木板，也就是同步最落后的。</li>
+</ul>
+
+<p><img src="../assets/20200706235345430.png" alt="LEO 和 HW" style="zoom: 67%;" /></p>
+
+<h5 id="什么时候分区会被移出-isr">什么时候分区会被移出 ISR？</h5>
+
+<blockquote>
+  <p>Kafka 如何维护 ISR 的。</p>
+
+  <p>Kafka GC 时间过长会导致什么问题？可能导致分区被踢出去 ISR。</p>
+</blockquote>
+
+<p>答案：通过两个参数控制维护 ISR。当分区触发两个条件中的任何一个时，都会被移除出 ISR。</p>
+
+<ol>
+  <li>消息落后太多：由参数 <code class="highlighter-rouge">‘replica.lag.max.messages</code>控制。<a href="http://kafka.apache.org/documentation/#upgrade_9_breaking">0.9.0后被移除</a></li>
+  <li>分区长时间没有发起<code class="highlighter-rouge">fetch</code>拉取请求：由参数<code class="highlighter-rouge">replica.lag.time.max.ms</code>控制。</li>
+</ol>
+
+<p>刷亮点：</p>
+
+<ol>
+  <li>这些因素怎么影响的：基本上，除非是新的 Broker，否则几乎都是由<strong>网络、磁盘IO和GC</strong>引起的。大多数情况下，是<strong>负载过高</strong>导致的。</li>
+  <li>过大过小的影响：这两个参数，过小会导致 <strong>ISR 频繁变化</strong>，过大会导致<strong>可靠性</strong>降低，存在数据丢失的风险。</li>
+</ol>
+
+<p>补充： 为什么kafka要将<code class="highlighter-rouge">replica.lag.max.messages</code>删除？</p>
+
+<ul>
+  <li>因为这个参数本身很难给出一个合适的值。
+    <ol>
+      <li>以默认的值4000为例，对于消息流入速度很低的主题（比如TPS为10），这个参数就没什么用；</li>
+      <li>对于消息流入速度很高的主题（比如TPS为2000），这个取值又会引入ISR的频繁变动（ISR 需要在<strong>Zookeeper</strong>中维护）。</li>
+    </ol>
+  </li>
+  <li>所以从0.9x版本开始，Kafka就彻底移除了这一个参数。</li>
+</ul>
+
+<h4 id="可靠性">可靠性</h4>
+
+<blockquote>
+  <ul>
+    <li>Kafka 是如何保证可靠性的？</li>
+    <li>如何提高 Kafka 的可靠性</li>
+    <li>如何提高 Kafka 吞吐量？可靠性和吞吐量在这里就是互斥的，调整参数只能提高一个，降低另外一个。</li>
+  </ul>
+</blockquote>
+
+<h5 id="ack-机制">ACK 机制</h5>
+
+<p>在 Producer 里面可以控制 <strong>ACK 机制</strong>写入消息。Producer 可以配置成三种：</p>
+
+<ol>
+  <li>Producer 发出去就算成功；</li>
+  <li>Producer 发出去，<strong>主分区</strong>写入本地磁盘就算成功；</li>
+  <li>Producer 发出去，<strong>ISR 所有的分区</strong>都写入磁盘，就算成功；</li>
+</ol>
+
+<p>其性能依次下降，但是<strong>可靠性</strong>依次上升。</p>
+
+<h5 id="isr-中分区不能少于三个">ISR 中分区<strong>不能少于三个</strong></h5>
+
+<p>当主分区挂掉的时候，会从 ISR 里面选举一个新的主分区出来。</p>
+
+<p>因为 ISR 里面包含了主分区，也就是说，如果整个 ISR 只有主分区，那么全部写入就退化为主分区写入。</p>
+
+<ul>
+  <li>所以在可靠性要求非常高的情况下，要求 ISR 中分区<strong>不能少于三个</strong>。通过在 Broker 中配置<code class="highlighter-rouge">min.insync.replicas</code> 参数。</li>
+</ul>
+
+<h5 id="避免-broker-宕机">避免 Broker 宕机</h5>
+
+<blockquote>
+  <p>除了 ISR 以外，还要强调一下</p>
+</blockquote>
+
+<p>Partition 是分布在不同 Broker 上，以避免 Broker 宕机导致 Topic 不可用。</p>
+
+<h4 id="其它中间件主从同步机制">其它中间件主从同步机制</h4>
+
+<p>ISR 的同步机制和其它中间件机制也是类似的，在涉及<strong>主从同步</strong>时都要在性能和可靠性之间做取舍。通常的选项都是：</p>
+
+<ol>
+  <li>主写入就认为成功</li>
+  <li>主写入 + <strong>至少一个从写入</strong>就认为成功；</li>
+  <li>主写入 + 大部分从库写入就认为成功（一般“大部分”是可以配置的，从这个意义上来说，2和3可以合并为一点）；</li>
+  <li>主写入 + 所有从库写入就认为成功；</li>
+</ol>
+
+<p>而“写入”也会有不同语义：</p>
+
+<ol>
+  <li>中间件写到<strong>日志缓存</strong>就认为写入了；</li>
+  <li>中间件写入到<strong>系统缓存</strong>（<code class="highlighter-rouge">page cache</code>）就认为写入了；</li>
+  <li>中间件强制<strong>刷新到磁盘</strong>（发起了 fsync）就认为写入了；</li>
+</ol>
+
+<p>都是性能到可靠性的取舍。</p>
+
+<h3 id="如何保证消息有序性">如何保证消息有序性？</h3>
+
+<p>答：Kafka 要做到消息有序，只需要将消息都<strong>投递到同一个分区</strong>里面。</p>
+
+<ul>
+  <li><strong>分区内部有序</strong>的特点：因为 Kafka 的设计确保了一个分区内部的消息是有序的。但是分区之间是没有顺序的。</li>
+  <li>这并不意味着只能使用一个分区，而是可以考虑在发消息时主动<strong>指定分区</strong>，确保业务上要求顺序的消息都被投递到<strong>同一个分区</strong>中。</li>
+  <li>例如按照用户 ID 来选择分区，确保用户相关的某些消息都在同一个分区内部。</li>
+  <li>（点出缺点）类似的方案都要注意<strong>分区负载</strong>，例如热点用户产生了大量的消息，都被积压在该分区。</li>
+</ul>
+
+<h4 id="全局有序消息">全局有序消息</h4>
+
+<p>比如<code class="highlighter-rouge">Kafka</code>的<strong>全局有序消息</strong>：生产者发消息时，1个<code class="highlighter-rouge">Topic</code>只能对应一个<code class="highlighter-rouge">Partition</code>（分区）、一个 <code class="highlighter-rouge">Consumer</code>，内部<strong>单线程消费</strong>。发送消息时指定<code class="highlighter-rouge"> key/Partition</code>。</p>
+
+<p><img src="../assets/kafka_order.awebp" alt="image.png" style="zoom:100%;" /></p>
 
 <h4 id="kafka-的负载均衡策略">Kafka 的负载均衡策略</h4>
 
@@ -299,151 +468,25 @@
     <ul>
       <li><strong>Key 的选取</strong>，大原则上是采用<strong>业务特征 ID</strong>，或者业务特征的某些字段拼接而成。
         <ul>
-          <li>对 Partition 负载的影响：比如说，可以考虑按照用 Order ID 作为 Key，这意味某个订单的消息肯定落在特定的某个 Partition 上，这就保证了针对该订单的消息是<strong>有序的</strong>。</li>
+          <li>对 Partition 负载的影响：比如说，可以考虑按照用 <strong>Order ID</strong> 作为 Key，这意味某个订单的消息肯定落在特定的某个 Partition 上，这就保证了针对该订单的消息是<strong>有序的</strong>。</li>
         </ul>
       </li>
       <li>风险、缺点：Partition 负载均衡与消费者负载均衡不匹配：
         <ul>
-          <li>如果 Key 设置不当，可能会导致某些 Partition 承载了大多数的流量。比如说按照商家 ID 来作为 Key，那么可能某些热点商家，大卖家，其消息就集中在某个 Partition 上，导致负载不均衡。</li>
-          <li>我们的消息的确分布均匀了，但是处理不同的消息可能有快有慢，在极端情况下，可能处理慢的消息都在特定的 Partition 上，因此导致某个消费者<strong>负载奇高</strong>，而其余的消费者却没有什么负载。</li>
+          <li>如果 Key 设置不当，可能会导致某些 Partition 承载了大多数的流量。比如说按照<strong>商家 ID</strong> 来作为 Key，那么可能某些热点商家、大卖家，其消息就集中在某个 Partition 上，导致负载不均衡。</li>
+          <li>消息的确分布均匀了，但是处理不同的消息可能有快有慢。在极端情况下，可能处理慢的消息都在特定的 Partition 上，因此导致某个消费者<strong>负载奇高</strong>，而其余的消费者却没有什么负载。</li>
         </ul>
       </li>
     </ul>
   </li>
   <li>无论是轮询，还是 Hash，都无法解决一个问题：都只考虑 Partition 的负载，而没有考虑 Consumer 的负载。（进一步凸显自己对负载均衡的理解）
     <ol>
-      <li>例如，我们可以用 Hash 策略均匀分布了消息，但是可能某些消息消费得慢，有些消息消费得快。</li>
-      <li>假如说非常不幸我们消费得慢的消息都落在某个 Partition，那么该 Partition 的消费者和别的消费者比起来，消费起来就很慢，带来<strong>很大的延迟</strong>，甚至出现<strong>消息堆积</strong>。</li>
-      <li>解决这个问题，可以用负载均衡算法中的最小连接（加权最小连接）、最少活跃法、最快响应时间法。</li>
+      <li>例如，可以用 Hash 策略均匀分布了消息，但是可能某些消息消费得慢，有些消息消费得快。</li>
+      <li>假如说非常不幸，消费得慢的消息都落在某个 Partition，那么该 Partition 的消费者和别的消费者比起来，消费起来就很慢，带来<strong>很大的延迟</strong>，甚至出现<strong>消息堆积</strong>。</li>
+      <li>解决这个问题，可以用负载均衡算法中的<strong>最小连接（加权最小连接）、最少活跃法、最快响应时间法</strong>。</li>
     </ol>
   </li>
 </ol>
-
-<h4 id="拉模型推模型">拉模型、推模型</h4>
-
-<blockquote>
-  <p>为什么 Kafka 在消费者端采用了拉（PULL）模型？</p>
-</blockquote>
-
-<p>，在 MQ 这种场景下的优缺点。加分点在于明确指出什么 MQ 使用了什么模型。</p>
-
-<p>答：采用拉模型的核心原因在于，消费者的消费速率不同。</p>
-
-<ul>
-  <li>在拉模型之下：消费者自己消费完毕就自己再去拉去一批，那么这种速率是<strong>由消费者自己控制</strong>的，所需要的控制信息也是由消费者自己保存的。</li>
-  <li>而采用推模型：就意味着中间件要和消费者就速率问题<strong>进行协商</strong>，否则容易导致要么推送过快，要么推送过慢的问题。
-    <ul>
-      <li>好处是：避免竞争。例如在多个消费者拉同一主题的消息的时候，就需要保证，不同消费者不会引起<strong>并发</strong>问题。</li>
-      <li>而 Kafka 不会有类似的问题，因为 Kafka 限制了一个 Partition 只能有一个消费者，所以拉模型反而更加合适。</li>
-    </ul>
-  </li>
-</ul>
-
-<h4 id="分区过多会引起什么问题">分区过多会引起什么问题？</h4>
-
-<blockquote>
-  <p>注意这里说的分区过多，一般都是指主分区本身就很多，而不是指一个主分区有一千个从分区。</p>
-
-  <p>后者，要从 ISR 的角度去分析。不过基本上不会面这个问题，面到了就怼回去，谁家的主分区会有一千个从分区。</p>
-</blockquote>
-
-<blockquote>
-  <ul>
-    <li>分区数量是不是越多越好？显然不是；</li>
-    <li>能不能通过增加分区数量来提高 Kafka 性能？注意，这个是可以的，但是要注意把握度，就是不能无限增加；</li>
-    <li>Topic 过多会引起什么问题？其实差不多是同一个问题，Topic 多意味着分区多，而且通常伴随的是每个 Topic 的数据量都不大；</li>
-  </ul>
-</blockquote>
-
-<p>要从 Producer、Consumer 和 Broker 三者考虑：</p>
-
-<ol>
-  <li>对于 <code class="highlighter-rouge">Producer </code>来说：它采用的是<strong>批量发送</strong>的机制，那么分区数量多的话，就需要<strong>消耗大量的内存</strong>来维护这些缓存的消息。同时，也增大了<strong>数据丢失</strong>的风险。</li>
-  <li>对于 <code class="highlighter-rouge">Consumer</code> 来说：分区数量多意味着要么部署非常多的实例，要么开启非常多的线程，无论是哪一种方案，都是<strong>开销巨大</strong>。</li>
-  <li>对于 <code class="highlighter-rouge">Broker</code> 来说：分区特别多而对应的 Broker 数量又不足的话，那么意味着一个 Broker 上分布着大量的分区，那么一次宕机就会引起 Kafka <strong>延时猛增</strong>。
-    <ol>
-      <li>同时，每一个分区都要求 Broker 开启三个句柄，那么会引起 Broker 上的文件句柄被急速消耗，可能导致程序崩溃。</li>
-      <li>还要考虑到，Kafka 虽然采用了顺序写，但是这是指在一个分区内部顺序写，在多个分区之间，是无法做到顺序写的。</li>
-    </ol>
-  </li>
-</ol>
-
-<h4 id="topic-的分区数量过多">Topic 的分区数量过多</h4>
-
-<p>如何解决：</p>
-
-<ol>
-  <li>增加 Broker，确保 Broker 上不会存在很多的分区。这可以避免 Broker 上文件句柄数量过多，顺序写退化为随机写，以及宕机影响范围太大的问题。</li>
-  <li>其次可以考虑拆分 Topic 并且部署到不同的集群。（注意，Topic 如果拆了但是没有增加 Broker，也没有部署额外的 Kafka 集群，那么其实还是没啥用）</li>
-  <li>当然，如果分区的写入负载其实并不大，那么可以考虑<strong>削减分区</strong>的。（kafka本身不支持削减分区）</li>
-</ol>
-
-<h4 id="不支持减少分区">不支持减少分区</h4>
-
-<p>Kafka 增加分区是可以的，但是减少分区是不能的。</p>
-
-<p>原因：</p>
-
-<ul>
-  <li>实现减少分区的核心难点在于，难以处理分区上的数据。</li>
-  <li>比如，减少的这个分区上的数据怎么处理？
-    <ul>
-      <li>大多数情况下，不能直接丢掉，那么只能考虑重新分配给其它的分区。</li>
-      <li>于是就涉及到，如何分配，对应的消费者怎么处理？以及对其余分区的影响。</li>
-    </ul>
-  </li>
-  <li>总体来说，减少分区的复杂度，远比增加分区的复杂度大，但是收益是小的。一方面，有别的手段来解决类似的问题，另一方面，大多数的场景，都是增加分区，而不是减少分区。</li>
-</ul>
-
-<p>假如我们要实现类似的功能，可以考虑两种方案：</p>
-
-<ol>
-  <li>创建一个完全一样的 Topic，然后分区数量少一点，等老的 Topic 消费完就直接下线，只留下这个新的 Topic；</li>
-  <li>考虑在写入分区的时候，不再写入特定的分区，可以通过业务来控制，也可以通过负载均衡机制来控制；其缺点是，这个没用的分区会长期存在，并没有在事实上删除它；</li>
-</ol>
-
-<h4 id="确定合适的分区消费者数量">确定合适的分区、消费者数量</h4>
-
-<blockquote>
-  <p>如何确定消费者数量？</p>
-
-  <p>要注意，消费者最多最多就是和分区数量一样，其它就是压测了。</p>
-</blockquote>
-
-<p>答：使用 Kafka 提供的<strong>压测工具</strong>来测试。</p>
-
-<ul>
-  <li>一般来说，我们对于某个特定的 Topic，其消息大小是能够从业务上推断出来的，也就是我们不存在说一个 Topic，某些消息特别长，某些消息特别短。大部分的消息长度都在相差不多的范围内。</li>
-  <li>因此我们可以控制写入一个分区的 <strong>TPS</strong>，观察<strong>同步延时</strong>和消息是否积压（消费端的消费数据，例如99线等也可以）。</li>
-  <li>分区数量会影响两端，因此要同时考虑 Producer 的效率和 Consumer 的效率。</li>
-</ul>
-
-<h3 id="如何保证消息有序性">如何保证消息有序性？</h3>
-
-<p>答：Kafka 要做到消息有序，只需要将消息都投递到同一个分区里面。</p>
-
-<ul>
-  <li>分区内部有序的特点：因为 Kafka 的设计确保了一个分区内部的消息是有序的。但是分区之间是没有顺序的。</li>
-  <li>这并不意味着我们只能使用一个分区，而是可以考虑在发消息的时候主动指定分区，确保业务上要求顺序的消息都被投递到同一个分区中。</li>
-  <li>例如按照用户 ID 来选择分区，确保用户相关的某些消息都在同一个分区内部。</li>
-  <li>（点出缺点）类似的方案都要注意<strong>分区负载</strong>，例如热点用户产生了大量的消息，都被积压在该分区。</li>
-</ul>
-
-<h3 id="kafka能不能重复消费">Kafka能不能重复消费？</h3>
-
-<blockquote>
-  <p>分析：这个问题，其实不是指我们之前提到的，消费者如何避免重复消费中的那种因为<strong>超时</strong>引起的重复消费。</p>
-
-  <p>面试官想问的是，我能不能主动重复消费（历史上的消息）。比如说，我程序有BUG，消费的时候出错了。等我修复完 BUG 之后，我打算重新消费一遍，有没有办法做到。</p>
-</blockquote>
-
-<p>答：能。Kafka 的分区用 offset 来记录消费者消费到哪里了。因此我们可以考虑指定 offset 来消费，比如指定一个很久之前的 offset。</p>
-
-<ul>
-  <li>一些场景之下，我们会更加倾向于指定时间节点，那么可以先根据时间戳找到 offset，然后再从 offset 消费。</li>
-  <li>消息保存时间，因为超过消息保存时间，就真找不着了。</li>
-  <li>不过要注意，有些时候，消息可能已经被归档了，就确实没法重复消费了。</li>
-</ul>
 
 <h3 id="rebalance">Rebalance</h3>
 
@@ -516,10 +559,47 @@
   <li><strong>影响性能</strong>：rebalance 的过程，一般是在几十毫秒到上百毫秒。这个过程会导致集群处于一种不稳定状态中，影响消费者的吞吐量；</li>
 </ol>
 
-<h5 id="zookeeper-在-kafka-中的作用"><del>Zookeeper 在 Kafka 中的作用</del></h5>
+<h3 id="拉模型推模型">拉模型、推模型</h3>
+
+<blockquote>
+  <p>为什么 Kafka 在消费者端采用了拉（PULL）模型？</p>
+
+  <p>在 MQ 这种场景下的优缺点。加分点在于明确指出什么 MQ 使用了什么模型。</p>
+</blockquote>
+
+<p>答：采用拉模型的核心原因在于，消费者的消费速率不同。</p>
+
+<ul>
+  <li>在<strong>拉模型</strong>之下：消费者自己消费完就再去拉去一批，那么这种速率是<strong>由消费者自己控制</strong>的，所需要的控制信息也是由消费者自己保存的。</li>
+  <li>而采用<strong>推模型</strong>：就意味着中间件要和消费者就速率问题<strong>进行协商</strong>，否则容易导致要么推送过快，要么推送过慢的问题。
+    <ul>
+      <li>好处是：避免竞争。例如在多个消费者拉同一主题的消息的时候，就需要保证，不同消费者不会引起<strong>并发</strong>问题。</li>
+      <li>而 Kafka 不会有类似的问题，因为 Kafka 限制了一个 Partition 只能有一个消费者，所以拉模型反而更加合适。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="kafka-能不能重复消费">Kafka 能不能重复消费？</h3>
+
+<blockquote>
+  <p>分析：这个问题，其实不是指我们之前提到的，消费者如何避免重复消费中的那种因为<strong>超时</strong>引起的重复消费。</p>
+
+  <p>面试官想问的是，能不能主动重复消费（历史上的消息）。比如说，程序有BUG，消费时出错了。等修复完 BUG 之后，打算重新消费一遍，有没有办法做到。</p>
+</blockquote>
+
+<p>答：能。Kafka 的分区用 offset 来记录消费者消费到哪里了。因此可以考虑指定 offset 来消费，比如指定一个很久之前的 offset。</p>
+
+<ul>
+  <li>一些场景之下，会更加倾向于<strong>指定时间节点</strong>，那么可以先根据时间戳找到 offset，然后再从 offset 消费。</li>
+  <li>消息保存时间，因为超过消息保存时间，就真找不着了。</li>
+  <li>不过要注意，有些时候，消息可能已经被归档了，就确实没法重复消费了。</li>
+</ul>
+
+<h2 id="zookeeper-在-kafka-中的作用"><del>Zookeeper 在 Kafka 中的作用</del></h2>
 
 <ol>
   <li>Broker 注册</li>
   <li>Topic 注册</li>
   <li>负载均衡</li>
+  <li>维护分区被移出 ISR 的参数</li>
 </ol>

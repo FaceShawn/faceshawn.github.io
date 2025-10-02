@@ -1,0 +1,907 @@
+<blockquote>
+  <p>摘要：Spring Security 认证方式，Cookie、Session、Token、JWT。</p>
+</blockquote>
+
+<!-- more -->
+
+<h2 id="目录">目录</h2>
+
+<p>[TOC]</p>
+
+<h3 id="无状态登录">无状态登录</h3>
+
+<p><strong>有状态服务</strong>：即服务端需要<strong>记录每次会话的客户端信息</strong>，从而识别客户端身份，根据用户身份进行请求的处理。</p>
+
+<ul>
+  <li>典型的设计如 Tomcat 中通过 Session 来<strong>记录用户认证信息</strong>的方式：
+    <ol>
+      <li>用户登录后，把用户信息保存在服务端 session 中，给用户一个 cookie 值，记录对应的 session，</li>
+      <li>然后下次请求，用户携带 cookie 值来（这一步有浏览器自动完成），服务器就能识别到对应 session，从而找到用户的信息。</li>
+    </ol>
+  </li>
+</ul>
+
+<p><strong>无状态性</strong>，即：</p>
+
+<ul>
+  <li>服务端不保存任何客户端请求者信息；</li>
+  <li>客户端的每次请求必须具备<strong>自描述信息</strong>，通过这些信息识别客户端身份。</li>
+</ul>
+
+<p>HTTP 是<strong>无状态</strong>的协议（对于事务处理<strong>没有记忆能力</strong>，每次客户端和服务端会话完成时，服务端不会保存任何会话信息）：每个请求都是完全独立的，服务端无法确认当前访问者的身份信息，无法分辨上一次的请求发送者和这一次的发送者是不是同一个人。</p>
+
+<ul>
+  <li>所以服务器与浏览器为了进行<strong>会话跟踪</strong>（知道是谁在访问我），就必须主动的去维护一个状态，这个状态用于告知服务端前后两个请求是否来自同一浏览器。</li>
+  <li>而这个状态需要通过 cookie 或者 session 去实现。</li>
+</ul>
+
+<p>如何实现无状态？<strong>无状态登录</strong>的流程：</p>
+
+<ol>
+  <li>首先客户端发送账户名/密码到服务端进行认证；</li>
+  <li>认证通过后，服务端将用户信息加密并且编码成一个 <strong>token</strong>，返回给客户端；</li>
+  <li>以后客户端每次发送请求，都需要携带认证的 token；</li>
+  <li>服务端对客户端发送来的 token 进行解密，判断是否有效，并且获取用户登录信息。</li>
+</ol>
+
+<h3 id="cookie-和-session-异同">Cookie 和 Session 异同</h3>
+
+<p>相同：都是用来跟踪浏览器<strong>用户身份</strong>的<strong>会话方式</strong>，但是两者的应用场景不太一样。</p>
+
+<p>区别：</p>
+
+<ol>
+  <li>定义：
+    <ul>
+      <li><code class="highlighter-rouge">Cookie</code>：网站（为了辨别用户身份而）储存在<strong>用户本地客户端</strong>上的数据，用来存储<strong>少量</strong>用户信息（通常经过加密）。</li>
+      <li><code class="highlighter-rouge">Session</code>：<strong>服务器</strong>用来存储用户信息、通过服务端记录用户的状态。</li>
+    </ul>
+  </li>
+  <li><strong>安全性</strong>：<code class="highlighter-rouge">Cookie</code>保存在<strong>客户端</strong>，用户能很容易的获取，<strong>安全性</strong>不高；<code class="highlighter-rouge">Session</code>保存在服务器，用户不易获取，<strong>安全性更高</strong>。</li>
+  <li><strong>数据量</strong>、存储大小不同：<code class="highlighter-rouge">Cookie</code>存储的<strong>数据量小</strong>，（单个 Cookie 保存的数据不能超过 4K）。<code class="highlighter-rouge">Session</code>储存的数据量远高于 Cookie，但占用<strong>服务器资源</strong>。</li>
+  <li><strong>存取值的类型不同</strong>：Cookie 只支持存<strong>字符串</strong>数据，想要设置其他类型的数据，需要将其转换成字符串，Session 可以存<strong>任意数据类型</strong>。</li>
+  <li><strong>有效期不同：</strong> Cookie 可设置为<strong>长时间保持</strong>，比如经常使用的<strong>默认登录</strong>功能。Session 一般失效时间较短，<strong>客户端关闭</strong>（默认情况下）或者 <strong>Session 超时</strong>都会失效。</li>
+  <li>典型场景、应用案例：
+    <ul>
+      <li><code class="highlighter-rouge">Cookie</code>应用案例：
+        <ol>
+          <li>保存<strong>已经登录过的</strong>用户信息，</li>
+          <li>保存用户首选项、主题和其他设置信息，</li>
+          <li>保存 <code class="highlighter-rouge">SessionId</code> 或 <code class="highlighter-rouge">Token</code> ，用于<strong>帮助记录</strong>用户当前的<strong>状态</strong>（因为 HTTP 协议是无状态的），</li>
+          <li>用来记录和分析用户行为，比如网上购物时，服务器获取某个页面的<strong>停留状态</strong>、或看了哪些商品，一种常用的实现方式就是将这些信息存放在 <code class="highlighter-rouge">Cookie</code>。</li>
+        </ol>
+      </li>
+      <li><code class="highlighter-rouge">Session</code>典型场景：
+        <ol>
+          <li><strong>购物车</strong>：系统不知道是哪个用户操作的，因为 HTTP 协议是<strong>无状态</strong>的。服务端给特定的用户创建特<strong>定的 <code class="highlighter-rouge">Session</code></strong> 之后就可以<strong>标识</strong>这个用户并且<strong>跟踪</strong>这个用户了。</li>
+          <li>个性化推送、<strong>免密登录</strong>。如 <code class="highlighter-rouge">HttpSession</code>。</li>
+        </ol>
+      </li>
+    </ul>
+  </li>
+</ol>
+
+<h2 id="cookie">Cookie</h2>
+
+<p>Cookie：指的就是浏览器里面能<strong>永久存储</strong>的一种数据，仅仅是浏览器实现的一种数据存储功能。</p>
+
+<ul>
+  <li><strong>由服务器生成</strong>，发送给浏览器，并（以kv形式）保存在浏览器本地（某个文件内）。
+    <ul>
+      <li>在下次向<strong>同一服务器</strong>再发起请求时，被携带并发送到服务器上。</li>
+    </ul>
+  </li>
+  <li>
+    <p>cookie 是<strong>不可跨域</strong>的： 每个 cookie 都会<strong>绑定单一的域名</strong>，无法在别的域名下获取使用，一级域名和二级域名之间是允许共享使用的（<strong>靠的是 domain）</strong>。</p>
+  </li>
+  <li>由于cookie是存在客户端上的，所以浏览器加入了一些限制确保cookie不会被恶意使用，同时不会占据太多磁盘空间，所以每个域的cookie数量是有限的。</li>
+</ul>
+
+<h3 id="保存方式">保存方式</h3>
+
+<p>Cookie的保存方式有两种：</p>
+
+<ol>
+  <li>如果没有设置cookie的失效时间，这个cookie就存在于<strong>浏览器进程</strong>；</li>
+  <li>设置了cookie的失效时间，那么这个cookie就存在于<strong>硬盘</strong>。</li>
+</ol>
+
+<h3 id="cookie-重要的属性">cookie 重要的属性</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">属性</th>
+      <th style="text-align: left">说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><strong>name=value</strong></td>
+      <td style="text-align: left">键值对，设置 Cookie 的名称及相对应的值，都必须是<strong>字符串类型</strong> <br />- 如果值为 Unicode 字符，需要为字符编码。<br />- 如果值为二进制数据，则需要使用 BASE64 编码。</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>domain</strong></td>
+      <td style="text-align: left">指定 cookie 所属域名，默认是当前域名</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>path</strong></td>
+      <td style="text-align: left">指定 cookie 在哪个<strong>路径（路由）下生效</strong>，默认是 ‘/’。 如果设置为 <code class="highlighter-rouge">/abc</code>，则只有 <code class="highlighter-rouge">/abc</code> 下的路由可以访问到该 cookie，如：<code class="highlighter-rouge">/abc/read</code>。</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>maxAge</strong></td>
+      <td style="text-align: left">cookie 失效的时间，单位秒。<br />- 如果为整数，则该 cookie 在 maxAge 秒后失效。<br />- 如果为负数，该 cookie 为临时 cookie ，关闭浏览器即失效，浏览器也不会以任何形式保存该 cookie 。<br />- 如果为 0，表示删除该 cookie 。默认为 -1。 - <strong>比 expires 好用</strong>。</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>expires</strong></td>
+      <td style="text-align: left"><strong>过期时间</strong>，在设置的某个时间点后该 cookie 就会失效。<br />一般浏览器的 cookie 都是默认储存的，当关闭浏览器结束这个会话的时候，这个 cookie 也就会被删除</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>secure</strong></td>
+      <td style="text-align: left">该 cookie 是否仅被使用<strong>安全协议传输</strong>。安全协议有 HTTPS，SSL等，在网络上传输数据之前先将数据加密。<br />默认为false。 当 secure 值为 true 时，cookie 在 HTTP 中是无效，在 HTTPS 中才有效。</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><strong>httpOnly</strong></td>
+      <td style="text-align: left">如果给某个 cookie 设置了 httpOnly 属性，则无法<strong>通过 JS 脚本 读取</strong>到该 cookie 的信息，但还是能通过 Application 中手动修改 cookie，所以只是在一定程度上可以<strong>防止 XSS 攻击</strong>，不是绝对的安全。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="在项目中使用">在项目中使用</h3>
+
+<blockquote>
+  <p>以 Spring Boot 项目为例。</p>
+</blockquote>
+
+<p>1) 创建 <code class="highlighter-rouge">Cookie</code>，并通过 <strong><code class="highlighter-rouge">HttpServletResponse</code></strong> 返回给客户端；</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@GetMapping</span><span class="o">(</span><span class="s">"/change-username"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="n">String</span> <span class="nf">setCookie</span><span class="o">(</span><span class="n">HttpServletResponse</span> <span class="n">response</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// 创建一个 cookie</span>
+    <span class="n">Cookie</span> <span class="n">cookie</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Cookie</span><span class="o">(</span><span class="s">"username"</span><span class="o">,</span> <span class="s">"Jovan"</span><span class="o">);</span>
+    <span class="c1">//设置 cookie过期时间</span>
+    <span class="n">cookie</span><span class="o">.</span><span class="na">setMaxAge</span><span class="o">(</span><span class="mi">7</span> <span class="o">*</span> <span class="mi">24</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span><span class="o">);</span> <span class="c1">// expires in 7 days</span>
+    <span class="c1">//添加到 response 中</span>
+    <span class="n">response</span><span class="o">.</span><span class="na">addCookie</span><span class="o">(</span><span class="n">cookie</span><span class="o">);</span>
+
+    <span class="k">return</span> <span class="s">"Username is changed!"</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>2) 使用 Spring 框架提供的 <strong><code class="highlighter-rouge">@CookieValue</code> 注解</strong>获取特定的 cookie 的值；</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@GetMapping</span><span class="o">(</span><span class="s">"/"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="n">String</span> <span class="nf">readCookie</span><span class="o">(</span><span class="nd">@CookieValue</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">"username"</span><span class="o">,</span> <span class="n">defaultValue</span> <span class="o">=</span> <span class="s">"Atta"</span><span class="o">)</span> <span class="n">String</span> <span class="n">username</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="s">"Hey! My username is "</span> <span class="o">+</span> <span class="n">username</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>3) 通过 <strong><code class="highlighter-rouge">HttpServletRequest</code> 的<code class="highlighter-rouge">getCookies()</code>方法</strong>，读取所有的 <code class="highlighter-rouge">Cookie</code> 值；</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@GetMapping</span><span class="o">(</span><span class="s">"/all-cookies"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="n">String</span> <span class="nf">readAllCookies</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+
+    <span class="n">Cookie</span><span class="o">[]</span> <span class="n">cookies</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="na">getCookies</span><span class="o">();</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">cookies</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">Arrays</span><span class="o">.</span><span class="na">stream</span><span class="o">(</span><span class="n">cookies</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">map</span><span class="o">(</span><span class="n">c</span> <span class="o">-&gt;</span> <span class="n">c</span><span class="o">.</span><span class="na">getName</span><span class="o">()</span> <span class="o">+</span> <span class="s">"="</span> <span class="o">+</span> <span class="n">c</span><span class="o">.</span><span class="na">getValue</span><span class="o">())</span>
+            	<span class="o">.</span><span class="na">collect</span><span class="o">(</span><span class="n">Collectors</span><span class="o">.</span><span class="na">joining</span><span class="o">(</span><span class="s">", "</span><span class="o">));</span>
+    <span class="o">}</span>
+
+    <span class="k">return</span> <span class="s">"No cookies"</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h2 id="session会话">Session（会话）</h2>
+
+<p>session 是另一种记录服务器和客户端<strong>会话状态</strong>的机制。</p>
+
+<ul>
+  <li>session 是<strong>基于 cookie 实现</strong>的，session 存储在服务器端，session id 会被存储到客户端的 cookie 中。</li>
+</ul>
+
+<h3 id="session-cookie-方案进行身份验证">Session-Cookie 方案进行身份验证</h3>
+
+<p>客户端和服务器间是通过http协议进行通信，但 http 协议是无状态的，<strong>不同次请求会话</strong>是没有任何关联的，优点是处理速度快。</p>
+
+<ul>
+  <li>很多时候都是通过 <code class="highlighter-rouge">SessionID</code> 来识别特定的用户，<del><code class="highlighter-rouge">SessionID</code> 一般会选择存放在 Redis 中</del>。</li>
+</ul>
+
+<p>在一次客户端和服务器之间的<strong>会话</strong>中，客户端（浏览器）向服务器发送请求，</p>
+
+<ol>
+  <li>首次访问：
+    <ol>
+      <li>用户向服务器发送用户名、密码、验证码用于登陆系统。</li>
+      <li><strong>服务器生成 Session</strong>：
+        <ol>
+          <li>服务器验证通过后，会为这个用户创建一个专属的 <strong>Session 对象</strong>（存放该用户的状态数据，如购物车、登录信息等），并存储在 Session 映射区，<del>一般会选择存放在 <strong>Redis</strong> 中</del>。</li>
+          <li>并给这个 Session 对象<strong>分配一个唯一的 <code class="highlighter-rouge">SessionID、JSESSIONID</code></strong>，服务器（通过 <strong>HTTP 响应头</strong>中的 <code class="highlighter-rouge">Set-Cookie</code> 指令），把这个 <code class="highlighter-rouge">SessionID</code> <strong>返回给浏览器</strong>。</li>
+        </ol>
+      </li>
+      <li>浏览器：接收到 <code class="highlighter-rouge">SessionID</code> 后，以 <strong>Cookie 的形式</strong>保存在本地。同时 Cookie 记录此 SessionID 属于哪个域名。</li>
+    </ol>
+  </li>
+  <li>后续访问：
+    <ol>
+      <li>当用户<strong>保持登录状态</strong>时，后续每次向该服务器发请求，（请求会自动判断此域名下是否存在 Cookie 信息，如果存在），浏览器都会<strong>自动带上</strong>这个存有 <code class="highlighter-rouge">SessionID</code> 的 Cookie。</li>
+      <li>服务器收到请求后，从 Cookie 中拿出 <code class="highlighter-rouge">SessionID</code>。到<strong>session库</strong>查询是否存在，
+        <ol>
+          <li>如果存在，那么服务器能找到之前保存的那个 Session 对象，从而知道对应<strong>哪个用户</strong>以及他之前的状态。并进行后续操作。</li>
+          <li>如果不存在，就会创建一个JSESSIONID，并在本次请求结束后将JSESSIONID返回给客户端，同时在客户端cookie中进行保存。</li>
+        </ol>
+      </li>
+      <li>进行后续操作。</li>
+    </ol>
+  </li>
+  <li>当浏览器关闭时，会话就结束了，但会话session还在。默认 session 保留30分钟。</li>
+</ol>
+
+<p><img src="../assets/1548492-20220331163509335-813514932.png" alt="img" /></p>
+
+<h3 id="使用-session-时需要注意">使用 Session 时需要注意</h3>
+
+<ul>
+  <li>客户端 Cookie 支持：依赖 Session 的核心功能要确保用户浏览器开启了 Cookie。</li>
+  <li>Session 过期管理：合理设置 Session 的过期时间，平衡安全性和用户体验。</li>
+  <li>Session ID 安全：
+    <ul>
+      <li>为包含 <code class="highlighter-rouge">SessionID</code> 的 Cookie 设置 <strong><code class="highlighter-rouge">HttpOnly</code> 标志</strong>可以防止客户端脚本（如 JavaScript）窃取，</li>
+      <li>设置 <strong>Secure 标志</strong>可以保证 <code class="highlighter-rouge">SessionID</code> 只在 HTTPS 连接下传输，增加安全性。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="httpsession-生命周期">HttpSession 生命周期</h3>
+
+<p>创建 HttpSession 对象的时机：</p>
+
+<ol>
+  <li>对于JSP：浏览器访问服务端的任何一个JSP或Servlet，服务器不会为JSP创建一个 HttpSession 对象的情况：
+    <ul>
+      <li>若当前的JSP或（Servlet）是客户端访问的当前WEB应用的<strong>第一个资源</strong>，且JSP的page指定属性<code class="highlighter-rouge">session="false"</code>，当前JSP页面禁用session隐含变量！但可以使用其他的显式的对象；</li>
+      <li>若当前JSP不是访问的第一个资源，且其他页面已经创建一个（和当前会话关联的）HttpSession对象，直接返回。</li>
+    </ul>
+  </li>
+  <li>对于Servlet而言：若Servlet是客户端访问的第一个WEB应用的资源，则只有调用了<code class="highlighter-rouge">request.getSession([true])</code> 才会创建HttpSession对象。</li>
+</ol>
+
+<p>Servlet 获取 HttpSession对象：<code class="highlighter-rouge">request.getSession(boolean create)</code>：</p>
+
+<ol>
+  <li>create为false，
+    <ol>
+      <li>若没有和当前JSP页面关联的HttpSession对象，则返回null；</li>
+      <li>若有则返回true；</li>
+    </ol>
+  </li>
+  <li>create默认为true，一定返回一个HTTPSession对象：
+    <ol>
+      <li>若没有和当前JSP页面关联的HttpSession对象，则服务器<strong>创建一个新的</strong>HttpSession对象返回，</li>
+      <li>若有则直接返回关联。</li>
+    </ol>
+  </li>
+</ol>
+
+<p>销毁 HttpSession 对象的时机：</p>
+
+<ol>
+  <li>直接<strong>显式调用</strong>HttpSession的<code class="highlighter-rouge">invalidate()</code>方法：使HttpSession失效。</li>
+  <li>服务器卸载了当前Web应用。</li>
+  <li>超出HttpSession的过期时间。</li>
+</ol>
+
+<h5 id="只要关闭浏览器-session-真的就消失了">只要关闭浏览器 ，session 真的就消失了？</h5>
+
+<p>不对。</p>
+
+<ul>
+  <li>对 session 来说，除非程序通知服务器删除一个 session，否则服务器会一直保留，程序一般都是在用户做 log off 的时候发个指令去删除 session。</li>
+  <li>然而浏览器从来不会主动在关闭之前通知服务器它将要关闭，因此服务器根本不会有机会知道浏览器已经关闭，之所以会有这种错觉，是大部分 session 机制都使用会话 cookie 来保存 session id，而关闭浏览器后这个 session id 就消失了，再次连接服务器时也就无法找到原来的 session。</li>
+  <li>如果服务器设置的 cookie 被保存在硬盘上，或者使用某种手段改写浏览器发出的 HTTP 请求头，把原来的 session id 发送给服务器，则再次打开浏览器仍然能够打开原来的 session。</li>
+  <li>恰恰是<strong>由于关闭浏览器不会导致 session 被删除，迫使服务器为 session 设置了一个失效时间，当距离客户端上一次使用 session 的时间超过这个失效时间时，服务器就认为客户端已经停止了活动，才会把 session 删除以节省存储空间。</strong></li>
+</ul>
+
+<h3 id="分布式会话管理">分布式会话管理</h3>
+
+<blockquote>
+  <p>多服务器节点下 Session-Cookie 方案</p>
+</blockquote>
+
+<p>举个例子：假如部署了两份相同的服务 A，B，</p>
+
+<ul>
+  <li>用户第一次登陆的时候 ，Nginx 通过<strong>负载均衡机制</strong>将用户请求转发到 A 服务器，此时用户的 Session 信息保存在 A 服务器。</li>
+  <li>结果，用户第二次访问的时候 Nginx 将请求路由到 B 服务器，由于 B 服务器没有保存 用户的 Session 信息，导致用户需要<strong>重新进行登陆</strong>。</li>
+</ul>
+
+<blockquote>
+  <p>应该如何避免上面这种情况的出现呢？</p>
+</blockquote>
+
+<p>有几个方案可供大家参考：</p>
+
+<ol>
+  <li>某个用户的所有请求都通过特性的<strong>哈希策略</strong>分配给同一个服务器处理。这样的话，每个服务器都保存了一<strong>部分</strong>用户的 Session 信息。服务器宕机，其保存的所有 Session 信息就完全<strong>丢失</strong>了。</li>
+  <li>每一个服务器保存的 Session 信息都是<strong>互相同步</strong>的，也就是说每一个服务器都保存了<strong>全量</strong>的 Session 信息。每当一个服务器的 Session 信息发生变化，就将其同步到其他服务器。<strong>成本太大</strong>，节点越多、同步成本也越高。</li>
+  <li>单独使用一个所有服务器都能访问到的数据节点（比如<strong>缓存</strong>）来存放 Session 信息。为了保证<strong>高可用</strong>，数据节点尽量要避免是单点。</li>
+  <li><strong>Spring Session</strong> 是一个用于在多个服务器之间<strong>管理会话</strong>的项目。可以与多种后端存储（如 <strong>Redis</strong>、MongoDB 等）集成，从而实现<strong>分布式会话管理</strong>。可以将会话数据存储在共享的外部存储中，以实现<strong>跨服务器</strong>的会话同步和共享。</li>
+</ol>
+
+<p>在考虑高性能之前，一定要做<strong>高可用</strong>。</p>
+
+<h3 id="session-的一致性问题">Session 的一致性问题</h3>
+
+<blockquote>
+  <p>分布式架构下 session 共享方案</p>
+</blockquote>
+
+<p>那么在部署生产环境下的 Tomcat 等 Web 容器时，<strong>一定是需要部署多个节点</strong>。此时，Session 的<strong>一致性</strong>就成为一个问题。</p>
+
+<blockquote>
+  <p>Session 的一致性，简单来理解，就是相同 sessionid 在多个 Web 容器下，Session 的数据要一致。</p>
+</blockquote>
+
+<p>以用户使用浏览器，Web 服务器为<strong>两台</strong> TomcatA、TomcatB 举例子。</p>
+
+<ol>
+  <li>接上述例子，浏览器已经访问 TomcatA ，获得 sessionid 为 X 。同时，在多台 Tomcat 的情况下，我们需要采用 Nginx 做负载均衡。</li>
+  <li>浏览器又发起一次请求访问 Web 服务器，Nginx 负载均衡转发请求到 TomcatB 上。TomcatB 会发现<strong>请求的 Cookie</strong> 中<strong>已</strong>存在 sessionid 为 X ，则直接获得 X 对应的 Session 。结果呢，找不到 X 对应的 Session ，只好创建一个 sessionid 为 X 的 Session 。</li>
+  <li>此时，虽然说浏览器的 sessionid 是 X ，但是对应到两个 Tomcat 中两个 Session 。那么，如果在 TomcatA 上做的 Session 修改，TomcatB 的 Session 还是原样，这样就会出现 <strong>Session 不一致</strong>的问题。</li>
+</ol>
+
+<p>解决 <strong>Session 不一致</strong>的问题，一般来说有三种方案：</p>
+
+<h4 id="session-黏连">Session 黏连</h4>
+
+<blockquote>
+  <p>IP 绑定策略</p>
+</blockquote>
+
+<p>使用 <strong>Nginx 负载均衡器</strong>实现<strong>会话黏连</strong>，将相同 sessionid 的浏览器所发起的请求，<strong>都转发到同一台服务器</strong>。</p>
+
+<ul>
+  <li>相当于把用户和 A 服务器粘到了一块。</li>
+  <li>
+    <p>这样，就不会存在多个 Web 服务器创建多个 Session 的情况，也就不会发生 Session 不一致的问题。</p>
+  </li>
+  <li>
+    <p><strong>优点：</strong> 简单，不需要对 session 做任何处理。</p>
+  </li>
+  <li><strong>缺点：</strong>
+    <ul>
+      <li>缺乏容错性，如果当前访问的服务器发生故障，用户被转移到第二个服务器上时，他的 session 信息都将失效。</li>
+      <li>因为，如果一台服务器<strong>重启</strong>，那么会导致转发到这个服务器上的 Session 全部丢失。</li>
+      <li>改进：<strong>Session 复制</strong>。</li>
+    </ul>
+  </li>
+  <li><strong>适用场景：</strong> 发生故障对客户产生的影响较小；服务器发生故障是低概率事件 。
+    <ul>
+      <li>目前基本不被采用。</li>
+    </ul>
+  </li>
+  <li><strong>实现方式：</strong> 以 Nginx 为例，在 upstream 模块配置 <strong>ip_hash 属性</strong>即可实现，将某个 ip的所有请求都定向到同一台服务器上，即将用户与服务器绑定。</li>
+</ul>
+
+<blockquote>
+  <p>具体怎么实现这种方式，可以看看 <a href="https://blog.csdn.net/bigtree_3721/article/details/78007853">《Nginx 第三方模块 —— nginx-sticky-module 的使用（基于cookie的会话保持）》</a> 文章。</p>
+</blockquote>
+
+<h4 id="session-复制">Session 复制</h4>
+
+<p>Web 服务器之间，进行 Session 复制同步。</p>
+
+<ul>
+  <li>
+    <p>任何一个服务器上的 session 发生改变（增删改），该节点会把这个 session 的所有内容序列化，然后广播给所有其它节点，不管其他服务器需不需要 session ，以此来保证 session 同步</p>
+  </li>
+  <li><strong>适用场景：</strong> 仅适用于实现 Session 复制的 Web 容器，例如说 Tomcat 、Weblogic 等等。
+    <ul>
+      <li>目前基本也不被采用。</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>优点：</strong> 可容错，各个服务器间 session 能够实时响应。</p>
+  </li>
+  <li><strong>缺点：</strong> 会对网络负荷造成一定压力，如果 session 量大的话可能会造成网络堵塞，拖慢服务器性能。效率低、浪费内存。
+    <ul>
+      <li>改进：<strong>Session 共享</strong>。</li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="../assets/d47d5cb95483956c76426585574ed133" alt="img" style="zoom: 80%;" /></p>
+
+<p>具体怎么实现这种方式，可以看看 <a href="session 共享-tomcat集群session复制">《Session 共享 —— Tomcat 集群 Session 复制》</a> 文章。</p>
+
+<h4 id="session-共享--持久化">Session 共享 / 持久化</h4>
+
+<blockquote>
+  <p>外部化存储（常用）</p>
+</blockquote>
+
+<blockquote>
+  <p>不同于上述的两种方案，考虑不再采用 <strong>Web 容器的内存中</strong>存储 Session ），</p>
+</blockquote>
+
+<p>而是将 Session 存储外部化，<strong>集中存储</strong>、<strong>持久化</strong>到（MySQL、Redis、MongoDB） 等数据库中。所有的机器都来访问这个地方的数据。</p>
+
+<ul>
+  <li><strong>优点：</strong> 服务器出现问题，session 不会丢失 。
+    <ul>
+      <li>Tomcat 就可以<strong>无状态化</strong>，专注提供 Web 服务或者 API 接口，未来拓展扩容也变得更加容易。</li>
+      <li>实现了 <strong>session 共享</strong>；不用复制了；</li>
+      <li>服务器<strong>重启</strong> session 不丢失（不过也要注意 session 在 Redis 中的刷新/失效机制）；</li>
+      <li>不仅可以<strong>跨服务器</strong> session 共享，甚至可以跨平台（例如网页端和 APP 端）</li>
+      <li>可以水平扩展（增加 Redis 服务器）；</li>
+    </ul>
+  </li>
+  <li><strong>缺点：</strong> 如果网站的访问量很大，把 session 存储到数据库中，会对数据库造成很大压力，还需要增加额外的开销维护数据库。
+    <ul>
+      <li>增加了<strong>单点失败</strong>的可能性， 要是那个负责session 的机器挂了， 所有人都得重新登录一遍， 估计得被人骂死。</li>
+      <li>架构上变得复杂，并且需要多访问一次 Redis。</li>
+    </ul>
+  </li>
+  <li>改进：
+    <ul>
+      <li>使用分布式缓存方案，比如 Memcached 、Redis <strong>集群</strong>来缓存 session。增加可靠性。</li>
+      <li><strong>引入 Token</strong>。</li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="../assets/4c6008d783611bb047e7524a15576647" alt="img" style="zoom: 50%;" /><img src="../assets/79a566230ee71dc79233e35529074335.jpg" alt="img" style="zoom: 55%;" /></p>
+
+<p>而实现 Session 外部化存储也有两种方式：</p>
+
+<ul>
+  <li>当然 ① 和 ② 两种方案思路是类似且一致的，只是说<strong>拓展的提供者和位置</strong>不同。</li>
+  <li>相比来说，② 会比 ① 更加通用一些。</li>
+</ul>
+
+<h5 id="使用-session-管理器">使用 Session 管理器</h5>
+
+<p>① 基于 Tomcat、Jetty 等 Web 容器<strong>自带的拓展</strong>，使用读取外部存储器的 Session 管理器。例如说：</p>
+
+<ul>
+  <li><a href="https://github.com/redisson/redisson/wiki/14.-第三方框架整合#146-spring-session会话管理器">《Redisson Tomcat<strong>会话管理器（Tomcat Session Manager）</strong>》</a> ，实现将 Tomcat 使用 Redis 存储 Session 。</li>
+  <li><a href="https://blog.csdn.net/xiao__gui/article/details/43271509">《Jetty 集群配置 Session 存储到 MySQL、MongoDB》</a> ，实现 <strong>Jetty</strong> 使用 MySQL、MongoDB 存储 Session 。</li>
+</ul>
+
+<h5 id="sessionwrapper-对象">SessionWrapper 对象</h5>
+
+<p>② 基于应用层封装 <strong><a href="https://github.com/javaee/servlet-spec/blob/master/src/main/java/javax/servlet/http/HttpServletRequest.java">HttpServletRequest</a> 请求对象</strong>，包装成自己的 RequestWrapper 对象，从而让实现调用 <a href="https://github.com/javaee/servlet-spec/blob/master/src/main/java/javax/servlet/http/HttpServletRequest.java#L542-L581"><code class="highlighter-rouge">HttpServletRequest#getSession()</code></a> 方法时，获得读写外部存储器的 SessionWrapper 对象。例如说，Spring Session。</p>
+
+<h5 id="spring-session">Spring Session</h5>
+
+<ul>
+  <li><strong>Spring Session</strong> 提供了 <a href="https://github.com/spring-projects/spring-session/blob/master/spring-session-core/src/main/java/org/springframework/session/web/http/SessionRepositoryFilter.java">SessionRepositoryFilter</a> 过滤器，过滤请求时，将请求 HttpServletRequest 对象包装成 <a href="https://github.com/spring-projects/spring-session/blob/master/spring-session-core/src/main/java/org/springframework/session/web/http/SessionRepositoryFilter.java#L192-L418">SessionRepositoryRequestWrapper</a> 对象。</li>
+  <li>调用 <a href="https://github.com/spring-projects/spring-session/blob/master/spring-session-core/src/main/java/org/springframework/session/web/http/SessionRepositoryFilter.java#L325-L328"><code class="highlighter-rouge">SessionRepositoryRequestWrapper#getSession()</code></a> 方法时，返回的是自己封装的 <a href="https://github.com/spring-projects/spring-session/blob/master/spring-session-core/src/main/java/org/springframework/session/web/http/SessionRepositoryFilter.java#L375-L390">HttpSessionWrapper</a> 对象。</li>
+  <li>后续，调用 HttpSessionWrapper 的方法，例如说 <code class="highlighter-rouge">HttpSessionWrapper#setAttribute(String name, Object value)</code> 方法，访问的就是外部数据源，而不是内存中。</li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SessionRepositoryFilter.java</span>
+
+<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">doFilterInternal</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">request</span><span class="o">,</span> <span class="n">HttpServletResponse</span> <span class="n">response</span><span class="o">,</span> <span class="n">FilterChain</span> <span class="n">filterChain</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">ServletException</span><span class="o">,</span> <span class="n">IOException</span> <span class="o">{</span>
+    <span class="c1">// sessionRepository 是访问外部数据源的操作类，例如说访问 Redis、MySQL 等等</span>
+    <span class="n">request</span><span class="o">.</span><span class="na">setAttribute</span><span class="o">(</span><span class="n">SESSION_REPOSITORY_ATTR</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="na">sessionRepository</span><span class="o">);</span>
+    
+
+    <span class="c1">// 将请求和响应进行包装成 SessionRepositoryRequestWrapper 和 SessionRepositoryResponseWrapper 对象</span>
+    <span class="n">SessionRepositoryFilter</span><span class="o">&lt;</span><span class="n">S</span><span class="o">&gt;.</span><span class="na">SessionRepositoryRequestWrapper</span> <span class="n">wrappedRequest</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SessionRepositoryFilter</span><span class="o">.</span><span class="na">SessionRepositoryRequestWrapper</span><span class="o">(</span><span class="n">request</span><span class="o">,</span> <span class="n">response</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="na">servletContext</span><span class="o">);</span>
+    <span class="n">SessionRepositoryFilter</span><span class="o">.</span><span class="na">SessionRepositoryResponseWrapper</span> <span class="n">wrappedResponse</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SessionRepositoryFilter</span><span class="o">.</span><span class="na">SessionRepositoryResponseWrapper</span><span class="o">(</span><span class="n">wrappedRequest</span><span class="o">,</span> <span class="n">response</span><span class="o">);</span>
+
+    <span class="c1">// 继续执行下一个过滤器</span>
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="n">filterChain</span><span class="o">.</span><span class="na">doFilter</span><span class="o">(</span><span class="n">wrappedRequest</span><span class="o">,</span> <span class="n">wrappedResponse</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+        <span class="c1">// 请求结束，提交 Session 到外部数据源</span>
+        <span class="n">wrappedRequest</span><span class="o">.</span><span class="na">commitSession</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="c1">// SessionRepositoryFilter#SessionRepositoryRequestWrapper.java</span>
+
+	<span class="nd">@Override</span>
+	<span class="kd">public</span> <span class="n">HttpSessionWrapper</span> <span class="nf">getSession</span><span class="o">()</span> <span class="o">{</span>
+		<span class="k">return</span> <span class="nf">getSession</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+	<span class="o">}</span>
+</code></pre></div></div>
+
+<h3 id="引入-token">引入 Token</h3>
+
+<blockquote>
+  <p>为什么要保存这可恶的session呢， 只让每个客户端去保存该多好？</p>
+</blockquote>
+
+<p>可是如果不保存这些session id , 怎么<strong>验证</strong>客户端发给我的session id 的确是我生成的呢？</p>
+
+<ul>
+  <li>如果不去验证，我们都不知道他们是不是合法登录的用户， 那些不怀好意的家伙们就可以伪造session id , 为所欲为了。</li>
+</ul>
+
+<p>关键点就是<strong>验证</strong> ！</p>
+
+<ul>
+  <li>比如说， 小F已经登录了系统， 我给他发一个<strong>令牌(token)</strong>， 里边包含了小F的 user id， 下一次小F 再次通过Http 请求访问我的时候， 把这个token 通过Http header 带过来就可以了。
+    <ul>
+      <li>问题：Token是明文的，任何人都可以<strong>伪造</strong> Token。</li>
+    </ul>
+  </li>
+  <li>对数据做一个<strong>签名</strong>：比如说用<strong>加密算法</strong> + （只有我才知道的）密钥， 对数据做一个签名， 把这个签名和数据一起作为token 。 由于密钥别人不知道， 就无法伪造token了。</li>
+  <li>（这个token 我不保存）， 当小F把这个token 给我发过来的时候，我再用<strong>同样的</strong>加密算法和密钥，对数据再计算一次签名， 和token 中的签名做个比较，
+    <ol>
+      <li>如果相同， 我就知道小F已经登录过了，并且可以直接取到小F的user id ,</li>
+      <li>如果不相同， 数据部分肯定被人篡改过， 我就告诉发送者：对不起，没有认证。</li>
+    </ol>
+  </li>
+</ul>
+
+<p><img src="../assets/e0444d8858508032c9c8b11b51850a0f" alt="img" style="zoom: 80%;" /><img src="../assets/a38d75882e1575ff9ddf336f934d8dc6" alt="img" style="zoom: 80%;" /></p>
+
+<ul>
+  <li>
+    <p>Token 中的数据是明文保存的（虽然我会用Base64做下编码， 但那不是加密）， 还是可以被别人看到的， 所以不能在其中保存像<strong>密码</strong>这样的敏感信息。</p>
+  </li>
+  <li>
+    <p>**CSRF **跨站请求伪造？：当然， 如果一个人的token 被别人偷走了， 那也没办法， 我也会认为小偷就是合法用户， 这其实和一个人的session id 被别人偷走是一样的。</p>
+  </li>
+  <li>
+    <p>这样一来， 我就不保存session id 了， 只是生成token , 然后验证token ， 我用<strong>CPU计算时间</strong>换取了我的 session 存储空间 ！</p>
+  </li>
+</ul>
+
+<p>解除了session id这个负担， 可以说是无事一身轻， 机器集群现在可以轻松地做<strong>水平扩展</strong>， 用户访问量增大， 直接加机器就行。这种<strong>无状态</strong>的感觉实在是太好了！</p>
+
+<h2 id="token令牌">Token（令牌）</h2>
+
+<h3 id="acesss-token">Acesss Token</h3>
+
+<p>Acesss Token：访问资源接口（API）时所需要的<strong>资源凭证</strong>。</p>
+
+<ul>
+  <li><strong>简单 token 的组成：</strong> uid（用户唯一的身份标识）、time（当前时间的时间戳）、sign（签名，token 的前几位以哈希算法压缩成的一定长度的十六进制字符串）。</li>
+  <li>特点：
+    <ol>
+      <li>服务端<strong>无状态化</strong>、<strong>可扩展性</strong>好</li>
+      <li>支持<strong>移动端</strong>设备</li>
+      <li>安全</li>
+      <li>支持跨程序调用</li>
+    </ol>
+  </li>
+  <li>基于 token 的用户认证是一种服务端<strong>无状态</strong>的认证方式，服务端不用存放 token 数据。
+    <ul>
+      <li>用解析 token 的计算时间<strong>换取</strong> session 的存储空间，从而减轻服务器的压力，减少频繁的查询数据库。</li>
+    </ul>
+  </li>
+  <li>token 完全由应用管理，所以它可以避开<strong>同源策略</strong>。</li>
+</ul>
+
+<h4 id="基于-token-的身份验证流程">基于 token 的身份验证流程</h4>
+
+<ol>
+  <li>客户端使用用户名跟密码<strong>请求登录</strong>。</li>
+  <li>服务端收到请求，去<strong>验证</strong>用户名与密码。</li>
+  <li>验证成功后，服务端会<strong>签发一个 token</strong> 并把这个 token 发送给客户端。</li>
+  <li>客户端收到 token 以后，会把它<strong>存储起来</strong>，比如放在 cookie 里或者 localStorage 里。</li>
+  <li>客户端每次向服务端请求资源时，都需要<strong>带着</strong>（服务端签发的）token（放到 HTTP 的 Header 里）。</li>
+  <li>服务端收到请求，然后去<strong>验证</strong>客户端请求里面带着的 token ，如果验证成功，就向客户端返回请求的数据。</li>
+</ol>
+
+<p><img src="../assets/3be751e707405a06201a0ef60c698f39.jpg" alt="img" style="zoom:50%;" /></p>
+
+<h3 id="refresh-token">Refresh Token</h3>
+
+<blockquote>
+  <p>另外一种 token——refresh token</p>
+</blockquote>
+
+<p>refresh token：是专用于<strong>刷新 access token</strong> 的 token。</p>
+
+<ul>
+  <li>如果没有 refresh token，也可以刷新 access token，但每次刷新都要用户输入登录用户名与密码，会很麻烦。</li>
+  <li>有了 refresh token，可以减少这个麻烦，客户端<strong>直接用 refresh token 去更新</strong> access token，无需用户进行额外的操作。</li>
+  <li><strong>Access Token 的有效期</strong>比较短，当过期而失效时，使用 Refresh Token 就可以获取到新的 Token，如果 Refresh Token 也失效了，用户就只能重新登录了。</li>
+  <li>Refresh Token 及过期时间是存储在服务器的数据库中，只有在申请新的 Acesss Token 时才会验证，不会对业务接口响应时间造成影响，也不需要向 Session 一样一直保持在内存中以应对大量的请求。</li>
+</ul>
+
+<p><img src="../assets/2b9dec4537eff5e7d345345f3cda224b10a7ad.jpg" alt="img" /></p>
+
+<h3 id="token-和-session-的区别">Token 和 Session 的区别</h3>
+
+<ul>
+  <li>Session 是一种<strong>记录</strong>服务器和客户端<strong>会话状态</strong>的机制，使服务端有状态化，可以记录会话信息。而 Token 是<strong>令牌</strong>，访问资源接口（API）时所需要的<strong>资源凭证</strong>。Token 使服务端<strong>无状态化</strong>，不会存储会话信息。</li>
+  <li>Session 和 Token 并不矛盾，作为身份认证 <strong>Token 安全性</strong>比 Session 好，因为每一个请求都有签名还能防止监听以及重放攻击，而 Session 就必须依赖链路层来保障通讯安全了。如果需要实现<strong>有状态的会话</strong>，仍然可以增加 Session 来在服务器端保存一些状态。</li>
+  <li>所谓 Session 认证只是简单的把 User 信息存储到 Session 里，因为 SessionID 的不可预测性，暂且认为是安全的。而 Token ，如果指的是 OAuth Token 或类似的机制的话，提供的是 <strong>认证 和 授权</strong> ，认证是针对用户，授权是针对 App 。
+    <ul>
+      <li>其目的是让某 App 有权利访问某用户的信息。这里的 Token 是唯一的。不可以转移到其它 App上，也不可以转到其它用户上。</li>
+      <li>Session 只提供一种简单的认证，即只要有此 SessionID ，即认为有此 User 的全部权利。是需要严格保密的，这个数据应该只保存在站方，不应该共享给其它网站或者第三方 App。</li>
+    </ul>
+  </li>
+  <li>所以简单来说：如果你的用户数据可能需要和第三方共享，或者允许第三方调用 API 接口，用 Token 。如果永远只是自己的网站，自己的 App，用什么就无所谓了。</li>
+</ul>
+
+<h3 id="csrf-攻击">CSRF 攻击</h3>
+
+<blockquote>
+  <p>为什么 Cookie 无法防止 CSRF 攻击，而 Token 可以？</p>
+</blockquote>
+
+<p>使用 Session-Cookie 方案进行身份验证时，容易出现 <strong>CSRF **跨站请求伪造：如果别人通过 <code class="highlighter-rouge">Cookie</code> 拿到了 <code class="highlighter-rouge">SessionId</code> 后就可以</strong>代替**你的身份访问系统了。</p>
+
+<p>但是，使用 <code class="highlighter-rouge">Token</code> 的话就不会存在这个问题：</p>
+
+<ol>
+  <li>在登录成功获得 <code class="highlighter-rouge">Token</code> 之后，一般会选择存放在 <code class="highlighter-rouge">localStorage</code> （浏览器本地存储）中。</li>
+  <li>然后在前端（通过某些方式）会给每个（发到后端的）请求加上这个 <code class="highlighter-rouge">Token</code>，这样就不会出现 CSRF 漏洞的问题。</li>
+  <li>因为，即使点击了<strong>非法链接</strong>发送了请求到服务端，这个非法请求是不会携带 <code class="highlighter-rouge">Token</code> 的，所以这个请求将是非法的。</li>
+</ol>
+
+<p>需要注意：不论是 <code class="highlighter-rouge">Cookie</code> 还是 <code class="highlighter-rouge">Token</code> 都无法避免 <strong>XSS 跨站脚本攻击</strong> 。</p>
+
+<h5 id="xss">XSS</h5>
+
+<p>跨站脚本攻击（Cross Site Scripting，XSS）：攻击者会用各种方式将<strong>恶意代码</strong>注入到其他用户的页面中。就可以通过脚本盗用信息比如 <code class="highlighter-rouge">Cookie</code> 。</p>
+
+<p><img src="../assets/20210615161108272.png" style="zoom: 67%;" /></p>
+
+<h2 id="jwt">JWT</h2>
+
+<p><strong>JWT</strong> (<code class="highlighter-rouge">JSON WEB TOKEN)</code>：是一种可安全传输的的 JSON 对象。由于使用了<strong>数字签名</strong>，所以是可信任和安全的。</p>
+
+<ul>
+  <li>是目前最流行的<strong>跨域认证</strong>解决方案，是一种<strong>基于 Token</strong> 的<strong>认证授权机制</strong>。</li>
+  <li>从全称可以看出，JWT 本身也是 Token，一种规范化之后的 <strong>JSON 结构的 Token</strong>。
+    <ul>
+      <li>JWT 是为了在网络应用环境间<strong>传递声明</strong>而执行的一种基于 JSON 的开放标准（<a href="https://tools.ietf.org/html/rfc7519">RFC 7519</a>）。</li>
+      <li>JWT 的声明一般被用来，在身份提供者和服务提供者间<strong>传递</strong>被认证的用户身份信息，以便于从资源服务器获取资源。比如用在用户登录上。</li>
+    </ul>
+  </li>
+  <li>可以使用 HMAC 算法或者是 RSA 的公/私秘钥对 JWT 进行签名。因为数字签名的存在，这些传递的信息是可信的。</li>
+  <li>用于解决<strong>使用 Session 进行身份认证</strong>遇到的问题。</li>
+</ul>
+
+<h4 id="token-和-jwt-的区别">Token 和 JWT 的区别</h4>
+
+<p>相同：</p>
+
+<ol>
+  <li>都是访问资源的令牌</li>
+  <li>都可以记录用户的信息</li>
+  <li>都是使服务端无状态化</li>
+  <li>都是只有验证成功后，客户端才能访问服务端上受保护的资源</li>
+</ol>
+
+<p>区别：</p>
+
+<ul>
+  <li>Token：服务端验证客户端发送过来的 Token 时，还需要<strong>查询数据库</strong>获取用户信息，然后验证 Token 是否有效。</li>
+  <li>JWT： 将 Token 和 Payload 加密后存储于客户端，服务端只需要<strong>使用密钥解密</strong>进行校验（校验也是 JWT 自己实现的）即可，不需要查询或者减少查询数据库，因为 JWT 自包含了用户信息和加密的数据。</li>
+</ul>
+
+<h4 id="优势">优势</h4>
+
+<p>相比于 Session 认证的方式来说，使用 JWT 进行身份认证主要有下面 4 个优势。</p>
+
+<ol>
+  <li><strong>无状态</strong>：JWT 自身包含了身份验证所需要的所有信息，因此，服务器不需要存储 JWT <strong>Session</strong> 信息。增加了系统的可用性和伸缩性，大大减轻了服务端的压力。
+    <ul>
+      <li>因为用户的状态不再存储在服务端的内存中，所以这是一种无状态的认证机制。</li>
+      <li>也导致了最大的缺点：<strong>不可控！</strong>就比如说，想要在 JWT 有效期内废弃一个 JWT 或者更改它的权限的话，并不会立即生效，通常需要等到有效期过后才可以。</li>
+      <li>再比如说，当用户 Logout 的话，JWT 也还有效。除非，在后端增加额外的处理逻辑，比如将失效的 JWT 存储起来，后端先验证 JWT 是否有效再进行处理。具体的解决办法，在后面详细介绍。</li>
+    </ul>
+  </li>
+  <li>有效<strong>避免 CSRF 攻击</strong>：因为 JWT 一般是存在在 <strong>localStorage</strong> 中，使用 JWT 进行身份验证的过程中是<strong>不会涉及到 Cookie</strong> 的。
+    <ol>
+      <li>CSRF 攻击需要<strong>依赖 Cookie</strong> ，Session 认证中 Cookie 中的 <code class="highlighter-rouge">SessionID</code> 是由浏览器发送到服务端的，只要发出请求，Cookie 就会被携带。借助这个特性，即使黑客无法获取你的 <code class="highlighter-rouge">SessionID</code>，只要让你误点攻击链接，就可以达到攻击效果。</li>
+      <li>使用 JWT 进行身份验证<strong>不需要依赖 Cookie</strong> ，因此可以避免 CSRF 攻击。
+        <ol>
+          <li>一般情况下使用 JWT 的话，在登录成功获得 JWT 之后，一般会选择存放在 localStorage 中。前端的每一个请求后续都会附带上这个 JWT，整个过程压根不会涉及到 Cookie。</li>
+          <li>因此，即使点击了<strong>非法链接</strong>发送了请求到服务端，这个非法请求也不会携带 JWT，所以这个请求将是非法的。</li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+  <li>适合<strong>移动端</strong>应用：使用 Session 进行身份认证的话，需要保存一份信息在服务器端，而且这种方式会依赖到 Cookie（需要 Cookie 保存 <code class="highlighter-rouge">SessionId</code>），所以不适合移动端。但是，使用 JWT 进行身份认证就不会存在这种问题，因为只要 JWT 可以被客户端存储就能够使用，而且 JWT 还可以跨语言使用。</li>
+  <li><strong>单点登录</strong>友好：使用 Session 进行身份认证的话，实现单点登录，需要把用户的 Session 信息保存在一台电脑上，并且还会遇到常见的 <strong>Cookie 跨域</strong>的问题。但是，使用 JWT 进行认证的话， JWT 被保存在客户端，不会存在这些问题。
+    <ul>
+      <li>因为 JWT 并<strong>不使用 Cookie</strong> 的，所以你可以使用任何域名提供你的 API 服务而不需要担心<strong>跨域资源共享问题</strong>（CORS）</li>
+    </ul>
+  </li>
+  <li>因为 JWT 是自包含的（内部包含了一些会话信息），因此减少了需要查询数据库的需要</li>
+</ol>
+
+<p>缺点：</p>
+
+<p>疑问：为什么不使用 <strong>JWT</strong>（JSON Web Token）？</p>
+
+<ul>
+  <li>
+    <p>JWT 是<strong>无状态的</strong>，无法实现 <strong>Token 的作废</strong>，例如说用户登出系统、修改密码等场景。</p>
+  </li>
+  <li>
+    <p>推荐阅读 <a href="https://www.iocoder.cn/Fight/Confused-about-cookies-sessions,-Tokens-JWT/?yudao">《还分不清 Cookie、Session、Token、JWT？》 (opens new window)</a>文章。</p>
+  </li>
+</ul>
+
+<h4 id="组成">组成</h4>
+
+<p>JWT 本质上就是一组字串，通过（<code class="highlighter-rouge">.</code>）切分成三个为 Base64Url 编码的部分：<code class="highlighter-rouge">header.payload.signature</code>。</p>
+
+<ol>
+  <li><strong>Header（头部）</strong> : 描述 JWT 的元数据，定义了<strong>生成签名的算法</strong>以及 <code class="highlighter-rouge">Token</code> 令牌的类型。</li>
+  <li><strong>Payload（载荷）</strong> : 用来存放实际需要传递的数据，包含声明（Claims），如<code class="highlighter-rouge">sub</code>（主题、存放用户名）、<code class="highlighter-rouge">jti</code>（JWT ID）、<code class="highlighter-rouge">token</code>的生成时间、过期时间。</li>
+  <li><strong>Signature（签名）</strong>：服务器通过 Payload、Header 和一个密钥（Secret）使用 Header 里面指定的签名算法（默认是 HMAC SHA256）生成。作用是防止 JWT（主要是 payload） <strong>被篡改</strong>，一旦<code class="highlighter-rouge">header</code>和<code class="highlighter-rouge">payload</code>被篡改，验证将失败。</li>
+</ol>
+
+<p><img src="../assets/jwt-composition.png" alt="JWT 组成" /></p>
+
+<p>示例：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">Header:</span> <span class="o">{</span><span class="s">"alg"</span><span class="o">:</span> <span class="s">"HS512"</span><span class="o">}</span>
+<span class="nl">Payload:</span> <span class="o">{</span><span class="s">"sub"</span><span class="o">:</span><span class="s">"admin"</span><span class="o">,</span><span class="s">"created"</span><span class="o">:</span><span class="mi">1489079981393</span><span class="o">,</span><span class="s">"exp"</span><span class="o">:</span><span class="mi">1489684781</span><span class="o">}</span>
+<span class="c1">//JWT计算公式，secret为加密算法的密钥</span>
+<span class="n">String</span> <span class="n">signature</span> <span class="o">=</span> <span class="n">HMACSHA512</span><span class="o">(</span><span class="n">base64UrlEncode</span><span class="o">(</span><span class="n">header</span><span class="o">)</span> <span class="o">+</span> <span class="s">"."</span> <span class="o">+</span> <span class="n">base64UrlEncode</span><span class="o">(</span><span class="n">payload</span><span class="o">),</span> <span class="n">secret</span><span class="o">);</span>
+
+<span class="c1">//生成一个JWT实例的字符串</span>
+<span class="n">eyJhbGciOiJIUzUxMiJ9</span><span class="o">.</span><span class="na">eyJzdWIiOiJhZG1pbiIsImNyZWF0ZWQiOjE1NTY3NzkxMjUzMDksImV4cCI6MTU1NzM4MzkyNX0</span><span class="o">.</span><span class="na">d</span><span class="o">-</span><span class="n">iki0193X0bBOETf2UN3r3PotNIEAV7mzIxxeI5IxFyzzkOZxS0PGfF_SK6wxCv2K8S0cZjMkv6b5bCqc0VBw</span>
+</code></pre></div></div>
+
+<h3 id="实现认证和授权的原理">实现认证和授权的原理</h3>
+
+<ol>
+  <li>用户向服务器发送用户名、密码以及验证码（用于登陆接口）；</li>
+  <li>如果<strong>校验</strong>正确，登录成功后，服务端生成已经签名的 Token，即 <strong>JWT</strong>，并返回给客户端；</li>
+  <li>客户端收到 Token 后自己保存起来（比如浏览器的 <code class="highlighter-rouge">localStorage</code>，放在 Cookie 中会有 CSRF 风险 ）；</li>
+  <li>之后当用户希望访问一个受保护的路由或者资源时，客户端（发出的所有请求都会）在 HTTP 请求头 <code class="highlighter-rouge">Header</code> 中携带这个 <strong>JWT 令牌</strong>：添加一个 <code class="highlighter-rouge">Authorization</code> 字段，使用 Bearer 模式值为 <code class="highlighter-rouge">JWT</code>，（<code class="highlighter-rouge">Authorization: Bearer &lt;Token&gt;</code>）；</li>
+  <li>服务端（的保护路由将会）检查请求头 Authorization 中的 JWT 信息，
+    <ul>
+      <li>通过对 <code class="highlighter-rouge">Authorization</code> 头中信息<strong>解码</strong>及<strong>数字签名校验</strong>（再次生成一个 Signature 并对比），</li>
+      <li>并从中获取其中的用户信息，从而实现认证和授权。</li>
+      <li>如果合法，则允许用户的行为。</li>
+    </ul>
+  </li>
+</ol>
+
+<p><img src="../assets/jwt-1.jpeg" alt="../_images/jwt-1.jpeg" style="zoom: 80%;" /></p>
+
+<h3 id="使用方式">使用方式</h3>
+
+<ul>
+  <li>客户端收到服务器返回的 JWT，可以储存在 Cookie 里面，也可以储存在 localStorage。</li>
+</ul>
+
+<h4 id="方式一">方式一</h4>
+
+<ul>
+  <li>
+    <p>当用户希望访问一个受保护的路由或者资源时</p>
+
+    <ul>
+      <li>可以把它放在 Cookie 里面自动发送，但是这样<strong>不能跨域</strong>，</li>
+      <li>所以更好的做法是，放在 <strong>HTTP 请求头</strong>信息的 Authorization 字段里，使用 Bearer 模式添加 JWT。</li>
+    </ul>
+
+    <div class="language-http highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">  GET /calendar/v1/events
+Host: api.example.com
+  Authorization: Bearer &lt;token&gt;
+</span></code></pre></div>    </div>
+
+    <ul>
+      <li>用户的状态不会存储在服务端的内存中，这是一种 <strong>无状态的认证机制</strong></li>
+      <li>服务端的保护路由将会检查请求头 Authorization 中的 JWT 信息，如果合法，则允许用户的行为。</li>
+      <li>由于 JWT 是自包含的，因此减少了需要查询数据库的需要</li>
+      <li>JWT 的这些特性使得我们可以完全依赖其无状态的特性提供数据 API 服务，甚至是创建一个下载流服务。</li>
+      <li>因为 JWT 并不使用 Cookie ，所以你可以使用任何域名提供你的 API 服务而<strong>不需要担心跨域资源共享问题</strong>（CORS）</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="方式二">方式二</h4>
+
+<ul>
+  <li>跨域时，可以把 JWT 放在 POST 请求的<strong>数据体</strong>里。</li>
+</ul>
+
+<h4 id="方式三">方式三</h4>
+
+<ul>
+  <li>通过 URL 传输</li>
+</ul>
+
+<div class="language-http highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">http://www.example.com/user?token=xxx
+</span></code></pre></div></div>
+
+<h3 id="如何防止被篡改">如何防止被篡改？</h3>
+
+<p>有了签名之后，即使 JWT 被泄露或者截获，黑客也没办法同时篡改 Signature、Header、Payload。</p>
+
+<ul>
+  <li>因为服务端拿到 JWT 之后，会解析出其中包含的 Header、Payload 以及 Signature 。并根据 Header、Payload、密钥<strong>再次生成一个 Signature</strong>。</li>
+  <li>拿新生成的 Signature 和 JWT 中的 Signature 作对比，如果一样就说明 Header 和 Payload 没有被修改。</li>
+</ul>
+
+<p>不过，如果服务端的秘钥也被泄露的话，黑客就可以同时篡改 Signature、Header、Payload 了。黑客直接修改了 Header 和 Payload 之后，再重新生成一个 Signature 就可以了。</p>
+
+<p>JWT 安全的核心在于<strong>签名</strong>，签名安全的<strong>核心在密钥</strong>。</p>
+
+<h3 id="如何加强安全性">如何加强安全性？</h3>
+
+<ol>
+  <li>使用安全系数高的<strong>加密算法</strong>。</li>
+  <li>使用成熟的开源库，没必要造轮子。</li>
+  <li>JWT 存放在 <strong>localStorage</strong> 中而不是 Cookie 中，避免 CSRF 风险。</li>
+  <li>一定不要将<strong>隐私信息</strong>存放在 Payload 当中。</li>
+  <li><strong>密钥</strong>一定保管好，不要泄露出去。JWT 安全的核心在于<strong>签名</strong>，签名安全的核心在<strong>密钥</strong>。</li>
+  <li>Payload 要加入 <code class="highlighter-rouge">exp</code> （JWT 的过期时间），永久有效的 JWT 不合理。并且，JWT 的过期时间不宜过长。</li>
+</ol>
+
+<h3 id="身份认证常见问题及解决办法">身份认证常见问题及解决办法</h3>
+
+<ol>
+  <li>注销登录等场景下 JWT 还有效</li>
+  <li>JWT 的续签问题</li>
+  <li>JWT 体积太大</li>
+</ol>
+
+<h2 id="cookiesessiontokenjwt-常见问题">Cookie、Session、Token、JWT 常见问题</h2>
+
+<blockquote>
+  <p>需要考虑的问题</p>
+</blockquote>
+
+<h4 id="使用-cookie-时">使用 cookie 时</h4>
+
+<ul>
+  <li>因为存储在客户端，容易被客户端篡改，使用前需要验证合法性</li>
+  <li>不要存储敏感数据，比如用户密码，账户余额</li>
+  <li>使用 httpOnly 在一定程度上提高安全性</li>
+  <li>尽量减少 cookie 的体积，能存储的数据量不能超过 4kb</li>
+  <li>设置正确的 domain 和 path，减少数据传输</li>
+  <li><strong>cookie 无法跨域</strong></li>
+  <li>一个浏览器针对一个网站最多存 20 个Cookie，浏览器一般只允许存放 300 个Cookie</li>
+  <li><strong>移动端对 cookie 的支持不是很好，而 session 需要基于 cookie 实现，所以移动端常用的是 token</strong></li>
+</ul>
+
+<h4 id="使用-session-时">使用 session 时</h4>
+
+<ul>
+  <li>将 session 存储在服务器里面，当用户同时在线量比较多时，这些 session 会占据较多的内存，需要在服务端定期的去清理过期的 session</li>
+  <li>当网站采用<strong>集群部署</strong>的时候，会遇到多台 web 服务器之间如何做 session 共享的问题。因为 session 是由单个服务器创建的，但是处理用户请求的服务器不一定是那个创建 session 的服务器，那么该服务器就无法拿到之前已经放入到 session 中的登录凭证之类的信息了。</li>
+  <li>当多个应用要共享 session 时，除了以上问题，还会遇到跨域问题，因为不同的应用可能部署的主机不一样，需要在各个应用做好 cookie 跨域的处理。</li>
+  <li><strong>sessionId 是存储在 cookie 中的，假如浏览器禁止 cookie 或不支持 cookie 怎么办？</strong> 一般会把 sessionId 跟在 url 参数后面即重写 url，所以 session 不一定非得需要靠 cookie 实现</li>
+  <li><strong>移动端对 cookie 的支持不是很好，而 session 需要基于 cookie 实现，所以移动端常用的是 token</strong></li>
+</ul>
+
+<h4 id="使用-token-时">使用 token 时</h4>
+
+<ul>
+  <li>如果你认为用数据库来存储 token 会导致查询时间太长，可以选择放在内存当中。比如 redis 很适合你对 token 查询的需求。</li>
+  <li><strong>token 完全由应用管理，所以它可以避开同源策略</strong></li>
+  <li><strong>token 可以避免 CSRF 攻击(因为不需要 cookie 了)</strong></li>
+  <li><strong>移动端对 cookie 的支持不是很好，而 session 需要基于 cookie 实现，所以移动端常用的是 token</strong></li>
+</ul>
+
+<h4 id="使用-jwt-时">使用 JWT 时</h4>
+
+<ul>
+  <li>因为 JWT 并不依赖 Cookie 的，所以你可以使用任何域名提供你的 API 服务而不需要担心跨域资源共享问题（CORS）</li>
+  <li>JWT 默认是不加密，但也是可以加密的。生成原始 Token 以后，可以用密钥再加密一次。</li>
+  <li>JWT 不加密的情况下，不能将秘密数据写入 JWT。</li>
+  <li>JWT 不仅可以用于认证，也可以用于交换信息。有效使用 JWT，可以降低服务器查询数据库的次数。</li>
+  <li>JWT 最大的优势是服务器不再需要存储 Session，使得服务器认证鉴权业务可以方便扩展。但这也是 JWT 最大的缺点：由于服务器不需要存储 Session 状态，因此使用过程中无法废弃某个 Token 或者更改 Token 的权限。也就是说一旦 JWT 签发了，到期之前就会始终有效，除非服务器部署额外的逻辑。</li>
+  <li>JWT 本身包含了认证信息，一旦泄露，任何人都可以获得该令牌的所有权限。为了减少盗用，JWT的有效期应该设置得比较短。对于一些比较重要的权限，使用时应该再次对用户进行认证。</li>
+  <li>JWT 适合一次性的命令认证，颁发一个有效期极短的 JWT，即使暴露了危险也很小，由于每次操作都会生成新的 JWT，因此也没必要保存 JWT，真正实现无状态。</li>
+  <li>为了减少盗用，JWT 不应该使用 HTTP 协议明码传输，要使用 HTTPS 协议传输。</li>
+</ul>
+
+<h4 id="使用加密算法时">使用加密算法时</h4>
+
+<ul>
+  <li>绝不要以<strong>明文存储</strong>密码</li>
+  <li>永远使用 哈希算法 来处理密码，绝不要使用 Base64 或其他编码方式来存储密码，这和以明文存储密码是一样的，使用哈希，而不要使用编码。编码以及加密，都是双向的过程，而密码是保密的，应该只被它的所有者知道， 这个过程必须是单向的。哈希正是用于做这个的，从来没有解哈希这种说法， 但是编码就存在解码，加密就存在解密。</li>
+  <li>绝不要使用弱哈希或已被破解的哈希算法，像 MD5 或 SHA1 ，只使用强密码哈希算法。</li>
+  <li>绝不要以明文形式显示或发送密码，即使是对密码的所有者也应该这样。如果你需要 “忘记密码” 的功能，可以随机生成一个新的 <strong>一次性的</strong>（这点很重要）密码，然后把这个密码发送给用户。</li>
+</ul>
+

@@ -1,5 +1,5 @@
 <blockquote>
-  <p>摘要：用于分库分表。</p>
+  <p>摘要：ShardingSphere 是目前最好用的数据库中间件之一，用于实现分库分表、读写分离，分布式事务、数据库治理。</p>
 </blockquote>
 
 <!-- more -->
@@ -12,38 +12,67 @@
 
 <h2 id="shardingsphere">ShardingSphere</h2>
 
+<blockquote>
+  <p>官方文档：</p>
+
+  <ul>
+    <li><a href="https://shardingsphere.apache.org/document/current/cn/features/sharding/">《ShardingSphere &gt; 概念 &amp; 功能 &gt; 数据分片》</a></li>
+    <li><a href="https://shardingsphere.apache.org/document/current/cn/manual/sharding-jdbc/usage/sharding/">《ShardingSphere &gt; 用户手册 &gt; Sharding-JDBC &gt; 使用手册 &gt; 数据分片》</a></li>
+    <li><a href="https://shardingsphere.apache.org/document/current/cn/manual/sharding-jdbc/configuration/">《ShardingSphere &gt; 用户手册 &gt; Sharding-JDBC &gt; 配置手册》</a></li>
+  </ul>
+</blockquote>
+
 <p>Apache ShardingSphere 是一款分布式的数据库生态系统。</p>
 
-<h2 id="分类">分类</h2>
+<p>ShardingSphere 是目前最好用的数据库中间件之一，用于实现分库分表、读写分离。</p>
+
+<p>当然，它不仅仅能够提供上述两个功能，也能提供分布式事务、数据库治理。</p>
+
+<h3 id="分类">分类</h3>
 
 <p>包含两大产品：</p>
 
-<h3 id="shardingsphere-proxy">ShardingSphere-Proxy</h3>
+<blockquote>
+  <p>Sharding-JDBC 采用无中心化架构，适用于 Java 开发的高性能的轻量级 OLTP 应用。</p>
+
+  <p>Sharding-Proxy 提供静态入口以及异构语言的支持，适用于 OLAP 应用以及对分片数据库进行管理和运维的场景。</p>
+</blockquote>
+
+<h4 id="shardingsphere-proxy">ShardingSphere-Proxy</h4>
 
 <p><code class="highlighter-rouge">ShardingSphere-Proxy</code> <strong>服务端</strong>分库分表：通过 JDBC 驱动层透明代理实现<strong>读写分离</strong>。被定位为透明化的<strong>数据库代理端</strong>，提供封装了数据库二进制协议的服务端版本，用于完成对异构语言的支持。</p>
 
 <ul>
   <li>代理层介于应用程序与数据库间，每次请求都需要做一次转发，请求会存在额外的时延。</li>
-  <li>这种方式对于应用非常友好，应用基本零改动，和语言无关，可以通过连接共享减少连接数消耗。</li>
-  <li>向应用程序完全透明，可直接当做 MySQL/PostgreSQL 使用；</li>
+  <li>这种方式对于应用非常友好，应用基本零改动，<strong>和语言无关</strong>，可以通过连接共享减少连接数消耗。</li>
+  <li>对应用程序<strong>完全透明</strong>，可直接当做 MySQL/PostgreSQL 使用；
+    <ul>
+      <li>适用于任何兼容 MySQL/PostgreSQL 协议的的客户端，如：MySQL Command Client, MySQL Workbench,Navicat 等。</li>
+      <li>可以搭建一个 Sharding-Proxy 服务，然后使用 Navicat 等 MySQL GUI 工具连接该服务，方便查询数据。</li>
+    </ul>
+  </li>
   <li>兼容 MariaDB 等基于 MySQL 协议的数据库，以及 openGauss 等基于 PostgreSQL 协议的数据库；</li>
-  <li>适用于任何兼容 MySQL/PostgreSQL 协议的的客户端，如：MySQL Command Client, MySQL Workbench,Navicat 等。</li>
 </ul>
 
-<h3 id="shardingsphere-jdbc">ShardingSphere-JDBC</h3>
+<h4 id="shardingsphere-jdbc">ShardingSphere-JDBC</h4>
 
 <p><code class="highlighter-rouge">ShardingSphere-JDBC</code> <strong>客户端</strong>分库分表：经常简称之为 sharding-jdbc 。定位为轻量级 Java 框架，在 Java 的 JDBC 层提供的额外服务。使用<strong>客户端直连</strong>数据库，以 jar 包形式提供服务，无需额外部署和依赖，可理解为增强版的 JDBC 驱动，完全兼容 JDBC 和各种 ORM 框架。</p>
 
 <ul>
   <li>适用于任何基于 JDBC 的 ORM 框架，如：JPA, Hibernate, Mybatis, Spring JDBC Template
   或直接使用JDBC；</li>
-  <li>支持任何第三方的数据库连接池，如：DBCP, C3P0, BoneCP, HikariCP 等；</li>
+  <li>支持任何第三方的数据库<strong>连接池</strong>，如：DBCP, C3P0, BoneCP, HikariCP 等；</li>
   <li>支持任意实现 JDBC 规范的数据库，目前支持 MySQL，PostgreSQL，Oracle，SQLServer 以及任何可使用JDBC访问的数据库。</li>
+  <li>相比 Sharding-Proxy 来说，是<strong>基于 client 模式</strong>，无需经过 proxy 一层的性能损耗，也不用考虑 proxy 的高可用，所以对于 Java 项目来说，更加被推荐。
+    <ul>
+      <li>目前，阿里、京东、美团等公司，都采用 client 模式的分库分表中间件。</li>
+    </ul>
+  </li>
 </ul>
 
 <p><img src="../assets/37480a85a746dcb7a469efb4d6acb24d.jpg" alt="img" style="zoom: 40%;" /><img src="../assets/3206512c7b6a0a08fe6e3af6891b03ae.jpg" alt="img" style="zoom:40%;" /></p>
 
-<h3 id="对比">对比</h3>
+<h4 id="对比">对比</h4>
 
 <p>当在 Proxy 和 JDBC 两种模式选择时，可以参考下表对照：</p>
 
@@ -91,7 +120,7 @@
 
 <p>越来越多的公司都在生产环境使用了 sharding-jdbc ，最核心的原因就是：<strong>简单</strong>（原理简单，易于实现，方便运维）。</p>
 
-<h3 id="混合部署架构">混合部署架构</h3>
+<h4 id="混合部署架构">混合部署架构</h4>
 
 <p>另外，在产品图中，Governance Center也是其中重要的部分。作用有点类似于微服务架构中的配置中心，可以使用第三方服务统一管理分库分表的配置信息，当前建议使用的第三方服务是Zookeeper，同时也支持<strong>Nacos</strong>，Etcd等其他第三方产品。</p>
 
@@ -99,7 +128,7 @@
 
 <p><img src="../assets/fa70b65c70979f4c7ff071438c89c263.png" alt="在这里插入图片描述" style="zoom: 50%;" /></p>
 
-<h2 id="功能">功能</h2>
+<h3 id="功能">功能</h3>
 
 <ol>
   <li><strong>SQL 路由</strong>：根据 SQL 类型（SELECT/WRITE）自动路由到主库或从库。</li>
@@ -206,168 +235,6 @@
     </ul>
   </li>
 </ul>
-
-<h2 id="实战案例">实战案例</h2>
-
-<blockquote>
-  <p>实战过程中，需要配置数据源信息，逻辑表对应的真实节点和分库分表策略（<strong>分片字段</strong>和<strong>分片算法</strong>）</p>
-</blockquote>
-
-<ul>
-  <li>另外搭建参考<a href="https://blog.csdn.net/qq_39944028/article/details/131266440">shardingsphere-jdbc的基本使用及各种分片策略</a></li>
-</ul>
-
-<h3 id="创建数据库">创建数据库</h3>
-
-<p>当企业用户创建一条采购订单 ， 会生成如下记录：</p>
-
-<ol>
-  <li>订单基础表 ： t_ent_order 表 , 1条记录 ；</li>
-  <li>订单详情表： t_ent_order_detail ，1条记录；</li>
-  <li>订单明细表： t_ent_order_item , 多条记录 。</li>
-</ol>
-
-<p>订单每年预估生成记录 1 亿条，数据量不大也不小，笔者参考原来神州专车的分库分表方式，订单数据采用了如下的分库分表策略：</p>
-
-<ul>
-  <li>订单基础表按照 ent_id (企业用户编号) 分库（四个分库），订单详情表保持一致。</li>
-  <li>订单明细表按照 ent_id (企业用户编号) 分库 (四个分库)，同时也要按照 ent_id (企业编号) 分表(八个分表)。</li>
-</ul>
-
-<p>首先创建 4 个库，分别是：ds_0、ds_1、ds_2、ds_3 。</p>
-
-<ul>
-  <li>这四个分库，每个分库都包含 <strong>订单基础表 ， 订单详情表 ，订单明细表</strong> 。但是因为明细表需要分表，所以包含多张表。</li>
-  <li>在 doc 中 ，分别在 4个库里执行 init.sql 语句 ，执行后效果见图 。</li>
-</ul>
-
-<p><img src="../assets/up-c9971a2fa253252d45c65a54b4fd07eb1f6.png" alt="img" style="zoom: 50%;" /></p>
-
-<h3 id="使用shardingsphere-jdbc">使用shardingsphere jdbc</h3>
-
-<p>springboot 项目中配置依赖 ：</p>
-
-<ul>
-  <li>重点强调， 原来分库分表之前， 很多 springboot 工程依赖 druid ，必须要删除</li>
-</ul>
-
-<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;dependency&gt;</span>
-    <span class="nt">&lt;groupId&gt;</span>org.apache.shardingsphere<span class="nt">&lt;/groupId&gt;</span>
-    <span class="nt">&lt;artifactId&gt;</span>sharding-jdbc-spring-boot-starter<span class="nt">&lt;/artifactId&gt;</span>
-    <span class="nt">&lt;version&gt;</span>4.1.1<span class="nt">&lt;/version&gt;</span>
-<span class="nt">&lt;/dependency&gt;</span>
-</code></pre></div></div>
-
-<p>配置文件中配置如下：</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">shardingsphere</span><span class="pi">:</span>
-  <span class="na">datasource</span><span class="pi">:</span>
-    <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
-    <span class="na">names</span><span class="pi">:</span> <span class="s">ds0,ds1,ds2,ds3</span>
-    <span class="na">ds0</span><span class="pi">:</span>
-      <span class="na">type</span><span class="pi">:</span> <span class="s">com.alibaba.druid.pool.DruidDataSource</span>
-      <span class="na">driverClassName</span><span class="pi">:</span> <span class="s">com.mysql.cj.jdbc.Driver</span>
-      <span class="na">url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/ds_0?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false&amp;serverTimezone=GMT%2B8&amp;useTimezone=true</span>
-      <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
-      <span class="na">password</span><span class="pi">:</span> <span class="s">ilxw</span>
-    <span class="na">ds1</span><span class="pi">:</span>
-      <span class="na">type</span><span class="pi">:</span> <span class="s">com.alibaba.druid.pool.DruidDataSource</span>
-      <span class="na">driverClassName</span><span class="pi">:</span> <span class="s">com.mysql.cj.jdbc.Driver</span>
-      <span class="na">url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/ds_1?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false&amp;serverTimezone=GMT%2B8&amp;useTimezone=true</span>
-      <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
-      <span class="na">password</span><span class="pi">:</span> <span class="s">ilxw</span>
-    <span class="na">ds2</span><span class="pi">:</span>
-      <span class="na">type</span><span class="pi">:</span> <span class="s">com.alibaba.druid.pool.DruidDataSource</span>
-      <span class="na">driverClassName</span><span class="pi">:</span> <span class="s">com.mysql.cj.jdbc.Driver</span>
-      <span class="na">url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/ds_2?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false&amp;serverTimezone=GMT%2B8&amp;useTimezone=true</span>
-      <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
-      <span class="na">password</span><span class="pi">:</span> <span class="s">ilxw</span>
-    <span class="na">ds3</span><span class="pi">:</span>
-      <span class="na">type</span><span class="pi">:</span> <span class="s">com.alibaba.druid.pool.DruidDataSource</span>
-      <span class="na">driverClassName</span><span class="pi">:</span> <span class="s">com.mysql.cj.jdbc.Driver</span>
-      <span class="na">url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/ds_3?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false&amp;serverTimezone=GMT%2B8&amp;useTimezone=true</span>
-      <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
-      <span class="na">password</span><span class="pi">:</span> <span class="s">ilxw</span>
-  <span class="na">props</span><span class="pi">:</span>
-    <span class="c1"># 日志显示 SQL</span>
-    <span class="s">sql.show</span><span class="pi">:</span> <span class="no">true</span>
-  <span class="na">sharding</span><span class="pi">:</span>
-    <span class="na">tables</span><span class="pi">:</span>
-      <span class="c1"># 订单表基础表</span>
-      <span class="na">t_ent_order</span><span class="pi">:</span>
-        <span class="c1"># 真实表</span>
-        <span class="na">actualDataNodes</span><span class="pi">:</span> <span class="s">ds$-&gt;{0..3}.t_ent_order</span>
-        <span class="c1"># 分库策略</span>
-        <span class="na">databaseStrategy</span><span class="pi">:</span>
-          <span class="na">complex</span><span class="pi">:</span>
-            <span class="na">sharding-columns</span><span class="pi">:</span> <span class="s">id,ent_id</span>
-            <span class="na">algorithm-class-name</span><span class="pi">:</span> <span class="s">cn.javayongshardingsphere.jdbc.service.sharding.HashSlotAlgorithm</span>
-        <span class="c1"># 分表策略</span>
-        <span class="na">tableStrategy</span><span class="pi">:</span>
-          <span class="na">none</span><span class="pi">:</span>
-      <span class="c1"># 订单条目表</span>
-      <span class="na">t_ent_order_item</span><span class="pi">:</span>
-        <span class="c1"># 真实表</span>
-        <span class="na">actualDataNodes</span><span class="pi">:</span> <span class="s">ds$-&gt;{0..3}.t_ent_order_item_$-&gt;{0..7}</span>
-        <span class="c1"># 分库策略</span>
-        <span class="na">databaseStrategy</span><span class="pi">:</span>
-          <span class="na">complex</span><span class="pi">:</span>
-            <span class="na">sharding-columns</span><span class="pi">:</span> <span class="s">id,ent_id</span>
-            <span class="na">algorithm-class-name</span><span class="pi">:</span> <span class="s">cn.javayongshardingsphere.jdbc.service.sharding.HashSlotAlgorithm</span>
-        <span class="c1"># 分表策略</span>
-        <span class="na">tableStrategy</span><span class="pi">:</span>
-          <span class="na">complex</span><span class="pi">:</span>
-            <span class="na">sharding-columns</span><span class="pi">:</span> <span class="s">id,ent_id</span>
-            <span class="na">algorithm-class-name</span><span class="pi">:</span> <span class="s">cn.javayongshardingsphere.jdbc.service.sharding.HashSlotAlgorithm</span>
-      <span class="c1"># 订单详情表</span>
-      <span class="na">t_ent_order_detail</span><span class="pi">:</span>
-        <span class="c1"># 真实表</span>
-        <span class="na">actualDataNodes</span><span class="pi">:</span> <span class="s">ds$-&gt;{0..3}.t_ent_order_detail</span>
-        <span class="c1"># 分库策略</span>
-        <span class="na">databaseStrategy</span><span class="pi">:</span>
-           <span class="na">complex</span><span class="pi">:</span>
-              <span class="na">sharding-columns</span><span class="pi">:</span> <span class="s">id,ent_id</span>
-              <span class="na">algorithm-class-name</span><span class="pi">:</span> <span class="s">cn.javayongshardingsphere.jdbc.service.sharding.HashSlotAlgorithm</span>
-        <span class="c1"># 分表策略</span>
-        <span class="na">tableStrategy</span><span class="pi">:</span>
-            <span class="na">complex</span><span class="pi">:</span>
-              <span class="na">sharding-columns</span><span class="pi">:</span> <span class="s">id,ent_id</span>
-              <span class="na">algorithm-class-name</span><span class="pi">:</span> <span class="s">cn.javayongshardingsphere.jdbc.service.sharding.HashSlotAlgorithm</span>
-    <span class="na">bindingTables</span><span class="pi">:</span>
-      <span class="pi">-</span> <span class="s">t_ent_order,t_ent_order_detail</span>
-</code></pre></div></div>
-
-<p>配置很简单，需要配置如下几点：</p>
-
-<ul>
-  <li>配置数据源，上面配置数据源是： ds0、ds1、ds2、ds3 ；</li>
-  <li>配置打印日志，也就是：sql.show ，在测试环境建议打开 ，便于调试；</li>
-  <li>配置哪些表需要分库分表 ，在 <code class="highlighter-rouge">shardingsphere.datasource.sharding.tables</code> 节点下面配置：</li>
-</ul>
-
-<p><img src="../assets/up-4212b6ecc449d47123b5168313aad087ac4.png" alt="img" /></p>
-
-<p>标红的是分库算法 ，下面的分表算法也是一样的。</p>
-
-<p>上图中看到配置分片规则包含如下两点：</p>
-
-<ol>
-  <li>真实节点</li>
-</ol>
-
-<p>对于应用来讲，查询的<strong>逻辑表</strong>是：t_ent_order_item 。</p>
-
-<p>它们在数据库中的真实形态是：<code class="highlighter-rouge">t_ent_order_item_0</code> 到 <code class="highlighter-rouge">t_ent_order_item_7</code>。</p>
-
-<p>真实数据节点是指数据分片的最小单元，由数据源名称和数据表组成。</p>
-
-<p>订单明细表的真实节点是：<code class="highlighter-rouge">ds$-&gt;{0..3}.t_ent_order_item_$-&gt;{0..7}</code> 。</p>
-
-<ol>
-  <li>分库分表算法</li>
-</ol>
-
-<p>配置分库策略和分表策略 , 每种策略都需要配置<strong>分片字段</strong>（ sharding-columns ）和<strong>分片算法</strong>。</p>
 
 <h2 id="分片算法">分片算法</h2>
 
@@ -657,6 +524,422 @@ commit;
   <li>分库分表组件根据ACM配置拿到新分库的分表规则，进行数据库读写操作。</li>
   <li>切量时会配合ACM配置灰度比例命中的用户进行停写。</li>
 </ol>
+
+<h2 id="实战案例">实战案例</h2>
+
+<blockquote>
+  <p>实战过程中，需要配置数据源信息，逻辑表对应的真实节点和分库分表策略（<strong>分片字段</strong>和<strong>分片算法</strong>）</p>
+</blockquote>
+
+<ul>
+  <li>另外搭建参考<a href="https://blog.csdn.net/qq_39944028/article/details/131266440">shardingsphere-jdbc的基本使用及各种分片策略</a></li>
+</ul>
+
+<h4 id="创建数据库">创建数据库</h4>
+
+<p>当企业用户创建一条采购订单 ， 会生成如下记录：</p>
+
+<ol>
+  <li>订单基础表 ： t_ent_order 表 , 1条记录 ；</li>
+  <li>订单详情表： t_ent_order_detail ，1条记录；</li>
+  <li>订单明细表： t_ent_order_item , 多条记录 。</li>
+</ol>
+
+<p>订单每年预估生成记录 1 亿条，数据量不大也不小，笔者参考原来神州专车的分库分表方式，订单数据采用了如下的分库分表策略：</p>
+
+<ul>
+  <li>订单基础表按照 ent_id (企业用户编号) 分库（四个分库），订单详情表保持一致。</li>
+  <li>订单明细表按照 ent_id (企业用户编号) 分库 (四个分库)，同时也要按照 ent_id (企业编号) 分表(八个分表)。</li>
+</ul>
+
+<p>首先创建 4 个库，分别是：ds_0、ds_1、ds_2、ds_3 。</p>
+
+<ul>
+  <li>这四个分库，每个分库都包含 <strong>订单基础表 ， 订单详情表 ，订单明细表</strong> 。但是因为明细表需要分表，所以包含多张表。</li>
+  <li>在 doc 中 ，分别在 4个库里执行 init.sql 语句 ，执行后效果见图 。</li>
+</ul>
+
+<p><img src="../assets/up-c9971a2fa253252d45c65a54b4fd07eb1f6.png" alt="img" style="zoom: 50%;" /></p>
+
+<h4 id="使用shardingsphere-jdbc">使用shardingsphere jdbc</h4>
+
+<p>springboot 项目中配置依赖 ：</p>
+
+<ul>
+  <li>重点强调， 原来分库分表之前， 很多 springboot 工程依赖 druid ，必须要删除</li>
+</ul>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.apache.shardingsphere<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>sharding-jdbc-spring-boot-starter<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>4.1.1<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div></div>
+
+<p>配置文件中配置如下：</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">shardingsphere</span><span class="pi">:</span>
+  <span class="na">datasource</span><span class="pi">:</span>
+    <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">names</span><span class="pi">:</span> <span class="s">ds0,ds1,ds2,ds3</span>
+    <span class="na">ds0</span><span class="pi">:</span>
+      <span class="na">type</span><span class="pi">:</span> <span class="s">com.alibaba.druid.pool.DruidDataSource</span>
+      <span class="na">driverClassName</span><span class="pi">:</span> <span class="s">com.mysql.cj.jdbc.Driver</span>
+      <span class="na">url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/ds_0?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false&amp;serverTimezone=GMT%2B8&amp;useTimezone=true</span>
+      <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
+      <span class="na">password</span><span class="pi">:</span> <span class="s">ilxw</span>
+    <span class="na">ds1</span><span class="pi">:</span>
+      <span class="na">type</span><span class="pi">:</span> <span class="s">com.alibaba.druid.pool.DruidDataSource</span>
+      <span class="na">driverClassName</span><span class="pi">:</span> <span class="s">com.mysql.cj.jdbc.Driver</span>
+      <span class="na">url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/ds_1?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false&amp;serverTimezone=GMT%2B8&amp;useTimezone=true</span>
+      <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
+      <span class="na">password</span><span class="pi">:</span> <span class="s">ilxw</span>
+    <span class="na">ds2</span><span class="pi">:</span>
+      <span class="na">type</span><span class="pi">:</span> <span class="s">com.alibaba.druid.pool.DruidDataSource</span>
+      <span class="na">driverClassName</span><span class="pi">:</span> <span class="s">com.mysql.cj.jdbc.Driver</span>
+      <span class="na">url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/ds_2?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false&amp;serverTimezone=GMT%2B8&amp;useTimezone=true</span>
+      <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
+      <span class="na">password</span><span class="pi">:</span> <span class="s">ilxw</span>
+    <span class="na">ds3</span><span class="pi">:</span>
+      <span class="na">type</span><span class="pi">:</span> <span class="s">com.alibaba.druid.pool.DruidDataSource</span>
+      <span class="na">driverClassName</span><span class="pi">:</span> <span class="s">com.mysql.cj.jdbc.Driver</span>
+      <span class="na">url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/ds_3?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false&amp;serverTimezone=GMT%2B8&amp;useTimezone=true</span>
+      <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
+      <span class="na">password</span><span class="pi">:</span> <span class="s">ilxw</span>
+      
+  <span class="na">props</span><span class="pi">:</span>
+    <span class="c1"># 日志显示 SQL</span>
+    <span class="s">sql.show</span><span class="pi">:</span> <span class="no">true</span>
+    
+  <span class="na">sharding</span><span class="pi">:</span>
+    <span class="na">tables</span><span class="pi">:</span>
+      <span class="c1"># 订单表基础表</span>
+      <span class="na">t_ent_order</span><span class="pi">:</span>
+        <span class="c1"># 真实表</span>
+        <span class="na">actualDataNodes</span><span class="pi">:</span> <span class="s">ds$-&gt;{0..3}.t_ent_order</span>
+        <span class="c1"># 分库策略</span>
+        <span class="na">databaseStrategy</span><span class="pi">:</span>
+          <span class="na">complex</span><span class="pi">:</span>
+            <span class="na">sharding-columns</span><span class="pi">:</span> <span class="s">id,ent_id</span>
+            <span class="na">algorithm-class-name</span><span class="pi">:</span> <span class="s">cn.javayongshardingsphere.jdbc.service.sharding.HashSlotAlgorithm</span>
+        <span class="c1"># 分表策略</span>
+        <span class="na">tableStrategy</span><span class="pi">:</span>
+          <span class="na">none</span><span class="pi">:</span>
+      <span class="c1"># 订单条目表</span>
+      <span class="na">t_ent_order_item</span><span class="pi">:</span>
+        <span class="c1"># 真实表</span>
+        <span class="na">actualDataNodes</span><span class="pi">:</span> <span class="s">ds$-&gt;{0..3}.t_ent_order_item_$-&gt;{0..7}</span>
+        <span class="c1"># 分库策略</span>
+        <span class="na">databaseStrategy</span><span class="pi">:</span>
+          <span class="na">complex</span><span class="pi">:</span>
+            <span class="na">sharding-columns</span><span class="pi">:</span> <span class="s">id,ent_id</span>
+            <span class="na">algorithm-class-name</span><span class="pi">:</span> <span class="s">cn.javayongshardingsphere.jdbc.service.sharding.HashSlotAlgorithm</span>
+        <span class="c1"># 分表策略</span>
+        <span class="na">tableStrategy</span><span class="pi">:</span>
+          <span class="na">complex</span><span class="pi">:</span>
+            <span class="na">sharding-columns</span><span class="pi">:</span> <span class="s">id,ent_id</span>
+            <span class="na">algorithm-class-name</span><span class="pi">:</span> <span class="s">cn.javayongshardingsphere.jdbc.service.sharding.HashSlotAlgorithm</span>
+      <span class="c1"># 订单详情表</span>
+      <span class="na">t_ent_order_detail</span><span class="pi">:</span>
+        <span class="c1"># 真实表</span>
+        <span class="na">actualDataNodes</span><span class="pi">:</span> <span class="s">ds$-&gt;{0..3}.t_ent_order_detail</span>
+        <span class="c1"># 分库策略</span>
+        <span class="na">databaseStrategy</span><span class="pi">:</span>
+           <span class="na">complex</span><span class="pi">:</span>
+              <span class="na">sharding-columns</span><span class="pi">:</span> <span class="s">id,ent_id</span>
+              <span class="na">algorithm-class-name</span><span class="pi">:</span> <span class="s">cn.javayongshardingsphere.jdbc.service.sharding.HashSlotAlgorithm</span>
+        <span class="c1"># 分表策略</span>
+        <span class="na">tableStrategy</span><span class="pi">:</span>
+            <span class="na">complex</span><span class="pi">:</span>
+              <span class="na">sharding-columns</span><span class="pi">:</span> <span class="s">id,ent_id</span>
+              <span class="na">algorithm-class-name</span><span class="pi">:</span> <span class="s">cn.javayongshardingsphere.jdbc.service.sharding.HashSlotAlgorithm</span>
+    <span class="na">bindingTables</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">t_ent_order,t_ent_order_detail</span>
+</code></pre></div></div>
+
+<p>配置很简单，需要配置如下几点：</p>
+
+<ul>
+  <li>配置数据源，上面配置数据源是： ds0、ds1、ds2、ds3 ；</li>
+  <li>配置打印日志，也就是：sql.show ，在测试环境建议打开 ，便于调试；</li>
+  <li>配置哪些表需要分库分表 ，在 <code class="highlighter-rouge">shardingsphere.datasource.sharding.tables</code> 节点下面配置：</li>
+</ul>
+
+<p><img src="../assets/up-4212b6ecc449d47123b5168313aad087ac4.png" alt="img" /></p>
+
+<p>标红的是分库算法 ，下面的分表算法也是一样的。</p>
+
+<p>上图中看到配置分片规则包含如下两点：</p>
+
+<ol>
+  <li>真实节点</li>
+</ol>
+
+<p>对于应用来讲，查询的<strong>逻辑表</strong>是：t_ent_order_item 。</p>
+
+<p>它们在数据库中的真实形态是：<code class="highlighter-rouge">t_ent_order_item_0</code> 到 <code class="highlighter-rouge">t_ent_order_item_7</code>。</p>
+
+<p>真实数据节点是指数据分片的最小单元，由数据源名称和数据表组成。</p>
+
+<p>订单明细表的真实节点是：<code class="highlighter-rouge">ds$-&gt;{0..3}.t_ent_order_item_$-&gt;{0..7}</code> 。</p>
+
+<ol>
+  <li>分库分表算法</li>
+</ol>
+
+<p>配置分库策略和分表策略 , 每种策略都需要配置<strong>分片字段</strong>（ sharding-columns ）和<strong>分片算法</strong>。</p>
+
+<h3 id="实现分库分表">实现分库分表</h3>
+
+<blockquote>
+  <p>使用 Sharding-JDBC 实现分库分表</p>
+</blockquote>
+
+<h4 id="设计思路">设计思路</h4>
+
+<p>将 <code class="highlighter-rouge">orders</code> 订单表，拆分到 <strong>2</strong> 个库，每个库 <strong>4</strong> 个订单表，一共 <strong>8</strong> 个表。</p>
+
+<ul>
+  <li>偶数后缀的表，在 <code class="highlighter-rouge">lab18_orders_0</code> 库下。
+    <ul>
+      <li>部分不需要分库分表的，例如说 <code class="highlighter-rouge">order_config</code> 订单配置表。</li>
+    </ul>
+  </li>
+  <li>奇数后缀的表，在 <code class="highlighter-rouge">lab18_orders_1</code> 库下。</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>lab18_orders_0 库
+  ├── orders_0
+  └── orders_2
+  └── orders_4
+  └── orders_6
+lab18_orders_1 库
+  ├── orders_1
+  └── orders_3
+  └── orders_5
+  └── orders_7
+</code></pre></div></div>
+
+<p>使用订单表上的 <code class="highlighter-rouge">user_id</code> 用户编号，进行分库分表的规则：</p>
+
+<ol>
+  <li>首先，按照 <code class="highlighter-rouge">index = user_id % 2</code> 计算，将记录路由到 <code class="highlighter-rouge">lab18_orders_${index}</code> <strong>库</strong>。</li>
+  <li>然后，按照 <code class="highlighter-rouge">index = user_id % 8</code> 计算，将记录路由到 <code class="highlighter-rouge">orders_${index}</code> <strong>表</strong>。</li>
+</ol>
+
+<p>举个例子：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">用户编号</th>
+      <th style="text-align: left">库</th>
+      <th style="text-align: left">表</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">1</td>
+      <td style="text-align: left"><code class="highlighter-rouge">lab18_orders_1</code></td>
+      <td style="text-align: left"><code class="highlighter-rouge">orders_1</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">2</td>
+      <td style="text-align: left"><code class="highlighter-rouge">lab18_orders_0</code></td>
+      <td style="text-align: left"><code class="highlighter-rouge">orders_2</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">3</td>
+      <td style="text-align: left"><code class="highlighter-rouge">lab18_orders_1</code></td>
+      <td style="text-align: left"><code class="highlighter-rouge">orders_3</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">4</td>
+      <td style="text-align: left"><code class="highlighter-rouge">lab18_orders_0</code></td>
+      <td style="text-align: left"><code class="highlighter-rouge">orders_4</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">5</td>
+      <td style="text-align: left"><code class="highlighter-rouge">lab18_orders_1</code></td>
+      <td style="text-align: left"><code class="highlighter-rouge">orders_5</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">6</td>
+      <td style="text-align: left"><code class="highlighter-rouge">lab18_orders_0</code></td>
+      <td style="text-align: left"><code class="highlighter-rouge">orders_6</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">7</td>
+      <td style="text-align: left"><code class="highlighter-rouge">lab18_orders_1</code></td>
+      <td style="text-align: left"><code class="highlighter-rouge">orders_7</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">8</td>
+      <td style="text-align: left"><code class="highlighter-rouge">lab18_orders_0</code></td>
+      <td style="text-align: left"><code class="highlighter-rouge">orders_8</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">9</td>
+      <td style="text-align: left"><code class="highlighter-rouge">lab18_orders_1</code></td>
+      <td style="text-align: left"><code class="highlighter-rouge">orders_1</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="应用配置文件">应用配置文件</h4>
+
+<blockquote>
+  <p><strong>逻辑表</strong> ：<strong>水平拆分</strong>的数据库（表）的相同逻辑和数据结构表的总称。例：订单数据<strong>根据主键尾数拆分</strong>为 10 张表，分别是 <code class="highlighter-rouge">t_order_0</code> 到 <code class="highlighter-rouge">t_order_9</code>（<strong>真实表</strong>），他们的<strong>逻辑表名</strong>为 <code class="highlighter-rouge">t_order</code> 。</p>
+
+  <p><strong>真实表</strong> ：在分片的数据库中真实存在的物理表。即上个示例中的 <code class="highlighter-rouge">t_order_0</code> 到 <code class="highlighter-rouge">t_order_9</code> 。</p>
+
+  <p><strong>数据节点</strong> ：数据分片的最小单元。由数据源名称和数据表组成，例：<code class="highlighter-rouge">ds_0.t_order_0</code> 。</p>
+</blockquote>
+
+<p>在 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-18/lab-18-sharding-datasource-01/src/main/resources"><code class="highlighter-rouge">resources</code></a> 目录下，创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-18/lab-18-sharding-datasource-01/src/main/resources/application.yaml"><code class="highlighter-rouge">application.yaml</code></a> 配置文件。</p>
+
+<ul>
+  <li>在 <code class="highlighter-rouge">mybatis</code> 配置项下，设置 <code class="highlighter-rouge">mybatis-spring-boot-starter</code> 自动化配置 MyBatis 需要的参数。</li>
+  <li>在 <code class="highlighter-rouge">spring.shardingsphere</code> 配置项下，设置 <code class="highlighter-rouge">sharding-jdbc-spring-boot-starter</code> 自动化配置 Sharding-JDBC 需要的参数。
+    <ol>
+      <li><code class="highlighter-rouge">datasource</code> 配置项：配置了 <code class="highlighter-rouge">ds-orders-0</code> 和 <code class="highlighter-rouge">ds-orders-1</code> 两个<strong>数据源</strong>，分别对应 <code class="highlighter-rouge">lab18_orders_0</code> 和 <code class="highlighter-rouge">lab18_orders_1</code> <strong>两个数据库</strong>。</li>
+      <li><code class="highlighter-rouge">sharding</code> 配置项：配置了 <code class="highlighter-rouge">orders</code> 和 <code class="highlighter-rouge">order_config</code> <a href="https://shardingsphere.apache.org/document/current/cn/features/sharding/concept/sql/">逻辑表</a> 。
+        <ul>
+          <li><code class="highlighter-rouge">orders</code> 配置项：设置 <strong><code class="highlighter-rouge">orders</code> 逻辑表</strong>，使用分库分表的规则。
+            <ul>
+              <li><code class="highlighter-rouge">actualDataNodes</code> ：对应的数据节点，使用的是<a href="https://shardingsphere.apache.org/document/current/cn/features/sharding/other-features/inline-expression/">行表达式</a> 。这里的意思是，<code class="highlighter-rouge">ds-orders-0.orders_0</code>, <code class="highlighter-rouge">ds-orders-0.orders_2</code>, <code class="highlighter-rouge">ds-orders-0.orders_4</code>, <code class="highlighter-rouge">ds-orders-0.orders_6</code>, <code class="highlighter-rouge">ds-orders-1.orders_1</code>, <code class="highlighter-rouge">ds-orders-1.orders_3</code>, <code class="highlighter-rouge">ds-orders-1.orders_5</code>, <code class="highlighter-rouge">ds-orders-1.orders_7</code> 。</li>
+              <li><code class="highlighter-rouge">key-generator</code> ：主键生成策略。这里采用分布式主键 SNOWFLAKE 方案。更多可以看 <a href="https://shardingsphere.apache.org/document/current/cn/features/sharding/other-features/key-generator/">《 ShardingSphere &gt; 概念 &amp; 功能 &gt; 数据分片 &gt; 其他功能 &gt; 分布式主键》</a> 文档。</li>
+              <li><code class="highlighter-rouge">database-strategy</code> ：按照 <code class="highlighter-rouge">index = user_id % 2</code> 分库，路由到 <code class="highlighter-rouge">ds-orders-${index}</code> 数据源（库）。</li>
+              <li><code class="highlighter-rouge">table-strategy</code> ：<code class="highlighter-rouge">index = user_id % 8</code> 分表，路由到 <code class="highlighter-rouge">orders_${index}</code> 数据表。</li>
+            </ul>
+          </li>
+          <li><code class="highlighter-rouge">order_config</code> 配置项：设置 <code class="highlighter-rouge">order_config</code> 逻辑表，<strong>不使用</strong>分库分表。
+            <ul>
+              <li><code class="highlighter-rouge">actualDataNodes</code> ：对应的数据节点，只对应数据源（库）为 <code class="highlighter-rouge">ds-orders-0</code> 的 <code class="highlighter-rouge">order_config</code> 表。</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><code class="highlighter-rouge">props</code> 配置项：设置拓展属性配置。
+        <ul>
+          <li><code class="highlighter-rouge">sql.show</code> ：设置打印 SQL 。因为我们编写的 SQL 会被 Sharding-JDBC 进行处理，实际执行的可能不是我们编写的，通过打印，方便观察和理解。</li>
+        </ul>
+      </li>
+    </ol>
+  </li>
+</ul>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spring</span><span class="pi">:</span>
+  <span class="c1"># ShardingSphere 配置项</span>
+  <span class="na">shardingsphere</span><span class="pi">:</span>
+    <span class="na">datasource</span><span class="pi">:</span>
+      <span class="c1"># 所有数据源的名字</span>
+      <span class="na">names</span><span class="pi">:</span> <span class="s">ds-orders-0, ds-orders-1</span>
+      
+      <span class="c1"># 订单 orders 数据源配置 00</span>
+      <span class="na">ds-orders-0</span><span class="pi">:</span>
+        <span class="na">type</span><span class="pi">:</span> <span class="s">com.zaxxer.hikari.HikariDataSource</span> <span class="c1"># 使用 Hikari 数据库连接池</span>
+        <span class="na">driver-class-name</span><span class="pi">:</span> <span class="s">com.mysql.jdbc.Driver</span>
+        <span class="na">jdbc-url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/lab18_orders_0?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8</span>
+        <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
+        <span class="na">password</span><span class="pi">:</span>
+        
+      <span class="c1"># 订单 orders 数据源配置 01</span>
+      <span class="na">ds-orders-1</span><span class="pi">:</span>
+        <span class="na">type</span><span class="pi">:</span> <span class="s">com.zaxxer.hikari.HikariDataSource</span> <span class="c1"># 使用 Hikari 数据库连接池</span>
+        <span class="na">driver-class-name</span><span class="pi">:</span> <span class="s">com.mysql.jdbc.Driver</span>
+        <span class="na">jdbc-url</span><span class="pi">:</span> <span class="s">jdbc:mysql://127.0.0.1:3306/lab18_orders_1?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8</span>
+        <span class="na">username</span><span class="pi">:</span> <span class="s">root</span>
+        <span class="na">password</span><span class="pi">:</span>
+        
+    <span class="c1"># 分片规则</span>
+    <span class="na">sharding</span><span class="pi">:</span>
+      <span class="na">tables</span><span class="pi">:</span>
+        <span class="c1"># orders 表配置</span>
+        <span class="na">orders</span><span class="pi">:</span>
+          <span class="na">actualDataNodes</span><span class="pi">:</span> <span class="s">ds-orders-0.orders_$-&gt;{[0,2,4,6]}, ds-orders-1.orders_$-&gt;{[1,3,5,7]}</span> <span class="c1"># 真实表。映射到 ds-orders-0 和 ds-orders-1 数据源的 orders 表们</span>
+          <span class="na">key-generator</span><span class="pi">:</span> <span class="c1"># 主键生成策略</span>
+            <span class="na">column</span><span class="pi">:</span> <span class="s">id</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">SNOWFLAKE</span>
+          <span class="na">database-strategy</span><span class="pi">:</span> <span class="c1"># 分库策略</span>
+            <span class="na">inline</span><span class="pi">:</span>
+              <span class="na">algorithm-expression</span><span class="pi">:</span> <span class="s">ds-orders-$-&gt;{user_id % 2}</span>
+              <span class="na">sharding-column</span><span class="pi">:</span> <span class="s">user_id</span>
+          <span class="na">table-strategy</span><span class="pi">:</span> <span class="c1"># 分表策略</span>
+            <span class="na">inline</span><span class="pi">:</span>
+              <span class="na">algorithm-expression</span><span class="pi">:</span> <span class="s">orders_$-&gt;{user_id % 8}</span>
+              <span class="na">sharding-column</span><span class="pi">:</span> <span class="s">user_id</span>
+        <span class="c1"># order_config 表配置</span>
+        <span class="na">order_config</span><span class="pi">:</span>
+          <span class="na">actualDataNodes</span><span class="pi">:</span> <span class="s">ds-orders-0.order_config</span> <span class="c1"># 仅映射到 ds-orders-0 数据源的 order_config 表</span>
+          
+    <span class="c1"># 拓展属性配置</span>
+    <span class="na">props</span><span class="pi">:</span>
+      <span class="na">sql</span><span class="pi">:</span>
+        <span class="na">show</span><span class="pi">:</span> <span class="no">true</span> <span class="c1"># 打印 SQL</span>
+
+<span class="c1"># mybatis 配置内容</span>
+<span class="na">mybatis</span><span class="pi">:</span>
+  <span class="na">config-location</span><span class="pi">:</span> <span class="s">classpath:mybatis-config.xml</span> <span class="c1"># 配置 MyBatis 配置文件路径</span>
+  <span class="na">mapper-locations</span><span class="pi">:</span> <span class="s">classpath:mapper/*.xml</span> <span class="c1"># 配置 Mapper XML 地址</span>
+  <span class="na">type-aliases-package</span><span class="pi">:</span> <span class="s">cn.iocoder.springboot.lab18.shardingdatasource.dataobject</span> <span class="c1"># 配置数据库实体包路径</span>
+</code></pre></div></div>
+
+<h4 id="实体类">实体类</h4>
+
+<p>创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-18/lab-18-sharding-datasource-01/src/main/java/cn/iocoder/springboot/lab18/shardingdatasource/dataobject/OrderDO.java"><code class="highlighter-rouge">OrderDO.java</code></a> 类，对应逻辑表。</p>
+
+<ol>
+  <li>在 <code class="highlighter-rouge">lab18_orders_0</code> 数据库下，创建 <code class="highlighter-rouge">orders_0</code>、<code class="highlighter-rouge">orders_2</code>、<code class="highlighter-rouge">orders_4</code>、<code class="highlighter-rouge">orders_6</code> 数据表。</li>
+  <li>在 <code class="highlighter-rouge">lab18_orders_1</code> 数据库下，创建 <code class="highlighter-rouge">orders_1</code>、<code class="highlighter-rouge">orders_3</code>、<code class="highlighter-rouge">orders_5</code>、<code class="highlighter-rouge">orders_7</code> 数据表。</li>
+</ol>
+
+<p>创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-18/lab-18-sharding-datasource-01/src/main/java/cn/iocoder/springboot/lab18/shardingdatasource/dataobject/OrderConfigDO.java"><code class="highlighter-rouge">OrderConfigDO.java</code></a> 类。</p>
+
+<h4 id="执行日志">执行日志</h4>
+
+<ul>
+  <li>Logic SQL ：逻辑 SQL 日志，就是我们编写的。</li>
+  <li>Actual SQL ：物理 SQL 日志，实际 Sharding-JDBC 向数据库真正发起的日志。
+    <ul>
+      <li>在这里，可以看到 <code class="highlighter-rouge">ds-orders-0</code> ，表明该物理 SQL ，是路由到 <code class="highlighter-rouge">ds-orders-0</code> <strong>数据源</strong>执行。</li>
+      <li>同时，查询的是 <code class="highlighter-rouge">order_config</code> 表。</li>
+      <li>符合配置的 <code class="highlighter-rouge">order_config</code> 逻辑表，不使用分库分表，对应的数据节点仅有 <code class="highlighter-rouge">ds-orders-0.order_config</code> 。</li>
+    </ul>
+  </li>
+</ul>
+
+<h5 id="数量不对应问题">数量不对应问题</h5>
+
+<p>明明只有一条 Logic SQL 操作，却发起了 8 条 Actual SQL 操作。这是为什么呢？</p>
+
+<ul>
+  <li>
+    <p>使用 <code class="highlighter-rouge">id = ?</code> 作为查询条件，因为 Sharding-JDBC 解析不到配置的 <code class="highlighter-rouge">user_id</code> <strong>片键</strong>（分库分表字段），作为查询字段，所以只好 <a href="https://shardingsphere.apache.org/document/current/cn/features/sharding/principle/route/#全库表路由">全库表路由</a> ，查询所有对应的数据节点，也就是配置的所有数据库的数据表。这样，在获得所有查询结果后，通过 <a href="https://shardingsphere.apache.org/document/current/cn/features/sharding/principle/merge/">归并引擎</a> 合并返回最终结果。</p>
+
+    <blockquote>
+      <p>通过将 Actual SQL 在每个数据库的数据表执行，返回的结果都是符合条件的。</p>
+
+      <p>这样，和使用 Logic SQL 在逻辑表中执行的结果，实际是一致的。</p>
+    </blockquote>
+  </li>
+  <li>
+    <p>那么，一次性发起这么多条 Actual SQL 是不是会顺序执行，导致很慢呢？</p>
+
+    <ul>
+      <li>实际上，Sharding-JDBC 有 <a href="https://shardingsphere.apache.org/document/current/cn/features/sharding/principle/execute/">执行引擎</a> ，会<strong>并行执行</strong>这多条 Actual SQL 操作。所以呢，最终操作时长，由最慢的 Actual SQL 所决定。</li>
+      <li>虽然说，<a href="https://shardingsphere.apache.org/document/current/cn/features/sharding/principle/execute/">执行引擎</a> 提供了并行执行 Actual SQL 操作的能力，还是推荐尽可能查询时，<strong>带有片键</strong>（分库分表字段）。</li>
+    </ul>
+  </li>
+</ul>
+
+<p>对 Sharding-JDBC 性能感兴趣的胖友，可以看看 <a href="https://shardingsphere.apache.org/document/current/cn/manual/sharding-jdbc/stress-test/">《Sharding-JDBC 性能测试报告》</a> 。</p>
+
+<h2 id="实现读写分离">实现读写分离</h2>
+
+<blockquote>
+  <p>见多数据源文档。</p>
+</blockquote>
 
 <h2 id="测试接口">测试接口</h2>
 

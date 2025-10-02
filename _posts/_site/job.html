@@ -1,0 +1,353 @@
+<blockquote>
+  <p>摘要：在分布式应用中，集成分布式定时器。比如 Quartz、Elastic-Job、XXL-JOB 等。</p>
+</blockquote>
+
+<!-- more -->
+
+<hr />
+
+<h2 id="目录">目录</h2>
+
+<p>[TOC]</p>
+<h2 id="任务调度中心">任务调度中心</h2>
+
+<p>参考：<a href="https://www.iocoder.cn/Spring-Boot/Job/">Spring Boot 定时任务入门</a></p>
+
+<h3 id="定时任务">定时任务</h3>
+
+<p>存在一类需求，是需要去<strong>定时执行</strong>的，此时就需要使用到<strong>定时任务</strong>。</p>
+
+<p>例如说，</p>
+
+<ul>
+  <li>每分钟扫描<strong>超时支付</strong>的订单，</li>
+  <li>每小时<strong>清理一次日志</strong>文件，</li>
+  <li>每天<strong>统计前一天的数据</strong>并生成报表，</li>
+  <li>每个月月初的工资单的推送，</li>
+  <li>每年一次的<strong>生日提醒</strong>等等。</li>
+</ul>
+
+<h3 id="jdk">JDK</h3>
+
+<p>在 JDK 中，内置了两个类，可以实现定时任务的功能：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">java.util.Timer</code> ：可以通过创建 <a href="https://github.com/frohoff/jdk8u-jdk/blob/master/src/share/classes/sun/misc/TimerTask.java"><code class="highlighter-rouge">java.util.TimerTask</code></a> 调度任务，在同一个线程中<strong>串行</strong>执行，相互影响。也就是说，对于同一个 Timer 里的多个 TimerTask 任务，如果一个 TimerTask 任务在执行中，其它 TimerTask 即使到达执行的时间，也只能排队等待。因为 Timer 是串行的，同时存在 <a href="https://blog.csdn.net/qincidong/article/details/82526458">坑坑</a> ，所以后来 JDK 又推出了 ScheduledExecutorService ，Timer 也基本不再使用。</li>
+  <li><a href="https://github.com/openjdk-mirror/jdk7u-jdk/blob/master/src/share/classes/java/util/concurrent/ScheduledExecutorService.java"><code class="highlighter-rouge">java.util.concurrent.ScheduledExecutorService</code></a> ：在 JDK 1.5 新增，基于线程池设计的定时任务类，每个调度任务都会被分配到线程池中<strong>并发</strong>执行，互不影响。这样 就解决了 Timer 串行的问题。</li>
+</ul>
+
+<p>在日常开发中，很少直接使用 Timer 或 ScheduledExecutorService 来实现定时任务的需求。主要有几点原因：</p>
+
+<ul>
+  <li>它们仅支持按照指定频率，不<strong>直接</strong>支持<strong>指定时间</strong>的定时调度，需要我们结合 Calendar 自行计算，才能实现复杂时间的调度。例如说，每天、每周五、2019-11-11 等等。</li>
+  <li>它们是<strong>进程级别</strong>，而我们为了实现定时任务的高可用，需要部署多个进程。此时需要等多考虑，多个进程下，同一个任务在相同时刻，不能重复执行。</li>
+  <li>项目可能存在定时任务较多，需要统一的管理，此时不得不进行<strong>二次封装</strong>。</li>
+</ul>
+
+<h3 id="调度任务中间件">调度任务中间件</h3>
+
+<p>所以，一般情况下，会选择专业的<strong>调度任务中间件</strong>。</p>
+
+<p>在 Spring 体系中，内置了两种定时任务的解决方案：</p>
+
+<ul>
+  <li>第一种，<a href="https://github.com/spring-projects/spring-framework">Spring Framework</a> 的 <a href="https://github.com/spring-projects/spring-framework/tree/master/spring-core/src/main/java/org/springframework/core/task">Spring Task</a> 模块，提供了<strong>轻量级</strong>的定时任务的实现。</li>
+  <li>第二种，<a href="https://github.com/spring-projects/spring-boot">Spring Boot</a> 2.0 版本，整合了 <a href="http://www.quartz-scheduler.org/">Quartz</a> 作业调度框架，提供了<strong>功能强大</strong>的定时任务的实现。Spring Framework 已经内置了 Quartz 的整合，2.X 版本提供了支持 Quartz 的自动化配置。</li>
+</ul>
+
+<p>在 Java 生态中，还有非常多优秀的开源的调度任务中间件：</p>
+
+<p>在分布式应用中，集成分布式定时器。比如 Quartz、Elastic-Job、XXL-JOB 等。</p>
+
+<ul>
+  <li><strong>Quartz</strong>：配合数据库表也是支持分布式定时任务的。</li>
+  <li>Elastic-job：当当网（基于quartz 二次开发的）弹性分布式任务调度系统。功能丰富强大，采用<strong>zookeeper</strong>实现<strong>分布式协调</strong>，实现任务高可用以及分片。由两个相互独立的子项目Elastic-Job-Lite和Elastic-Job-Cloud组成，使用Elastic-Job可以快速实现分布式任务调度。</li>
+  <li><strong>XXL-JOB</strong>：是一个分布式任务调度平台，核心设计目标是开发迅速、学习简单、轻量级、易扩展。
+    <ul>
+      <li>将调度行为抽象形成“调度中心”公共平台，而平台自身并不承担业务逻辑，“调度中心”负责发起调度请求。</li>
+      <li>将任务抽象成分散的JobHandler，交由“执行器”统一管理，“执行器”负责接收调度请求并执行对应的JobHandler中业务逻辑。</li>
+      <li>因此，“调度”和“任务”两部分可以相互解耦，提高系统整体稳定性和扩展性。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="对比选型">对比选型</h3>
+
+<p>可能胖友希望了解下不同调度中间件的对比。表格如下：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">特        性</th>
+      <th style="text-align: left">quartz</th>
+      <th style="text-align: left">elastic-job-lite</th>
+      <th style="text-align: left">xxl-job</th>
+      <th style="text-align: left">LTS</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">依赖</td>
+      <td style="text-align: left">MySQL、jdk</td>
+      <td style="text-align: left">jdk、zookeeper</td>
+      <td style="text-align: left">mysql、jdk</td>
+      <td style="text-align: left">jdk、zookeeper、maven</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">高     可用</td>
+      <td style="text-align: left"><strong>多节点</strong>部署，通过竞争数据库锁来保证只有一个节点执行任务</td>
+      <td style="text-align: left">通过<strong>zookeeper</strong>的注册与发现，可以动态的添加服务器</td>
+      <td style="text-align: left">基于竞争数据库锁保证只有一个节点执行任务，支持<strong>水平扩容</strong>。可以手动增加定时任务，启动和暂停任务，有监控</td>
+      <td style="text-align: left">集群部署,可以动态的添加服务器。可以手动增加定时任务，启动和暂停任务。有监控</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">任务  分片</td>
+      <td style="text-align: left">×</td>
+      <td style="text-align: left">√</td>
+      <td style="text-align: left">√</td>
+      <td style="text-align: left">√</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">管理界面</td>
+      <td style="text-align: left">×</td>
+      <td style="text-align: left">√</td>
+      <td style="text-align: left">√</td>
+      <td style="text-align: left">√</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">难易程度</td>
+      <td style="text-align: left">简单</td>
+      <td style="text-align: left">简单</td>
+      <td style="text-align: left">简单</td>
+      <td style="text-align: left">略复杂</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">高级功能</td>
+      <td style="text-align: left">-</td>
+      <td style="text-align: left"><strong>弹性扩容</strong>，多种作业模式，失效转移，运行状态收集，多线程处理数据，幂等性，容错处理，spring命名空间支持</td>
+      <td style="text-align: left"><strong>弹性扩容</strong>，分片广播，故障转移，Rolling实时日志，GLUE（支持在线编辑代码，免发布）,任务进度监控，任务依赖，数据加密，邮件报警，运行报表，国际化</td>
+      <td style="text-align: left">支持spring，spring boot，业务日志记录器，SPI扩展支持，故障转移，节点监控，多样化任务执行结果支持，FailStore容错，动态扩容。</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">版本更新</td>
+      <td style="text-align: left">半年没更新</td>
+      <td style="text-align: left">2年没更新</td>
+      <td style="text-align: left">最近有更新</td>
+      <td style="text-align: left">1年没更新</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="中心化去中心化"><strong>中心化、去中心化</strong></h3>
+
+<p>一个分布式的调度中间件，会存在两种角色：</p>
+
+<ol>
+  <li>调度器：负责调度任务，下发给执行器。</li>
+  <li>执行器：负责接收任务，执行具体任务。</li>
+</ol>
+
+<p>那么，如果从<strong>调度系统的角度</strong>来看，分布式调度中间件的实现方式可以分成两类：</p>
+
+<ul>
+  <li>中心化： 调度中心和执行器<strong>分离</strong>，调度中心统一调度，通知某个执行器处理任务。
+    <ol>
+      <li>XXL-Job</li>
+      <li>链家的 <a href="https://github.com/LianjiaTech/kob">kob</a></li>
+      <li>美团的 Crane（暂未开源）</li>
+    </ol>
+  </li>
+  <li>去中心化：调度中心和执行器<strong>一体化</strong>，自己调度自己执行处理任务。
+    <ol>
+      <li><a href="http://elasticjob.io/docs/elastic-job-lite/00-overview/">Elastic Job</a></li>
+      <li>唯品会的 <a href="https://github.com/vipshop/Saturn">Saturn</a></li>
+      <li><a href="http://www.quartz-scheduler.org/">Quartz</a> 基于数据库的集群方案</li>
+      <li>淘宝的 <a href="https://github.com/taobao/TBSchedule">TBSchedule</a>（暂停更新，只能使用阿里云 <a href="https://cn.aliyun.com/aliware/schedulerx">SchedulerX</a> 服务）</li>
+    </ol>
+  </li>
+</ul>
+
+<blockquote>
+  <p>如果胖友想要更加的理解，可以看看 <a href="https://www.jianshu.com/p/989298cf5314">《中心化 V.S 去中心化调度设计》</a></p>
+</blockquote>
+
+<h3 id="任务竞争-vs-任务预分配"><strong>任务竞争 V.S 任务预分配</strong></h3>
+
+<p>那么，如果从<strong>任务分配的角度</strong>来看，可以分成两类：</p>
+
+<ul>
+  <li>任务竞争：调度器会通过竞争任务，下发任务给执行器。
+    <ol>
+      <li>链家的 <a href="https://github.com/LianjiaTech/kob">kob</a></li>
+      <li>美团的 Crane（暂未开源）</li>
+      <li><a href="http://www.quartz-scheduler.org/">Quartz</a> 基于数据库的集群方案</li>
+    </ol>
+  </li>
+  <li>任务预分配：调度器预先分配任务给不同的执行器，无需进行竞争。
+    <ol>
+      <li><a href="http://elasticjob.io/docs/elastic-job-lite/00-overview/">Elastic Job</a></li>
+      <li>唯品会的 <a href="https://github.com/vipshop/Saturn">Saturn</a></li>
+      <li>淘宝的 <a href="https://github.com/taobao/TBSchedule">TBSchedule</a>（暂停更新，只能使用阿里云 <a href="https://cn.aliyun.com/aliware/schedulerx">SchedulerX</a> 服务）</li>
+    </ol>
+  </li>
+</ul>
+
+<p>一般来说，基于<strong>任务预分配</strong>的任务调度平台，都会选择使用 Zookeeper 来协调分配任务到不同的节点上。同时，任务调度平台必须是去中心化的方案，每个节点即是调度器又是执行器。这样，任务在预分配在每个节点之后，后续就自己调度给自己执行。</p>
+
+<p>相比较而言，随着节点越来越多，基于<strong>任务竞争</strong>的方案会因为任务竞争，导致存在性能下滑的问题。而基于任务预分配的方案，则不会存在这个问题。并且，基于任务预分配的方案，性能会优于基于任务竞争的方案。</p>
+
+<p>这里在推荐一篇 Elastic Job 开发者张亮的文章 <a href="https://www.infoq.cn/article/dangdang-distributed-work-framework-elastic-job">《详解当当网的分布式作业框架 elastic-job》</a> ，灰常给力！</p>
+
+<h3 id="quartz-是个优秀的调度内核"><strong>Quartz 是个优秀的调度内核</strong></h3>
+
+<p>绝大多数情况下，我们不会直接使用 Quartz 作为我们的调度中间件的选择。但是，基本所有的分布式调度中间件，都将 Quartz 作为调度内核，因为 Quartz 在单纯任务调度本身提供了很强的功能。</p>
+
+<p>不过呢，随着一个分布式调度中间件的逐步完善，又会逐步考虑抛弃 Quartz 作为调度内核，转而自研。例如说 XXL-JOB 在 2.1.0 RELEASE 的版本中，就已经更换成自研的调度模块。其替换的理由如下：</p>
+
+<blockquote>
+  <p>XXL-JOB 最终选择自研调度组件（早期调度组件基于 Quartz）；</p>
+
+  <ul>
+    <li>一方面，是为了精简系统降低冗余依赖。</li>
+    <li>另一方面，是为了提供系统的可控度与稳定性。</li>
+  </ul>
+</blockquote>
+
+<h2 id="spring-task">Spring Task</h2>
+
+<blockquote>
+  <p>实际场景下，很少使用</p>
+</blockquote>
+
+<ul>
+  <li>创建 <code class="highlighter-rouge">#execute()</code> 方法，实现打印日志。同时，在该方法上，添加 <a href="https://github.com/spring-projects/spring-framework/blob/master/spring-context/src/main/java/org/springframework/scheduling/annotation/Scheduled.java"><code class="highlighter-rouge">@Scheduled</code></a> 注解，设置每 2 秒执行该方法。</li>
+</ul>
+
+<h4 id="scheduled">@Scheduled</h4>
+
+<p>设置定时任务的执行计划。</p>
+
+<p><strong>常用</strong>属性如下：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">cron</code> 属性：Spring Cron 表达式。例如说，<code class="highlighter-rouge">"0 0 12 * * ?"</code> 表示每天中午执行一次，<code class="highlighter-rouge">"11 11 11 11 11 ?"</code> 表示 11 月 11 号 11 点 11 分 11 秒执行一次（哈哈哈）。更多示例和讲解，可以看看 <a href="https://blog.csdn.net/bingduanlbd/article/details/51740913">《Spring Cron 表达式》</a> 文章。注意，以调用<strong>完成时刻</strong>为开始计时时间。</li>
+  <li><code class="highlighter-rouge">fixedDelay</code> 属性：固定执行间隔，单位：毫秒。注意，以调用<strong>完成时刻</strong>为开始计时时间。</li>
+  <li><code class="highlighter-rouge">fixedRate</code> 属性：固定执行间隔，单位：毫秒。注意，以调用<strong>开始时刻</strong>为开始计时时间。</li>
+</ul>
+
+<p>这三个属性，有点雷同，可以看看 <a href="https://www.iteye.com/blog/guwq2014-2424520">《@Scheduled 定时任务的fixedRate、fixedDelay、cron 的区别》</a> ，一定要分清楚差异。</p>
+
+<p><strong>不常用</strong>属性如下：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">initialDelay</code> 属性：初始化的定时任务执行延迟，单位：毫秒。</li>
+  <li><code class="highlighter-rouge">zone</code> 属性：解析 Spring Cron 表达式的所属的时区。默认情况下，使用服务器的本地时区。</li>
+  <li><code class="highlighter-rouge">initialDelayString</code> 属性：<code class="highlighter-rouge">initialDelay</code> 的字符串形式。</li>
+  <li><code class="highlighter-rouge">fixedDelayString</code> 属性：<code class="highlighter-rouge">fixedDelay</code> 的字符串形式。</li>
+  <li><code class="highlighter-rouge">fixedRateString</code> 属性：<code class="highlighter-rouge">fixedRate</code> 的字符串形式。</li>
+</ul>
+
+<h4 id="应用配置文件">应用配置文件</h4>
+
+<h2 id="quartz">Quartz</h2>
+
+<p>Quartz 是一个开源的作业调度框架，它完全由 Java 写成，并设计用于 J2SE 和 J2EE 应用中。它提供了巨大的灵活性而不牺牲简单性。你能够用它来为执行一个作业而创建简单的或复杂的调度。</p>
+
+<ul>
+  <li>Quartz 自带了集群方案。它通过将作业信息存储到关系数据库中，并使用关系数据库的<strong>行锁</strong>来实现执行作业的竞争，从而保证多个进程下，同一个任务在相同时刻，不能重复执行。</li>
+  <li>很多特征，如：数据库支持，<strong>集群</strong>，插件，EJB 作业预构建，JavaMail 及其它，支持 cron-like 表达式等等。</li>
+</ul>
+
+<p>在 Quartz 体系结构中，有三个组件非常重要：</p>
+
+<ul>
+  <li>Scheduler ：调度器</li>
+  <li>Trigger ：触发器</li>
+  <li>Job ：任务</li>
+</ul>
+
+<h3 id="quartz-集群">Quartz 集群</h3>
+
+<p>实际场景下，我们必然需要考虑定时任务的<strong>高可用</strong>，所以基本上，肯定使用 Quartz 的集群方案。因此本小节，我们使用 Quartz 的 <strong>JDBC</strong> 存储器 <a href="https://github.com/quartz-scheduler/quartz/blob/master/quartz-core/src/main/java/org/quartz/impl/jdbcjobstore/JobStoreTX.java">JobStoreTX</a> ，并是使用 MySQL 作为数据库。</p>
+
+<h3 id="定时任务配置">定时任务配置</h3>
+
+<p>完成上述的工作之后，需要配置 Quartz 的定时任务。目前，有两种方式：</p>
+
+<ul>
+  <li>方式一，<a href="https://www.iocoder.cn/Spring-Boot/Job/?yudao#">「4.6.1 Bean 自动设置」</a> 。</li>
+  <li>方式二，<a href="https://www.iocoder.cn/Spring-Boot/Job/?yudao#">「4.6.2 Scheduler 手动设置」</a> 。</li>
+</ul>
+
+<h2 id="xxl-job">XXL-JOB</h2>
+
+<blockquote>
+  <p>因为Quartz 只提供了任务调度的功能，不提供管理任务的管理与监控控制台，需要自己去做二次封装。</p>
+</blockquote>
+
+<p>XXL-JOB 是一个轻量级分布式任务调度平台，其核心设计目标是开发迅速、学习简单、轻量级、易扩展。</p>
+
+<h3 id="依赖配置文件">依赖、配置文件</h3>
+
+<p>在 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-28-task-xxl-job/src/main/resources/application.yml"><code class="highlighter-rouge">application.yml</code></a> 中，添加 Quartz 的配置，如下：</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">server</span><span class="pi">:</span>
+  <span class="na">port</span><span class="pi">:</span> <span class="s">9090</span> <span class="c1">#指定一个端口，避免和 XXL-JOB 调度中心的端口冲突。仅仅测试之用</span>
+
+<span class="c1"># xxl-job</span>
+<span class="na">xxl</span><span class="pi">:</span>
+  <span class="na">job</span><span class="pi">:</span>
+    <span class="na">admin</span><span class="pi">:</span>
+      <span class="na">addresses</span><span class="pi">:</span> <span class="s">http://127.0.0.1:8080/xxl-job-admin</span> <span class="c1"># 调度中心部署跟地址 [选填]：如调度中心集群部署存在多个地址则用逗号分隔。执行器将会使用该地址进行"执行器心跳注册"和"任务结果回调"；为空则关闭自动注册；</span>
+    <span class="na">executor</span><span class="pi">:</span>
+      <span class="na">appname</span><span class="pi">:</span> <span class="s">lab-28-executor</span> <span class="c1"># 执行器 AppName [选填]：执行器心跳注册分组依据；为空则关闭自动注册</span>
+      <span class="na">ip</span><span class="pi">:</span> <span class="c1"># 执行器IP [选填]：默认为空表示自动获取IP，多网卡时可手动设置指定IP，该IP不会绑定Host仅作为通讯实用；地址信息用于 "执行器注册" 和 "调度中心请求并触发任务"；</span>
+      <span class="na">port</span><span class="pi">:</span> <span class="s">6666</span> <span class="c1"># ### 执行器端口号 [选填]：小于等于0则自动获取；默认端口为9999，单机部署多个执行器时，注意要配置不同执行器端口；</span>
+      <span class="na">logpath</span><span class="pi">:</span> <span class="s">/Users/yunai/logs/xxl-job/lab-28-executor</span> <span class="c1"># 执行器运行日志文件存储磁盘路径 [选填] ：需要对该路径拥有读写权限；为空则使用默认路径；</span>
+      <span class="na">logretentiondays</span><span class="pi">:</span> <span class="s">30</span> <span class="c1"># 执行器日志文件保存天数 [选填] ： 过期日志自动清理, 限制值大于等于3时生效; 否则, 如-1, 关闭自动清理功能；</span>
+    <span class="na">accessToken</span><span class="pi">:</span> <span class="s">yudaoyuanma</span> <span class="c1"># 执行器通讯TOKEN [选填]：非空时启用；</span>
+</code></pre></div></div>
+
+<h3 id="xxljobconfiguration">XxlJobConfiguration</h3>
+
+<ul>
+  <li>在 <code class="highlighter-rouge">#xxlJobExecutor()</code> 方法，创建了 Spring 容器下的 XXL-JOB 执行器 Bean 对象。</li>
+  <li>要注意，方法上添加了的 <code class="highlighter-rouge">@Bean</code> 注解，配置了启动和销毁方法。</li>
+</ul>
+
+<h3 id="demojob">DemoJob</h3>
+
+<ul>
+  <li>继承 XXL-JOB <a href="https://github.com/xuxueli/xxl-job/blob/master/xxl-job-core/src/main/java/com/xxl/job/core/handler/IJobHandler.java">IJobHandler</a> 抽象类，通过实现 <code class="highlighter-rouge">#execute(String param)</code> 方法，从而实现定时任务的逻辑。</li>
+  <li>在方法上，添加 <a href="https://github.com/xuxueli/xxl-job/blob/master/xxl-job-core/src/main/java/com/xxl/job/core/handler/annotation/JobHandler.java"><code class="highlighter-rouge">@JobHandler</code></a> 注解，设置 JobHandler 的名字。后续，在调度中心的控制台中，新增任务时，需要使用到这个名字。</li>
+</ul>
+
+<p><code class="highlighter-rouge">#execute(String param)</code> 方法的返回结果，为 <a href="https://github.com/xuxueli/xxl-job/blob/master/xxl-job-core/src/main/java/com/xxl/job/core/biz/model/ReturnT.java">ReturnT</a> 类型。</p>
+
+<ul>
+  <li>当返回值符合 <code class="highlighter-rouge">“ReturnT.code == ReturnT.SUCCESS_CODE”</code> 时表示任务执行成功，</li>
+  <li>否则表示任务执行失败，而且可以通过 <code class="highlighter-rouge">“ReturnT.msg”</code> 回调错误信息给调度中心；</li>
+  <li>从而，在任务逻辑中可以方便的控制任务执行结果。</li>
+</ul>
+
+<p><code class="highlighter-rouge">#execute(String param)</code> 方法的方法参数，为调度中心的控制台中，新增任务时，配置的“任务参数”。一般情况下，不会使用到。</p>
+
+<h3 id="新增执行器">新增执行器</h3>
+
+<p>浏览器打开 http://127.0.0.1:8080/xxl-job-admin/jobgroup 地址，即「执行器管理」菜单。</p>
+
+<p><img src="../assets/xxl-job04.jpg" alt="新增执行器" style="zoom:33%;" /></p>
+
+<h4 id="新建任务">新建任务</h4>
+
+<p>浏览器打开 http://127.0.0.1:8080/xxl-job-admin/jobinfo 地址，即「任务管理」菜单。</p>
+
+<p><img src="../assets/xxl-job07.jpg" alt="新增" style="zoom: 33%;" /></p>
+
+<h2 id="elastic-job">Elastic-Job</h2>
+
+<p>Elastic-Job 是一个分布式调度解决方案，由两个相互独立的子项目 Elastic-Job-Lite 和 Elastic-Job-Cloud 组成。</p>
+
+<p>Elastic-Job-Lite 定位为轻量级<strong>无中心化</strong>解决方案，使用 jar 包的形式提供分布式任务的协调服务。</p>
+
+<p>Elastic-Job 基本是国内开源<strong>最好</strong>的调度任务中间件的几个中间件，可能没有之一</p>

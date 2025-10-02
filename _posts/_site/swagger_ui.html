@@ -1,0 +1,209 @@
+<blockquote>
+  <p>摘要：可动态地根据<strong>注解</strong>生成在线API文档。是一套基于 OpenAPI 规范构建的开源工具，可帮助设计、构建、记录及使用 Restful 接口。</p>
+</blockquote>
+
+<!-- more -->
+
+<h2 id="目录">目录</h2>
+
+<p>[TOC]</p>
+
+<h2 id="整合-swagger-ui-接口文档">整合 Swagger-UI 接口文档</h2>
+
+<h5 id="接口文档简介">接口文档简介</h5>
+
+<p>Swagger-UI（音S歪戈）：可动态地根据<strong>注解</strong>生成在线API文档。是一套基于 OpenAPI 规范构建的开源工具，可帮助设计、构建、记录及使用 Restful 接口。</p>
+
+<p>作用： 前后端分离的情况下，只需少量注解即可生成一份自带 UI 界面的 <strong>Rest API 文档</strong>，包括接口需要的参数及返回值，还可直接对 API <strong>调试</strong>。</p>
+
+<h5 id="整合-swagger-ui-的步骤">整合 Swagger-UI 的步骤</h5>
+
+<ol>
+  <li>添加项目依赖；</li>
+  <li>添加 Swagger-UI 的 Java 配置文件；</li>
+  <li>给 XxxController 添加 Swagger 注解；</li>
+  <li>修改 MyBatis Generator 注释的生成规则，运行代码生成器重新生成 model 实体类，给字段加上注解 <code class="highlighter-rouge">@ApiModelProperty</code> 来取代原来的方法注释，（<del>mapper 接口及其xml实现文件</del>）。
+    <ol>
+      <li>在 Generator 生成类中，读取并解析 <code class="highlighter-rouge">generatorConfig.xml</code> 配置文件，</li>
+      <li>指定<strong>自定义注释生成器</strong> <code class="highlighter-rouge">CommentGenerator</code> 类中的方法，</li>
+      <li>使用 <code class="highlighter-rouge">field.addJavaDocLine()</code>，给实体类的字段添加注释、Swagger 注解 <code class="highlighter-rouge">@ApiModelProperty</code> 来取代原来的方法注释。</li>
+    </ol>
+  </li>
+  <li>访问Swagger-UI接口文档地址：http://localhost:8080/swagger-ui/index.html</li>
+</ol>
+
+<h5 id="配置文件">配置文件</h5>
+
+<p><code class="highlighter-rouge">config/SwaggerConfig.java</code></p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Configuration</span>
+<span class="nd">@EnableSwagger2</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SwaggerConfig</span> <span class="kd">extends</span> <span class="n">BaseSwaggerConfig</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">SwaggerProperties</span> <span class="nf">swaggerProperties</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">SwaggerProperties</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">apiBasePackage</span><span class="o">(</span><span class="s">"com.macro.mall.controller"</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">title</span><span class="o">(</span><span class="s">"mall后台系统"</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">description</span><span class="o">(</span><span class="s">"mall后台相关接口文档"</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">contactName</span><span class="o">(</span><span class="s">"macro"</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">version</span><span class="o">(</span><span class="s">"1.0"</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">enableSecurity</span><span class="o">(</span><span class="kc">true</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h5 id="常用注解">常用注解</h5>
+
+<ol>
+  <li><code class="highlighter-rouge">@EnableSwagger2</code>：打开 Swagger-UI，用于生成相关文档信息；</li>
+  <li><code class="highlighter-rouge">@Api</code>：修饰 Controller 类；</li>
+  <li><code class="highlighter-rouge">@ApiOperation</code>：修饰 Controller 类中的接口方法；</li>
+  <li><code class="highlighter-rouge">@ApiParam</code>：修饰接口参数；</li>
+  <li><code class="highlighter-rouge">@ApiModelProperty</code>：修饰<strong>实体类的属性</strong>，用于实体类是请求参数或返回结果时；</li>
+  <li><code class="highlighter-rouge">@Schema</code> 注解：通常与Swagger或OpenAPI规范一起使用，用于为API模型（如<a href="https://so.csdn.net/so/search?q=请求体&amp;spm=1001.2101.3001.7020">请求体</a>、响应体等）中的属性或整个模型<strong>提供元数据描述</strong>。这些描述信息对于生成API文档、客户端代码以及理解API的结构和用法非常有帮助。</li>
+</ol>
+
+<h5 id="commentgenerator-自定义注释生成器"><code class="highlighter-rouge">CommentGenerator</code> 自定义注释生成器</h5>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+ * 自定义注释生成器
+ */</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CommentGenerator</span> <span class="kd">extends</span> <span class="n">DefaultCommentGenerator</span> <span class="o">{</span>
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">addFieldComment</span><span class="o">(...)</span> <span class="o">{</span>
+        <span class="o">...</span>
+        <span class="c1">// 给model的字段添加@ApiModelProperty注解来取代原来的方法注释</span>
+        <span class="n">field</span><span class="o">.</span><span class="na">addJavaDocLine</span><span class="o">(</span><span class="s">"@ApiModelProperty(value=\""</span> <span class="o">+</span> <span class="n">remarks</span> <span class="o">+</span> <span class="s">"\")"</span> <span class="o">);</span>
+    <span class="o">}</span>
+    <span class="c1">// 使其能在import中导入@ApiModelProperty，</span>
+    <span class="c1">// 否则需手动导入该类，在需生成大量实体类时非常麻烦</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">addJavaFileComment</span><span class="o">(...)</span> <span class="o">{</span>
+    <span class="o">...</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>参考：</p>
+
+<ul>
+  <li><a href="https://snailclimb.gitee.io/springboot-guide/#/./docs/basis/swagger">springboot-guide Swagger </a></li>
+  <li><a href="https://github.com/Snailclimb/spring-security-jwt-guide">从零入门 ！Spring Security With JWT（含权限验证）后端部分代码</a></li>
+</ul>
+
+<h2 id="swagger-注解">Swagger 注解</h2>
+
+<h4 id="基本信息注解">基本信息注解</h4>
+
+<p>可用于：类、接口。</p>
+
+<ul>
+  <li><code class="highlighter-rouge">@OpenAPIDefinition</code>：用于定义整个 API 文档的基本信息。
+    <ul>
+      <li><code class="highlighter-rouge">info</code>：指定 <code class="highlighter-rouge">@Info</code> 注解的对象，用于描述 API 文档的基本信息。</li>
+    </ul>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">@Info</code>：用于定义 API 文档的基本信息。</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">@Contact</code>：用于定义 API 文档中的联系人信息。</p>
+  </li>
+  <li><code class="highlighter-rouge">@License</code>：用于定义 API 文档中的许可证信息。</li>
+</ul>
+
+<h4 id="分组注解">分组注解</h4>
+
+<ul>
+  <li><code class="highlighter-rouge">@Tag</code>：用于给 API 分组，用途类似于为 API 文档<strong>添加标签</strong>。
+    <ul>
+      <li>可用于：方法、类、接口。</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@FeignClient</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="n">ApiConstants</span><span class="o">.</span><span class="na">NAME</span><span class="o">)</span>
+<span class="nd">@Tag</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"RPC 服务 - 文件"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">FileApi</span> <span class="o">{</span>
+
+    <span class="n">String</span> <span class="n">PREFIX</span> <span class="o">=</span> <span class="n">ApiConstants</span><span class="o">.</span><span class="na">PREFIX</span> <span class="o">+</span> <span class="s">"/file"</span><span class="o">;</span>
+    <span class="o">....</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h4 id="请求方法注解">请求方法注解</h4>
+
+<p>可用于：方法。</p>
+
+<p>以下注解用于描述 API 的请求方法：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">@Operation</code>：用于描述 API 的操作。</li>
+  <li><code class="highlighter-rouge">@RequestBody</code>：用于描述操作的请求体。</li>
+  <li><code class="highlighter-rouge">@ApiResponse</code>：用于描述操作的响应结果。</li>
+  <li><code class="highlighter-rouge">@Content</code>：用于描述请求体或响应的内容。</li>
+  <li><code class="highlighter-rouge">@Parameter</code>：用于描述操作的<strong>输入参数</strong>。
+    <ul>
+      <li><code class="highlighter-rouge">@Parameters</code></li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">@Schema</code>：用于描述数据模型的属性。
+    <ul>
+      <li>可用于：方法、类、接口。</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Parameters</span><span class="o">({</span>
+    <span class="nd">@Parameter</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"dataSourceConfigId"</span><span class="o">,</span> <span class="n">description</span> <span class="o">=</span> <span class="s">"数据源配置的编号"</span><span class="o">,</span> <span class="n">required</span> <span class="o">=</span> <span class="kc">true</span><span class="o">,</span> <span class="n">example</span> <span class="o">=</span> <span class="s">"1"</span><span class="o">),</span>
+    <span class="nd">@Parameter</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"name"</span><span class="o">,</span> <span class="n">description</span> <span class="o">=</span> <span class="s">"表名，模糊匹配"</span><span class="o">,</span> <span class="n">example</span> <span class="o">=</span> <span class="s">"yudao"</span><span class="o">),</span>
+    <span class="nd">@Parameter</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"comment"</span><span class="o">,</span> <span class="n">description</span> <span class="o">=</span> <span class="s">"描述，模糊匹配"</span><span class="o">,</span> <span class="n">example</span> <span class="o">=</span> <span class="s">"芋道"</span><span class="o">)</span>
+<span class="o">})</span>
+</code></pre></div></div>
+
+<h4 id="路径注解">路径注解</h4>
+
+<p>可用于：方法的参数。</p>
+
+<p>以下注解用于描述 API 的路径：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">@Path</code>：用于定义路径参数。
+    <ul>
+      <li>可用于：方法。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">@PathVariable</code>：用于描述路径参数。</li>
+  <li><code class="highlighter-rouge">@RequestParam</code>：用于描述查询参数。</li>
+  <li><code class="highlighter-rouge">@RequestBody</code>：用于描述请求体。</li>
+</ul>
+
+<h4 id="响应注解">响应注解</h4>
+
+<p>可用于：方法。</p>
+
+<p>以下注解用于描述 API 的响应结果：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">@ApiResponse</code>：用于描述响应结果。</li>
+  <li><code class="highlighter-rouge">@Content</code>：用于描述响应结果的内容。</li>
+  <li><code class="highlighter-rouge">@Schema</code>：用于描述数据模型的<strong>属性</strong>。
+    <ul>
+      <li>可用于：方法、类、接口。</li>
+    </ul>
+  </li>
+</ul>
+
+<pre><code class="language-JAVA">@Schema(description = "RPC 服务 - API 错误日志创建 Request DTO")
+@Data
+public class ApiErrorLogCreateReqDTO {
+
+    @Schema(description = "链路追踪编号", example = "89aca178-a370-411c-ae02-3f0d672be4ab")
+    private String traceId;
+
+    @Schema(description = "用户编号", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    private Long userId;
+    
+    ....
+}
+</code></pre>
+

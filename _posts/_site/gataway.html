@@ -36,7 +36,7 @@
   <li>存在跨域请求：在一定场景下处理相对复杂。</li>
 </ol>
 
-<h3 id="基本功能">基本功能</h3>
+<h2 id="基本功能">基本功能</h2>
 
 <p>网关是所有微服务的门户，功能包括：<del>统一入口，统一校验，统一分发</del></p>
 
@@ -49,7 +49,7 @@
   <li>日志记录、监控：网关可以记录请求的日志信息，包括请求时间、请求路径、请求参数、响应状态等，以便于后续分析和监控。</li>
 </ol>
 
-<h3 id="认证和鉴权">认证和鉴权</h3>
+<h2 id="认证和鉴权">认证和鉴权</h2>
 
 <p>大致的认证鉴权流程，架构如下图：</p>
 
@@ -82,7 +82,7 @@
 
 <p><img src="../assets/981a462ee187460f989f6e4376f965e1~tplv-k3u1fbpfcp-zoom-1.image" alt="img" /></p>
 
-<h3 id="常见的网关系统">常见的网关系统</h3>
+<h2 id="常见的网关系统">常见的网关系统</h2>
 
 <ol>
   <li><strong>Spring Cloud Gateway</strong>：<strong>推荐</strong>。</li>
@@ -103,7 +103,7 @@
 
 <p>综上所述，Spring Cloud Gateway在性能、功能和社区支持方面优于Zuul，但在易用性方面略逊一筹。在实际项目中，可以根据项目需求和团队技术栈选择合适的微服务网关方案。</p>
 
-<h3 id="spring-cloud-zuul">Spring Cloud Zuul</h3>
+<h2 id="spring-cloud-zuul">Spring Cloud Zuul</h2>
 
 <p>Zuul提供基于配置的API表层。</p>
 
@@ -117,12 +117,17 @@
   <li>Spring Cloud Security通过Spring Cloud Zuul解决了许多安全问题。</li>
 </ul>
 
-<h3 id="spring-cloud-gateway">Spring Cloud Gateway</h3>
+<h2 id="spring-cloud-gateway">Spring Cloud Gateway</h2>
 
-<p>Spring Cloud Gateway是Spring Cloud的新一代API网关，基于WebFlux框架实现，旨在为微服务架构提供一种简单而有效的统一的API路由管理方式。</p>
+<p>Spring Cloud Gateway是Spring Cloud的新一代API网关，旨在为微服务架构提供一种简单而有效的统一的API路由管理方式。</p>
 
 <ul>
   <li>作为Spring Cloud生态系统中的网关，目标是替代Netflix ZUUL，具有更好的性能、更强的扩展性、以及更丰富的功能特性，其不仅提供统一的路由方式，并且基于<strong>Filter链</strong>的方式提供了网关基本的功能，例如:安全，监控/埋点，限流等。</li>
+  <li>该项目是基于 Spring 5.0，Spring Boot 2.0 和 Project Reactor 等技术开发的网关。
+    <ul>
+      <li>基于WebFlux框架实现的，而WebFlux框架底层则使用了高性能的<strong>Reactor模式</strong>通信框架Netty。</li>
+    </ul>
+  </li>
 </ul>
 
 <h4 id="功能">功能</h4>
@@ -139,7 +144,65 @@
   <li>监控和日志： 提供监控和日志功能，帮助理解网关的运行状况，分析请求流量</li>
 </ol>
 
-<h4 id="工作流程">工作流程</h4>
+<h3 id="基于-reactor-实现">基于 Reactor 实现</h3>
+
+<p>Reactor 是一个运行在 Java8 之上满足 Reactice 规范的响应式框架，提供了一组<strong>响应式风格</strong>的 API。</p>
+
+<p>Reactor 有两个核心类： <code class="highlighter-rouge">Flux&lt;T&gt;</code> 和 <code class="highlighter-rouge">Mono&lt;T&gt;</code>，这两个类都实现 Publisher 接口。</p>
+
+<ul>
+  <li>Flux 类似 RxJava 的 Observable，它可以触发零到多个事件，并根据实际情况结束处理或触发错误。</li>
+  <li>Mono 最多只触发一个事件，所以可以把 Mono 用于在<strong>异步任务完成时</strong>发出通知。</li>
+</ul>
+
+<p><img src="../assets/2e5d2af3e0c94a1478b3dcff3f45c2be.png" alt="preview" style="zoom:50%;" /></p>
+
+<p>Flux 和 Mono 都是数据流的发布者，使用 Flux 和 Mono 都可以发出三种数据信号：元素值，错误信号，完成信号；</p>
+
+<ul>
+  <li>错误信号和完成信号都代表终止信号，终止信号用于告诉订阅者数据流结束了，错误信号终止数据流同时把错误信息传递给订阅者。</li>
+</ul>
+
+<h4 id="mono">Mono</h4>
+
+<p>Mono 是一个发出(emit)<code class="highlighter-rouge">0-1</code>个元素的Publisher,可以被<code class="highlighter-rouge">onComplete</code>信号或者<code class="highlighter-rouge">onError</code>信号所终止。</p>
+
+<p>mono 整体和Flux差不多，只不过这里只会发出0-1个元素。也就是说不是有就是没有。</p>
+
+<h5 id="演化过程">演化过程</h5>
+
+<p>象Flux一样，我们来看看Mono的演化过程以帮助理解。</p>
+
+<h6 id="传统数据处理">传统数据处理</h6>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="n">ClientUser</span> <span class="nf">currentUser</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">isAuthenticated</span> <span class="p">?</span> <span class="k">new</span> <span class="nf">ClientUser</span><span class="p">(</span><span class="s">"felord.cn"</span><span class="p">,</span> <span class="s">"reactive"</span><span class="p">)</span> <span class="p">:</span> <span class="k">null</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>直接返回符合条件的<strong>对象</strong>或者<code class="highlighter-rouge">null</code>。</p>
+
+<h6 id="optional的处理方式">Optional的处理方式</h6>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="n">Optional</span><span class="p">&lt;</span><span class="n">ClientUser</span><span class="p">&gt;</span> <span class="nf">currentUser</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">isAuthenticated</span> <span class="p">?</span> <span class="n">Optional</span><span class="p">.</span><span class="nf">of</span><span class="p">(</span><span class="k">new</span> <span class="nf">ClientUser</span><span class="p">(</span><span class="s">"felord.cn"</span><span class="p">,</span> <span class="s">"reactive"</span><span class="p">))</span>
+            <span class="p">:</span> <span class="n">Optional</span><span class="p">.</span><span class="nf">empty</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>这个Optional我觉得就有反应式的那种味儿了，当然它并不是反应式。当我们不从返回值Optional取其中具体的对象时，我们不清楚里面到底有没有，但是Optional是一定客观存在的,不会出现<strong>NPE</strong>问题。</p>
+
+<h6 id="反应式数据处理">反应式数据处理</h6>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="n">Mono</span><span class="p">&lt;</span><span class="n">ClientUser</span><span class="p">&gt;</span> <span class="nf">currentUser</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">isAuthenticated</span> <span class="p">?</span> <span class="n">Mono</span><span class="p">.</span><span class="nf">just</span><span class="p">(</span><span class="k">new</span> <span class="nf">ClientUser</span><span class="p">(</span><span class="s">"felord.cn"</span><span class="p">,</span> <span class="s">"reactive"</span><span class="p">))</span>
+            <span class="p">:</span> <span class="n">Mono</span><span class="p">.</span><span class="nf">empty</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>和Optional有点类似的机制，当然Mono不是为了解决<strong>NPE</strong>问题的，它是为了<strong>处理响应流中单个值</strong>（也可能是<code class="highlighter-rouge">Void</code>）而存在的。</p>
+
+<h3 id="工作流程">工作流程</h3>
 
 <ol>
   <li>客户端向<code class="highlighter-rouge">Spring Cloud Gateway</code>发出请求，</li>
@@ -152,7 +215,7 @@
 
 <p><img src="../assets/5ef31595e5315f6381b4698c3d5a80b7.png" alt="img" style="zoom: 33%;" /></p>
 
-<h4 id="网关服务搭建">网关服务搭建</h4>
+<h3 id="网关服务搭建">网关服务搭建</h3>
 
 <p>参考：</p>
 
@@ -178,7 +241,7 @@
 
 <p><img src="../assets/2c3d396bce3f4c37900747fd973b9ed5~tplv-k3u1fbpfcp-zoom-1.image" alt="img" style="zoom: 67%;" /></p>
 
-<h4 id="applicationyml-配置">application.yml 配置</h4>
+<h3 id="applicationyml-配置">application.yml 配置</h3>
 
 <p>添加 nacos 与 网关的相关配置如下：</p>
 
@@ -221,7 +284,7 @@
             <span class="pi">-</span> <span class="s">Weight=group1, 2</span>
 </code></pre></div></div>
 
-<h4 id="三大核心概念">三大核心概念</h4>
+<h3 id="三大核心概念">三大核心概念</h3>
 
 <ol>
   <li><strong><code class="highlighter-rouge">routes</code>（路由）</strong>：路由是网关最基础的部分，路由信息由一个ID、一个目标URI、一组断言和过滤器组成。路由断言Predicate用于匹配请求，过滤器Filter用于修改请求和响应。如果断言为true，则说明请求URI和配置匹配，则执行路由。</li>
@@ -229,7 +292,7 @@
   <li><strong><code class="highlighter-rouge">filter</code>（过滤器）</strong>：可以在返回请求之前或之后修改请求和响应的内容。从作用范围可分为GatewayFilter（局部过滤器）和 GlobalFilter（全局过滤器）</li>
 </ol>
 
-<h5 id="routes路由">routes（路由）</h5>
+<h4 id="routes路由">routes（路由）</h4>
 
 <ul>
   <li><code class="highlighter-rouge">id</code>：路由的唯一id，名称任意</li>
@@ -248,7 +311,7 @@
   <li><code class="highlighter-rouge">filter</code>：</li>
 </ul>
 
-<h5 id="predicates断言">predicates（断言）</h5>
+<h4 id="predicates断言">predicates（断言）</h4>
 
 <p>断言（Predicate ）属于 Java8 语言中的 Predicate 函数，参数为 ServerWebExchange 对象。可以让开发者（通过请求头、或请求参数）匹配到任意的 HTTP 请求。</p>
 
@@ -343,7 +406,7 @@
 <span class="o">}</span>
 </code></pre></div></div>
 
-<h5 id="filter过滤器">filter（过滤器）</h5>
+<h4 id="filter过滤器">filter（过滤器）</h4>
 
 <p><img src="../assets/8f72d0c84bd9b9423ca3508d6501b8f8.jpeg" alt="在这里插入图片描述" style="zoom:80%;" /></p>
 
@@ -416,6 +479,7 @@
             <span class="o">}</span>
 
             <span class="n">ServerHttpRequest</span> <span class="n">request</span> <span class="o">=</span> <span class="n">exchange</span><span class="o">.</span><span class="na">getRequest</span><span class="o">();</span>
+            <span class="c1">//</span>
             <span class="n">HttpHeaders</span> <span class="n">headers</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="na">getHeaders</span><span class="o">();</span>
             <span class="c1">//从请求头中获取token</span>
             <span class="n">String</span> <span class="n">token</span> <span class="o">=</span> <span class="n">headers</span><span class="o">.</span><span class="na">getFirst</span><span class="o">(</span><span class="n">AUTHORIZE_TOKEN</span><span class="o">);</span>
@@ -479,7 +543,7 @@
 
 <p>场景：模拟Nginx的Access Log 功能，记录每次请求的相关信息。</p>
 
-<h4 id="集成注册中心动态路由">集成注册中心、动态路由</h4>
+<h3 id="集成注册中心动态路由">集成注册中心、动态路由</h3>
 
 <p>网关接收外部请求，按照一定的规则，将请求转发给其他服务或者应用。如果站在服务调用的角度，网关就扮演着服务消费者的角色。</p>
 
@@ -505,7 +569,7 @@
 
 <p>在 Spring Boot 主类上添加 <code class="highlighter-rouge">@EnableDiscoveryClient</code> 注解，以启用服务发现功能。</p>
 
-<h4 id="集成配置中心">集成配置中心</h4>
+<h3 id="集成配置中心">集成配置中心</h3>
 
 <p>将网关的一系列配置写到项目的配置文件中，一旦路由发生改变必须要重新配置项目，这样维护成本很高。</p>
 
@@ -532,7 +596,7 @@
 
 <p><img src="../assets/global_config.webp" style="zoom:80%;" /></p>
 
-<h4 id="自定义全局异常处理">自定义全局异常处理</h4>
+<h3 id="自定义全局异常处理">自定义全局异常处理</h3>
 
 <p>通过前面的测试可以看到一个现象：一旦路由的微服务下线或者失联了，Spring Cloud Gateway直接返回了一个错误页面，Whitelabel Error Page。</p>
 
@@ -590,19 +654,19 @@
 <span class="o">}</span>
 </code></pre></div></div>
 
-<h3 id="oauth20-认证和授权服务搭建">OAuth2.0 认证和授权服务搭建</h3>
+<h2 id="oauth20-认证和授权服务搭建">OAuth2.0 认证和授权服务搭建</h2>
 
 <p>很多企业是将认证授权服务直接集成到网关中，这么做耦合性太高了，这里直接将认证授权服务抽离出来。</p>
 
 <p>认证服务的搭建这里就不再细说了，上一篇文章中已经介绍的很清楚了：<a href="https://mp.weixin.qq.com/s?__biz=MzU3MDAzNDg1MA==&amp;mid=2247502801&amp;idx=1&amp;sn=56b1af09bfa25d5e44193a7d75dfa623&amp;chksm=fcf7141ccb809d0a1b0b2d7f6d9893c7d3e560dd8996296276f0274d2578236ee87e9124810d&amp;token=278610351&amp;lang=zh_CN#rd">OAuth2.0实战！使用JWT令牌认证！</a></p>
 
-<h3 id="接口测试">接口测试</h3>
+<h2 id="接口测试">接口测试</h2>
 
 <p><img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/4/8/169fb98af598c40c~tplv-t2oaga2asx-jj-mark:3024:0:0:0:q75.png" alt="img" /></p>
 
-<h3 id="knife4j-api-文档生成工具">Knife4j API 文档生成工具</h3>
+<h2 id="knife4j-api-文档生成工具">Knife4j API 文档生成工具</h2>
 
-<h3 id="请求过滤"><del>请求过滤</del></h3>
+<h2 id="请求过滤"><del>请求过滤</del></h2>
 
 <p>请求过滤的方法：</p>
 
