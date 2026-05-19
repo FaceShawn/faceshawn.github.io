@@ -10,12 +10,15 @@ tags:
   - 高可用
   - Sharding-Sphere
   - 数据库
+  - 读写分离
+  - 分库分表
+  - 分布式事务
 location:
   - 黄金时代
 abbrlink: 'sharding_sphere'
 permalink: 'sharding_sphere'
 date: 2025-09-14 16:41:00
-updated: 2026-04-14 16:41:00
+updated: 2026-04-17 16:41:00
 ---
 
 > 摘要：ShardingSphere 是目前最好用的数据库中间件之一，用于实现分库分表、读写分离，分布式事务、数据库治理。
@@ -65,14 +68,14 @@ ShardingSphere 是目前最好用的数据库中间件之一，用于实现分�
 
 `ShardingSphere-JDBC` **客户端**分库分表：经常简称之为 sharding-jdbc 。定位为轻量级 Java 框架，在 Java 的 JDBC 层提供的额外服务。使用**客户端直连**数据库，以 jar 包形式提供服务，无需额外部署和依赖，可理解为增强版的 JDBC 驱动，完全兼容 JDBC 和各种 ORM 框架。
 
-- 适用于任何基于 JDBC 的 ORM 框架，如：JPA, Hibernate, Mybatis, Spring JDBC Template
+- 适用于任何基于 JDBC 的 ORM 框架，如：`JPA, Hibernate, Mybatis, Spring JDBC Template`
     或直接使用JDBC；
-- 支持任何第三方的数据库**连接池**，如：DBCP, C3P0, BoneCP, HikariCP 等；
+- 支持任何第三方的数据库**连接池**，如：`DBCP, C3P0, BoneCP, HikariCP` 等；
 - 支持任意实现 JDBC 规范的数据库，目前支持 MySQL，PostgreSQL，Oracle，SQLServer 以及任何可使用JDBC访问的数据库。
 - 相比 Sharding-Proxy 来说，是**基于 client 模式**，无需经过 proxy 一层的性能损耗，也不用考虑 proxy 的高可用，所以对于 Java 项目来说，更加被推荐。
     - 目前，阿里、京东、美团等公司，都采用 client 模式的分库分表中间件。
 
-<img src="../assets/37480a85a746dcb7a469efb4d6acb24d.jpg" alt="img" style="zoom: 40%;" /><img src="../assets/3206512c7b6a0a08fe6e3af6891b03ae.jpg" alt="img" style="zoom:40%;" />
+<img src="../assets/37480a85a746dcb7a469efb4d6acb24d.jpg" alt="img" style="zoom: 45%;" /><img src="../assets/3206512c7b6a0a08fe6e3af6891b03ae.jpg" alt="img" style="zoom:40%;" />
 
 #### 对比
 
@@ -95,7 +98,7 @@ ShardingSphere 是目前最好用的数据库中间件之一，用于实现分�
 
 由于ShardingJDBC和ShardingProxy都支持通过Governance Center，将配置信息交个第三方服务管理，因此，也就自然支持了通过Governance Center进行整合的混合部署架构。
 
-<img src="../assets/fa70b65c70979f4c7ff071438c89c263.png" alt="在这里插入图片描述" style="zoom: 50%;" />
+<img src="../assets/fa70b65c70979f4c7ff071438c89c263.png" alt="在这里插入图片描述" style="zoom: 67%;" />
 
 ### 功能
 
@@ -104,7 +107,7 @@ ShardingSphere 是目前最好用的数据库中间件之一，用于实现分�
 3. **主从同步**：依赖 MySQL 原生主从复制机制保障数据一致性。
 4. **故障转移**：配置心跳检测实现从库故障自动剔除。
 
-<img src="../assets/1740542496552-dbf53244-b6f0-4d1d-9145-edeeeced0bb5.png" alt="img" style="zoom: 40%;" />
+<img src="../assets/1740542496552-dbf53244-b6f0-4d1d-9145-edeeeced0bb5.png" alt="img" style="zoom: 50%;" />
 
 ## 基本原理
 
@@ -125,6 +128,8 @@ sharding-jdbc 的本质上就是**实现 JDBC 的核心接口**。
 | Statement         | ShardingStatement         |
 | PreparedStatement | ShardingPreparedStatement |
 | ResultSet         | ShardingResultSet         |
+
+#### 核心流程
 
 下图展示了 Prxoy 和 JDBC 两种模式的核心流程。
 
@@ -241,7 +246,7 @@ Integer getWorkerId(Long orderId) {
 
 见下图，假设原来订单数据有 4 个实例 ，每个实例一个数据库，每个数据库上包含 16 张表，现在需要把 4 个实例迁移到8个实例上，每个实例上一个数据库，每个数据库包含 64 张表 。
 
-<img src="../assets/up-93a52112e8fedceaa745487cbb0fccf62f5.png" style="zoom:67%;" />
+<img src="../assets/up-93a52112e8fedceaa745487cbb0fccf62f5.png" style="zoom: 80%;" />
 
 整个数据迁移工作包括 ：
 
@@ -315,7 +320,7 @@ Integer getWorkerId(Long orderId) {
 
 binlog 是全字段发送,不会存在丢字段情况。
 
-**双向同步时的 binlog 循环消费问题**
+##### 双向同步时的 binlog 循环消费问题
 
 想象一下，业务写一条数据到旧实例的一张表，于是产生了一条 binlog ； 数据同步中间件接到 binlog 后，将该记录写入到新实例，于是在新实例也产生了一条 binlog ；此时 数据同步中间件又接到了该 binlog ......不断循环，消息越来越多，数据顺序也被打乱。
 
@@ -378,7 +383,7 @@ commit;
 
 ##### 灰度切换数据源
 
-**整体灰度切流方案**
+###### 整体灰度切流方案
 
 整体灰度方案：SP+用户纬度来实现，SP纬度：依靠灰度环境切量来做，用户纬度：依赖用户ID后四位百分比切流。
 
@@ -389,11 +394,11 @@ commit;
 3. 在切换数据源
 4. 最后关闭停写，开始正常业务写入
 
-**切流前准备——ABC验证**
+###### **切流前准备——ABC验证**
 
 虽然在切流之前，在测试环境进过了大量的测试，但是测试环境毕竟和生产环境不一样，生产环境数据库一旦出问题就可能是灭顶之灾，虽然上面介绍了数据校验和数据修复流程，但是把问题拦截在发生之前是做服务稳定性最重要的工作。
 
-因此我们提出了ABC验证的概念，灰度环境ABC验证准备：
+因此提出了ABC验证的概念，灰度环境ABC验证准备：
 
 1. 新购买两套数据库实例，当前订单库为A，新买的两套为分别为B、C
 2. 配置DTS从A单项同步到B（dts支持同构不需要rehash的数据同步），B做为旧库的验证库，C库做为新库
@@ -402,7 +407,7 @@ commit;
 
 <img src="../assets/f48411309ee648e08240c7814b93a01d.png" alt="img" style="zoom:50%;" />
 
-**灰度切流步骤**
+###### **灰度切流步骤**
 
 具体灰度方案和数据源切换流程：
 

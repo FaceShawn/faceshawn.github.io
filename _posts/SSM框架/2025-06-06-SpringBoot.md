@@ -5,13 +5,6 @@ categories:
 tags:
   - SSM
   - Spring-Boot
-  - ORM
-  - MyBatis
-  - Redis
-  - ELK
-  - Swagger-UI
-  - Spring-Security
-  - Hutool
   - Thymeleaf
 location:
 abbrlink: 'spring_boot'
@@ -20,7 +13,7 @@ date: 2025-06-06 13:42:12
 updated: 2025-06-06 11:56:00
 ---
 
-> 摘要：Spring Boot 包括配置、自动装配、数据库等。Spring Boot 整合 Web、Hibernate、MyBatis、Redis、ELK、Swagger-UI、Security、Hutool 等。
+> 摘要：Spring Boot 包括配置、自动装配、数据库等。另外，Spring Boot 整合 Web、Hibernate、MyBatis、Redis、ELK、Swagger-UI、Security、Hutool 等见其它文档。
 
 <!-- more -->
 
@@ -126,7 +119,7 @@ server:
 
 2. `@Value("${url}")`：用在**属性**上，只读取配置文件中的某一个配置，与当前属性**绑定**；只支持基本数据类型 + String 类型，支持 SpEL 表达式。**不推荐**。与 [Lombok 常用注解](#数据类型转换)重名；
 
-    ```
+    ```java
     import org.springframework.beans.factory.annotation.Value;
     
     @Value("${aliyun.oss.accessKeyId}")
@@ -149,7 +142,7 @@ server:
 1. 创建 `application-{profile}.properties` 文件，如：`application-dev.properties` 用于开发环境；
 2. 在 `application.properties` 文件中添加 `spring.profiles.active=dev`；
 
-```
+```bash
 // 命令行激活：将 Spring Boot 项目打包成 JAR 文件
 // 命令行窗口，跳转到 JAR 文件所在目录，执行以下命令，
 // 启动该项目，并激活开发环境的 Profile。
@@ -849,7 +842,7 @@ management:
 
 ##### 配置 thymeleaf
 
-```
+```yaml
 spring:
   thymeleaf:
     prefix: classpath:/templates/

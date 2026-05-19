@@ -23,13 +23,13 @@ updated: 2025-06-14 11:56:00
 
 ## 整合 Swagger-UI 接口文档
 
-##### 接口文档简介
+#### 接口文档简介
 
 Swagger-UI（音S歪戈）：可动态地根据**注解**生成在线API文档。是一套基于 OpenAPI 规范构建的开源工具，可帮助设计、构建、记录及使用 Restful 接口。
 
 作用： 前后端分离的情况下，只需少量注解即可生成一份自带 UI 界面的 **Rest API 文档**，包括接口需要的参数及返回值，还可直接对 API **调试**。
 
-##### 整合 Swagger-UI 的步骤
+#### 整合 Swagger-UI 的步骤
 
 1. 添加项目依赖；
 2. 添加 Swagger-UI 的 Java 配置文件；
@@ -62,7 +62,7 @@ public class SwaggerConfig extends BaseSwaggerConfig {
 }
 ```
 
-##### 常用注解
+#### 常用注解
 
 1. `@EnableSwagger2`：打开 Swagger-UI，用于生成相关文档信息；
 2. `@Api`：修饰 Controller 类；
@@ -71,7 +71,9 @@ public class SwaggerConfig extends BaseSwaggerConfig {
 5. `@ApiModelProperty`：修饰**实体类的属性**，用于实体类是请求参数或返回结果时；
 6. `@Schema` 注解：通常与Swagger或OpenAPI规范一起使用，用于为API模型（如[请求体](https://so.csdn.net/so/search?q=请求体&spm=1001.2101.3001.7020)、响应体等）中的属性或整个模型**提供元数据描述**。这些描述信息对于生成API文档、客户端代码以及理解API的结构和用法非常有帮助。
 
-##### `CommentGenerator` 自定义注释生成器
+#### `CommentGenerator` 
+
+> 自定义注释生成器
 
 ```java
 /**

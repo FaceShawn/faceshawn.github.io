@@ -11,14 +11,17 @@ tags:
   - RESTful
   - HTTP
   - Tomcat
+  - HttpServetRequest
+  - Hutool
 location:
+  - 黄金时代
 abbrlink: 'ssm'
 permalink: 'ssm'
 date: 2021-09-01 13:42:12
 updated: 2025-05-28 11:56:00
 ---
 
-> 摘要：Spring + Spring MVC + Mybatis。Spring MVC，包括 MVC、Java Web。
+> 摘要：Spring + Spring MVC + Mybatis。Java Web，Spring MVC，包括 MVC 设计模式、工作原理、前后端分离、接收请求参数（REST 常用注解）、参数校验、统一响应和异常，Hutool、Guava 工具类。
 
 <!-- more -->
 
@@ -28,18 +31,57 @@ updated: 2025-05-28 11:56:00
 
 ## SSM 框架
 
-> 至少在项目里做过。介绍项目时，用一个业务流程说说 spring mvc 如何做的。
+> 介绍项目时，用一个[业务流程](#业务流程)说说 spring mvc 如何做的。
 
-SSM 框架集是 `Spring + Spring MVC + Mybatis ` 框架的整合，`Spring` 实现业务对象管理，`Spring MVC` 负责请求转发和视图管理，`Mybatis` 作为数据对象的持久化引擎。
+SSM 框架集是 `Spring + Spring MVC + Mybatis ` 框架的整合：`Spring` 实现**业务对象**管理，`Spring MVC` 负责请求转发和视图管理，`Mybatis` 作为数据对象的持久化引擎。
 
 - 是标准的 MVC 模式，将整个系统划分为 `model/DAO` 层、`View` 层、`Controller` 层、`Service` 层.
 - 是目前比较主流的 Java EE 企业级框架，适用于搭建各种大型的企业级应用系统。
+
+### 模块框架演化
+
+1. MVC 模式：应用分层开发 ——> Spring MVC
+    1. Model：**@Entity + @NamedQuery 写 SQL** ——> JPA 数据接口层（extends JpaRepository + @Repository 注解）
+    2. View：
+    3. Controller：
+2. SSM：
+    1. Spring（实现**业务对象 **Bean 管理）——> Spring Boot
+    2. Spring MVC：负责请求转发和视图管理。
+        - Controller：
+            - ——> Service 层 + ServiceImpl：（剥离重复的业务逻辑，@Autowired 注入 Bean）
+            - RESTful + @RestController ——> CommonResult + ErrorCode + Exception + Hibernate Validator 参数校验
+        - View ——> 对 View 细化，前后端分离（后端**关注数据和逻辑**，前端关注界面与交互）
+        - Model：DAO 数据持久层 ——> DAL 数据访问层：
+            - Mapper 接口
+            - POJO：DO + VO + DTO，Lombok（实体类 Getter/Settor 注解）
+            - **Redis**
+    3. MyBatis（作为数据对象的持久化引擎） ——> MyBatis Plus ——> MapStruct + Convert
+        - **ORM**：对象–关系映射，用于建立 Java Object **实体类**和数据库表之间的映射，从而达到**操作**实体类就相当于操作数据库表的目的。
+        - MyBatis 实现 Mapper 接口
+            1. 全注解实现 Mapper（SQL **不够灵活**，每次都要修改 SQL）
+            2. XML 实现 Mapper。工作量大。（MyBatis Generator 生成）
+            3. MyBatis Plus 增强（BaseMapper + LambdaQueryWrapper 条件构造器） ——> MapStruct  + **Convert**（ DO 转 VO） + Easy Trans 翻译枚举属性
+3. Spring Boot 整合框架 ——> Spring Cloud ——> Spring Cloud Alibaba
+    - 整合 Spring Security ——> Cookie、Session、Token、JWT——> OAuth2 + RBAC 授权
+    - 整合 Swagger2 ——> Swagger3 ——> Knife4j
+    - 整合 ELK
+    - ——> ~~WebSocket~~
+4. 单体应用 ——> **多模块** ——> 分布式架构 ——> SOA ——> 微服务架构：
+    - API：Feign 
+        - Gateway、Nacos、Config
+        - 分布式链路追踪
+    - 高并发、高性能、高可用集群：
+        - 负载均衡：Nginx、CDN、Feign 客户端负载均衡
+        - **消息队列**
+        - 限流降级熔断
+    - 数据库： 读写分离、分库分表
 
 ### 简化的开发步骤
 
 1. 需求分析：功能需求和非功能需求（稳定性、性能）；
 2. 系统设计：系统**架构**示意图：普通用户、管理员，前端（输入输出），后台，MyBatis 数据持久化，微服务，配置等；
-    1. 系统概要设计：系统功能模块（划分）图：系统-子系统-功能模块，各自的描述、输入输出接口设计（格式、入参和出参/返回值）。接口文档现在都是 [Swagger-UI](#接口文档)，注解标注在 Controller；
+    1. 系统概要设计：系统功能模块（划分）图：系统-子系统-功能模块，各自的描述、输入输出接口设计（格式、入参和出参/返回值）。
+        - 接口文档现在都是 [Swagger-UI](#接口文档)，注解标注在 Controller；
     2. 数据库表结构设计：
         1. **逻辑设计/详细设计** : 通过将 E-R 图转换成表，实现从 E-R 模型到关系模型的转换（转为 POJOs 及 DAO 接口），并应用三大范式优化；
         2. **物理结构设计** : 为设计的数据库选择合适的存储结构和存取路径，做具体的技术选型。
@@ -49,7 +91,7 @@ SSM 框架集是 `Spring + Spring MVC + Mybatis ` 框架的整合，`Spring` 实
 3. 系统实现；
 4. 单元测试，回归测试，覆盖率测试。
 
-##### 系统业务架构示意图
+#### 系统业务架构示意图
 
 项目技术架构图：
 
@@ -59,17 +101,19 @@ SSM 框架集是 `Spring + Spring MVC + Mybatis ` 框架的整合，`Spring` 实
 
 <img src="../assets/mall系统架构示意图.jpg" alt="系统架构图" style="zoom: 37%;" />
 
-##### 系统功能模块图
+#### ~~系统功能模块图~~
 
 
 
-##### E-R 模型图
+#### E-R 模型图
 
-<img src="../assets/image-20220925110316119.png" alt="image-20220925110316119" style="zoom:100%;" /><img src="../assets/image-20220925111724175.png" alt="image-20220925111724175" style="zoom:100%;" />
+<img src="../assets/image-20220925110316119.png" alt="image-20220925110316119" style="zoom:100%;" />
+
+<img src="../assets/image-20220925111724175.png" alt="image-20220925111724175" style="zoom:100%;" />
 
 ### 项目架构
 
-<img src="../assets/arch_screen_02.png" alt="img" style="zoom:70%;" /><img src="../assets/image-20250805140940884.png" alt="img" style="zoom:60%;" />
+<img src="../assets/image-20250805140940884.png" alt="img" style="zoom:60%;" />
 
 在[《阿里巴巴 Java 开发手册》](https://github.com/alibaba/p3c/blob/master/阿里巴巴Java开发手册（华山版）.pdf)中，推荐分层如下图：
 
@@ -79,7 +123,7 @@ SSM 框架集是 `Spring + Spring MVC + Mybatis ` 框架的整合，`Spring` 实
 
 项目的目录结构展示了Maven所约定了源代码的位置，只需配置很少的信息就可以自动完成编译，测试和打包等工作。
 
-<img src="../assets/250px-Maven_CoC.svg.png" alt="img" style="zoom:80%;" />
+<img src="../assets/arch_screen_02.png" alt="img" style="zoom:70%;" /><img src="../assets/250px-Maven_CoC.svg.png" alt="img" style="zoom:100%;" />
 
 Java Web 项目中的 SSM 目录结构，同时也遵循 maven 的目录规范：
 
@@ -212,8 +256,8 @@ Java Web 项目中的 SSM 目录结构，同时也遵循 maven 的目录规范�
 
 > 两个配置指定的路径相同。
 
-- **Spring Boot 配置类**配置 MyBatis，用来指定 mapper 映射器接口的 xml 实现所在的**项目目录**。
-- **MyBatis 配置类**中通过`@MapperScan`，用来指定 mapper 映射器接口的 xml 实现所在的**包路径**。
+- Spring Boot 配置类配置 MyBatis，用来指定 mapper 映射器接口的 xml 实现所在的**项目目录**。
+- MyBatis 配置类中通过`@MapperScan`，用来指定 mapper 映射器接口的 xml 实现所在的**包路径**。
 
 ##### Mybatis Generator 简介
 
@@ -391,11 +435,10 @@ public class ApiEncryptProperties {
      */
     @NotEmpty(message = "响应的加密密钥不能为空")
     private String responseKey;
-
 }
 ```
 
-### API 日志
+### ~~API 日志~~
 
 
 
@@ -965,7 +1008,7 @@ public List<Teacher> getKlassRelatedTeachers(
 1. Content-Type 为 application/json，确保传递的是 JSON 数据；
 2. 参数转化的配置必须统一，否则无法接收数据，比如 json、request 混用等。
 
-```
+```java
 @ApiOperation(value = "登录以后返回token")
 @RequestMapping(value = "/login", method = RequestMethod.POST)
 @ResponseBody
@@ -1041,7 +1084,7 @@ public String addUser5(@ModelAttribute("user") UserModel user) {
 4. `DELETE`：从服务器删除指定的资源，如 DELETE /users/12（删除编号为 12 的学生）；
 5. `PATCH`：更新服务器上的资源（可看作是**部分更新**），较少用。
 
-```
+```java
 @GetMapping("/users")
 //<==>@RequestMapping(value = "/users", method = RequestMethod.GET)
 public ResponseEntity<List<User> > getAllUsers() {
@@ -1073,6 +1116,10 @@ public ResponseEntity updateStudent(@RequestBody StudentUpdateRequest stuUpdateR
 ### 参数校验、统一响应和异常
 
 > 参考参数校验、统一响应和异常处理文档
+
+### 业务流程举例
+
+> 介绍项目时，用一个业务流程说说 spring mvc 如何做的。
 
 ### 测试接口
 

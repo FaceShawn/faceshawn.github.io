@@ -175,7 +175,7 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
 
 [Spring Boot 使用 JPA](http://www.imooc.com/wiki/springbootlesson/jpa.html) 测试类
 
-#### Entity 层
+#### Entity 层注解
 
 [JPA 注解（一） id table entity](http://conkeyn.iteye.com/blog/602463)
 
@@ -185,7 +185,7 @@ Entity 数据持久层：
     - `[name]`可选属性，默认为所标注的实体类名。因为用类反射机制 `Class.newInstance()` 方法创建实例的需要，至少有一个无参构造方法。也可标注抽象类。
 - `@NamedQuery`：标注在接口的**自定义查询方法**上，指定要执行的查询语句；
 - `@NamedQueries`：定义多个；
-- `serialVersionUID`：适用于JAVA序列化机制。简单来说，通过判断类的`serialVersionUID`来验证版本一致。
+- `serialVersionUID`：适用于JAVA**序列化机制**。简单来说，通过判断类的`serialVersionUID`来验证版本一致。
     - 在进行反序列化时，JVM会把传来的字节流中的`serialVersionUID`与本地相应实体类的`serialVersionUID`进行比较。
     - 如果相同说明是一致的，可以进行反序列化，否则会出现反序列化版本一致的异常，即是`InvalidCastException`。
 
@@ -207,7 +207,7 @@ public List<UserModel> findByAge(int age);
 - `@Query`：标注在（继承 `JpaRepository` 接口的）自定义查询方法上，指定要执行的查询语句；
 - `@Modifying`：支持更新类的 Query 语句，配合 `@Transactional` [Spring 事务](#Spring 事务) 使用；
 
-```
+```java
 // like后的参数需在前、后加“%”
 // nativeQuery=true表示指定本地查询
 @Query(value="select * from tbl_user where name like %?1", nativeQuery=true)
@@ -223,7 +223,7 @@ public int findByUidOrAge(@Param("nn") String name, @Param("newName") String new
     - `catalog `和 `schema`（思gay玛）属性：表示目录名或数据库名，根据不同的数据类型有所不同；
     - `uniqueConstraints` 属性：表示该实体所关联的唯一约束条件，可有多个唯一约束；默认没有，需配合`@UniqueContraint`用。
 
-```
+```java
 @Entity
 @Table(name = "tb_contact", schema = "test", uniqueConstraints = {   
         @UniqueConstraint(columnNames = {"name", "email" }),  
@@ -244,7 +244,7 @@ public class ContactEO implements Serializable {}
     7. `length `属性：字段长度，当字段的类型为 varchar 时才有效，默认为255个字符。
     8. `precision` 和 `scale` 属性：精度；当字段类型为 double 时，precision 表示数值的总长度，scale 表示小数点所占的位数。
 
-```
+```java
 @Temporal(TemporalType.TIMESTAMP)
 @Column(name = "create_time", unique = false)
 private Date createTime;
@@ -267,7 +267,7 @@ private Date createTime;
 - `@TableGenerator`
 - `@SequenceGenerator`
 
-```
+```java
 @Id
 @GeneratedValue(strategy=GenerationType.AUTO)
 private String id;
@@ -323,7 +323,7 @@ Java 数据类型与数据库中的类型转换由 JPA 实现框架**自动转�
 
 
 
-## 数据持久层演化
+## ~~数据持久层演化~~
 
 1. MVC：
     1. 直接用 JDBC，model 实体层 （@Entity + @NamedQuery 写 SQL）
@@ -616,11 +616,11 @@ int delete(String statement, Object parameter)
 List<BatchResult> flushStatements()
 
 // 本地缓存
-每当创建一个新 session，MyBatis 就会创建与之相关联的本地缓存，保存任何在 session 执行过的查询结果；
-当再次执行参数相同的查询时，不需再实际查询数据库。
-在做出修改、事务提交或回滚，及关闭 session 时清空。
-默认情况下，本地缓存数据的生命周期等同于整个 session 的周期。
-由于缓存会被用来解决循环引用问题和加快重复嵌套查询的速度，所以无法将其完全禁用。
+// 每当创建一个新 session，MyBatis 就会创建与之相关联的本地缓存，保存任何在 session 执行过的查询结果；
+// 当再次执行参数相同的查询时，不需再实际查询数据库。
+// 在做出修改、事务提交或回滚，及关闭 session 时清空。
+// 默认情况下，本地缓存数据的生命周期等同于整个 session 的周期。
+// 由于缓存会被用来解决循环引用问题和加快重复嵌套查询的速度，所以无法将其完全禁用。
 void clearCache()
 
 // 2. 事务控制方法，用由 Connection 实例控制的 JDBC 事务管理器时起作用
@@ -630,16 +630,16 @@ void commit([boolean force])
 void rollback([boolean force])
 
 // 3. 使用映射器
-上述的各个 insert、update、delete 和 select 方法都很强大，
-但也有些繁琐，并不符合类型安全，对 IDE 和单元测试也不友好。
-因此，用映射器类来执行映射语句更常见。
+// 上述的各个 insert、update、delete 和 select 方法都很强大，
+// 但也有些繁琐，并不符合类型安全，对 IDE 和单元测试也不友好。
+// 因此，用映射器类来执行映射语句更常见。
 <T> T getMapper(Class<T> type)
 
 // 确保 SqlSession 被关闭
 void close()
 ```
 
-### 创建映射器类/接口
+### 映射器接口
 
 映射器类/接口（DAO 层）：`XxxDao.java / XxxMapper.java`，实现 Mapper 接口或由 `@Mapper ` 修饰的类；映射器类/接口就是一个仅需声明与 `SqlSession` 方法（映射器方法）相匹配的接口。
 
@@ -654,6 +654,59 @@ void close()
 2. `@MapperScan(basePackages = {"com.macro.mall.mapper","com.macro.mall.dao"})` ：表示动态**扫描**指定包下的 mapper 接口，相当于每个 mapper 接口上都标注 `@Mapper`。
     - （当 mapper 接口较多时），用于 Spring Boot 主启动类或 config/**Java 配置类**上，
     - 见 [SqlSessionFactoryBuilder 类](#SqlSessionFactoryBuilder 类)。
+
+#### Dao 接口
+
+Mybatis 的 Dao 接口里的方法，参数不同时，方法可**重载**。
+
+但是多个接口**对应的映射**必须只有一个，否则启动会报错。同一 xml `namspace `下的 id 不允许重复。
+
+重载需满足以下条件：
+
+1. 仅有一个无参方法和一个有参方法；
+2. 多个有参方法时，参数数量必须一致，且使用相同的 `@Param` ，或使用 `param1` 这种。
+    - id 相同，对应同一段 `MappedStatement` 标签，用**动态 SQL** 的`<if test="id != null">` **标签**处理不同的参数列表来实现重载。
+
+##### Dao 接口的**工作原理**
+
+MyBatis 运行时会用 **JDK 动态代理**为 Dao 接口生成 `proxy` 代理对象，用于拦截接口方法，转而执行 `MappedStatement` 所代表的 SQL，返回 SQL 执行结果。
+
+- 最佳实践中，通常一个 xml 映射文件，都会写一个 Dao 接口与之对应。
+- 在 MyBatis 中，每一个 `<select>` 、 `<insert>` 、 `<update>` 、 `<delete>` 标签，都会被解析为一个 **`MappedStatement` 对象**。
+- Dao 接口就是常说的 `Mapper` 接口，
+    1. 接口的**全限名，**就是映射文件中的 namespace 的值，
+    2. 接口的**方法名**，就是映射文件中 `MappedStatement` 的 id 值，对应`<select>` 等元素的`id`属性，是在命名空间中**唯一的标识符**，用来引用此语句；
+    3. 接口方法的**参数**，就是传递给 SQL 的参数。
+- `Mapper` 接口是没有实现类的，当调用接口方法时，接口全限名+方法名拼接字符串作为 key 值，可唯一定位一个 `MappedStatement` 。
+- 举例： `com.mybatis3.mappers.StudentDao.findStudentById` ，可以唯一找到 namespace 为 `com.mybatis3.mappers.StudentDao` 下面 `id = findStudentById` 的 `MappedStatement` 。
+
+Mybatis 版本 3.3.0：
+
+```java
+/**
+ * Mapper接口里面方法重载
+ */
+public interface StuMapper {
+
+	List<Student> getAllStu();
+	List<Student> getAllStu(@Param("id") Integer id);
+}
+```
+
+然后在 `StuMapper.xml` 中利用 Mybatis 的**动态 sql** 就可以实现。
+
+```sql
+	<select id="getAllStu" resultType="com.pojo.Student">
+ 		select * from student
+		<where> ##
+			<if test="id != null"> ##
+				id = #{id}
+			</if>
+		</where>
+ 	</select>
+```
+
+能正常运行，并能得到相应的结果，这样就实现了在 Dao 接口中写重载方法。
 
 ### 映射器接口实现/绑定
 
@@ -834,8 +887,7 @@ SQL 查询的返回值可以是单个对象、多个对象的列表或简单的�
 3. `<resultMap> `：描述如何从数据库结果集中**加载对象**。逐一定义**数据库表的列名`column` **和 **`model` 对象的属性名**间的映射关系。
 4. ~~`<parameterMap>` – 老式风格的参数映射。已废弃，现用行内参数映射 parameterType属性。~~
 5. `<sql id="Base_Column_List">`：可被其他语句引用的**可重用语句块**。比如基本字段列表部分。（在加载阶段）参数可静态地确定下来。
-    1. `trim|where|set|foreach|if|choose|when|otherwise|bind` 等；
-    2. 
+    - `trim|where|set|foreach|if|choose|when|otherwise|bind` 等；
 6. `<include>`：用于引入sql片段；
     1. 被引用的 B 标签依然可以定义在任何地方，MyBatis 都可以正确识别。
     2. 原理是，MyBatis **解析** A 标签，发现 A 标签引用了 B 标签，但是 B 标签尚未解析到，此时 MyBatis 会将 A 标签标记为**未解析状态**，然后继续解析余下的标签，待所有标签解析完毕，MyBatis 会重新解析那些被标记为未解析的标签，此时再解析 A 标签时，B 标签已经存在，A 标签也就可以正常解析完成了。
@@ -913,14 +965,14 @@ SQL 查询的返回值可以是单个对象、多个对象的列表或简单的�
                 #{id}
             </foreach>
     </select>
-
 </mapper>
 ```
 
 ##### 将 sql 执行结果封装为目标对象并返回
 
 - 第一种是使用 `<resultMap>` 标签，逐一定义列名和对象属性名之间的映射关系。
-- 第二种是使用 sql 列的别名功能，将列别名书写为对象属性名，比如 T_NAME AS NAME，对象属性名一般是小写 name，但是列名不区分大小写，MyBatis 会忽略列名大小写，智能找到与之对应对象属性名。
+- 第二种是使用 sql 列的**别名**功能，将列别名书写为对象属性名。
+    - 比如 T_NAME AS NAME，对象属性名一般是小写 name，但是列名不区分大小写，MyBatis 会忽略列名大小写，智能找到与之对应对象属性名。
 
 有了列名与属性名的映射关系后，MyBatis 通过**反射**创建对象，同时使用反射给对象的属性逐一赋值并返回。那些找不到映射关系的属性，是无法完成赋值的。
 
@@ -946,13 +998,15 @@ SQL 查询的返回值可以是单个对象、多个对象的列表或简单的�
     - 嵌套结果映射 – 集合可是 `resultMap` 元素，或是对其它结果映射的引用；
 6. `<discriminator>` – 歧视者，用结果值来决定使用哪个 `resultMap`；
 
-```
+```xml
 <resultMap id="orderDetailResultMap" type="com.macro.mall.dto.OmsOrderDetail" extends="com.macro.mall.mapper.OmsOrderMapper.BaseResultMap">
     <collection property="orderItemList" resultMap="com.macro.mall.mapper.OmsOrderItemMapper.BaseResultMap" columnPrefix="item_"/>
 </resultMap>
 ```
 
-##### `typeHandlers` 类型处理器映射 Enum 枚举类？
+###### `typeHandlers` 类型处理器
+
+> `typeHandlers` 类型处理器映射 Enum 枚举类？
 
 MyBatis 可以映射枚举类，不单可以映射枚举类，MyBatis 可以映射任何对象到表的一列上。
 
@@ -961,7 +1015,7 @@ MyBatis 可以映射枚举类，不单可以映射枚举类，MyBatis 可以映�
 - 一是完成从 javaType 至 jdbcType 的转换；
 - 二是完成 jdbcType 至 javaType 的转换，体现为 `setParameter()` 和 `getResult()` 两个方法，分别代表设置 sql 问号占位符参数和获取列查询结果。
 
-##### 实体类中的属性名和表中的字段名不一致时的解决方案
+###### 实体类属性名和表字段名不一致
 
 实体类中的属性名和表中的字段名不一致时的解决方案：
 
@@ -969,8 +1023,10 @@ MyBatis 可以映射枚举类，不单可以映射枚举类，MyBatis 可以映�
 
 2. 通过 `<resultMap>` 来**映射**字段名和实体类属性名的一一对应关系。
 
-##### MyBatis 能执行一对多的关联查询吗？
+###### 一对多的关联查询
 
+> MyBatis 能执行一对多的关联查询吗？
+>
 > 都有哪些实现方式，以及它们之间的区别。
 
 能，MyBatis 不仅可以执行一对一、一对多的**关联查询**，还可以执行多对一，多对多的关联查询，
@@ -984,7 +1040,7 @@ MyBatis 可以映射枚举类，不单可以映射枚举类，MyBatis 可以映�
 - 另一种是使用**嵌套查询**，即使用 join 查询，一部分列是 A 对象的属性值，另外一部分列是关联对象 B 的属性值。
     - 好处：只发一个 sql 查询，就可以把主对象和其关联对象查出来。
 
-```
+```xml
 <resultMap id="BaseResultMap" type="com.macro.mall.model.OmsOrder">
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="member_id" jdbcType="BIGINT" property="memberId" />
@@ -1007,7 +1063,9 @@ MyBatis 可以映射枚举类，不单可以映射枚举类，MyBatis 可以映�
 | 1    | teacher | 39   |
 | 1    | teacher | 40   |
 
-##### 是否支持延迟加载及实现原理？
+##### 延迟加载
+
+> 是否支持延迟加载及实现原理？
 
 MyBatis 仅支持 **association 关联对象**和 collection 关联集合对象的**延迟加载**。
 
@@ -1015,6 +1073,8 @@ MyBatis 仅支持 **association 关联对象**和 collection 关联集合对象�
 - collection 指的就是一对多查询。
 
 在 MyBatis 配置文件中，可以配置是否启用延迟加载 `lazyLoadingEnabled=true|false。`
+
+###### 实现原理
 
 原理是：使用 `CGLIB` 创建目标对象的代理对象，当调用目标方法时，进入拦截器方法，
 
@@ -1082,7 +1142,9 @@ MyBatis 仅支持 **association 关联对象**和 collection 关联集合对象�
 </select>
 ```
 
-##### 不同的 xml 映射文件，id 是否可以重复？
+###### id 属性
+
+> 不同的 xml 映射文件，id 是否可以重复？
 
 下面那些顶级元素的 id 属性是否可重复：
 
@@ -1093,57 +1155,6 @@ MyBatis 仅支持 **association 关联对象**和 collection 关联集合对象�
 
 **原因**：就是 `namespace+id` 是作为 `Map<String, MappedStatement>` 的 key 使用的，如果没有 namespace，就剩下 id，那么 id 重复会导致**数据互相覆盖**。有了 namespace，自然 id 就可以重复。
 
-##### Dao 接口的工作原理、方法可重载
-
-Mybatis 的 Dao 接口里的方法，参数不同时，方法可**重载**。
-
-但是多个接口**对应的映射**必须只有一个，否则启动会报错。同一 xml `namspace `下的 id 不允许重复。
-
-重载需满足以下条件：
-
-1. 仅有一个无参方法和一个有参方法；
-2. 多个有参方法时，参数数量必须一致，且使用相同的 `@Param` ，或使用 `param1` 这种。
-    - id 相同，对应同一段 `MappedStatement` 标签，用**动态 SQL** 的`<if test="id != null">` **标签**处理不同的参数列表来实现重载。
-
-Dao 接口的**工作原理**：MyBatis 运行时会用 **JDK 动态代理**为 Dao 接口生成 `proxy` 代理对象，用于拦截接口方法，转而执行 `MappedStatement` 所代表的 SQL，返回 SQL 执行结果。
-
-- 最佳实践中，通常一个 xml 映射文件，都会写一个 Dao 接口与之对应。
-- 在 MyBatis 中，每一个 `<select>` 、 `<insert>` 、 `<update>` 、 `<delete>` 标签，都会被解析为一个 **`MappedStatement` 对象**。
-- Dao 接口就是常说的 `Mapper` 接口，
-    1. 接口的**全限名，**就是映射文件中的 namespace 的值，
-    2. 接口的**方法名**，就是映射文件中 `MappedStatement` 的 id 值，对应`<select>` 等元素的`id`属性，是在命名空间中**唯一的标识符**，用来引用此语句；
-    3. 接口方法的**参数**，就是传递给 SQL 的参数。
-- `Mapper` 接口是没有实现类的，当调用接口方法时，接口全限名+方法名拼接字符串作为 key 值，可唯一定位一个 `MappedStatement` 。
-- 举例： `com.mybatis3.mappers.StudentDao.findStudentById` ，可以唯一找到 namespace 为 `com.mybatis3.mappers.StudentDao` 下面 `id = findStudentById` 的 `MappedStatement` 。
-
-Mybatis 版本 3.3.0：
-
-```java
-/**
- * Mapper接口里面方法重载
- */
-public interface StuMapper {
-
-	List<Student> getAllStu();
-	List<Student> getAllStu(@Param("id") Integer id);
-}
-```
-
-然后在 `StuMapper.xml` 中利用 Mybatis 的**动态 sql** 就可以实现。
-
-```java
-	<select id="getAllStu" resultType="com.pojo.Student">
- 		select * from student
-		<where> ##
-			<if test="id != null"> ##
-				id = #{id}
-			</if>
-		</where>
- 	</select>
-```
-
-能正常运行，并能得到相应的结果，这样就实现了在 Dao 接口中写重载方法。
-
 #####  `<insert>` `<update>` 元素
 
 仅对 `insert `和 `update ` 有用的属性：
@@ -1152,7 +1163,7 @@ public interface StuMapper {
 2. `<selectKey>` ：不支持自增的主键生成策略标签；
 3. ~~`keyColumn`~~：通过生成的键值设置表中的列名，仅在某些数据库（如 PostgreSQL）是必须的，当主键不是表的第一列时需设置。
 
-##### `<insert>` 语句的 `<selectKey>`
+######  `<selectKey>`
 
 在 MySQL 中用函数来自动生成插入表的主键，而且需方法返回这个生成主键，如用 MyBatis 的 `<selectKey> `标签。
 
@@ -1184,7 +1195,7 @@ public interface StuMapper {
 
 > 见 SSM 分层目录中的 [`mall-mbg/src/main/`](#分层目录)。
 
-#### 依赖项
+#### 依赖
 
 `pom.xml` 
 
@@ -1360,13 +1371,13 @@ MyBatis 提供了 9 种动态 sql 标签:
     4. `suffixOverrides` 语句后面部分要去掉的的内容。
 
         ```xml
-        	insert into pms_member_price
-            <trim prefix="(" suffix=")" suffixOverrides=",">
-              <if test="productId != null">
+        insert into pms_member_price
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="productId != null">
                 product_id, #{productId,jdbcType=BIGINT},
-              </if>
-            </trim>
-          </insert>
+            </if>
+        </trim>
+        </insert>
         ```
 
 3. `<choose> (<when>, <otherwise>)`：同 `<switch>`；

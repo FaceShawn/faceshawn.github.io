@@ -25,9 +25,7 @@ updated: 2025-06-12 13:42:12
 
 [TOC]
 
-
-
-### 无状态登录
+## 无状态登录
 
 **有状态服务**：即服务端需要**记录每次会话的客户端信息**，从而识别客户端身份，根据用户身份进行请求的处理。
 
@@ -52,7 +50,7 @@ HTTP 是**无状态**的协议（对于事务处理**没有记忆能力**，每�
 3. 以后客户端每次发送请求，都需要携带认证的 token；
 4. 服务端对客户端发送来的 token 进行解密，判断是否有效，并且获取用户登录信息。
 
-### Cookie 和 Session 异同
+## Cookie 和 Session 异同
 
 相同：都是用来跟踪浏览器**用户身份**的**会话方式**，但是两者的应用场景不太一样。
 
@@ -94,15 +92,15 @@ Cookie的保存方式有两种：
 
 ### cookie 重要的属性
 
-| 属性           | 说明                                                         |
-| :------------- | :----------------------------------------------------------- |
-| **name=value** | 键值对，设置 Cookie 的名称及相对应的值，都必须是**字符串类型** <br />- 如果值为 Unicode 字符，需要为字符编码。<br />- 如果值为二进制数据，则需要使用 BASE64 编码。 |
-| **domain**     | 指定 cookie 所属域名，默认是当前域名                         |
-| **path**       | 指定 cookie 在哪个**路径（路由）下生效**，默认是 '/'。 如果设置为 `/abc`，则只有 `/abc` 下的路由可以访问到该 cookie，如：`/abc/read`。 |
-| **maxAge**     | cookie 失效的时间，单位秒。<br />- 如果为整数，则该 cookie 在 maxAge 秒后失效。<br />- 如果为负数，该 cookie 为临时 cookie ，关闭浏览器即失效，浏览器也不会以任何形式保存该 cookie 。<br />- 如果为 0，表示删除该 cookie 。默认为 -1。 - **比 expires 好用**。 |
-| **expires**    | **过期时间**，在设置的某个时间点后该 cookie 就会失效。<br />一般浏览器的 cookie 都是默认储存的，当关闭浏览器结束这个会话的时候，这个 cookie 也就会被删除 |
-| **secure**     | 该 cookie 是否仅被使用**安全协议传输**。安全协议有 HTTPS，SSL等，在网络上传输数据之前先将数据加密。<br />默认为false。 当 secure 值为 true 时，cookie 在 HTTP 中是无效，在 HTTPS 中才有效。 |
-| **httpOnly**   | 如果给某个 cookie 设置了 httpOnly 属性，则无法**通过 JS 脚本 读取**到该 cookie 的信息，但还是能通过 Application 中手动修改 cookie，所以只是在一定程度上可以**防止 XSS 攻击**，不是绝对的安全。 |
+| 属性       | 说明                                                         |
+| :--------- | :----------------------------------------------------------- |
+| name=value | 键值对，设置 Cookie 的名称及相对应的值，都必须是**字符串类型** <br />- 如果值为 Unicode 字符，需要为字符编码。<br />- 如果值为二进制数据，则需要使用 BASE64 编码。 |
+| domain     | 指定 cookie 所属域名，默认是当前域名                         |
+| path       | 指定 cookie 在哪个**路径（路由）下生效**，默认是 '/'。 如果设置为 `/abc`，则只有 `/abc` 下的路由可以访问到该 cookie，如：`/abc/read`。 |
+| maxAge     | cookie 失效的时间，单位秒。<br />- 如果为整数，则该 cookie 在 maxAge 秒后失效。<br />- 如果为负数，该 cookie 为临时 cookie ，关闭浏览器即失效，浏览器也不会以任何形式保存该 cookie 。<br />- 如果为 0，表示删除该 cookie 。默认为 -1。 - **比 expires 好用**。 |
+| expires    | **过期时间**，在设置的某个时间点后该 cookie 就会失效。<br />一般浏览器的 cookie 都是默认储存的，当关闭浏览器结束这个会话的时候，这个 cookie 也就会被删除 |
+| secure     | 该 cookie 是否仅被使用**安全协议传输**。安全协议有 HTTPS，SSL等，在网络上传输数据之前先将数据加密。<br />默认为false。 当 secure 值为 true 时，cookie 在 HTTP 中是无效，在 HTTPS 中才有效。 |
+| httpOnly   | 如果给某个 cookie 设置了 httpOnly 属性，则无法**通过 JS 脚本 读取**到该 cookie 的信息，但还是能通过 Application 中手动修改 cookie，所以只是在一定程度上可以**防止 XSS 攻击**，不是绝对的安全。 |
 
 ### 在项目中使用
 
@@ -242,7 +240,7 @@ Servlet 获取 HttpSession对象：`request.getSession(boolean create)`：
 
 在考虑高性能之前，一定要做**高可用**。
 
-### Session 的一致性问题
+### 分布式 Session 的一致性问题
 
 > 分布式架构下 session 共享方案
 
@@ -258,41 +256,46 @@ Servlet 获取 HttpSession对象：`request.getSession(boolean create)`：
 
 解决 **Session 不一致**的问题，一般来说有三种方案：
 
-#### Session 黏连
+#### ~~客户端存储~~
 
-> IP 绑定策略
+**客户端存储**：直接将信息存储在客户端上的cookie中，客户端通过http协议和服务器进行cookie交互，常用来存储不敏感信息；
+
+- 缺点：
+    1. 数据存储在客户端，存在安全隐患；
+    2. cookie存储大小、类型存在限制；
+    3. 数据存储在cookie中，如果一次请求cookie过大，会给网络增加更大的开销；
+
+#### Session 黏连、IP 绑定
 
 使用 **Nginx 负载均衡器**实现**会话黏连**，将相同 sessionid 的浏览器所发起的请求，**都转发到同一台服务器**。
 
-- 相当于把用户和 A 服务器粘到了一块。
-- 这样，就不会存在多个 Web 服务器创建多个 Session 的情况，也就不会发生 Session 不一致的问题。
-
+- 基于nginx的**`ip-hash`策略**，可对客户端和服务器进行绑定。同一个客户端只能访问同一服务器，无论客户端发送多少次请求都被同一个服务器处理；
+- 相当于把用户和 A 服务器**粘到了一起**。这样，就不会存在多个 Web 服务器创建多个 Session 的情况，也就不会发生 Session 不一致的问题。
 - **优点：** 简单，不需要对 session 做任何处理。
-
 - **缺点：** 
     - 缺乏容错性，如果当前访问的服务器发生故障，用户被转移到第二个服务器上时，他的 session 信息都将失效。
-    - 因为，如果一台服务器**重启**，那么会导致转发到这个服务器上的 Session 全部丢失。
+    - 易造成**单点故障**：因为，如果一台服务器**宕机、重启**，那么会导致（转发到）这个服务器上的 Session 全部丢失。
     - 改进：**Session 复制**。
-
 - **适用场景：** 发生故障对客户产生的影响较小；服务器发生故障是低概率事件 。
     - 目前基本不被采用。
-
 - **实现方式：** 以 Nginx 为例，在 upstream 模块配置 **ip_hash 属性**即可实现，将某个 ip的所有请求都定向到同一台服务器上，即将用户与服务器绑定。
 
 > 具体怎么实现这种方式，可以看看 [《Nginx 第三方模块 —— nginx-sticky-module 的使用（基于cookie的会话保持）》](https://blog.csdn.net/bigtree_3721/article/details/78007853) 文章。
 
 #### Session 复制
 
-Web 服务器之间，进行 Session 复制同步。
+Session 复制：搭建 web 服务器集群。将服务器A的session复制到服务器B，同样将服务器B的session也复制到服务器A。
 
-- 任何一个服务器上的 session 发生改变（增删改），该节点会把这个 session 的所有内容序列化，然后广播给所有其它节点，不管其他服务器需不需要 session ，以此来保证 session 同步
+- 像tomcat等web容器都支持session复制的功能；在**同一个局域网内**，一台服务器的`session`会广播给其他服务器。
+
+- 任何一个服务器上的 session 发生改变（增删改），该节点会把这个 session 的所有内容序列化，然后广播给所有其它节点（不管其他服务器需不需要 session ），以此来保证 session 同步
 
 - **适用场景：** 仅适用于实现 Session 复制的 Web 容器，例如说 Tomcat 、Weblogic 等等。
     - 目前基本也不被采用。
 
 - **优点：** 可容错，各个服务器间 session 能够实时响应。
 
-- **缺点：** 会对网络负荷造成一定压力，如果 session 量大的话可能会造成网络堵塞，拖慢服务器性能。效率低、浪费内存。
+- **缺点：** 会对网络负荷造成一定压力。如果并发量大，session 需要同步的数据量大，可能会造成网络堵塞，拖慢服务器性能。效率低、浪费内存。
     - 改进：**Session 共享**。
 
 <img src="../assets/d47d5cb95483956c76426585574ed133" alt="img" style="zoom: 80%;" />
@@ -372,6 +375,13 @@ protected void doFilterInternal(HttpServletRequest request, HttpServletResponse 
 		return getSession(true);
 	}
 ```
+
+客户端发送一个请求，经过**负载均衡**后被分配到其中一个服务器，由于不同服务器含有不同的web服务器（如Tomcat），并不能发现之前web服务器保存的session信息，就会再次生成一个JSESSIONID，之前的状态就会丢失。
+
+#### Session 一致性的 4 种解决方案
+
+1. 
+2. **基于redis存储session**：直接引入依赖，将所有服务器的`session`进行统一管理，可用`redis`等高性能服务器来集中管理session，spring官方提供的`spirng-session`就是这样处理`session`的一致性问题；用的最多。
 
 ### 引入 Token
 
@@ -617,7 +627,7 @@ JWT 安全的核心在于**签名**，签名安全的**核心在密钥**。
 2. JWT 的续签问题
 3. JWT 体积太大
 
-## Cookie、Session、Token、JWT 常见问题
+## 常见问题
 
 > 需要考虑的问题
 

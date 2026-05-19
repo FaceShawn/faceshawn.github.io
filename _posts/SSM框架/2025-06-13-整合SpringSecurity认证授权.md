@@ -24,7 +24,7 @@ updated: 2025-06-13 11:56:00
 
 ## 整合 Spring Security 权限
 
-#### 添加依赖
+### 添加依赖
 
 在 `pom.xml` 中
 
@@ -35,7 +35,7 @@ updated: 2025-06-13 11:56:00
 </dependency>
 ```
 
-#### Spring Boot 配置
+### Spring Boot 配置
 
 在Spring Boot应用程序中，可以通过在`application.properties`文件或`application.yml`文件中配置Spring Security。
 
@@ -63,7 +63,7 @@ spring:
       enabled: true
 ```
 
-#### 添加配置类
+### 添加配置类
 
 ```java
 // SecurityConfig.java
@@ -108,11 +108,11 @@ public class MallSecurityConfig extends SecurityConfig {
 
 <img src="../assets/8fdccbc24a2225db315a8800cdfe1c09.png" alt="img" style="zoom:80%;" />
 
-##### **示例一**
+#### 示例一
 
 自定义 Spring Security 的配置，实现**权限控制**。
 
-###### SecurityConfig
+##### SecurityConfig
 
 在 [`cn.iocoder.springboot.lab01.springsecurity.config`](https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-01-spring-security/lab-01-springsecurity-demo-role/src/main/java/cn/iocoder/springboot/lab01/springsecurity/config) 包下，创建 [SecurityConfig](https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-01-spring-security/lab-01-springsecurity-demo-role/src/main/java/cn/iocoder/springboot/lab01/springsecurity/config/SecurityConfig.java) 配置类，继承 [WebSecurityConfigurerAdapter](https://github.com/spring-projects/spring-security/blob/master/config/src/main/java/org/springframework/security/config/annotation/web/configuration/WebSecurityConfigurerAdapter.java) 抽象类，实现 Spring Security 在 Web 场景下的自定义配置。
 
@@ -127,7 +127,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 }
 ```
 
-###### 重写 `#configure(AuthenticationManagerBuilder auth)` 方法
+##### 重写 `#configure(AuthenticationManagerBuilder auth)` 方法
 
 重写 `#configure(AuthenticationManagerBuilder auth)` 方法，实现 [AuthenticationManager](https://github.com/spring-projects/spring-security/blob/master/core/src/main/java/org/springframework/security/authentication/AuthenticationManager.java) 认证管理器。
 
@@ -158,7 +158,7 @@ protected void configure(AuthenticationManagerBuilder auth) throws Exception {
     - 生产环境下，推荐使用 [BCryptPasswordEncoder](https://github.com/spring-projects/spring-security/blob/master/crypto/src/main/java/org/springframework/security/crypto/bcrypt/BCryptPasswordEncoder.java) 。更多关于 PasswordEncoder 的内容，推荐阅读[《该如何设计你的 PasswordEncoder?》](http://www.iocoder.cn/Spring-Security/laoxu/PasswordEncoder/?self)文章。
 - `<Z>` 处，配置了「admin/admin」和「normal/normal」两个用户，分别对应 ADMIN 和 NORMAL 角色。相比[「2. 快速入门」](https://www.iocoder.cn/Spring-Boot/Spring-Security/#)来说，可以配置更多的用户。
 
-##### 重写 `#configure(HttpSecurity http)` 方法
+###### 重写 `#configure(HttpSecurity http)` 方法
 
 然后，重写 `#configure(HttpSecurity http)` 方法，主要配置 URL 的权限控制。
 
@@ -188,8 +188,6 @@ protected void configure(HttpSecurity http) throws Exception {
 }
 ```
 
-
-
 - `<X>` 处，调用 `HttpSecurity#authorizeRequests()` 方法，开始配置 URL 的**权限控制**。注意看艿艿配置的**四个**权限控制的配置。下面，是配置权限控制会使用到的方法：
     - `#(String... antPatterns)` 方法，配置匹配的 URL 地址，基于 [Ant 风格路径表达式](https://blog.csdn.net/songdexv/article/details/7219686) ，可传入多个。
     - 【常用】`#permitAll()` 方法，所有用户可访问。
@@ -209,11 +207,11 @@ protected void configure(HttpSecurity http) throws Exception {
 - `<Z>` 处，调用 `HttpSecurity#logout()` 方法，配置**退出**相关。
     - 如果胖友想要自定义退出页面，可以通过 `#logoutUrl(String logoutUrl)` 方法，来进行设置。不过这里我们希望像[「2. 快速入门」](https://www.iocoder.cn/Spring-Boot/Spring-Security/#)一样，使用默认的退出界面，所以不进行设置。
 
-##### 示例二
+#### 示例二
 
 使用 Spring Security 的注解，实现权限控制。
 
-###### 3.3.1 SecurityConfig
+##### 3.3.1 SecurityConfig
 
 修改 [SecurityConfig](https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-01-spring-security/lab-01-springsecurity-demo-role/src/main/java/cn/iocoder/springboot/lab01/springsecurity/config/SecurityConfig.java) 配置类，增加 [`@EnableGlobalMethodSecurity`](https://docs.spring.io/spring-security/site/docs/current/api/org/springframework/security/config/annotation/method/configuration/EnableGlobalMethodSecurity.html) 注解，开启对 Spring Security 注解的方法，进行权限验证。
 
@@ -223,7 +221,7 @@ protected void configure(HttpSecurity http) throws Exception {
 public class SecurityConfig extends WebSecurityConfigurerAdapter
 ```
 
-###### DemoController
+##### DemoController
 
 - [`@PermitAll`](https://github.com/jboss/jboss-annotations-api_spec/blob/master/src/main/java/javax/annotation/security/PermitAll.java) 注解，等价于 `#permitAll()` 方法，所有用户可访问。
 
@@ -233,11 +231,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
 
 - [`@PreAuthorize`](https://github.com/spring-projects/spring-security/blob/master/core/src/main/java/org/springframework/security/access/prepost/PreAuthorize.java) 注解，等价于 `#access(String attribute)` 方法，，当 Spring EL 表达式的执行结果为 true 时，可以访问。
 
-
-
-
-
-#### 添加 `JwtTokenUtil` 工具类
+### 添加 `JwtTokenUtil` 工具类
 
 > 用于生成、解析、验证`JwtToken ` 的工具类；
 
@@ -247,7 +241,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
 - `validateToken(String token, UserDetails userDetails)`：判断token是否还有效；
     - `getUserNameFromToken(String token)`：从token中获取登录用户的信息；
 
-#### 登录注册功能实现
+### 登录注册功能实现
 
 > 如果没有**自定义**登录界面，所以默认会使用 [DefaultLoginPageGeneratingFilter](https://github.com/spring-projects/spring-security/blob/master/web/src/main/java/org/springframework/security/web/authentication/ui/DefaultLoginPageGeneratingFilter.java) 类，生成上述界面。
 
@@ -285,13 +279,13 @@ public CommonResult<List<PmsBrand>> getBrandList() {
 1. [用 Swagger 测试接口，怎么在请求头中携带 Token？](https://juejin.cn/post/6844904183762550797)
 2. [Swagger2.7升级到3.0后的若干问题](https://blog.csdn.net/qq_34963264/article/details/126684715)
 
-##### 直接在 Swagger 中填入认证信息
+#### 直接在 Swagger 中填入认证信息
 
 **认证方式二**、直接在 Swagger 中填入认证信息，这样就不用从外部去获取 access_token 了。
 
 - 主要是 SecurityScheme 不同。这里采用了 OAuthBuilder 来构建，构建时即得配置 token 的获取地址。仅限于 OAuth2 模式。
 
-##### Swagger 配置实现自带 `Authorization ` 头
+#### Swagger 配置实现自带 `Authorization ` 头
 
 **认证方式一**、修改 Swagger 的配置，实现调用接口自带 `Authorization ` 头，通过 `Authorize` 按钮设置 Token，即可访问需登录的接口。
 
@@ -613,15 +607,7 @@ public class SessionConfiguration {
 
 
 
-### 整合 Spring Session + Spring Security 
-
-
-
-## 整合 OAuth2
-
-
-
-## 整合 JWT
+## 整合 Spring Session + Spring Security
 
 
 

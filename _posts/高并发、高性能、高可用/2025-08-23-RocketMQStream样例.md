@@ -19,10 +19,10 @@ location:
 abbrlink: 'rocket_mq_stream_example'
 permalink: 'rocket_mq_stream_example'
 date: 2025-08-23 16:41:00
-updated: 2025-08-23 16:41:00
+updated: 2025-12-23 16:41:00
 ---
 
-> 摘要：三种消息发送方式，两种消息消费方式，丧钟高级消息类型。
+> 摘要：三种消息发送方式，两种消息消费方式，三种高级消息类型。
 
 <!-- more -->
 
@@ -36,65 +36,56 @@ updated: 2025-08-23 16:41:00
 
 #### 区别
 
-Spring Boot整合RocketMQ和Spring Cloud Stream整合RocketMQ是两种不同的方法，它们在使用RocketMQ消息队列时有一些**关键区别**：
+Spring Boot 和 Spring Cloud Stream 整合RocketMQ是两种不同的方法，它们在使用RocketMQ消息队列时有一些**关键区别**：
 
-- **Spring Boot** 整合RocketMQ：
+- **Spring Boot** 整合RocketMQ：这种方式对RocketMQ的使用**更为直接**，适用于需要更多**自定义控制**的场景，例如特定的**消息处理逻辑、异常处理**等。
 
-    1. 通常是直接集成**RocketMQ客户端SDK**，以在Spring Boot应用中使用RocketMQ。
-    2. 使用rocketmq-client依赖，使用rocketmq官方原生方式操作mq。
-    3. 需要**配置**RocketMQ的**生产者和消费者**，设置主题（Topic）和标签（Tag），并编写代码来发送和接收消息。
-    4. 这种方式对RocketMQ的使用**更为直接**，适用于需要更多**自定义控制**的场景，例如特定的消息处理逻辑、异常处理等。
-    5. RocketMQ的维护和配置需要手动完成。
+    1. 使用rocketmq-client依赖，使用rocketmq官方**原生方式**操作mq。
+        - 通常是直接集成**RocketMQ客户端SDK**，用于在Spring Boot应用中使用RocketMQ。
+    2. RocketMQ的维护和配置需要手动完成。需要**配置**RocketMQ的**生产者和消费者**，设置主题（Topic）和标签（Tag），并编写代码来发送和接收消息。
+    
+- **Spring Cloud Stream** 整合RocketMQ：Spring Cloud Stream是Spring Cloud项目的一部分，提供了一种更抽象的消息处理方式（更高级的抽象），以简化消息系统的使用。使开发者可以**更关注业务逻辑**，而不必处理底层消息队列的细节。
 
-- **Spring Cloud Stream** 整合RocketMQ：
-
-    1. Spring Cloud Stream是Spring Cloud项目的一部分，提供了一种更抽象的消息处理方式，以简化消息系统的使用。
-
-    2. 使用 RocketMQTemplate，只需要配置即可使用，比较简单。
+    2. 使用 **RocketMQTemplate**，只需要配置即可使用，比较简单。
 
     3. 整合RocketMQ**抽象了**消息生产者和消费者的**细节**，通过**Binder**来管理消息队列的连接和配置。
 
     4. 可以通过声明式的方式定义输入（input）和输出（output），并且不需要关心底层消息通信的细节，例如主题和标签。
 
-    5. 提供了一种更高级的抽象，使开发者可以**更关注业务逻辑**，而不必处理底层消息队列的细节。
+    4. 配置和维护方面，Spring Cloud Stream通过Binder层来处理。
 
-    6. 配置和维护方面，Spring Cloud Stream通过Binder层来处理。
+         
 
-        
 
 #### 如何选择
 
+综上所述，总之，选择哪种方式更合适取决于项目需求、团队的技术栈和经验。
 
-
-综上所述，总之，选择哪种方式更合适取决于项目需求和团队的技术栈和经验。
-
-- Spring Boot整合RocketMQ需要**显式配置**RocketMQ的细节，更适合需要更多**自定义控制**（和更低层次的操作RocketMQ）的场景，或者已经有丰富的RocketMQ经验。
-- 而Spring Cloud Stream整合RocketMQ提供了更高级的抽象，简化了消息队列的使用，适用于关注业务逻辑而不想处理底层（消息队列）细节的场景。希望更快速地集成和更高级的抽象。
+- Spring Boot整合RocketMQ需要**显式配置**RocketMQ的细节，更适合需要更多**自定义控制**的场景，或者已经有丰富的RocketMQ经验。
+- 而Spring Cloud Stream整合RocketMQ提供了**更高级的抽象**，简化了消息队列的使用，适用于关注业务逻辑而不想处理底层（消息队列）细节的场景。希望更快速地集成和更高级的抽象。
 
 选择哪种方式取决于项目的需求、复杂度、开发团队的偏好、技术栈、经验。
 
 - 选择Spring Boot整合RocketMQ的场景：
     1. 需要更多**自定义控制**：如果需要完全掌控RocketMQ的配置和细节，或者应用需要与RocketMQ进行更复杂的交互，（例如自定义消息处理逻辑、**事务性消息**等）。
-    2. **现有项目集成**：如果已经有一个使用Spring Boot的项目，并且想要将RocketMQ集成到现有项目中，Spring Boot整合更直接，因为它允许您**轻松地添加**RocketMQ依赖和配置。
-    3. 更大的**团队专业知识**：如果您的团队在RocketMQ的使用和管理方面拥有深厚的专业知识，并且愿意自己配置和维护RocketMQ连接和配置，那么Spring Boot整合可以为您提供更多的**自定义选项**。
+    2. **现有项目集成**：如果已经有一个使用Spring Boot的项目，并且想要将RocketMQ集成到现有项目中，Spring Boot整合更直接，因为它允许**轻松地添加**RocketMQ依赖和配置。
+    3. 更大的**团队专业知识**：如果团队在RocketMQ的使用和管理方面拥有深厚的专业知识，并且愿意自己配置和维护RocketMQ连接和配置，那么Spring Boot整合可以提供更多的**自定义选项**。
 
 - 选择Spring Cloud Stream整合RocketMQ的场景：
     1. **快速集成**：如果需要快速集成消息队列、并且不希望处理繁琐的配置细节，Spring Cloud Stream提供了更简化的**声明式配置**，使集成变得更容易。
-    2. **简化的抽象**：如果您更关注业务逻辑、而不愿意处理消息队列的底层细节，Spring Cloud Stream提供了**更高级的抽象**，使您只需关注消息通道和处理逻辑。
-    3. **微服务架构**：如果您的应用是基于微服务架构构建的，Spring Cloud Stream的特性使得在不同微服务之间传递消息变得更加容易。
-    4. **事件驱动架构**：如果您的应用采用事件驱动架构，Spring Cloud Stream提供了更便捷的方式来定义和处理事件消息。
-
-
+    2. **简化的抽象**：如果更关注业务逻辑、而不愿意处理消息队列的底层细节，Spring Cloud Stream提供了**更高级的抽象**，使只需关注消息通道和处理逻辑。
+    3. **微服务架构**：如果应用是基于**微服务架构**构建的，Spring Cloud Stream的特性使得在不同微服务之间传递消息变得更加容易。
+    4. **事件驱动架构**：如果应用采用事件驱动架构，Spring Cloud Stream提供了更便捷的方式来定义和处理事件消息。
 
 
 
 实例**场景**：假设正在构建一个电子商务平台，需要处理订单的**消息通知**。
 
-#### Spring Boot 整合 RocketMQ 步骤
+#### Spring Boot 整合步骤
 
-1. **配置**：在Spring Boot应用中，您需要配置RocketMQ的连接信息、生产者和消费者，并定义主题和标签，如下：
+1. **配置**：在Spring Boot应用中，需要配置RocketMQ的连接信息、生产者和消费者，并定义主题和标签，如下：
 2. **生产者**：编写订单服务，使用RocketMQ的生产者将订单通知**发送**到"order-topic"主题。
-3. **消费者**：编写订单处理服务，使用RocketMQ的消费者**监听**"order-topic"主题，并在收到消息时执行相应的处理逻辑。
+3. **消费者**：编写订单处理服务，使用RocketMQ的消费者**监听**"order-topic"主题，并在收到消息时，执行相应的处理逻辑。
 4. **维护**：配置RocketMQ的连接、主题和标签，以及处理消息消费的错误和异常。
 
 ```yaml
@@ -112,7 +103,7 @@ rocketmq.consumer.topic=order-topic
 rocketmq.consumer.tag=order-tag
 ```
 
-#### Spring Cloud Stream 整合 RocketMQ 步骤
+#### Spring Cloud Stream 整合步骤
 
 1. **依赖**：添加Spring Cloud Stream和RocketMQ的依赖。
 
@@ -167,17 +158,9 @@ rocketmq.consumer.tag=order-tag
 
 [Spring Cloud Stream](https://github.com/spring-cloud/spring-cloud-stream) 是一个用于构建基于**消息**的微服务应用框架，使用 [Spring Integration](https://www.oschina.net/p/spring+integration) 与 **Broker** 进行连接。
 
+- 微服务中会经常使用**消息中间件**，用于在服务与服务之间传递消息，例如RabbitMQ、Kafka和RocketMQ。
 - 提供了消息中间件的**统一抽象**，推出了 `publish-subscribe、consumer groups、partition` 这些统一的概念。
-
-#### 消息中间件的**统一抽象**
-
-微服务中会经常使用消息中间件，通过消息中间件在服务与服务之间传递消息，例如RabbitMQ、Kafka和RocketMQ。
-
-- 无论使用哪一种消息中间件和服务之间都有一点耦合性，这个耦合性指的是原来使用RabbitMQ，现在要替换为RocketMQ，我们的微服务改动比较大，因为两款消息中间件有一些区别，
-- 使用Spring Cloud Stream来整合我们的消息中间件，这样就可以降低微服务和消息中间件的耦合性，做到轻松在不同消息中间件之间**切换**，
-- 然而Spring Cloud Stream官方整合了消息中间件，Spring Cloud Alibaba写了个starter可以支持RocketMQ。
-
-Spring Cloud Stream是一个构建消息驱动微服务的框架，解决了开发人员无感知的使用消息中间件的问题，因为对消息中间件的进一步封装，可以做到代码层面对消息中间件的**无感知**，甚至于动态的切换中间件(rabbitmq切换为rocketmq或者kafka)，使得微服务开发的**高度解耦**，服务可以关注更多自己的业务流程。
+- 因为对消息中间件的进一步封装，可以做到（开发人员）代码层面对消息中间件的**无感知**，甚至于**动态的切换**中间件(rabbitmq切换为rocketmq或者kafka)，使得微服务开发的**高度解耦**，服务可以关注更多自己的业务流程。
 
 Spring Cloud Stream 内部有两个概念：**Binder** 和 **Binding**。
 
@@ -297,7 +280,7 @@ output().send(message);
 
 我们可以直接使用要传输的数据创建Message对象如下，使用一个字符串“Hello，world！”来创建一个Message：
 
-[![img](https://upload-images.jianshu.io/upload_images/5891170-2d2fff3bbeb465ba.png?imageMogr2/auto-orient/strip|imageView2/2/w/588/format/webp)](https://upload-images.jianshu.io/upload_images/5891170-2d2fff3bbeb465ba.png?imageMogr2/auto-orient/strip|imageView2/2/w/588/format/webp)
+![img](https://upload-images.jianshu.io/upload_images/5891170-2d2fff3bbeb465ba.png?imageMogr2/auto-orient/strip|imageView2/2/w/588/format/webp)
 
 MessageBuilder提供了一些方法来设置header如：
 
@@ -619,7 +602,6 @@ public class Demo01Message {
     private Integer id;
 
     // ... 省略 setter/getter/toString 方法
-
 }
 ```
 
@@ -1015,12 +997,44 @@ INFO 51096 --- [MessageThread_1] c.i.s.l.r.c.listener.Demo01Consumer: [onMessage
 
 <img src="https://img2020.cnblogs.com/blog/1540879/202201/1540879-20220106154013500-120269960.png" alt="img" style="zoom:80%;" />
 
-搭建一个 Spring Cloud Stream 消费异常处理机制的示例。考虑方便，我们直接复用[「2. 快速入门」](https://www.iocoder.cn/Spring-Cloud-Alibaba/RocketMQ/#)小节的项目，
+**广播消费**：当使用广播消费模式时，每条消息推送给集群内所有的消费者，保证消息至少被每个消费者消费一次。
+
+![img](https://img2024.cnblogs.com/blog/2487169/202403/2487169-20240328135421183-2127747904.png)
+
+广播消费主要用于两种场景：**消息推送**和**缓存同步**。
+
+#### 消息推送
+
+下图是专车的司机端推送机制，用户下单之后，订单系统生成专车订单，派单系统会根据相关算法将订单派给某司机，司机端就会收到派单推送消息。
+
+![img](https://img2024.cnblogs.com/blog/2487169/202403/2487169-20240328135419672-1923452486.png)
+
+推送服务是一个 TCP 服务（自定义协议），同时也是一个消费者服务，消息模式是广播消费。
+
+司机打开司机端 APP 后，APP 会通过负载均衡和推送服务创建长连接，推送服务会保存 TCP 连接引用 （比如司机编号和 TCP channel 的引用）。
+
+派单服务是生产者，将派单数据发送到 MetaQ , 每个推送服务都会消费到该消息，推送服务判断本地内存中是否存在该司机的 TCP channel ， 若存在，则通过 TCP 连接将数据推送给司机端。
+
+#### 缓存同步
+
+高并发场景下，很多应用使用本地缓存，提升系统性能 。
+
+本地缓存可以是 HashMap 、ConcurrentHashMap ，也可以是缓存框架 Guava Cache 或者 Caffeine cache 。
+
+![img](https://img2024.cnblogs.com/blog/2487169/202403/2487169-20240328135424470-991863943.png)
+
+如上图，应用A启动后，作为一个 RocketMQ 消费者，消息模式设置为广播消费。为了提升接口性能，每个应用节点都会将字典表加载到本地缓存里。
+
+当字典表数据变更时，可以通过业务系统发送一条消息到 RocketMQ ，每个应用节点都会消费消息，刷新本地缓存。
+
+#### 示例
+
+搭建一个 Spring Cloud Stream 消费异常处理机制的示例。考虑方便，直接复用[「2. 快速入门」](https://www.iocoder.cn/Spring-Cloud-Alibaba/RocketMQ/#)小节的项目，
 
 - 使用 [`labx-06-sca-stream-rocketmq-producer-demo`](https://github.com/YunaiV/SpringBoot-Labs/blob/master/labx-06-spring-cloud-stream-rocketmq/labx-06-sca-stream-rocketmq-producer-demo/) 发送消息，
 - 从 [`labx-06-sca-stream-rocketmq-consumer-demo`](https://github.com/YunaiV/SpringBoot-Labs/blob/master/labx-06-spring-cloud-stream-rocketmq/labx-06-sca-stream-rocketmq-consumer-demo/) 复制出 [`labx-06-sca-stream-rocketmq-consumer-broadcasting`](https://github.com/YunaiV/SpringBoot-Labs/blob/master/labx-06-spring-cloud-stream-rocketmq/labx-06-sca-stream-rocketmq-consumer-broadcasting/) 来**演示广播消费**。
 
-#### 配置文件
+##### 配置文件
 
 修改 [`application.yml`](https://github.com/YunaiV/SpringBoot-Labs/blob/master/labx-06-spring-cloud-stream-rocketmq/labx-06-sca-stream-rocketmq-consumer-broadcasting/src/main/resources/application.yml) 配置文件，设置 `broadcasting` 配置项为 `true`，开启**广播消费**的模式。
 
@@ -1052,7 +1066,7 @@ spring:
               messageModel: BROADCASTING # 消费模式，由MessageModel定义
 ```
 
-#### 简单测试
+##### 简单测试
 
 ① 执行 **Consumer**Application 两次，启动两个**消费者**的实例，从而实现在消费者分组 `demo01-consumer-group-DEMO-TOPIC-01` 下有两个消费者实例。
 

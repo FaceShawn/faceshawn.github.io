@@ -74,7 +74,14 @@ Spring Cloud 本身并不是一个开箱即用的框架，它是一套微服务�
 - Spring Cloud Netflix 是 Spring Cloud 的第一代实现，主要由 Eureka、Ribbon、Feign、Hystrix 等组件组成。
 - Spring Cloud Alibaba 是 Spring Cloud 的第二代实现，主要由 Nacos、Sentinel、Seata 等组件组成。
 
-<img src="../assets/spring-cloud-img.png" alt="spring-cloud" style="zoom: 33%;" />
+<img src="../assets/7d52af2b2e5d2baa0a26c9e4411417c4.png" alt="在这里插入图片描述" style="zoom: 60%;" />
+
+
+
+### 和 Spring Boot 的关系
+
+- Spring Boot是build anything，
+- 而Spring Cloud是coordinate anything，Spring Cloud的每一个微服务解决方案都是基于Spring Boot构建的。
 
 ### 版本
 

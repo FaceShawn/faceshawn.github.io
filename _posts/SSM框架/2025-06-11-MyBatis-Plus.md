@@ -23,7 +23,7 @@ updated: 2025-06-11 16:41:00
 
 ---
 
-### 目录
+## 目录
 
 [TOC]
 
@@ -219,21 +219,20 @@ FastAutoGenerator.create("url", "username", "password")
 4. MySQL 下 **tinyint 字段**转换问题：
 
     - 当字段长度为 1 时，无法转换成 **Boolean 字段**，建议在指定数据库连接时添加 `&tinyInt1isBit=true`。
+- 当字段长度大于 1 时，默认转换成 **Byte**，如果想继续转换成 Integer，可使用如下代码：
 
-    - 当字段长度大于 1 时，默认转换成 **Byte**，如果想继续转换成 Integer，可使用如下代码：
-
-        ```java
-        FastAutoGenerator.create("url", "username", "password")
-                .dataSourceConfig(builder ->
-                        builder.typeConvertHandler((globalConfig, typeRegistry, metaInfo) -> {
-                            // 兼容旧版本转换成Integer
-                            if (JdbcType.TINYINT == metaInfo.getJdbcType()) {
-                                return DbColumnType.INTEGER;
-                            }
-                            return typeRegistry.getColumnType(metaInfo);
-                        })
-                );
-        ```
+```java
+FastAutoGenerator.create("url", "username", "password")
+        .dataSourceConfig(builder ->
+                builder.typeConvertHandler((globalConfig, typeRegistry, metaInfo) -> {
+                    // 兼容旧版本转换成Integer
+                    if (JdbcType.TINYINT == metaInfo.getJdbcType()) {
+                        return DbColumnType.INTEGER;
+                    }
+                    return typeRegistry.getColumnType(metaInfo);
+                })
+        );
+```
 
 ##### 依赖
 
@@ -331,7 +330,6 @@ public static void main(String[] args) {
         .templateEngine(new FreemarkerTemplateEngine()) // 使用Freemarker引擎模板，默认的是Velocity引擎模板
 
         .execute();
-
 }
 ```
 
@@ -355,7 +353,6 @@ public static void main(String[] args) {
 
 ```java
 package com..common.dao;
-
 import java.io.Serializable;
 
 //public class BaseEntity implements Serializable {
@@ -538,8 +535,6 @@ package cn..module.product.dal.dataobject.sku;
 
 /**
  * 商品 SKU DO
- *
- * @author 芋道源码
  */
 @TableName(value = "product_sku", autoResultMap = true)
 @KeySequence("product_sku_seq") // 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。

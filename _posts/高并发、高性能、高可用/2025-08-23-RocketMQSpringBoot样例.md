@@ -17,7 +17,7 @@ location:
 abbrlink: 'rocket_mq_spring_example'
 permalink: 'rocket_mq_spring_example'
 date: 2025-08-23 16:41:00
-updated: 2025-08-23 16:41:00
+updated: 2025-12-11 16:41:00
 ---
 
 > 摘要：RocketMQ与SpringBoot集成，使用rocketmq-client依赖，使用rocketmq官方原生方式操作mq。包括基本消息（消息发送、消费），顺序消息，延时消息，批量消息，过滤消息，消息事务，Logappender 日志，OpenMessaging。
@@ -237,23 +237,20 @@ public class Consumer {
 
 顺序消费的原理解析，在默认的情况下消息发送会采取Round Robin轮询方式把消息发送到不同的queue(分区队列)；而消费消息的时候从多个queue上拉取消息，这种情况发送和消费是不能保证顺序。但是如果控制发送的顺序消息只依次发送到同一个queue中，消费的时候只从这个queue上依次拉取，则就保证了顺序。当发送和消费参与的queue只有一个，则是全局有序；如果多个queue参与，则为分区有序，即相对每个queue，消息都是有序的。
 
-下面用订单进行分区有序的示例。一个订单的顺序流程是：创建、付款、推送、完成。订单号相同的消息会被先后发送到同一个队列中，消费时，同一个OrderId获取到的肯定是同一个队列。
+下面用订单进行**分区有序**的示例。
+
+- 一个**订单**的顺序流程是：创建、付款、推送、完成。
+
+- 订单号相同的消息会被先后发送到同一个队列中，消费时，同一个OrderId获取到的肯定是同一个队列。
 
 ### 2.1 顺序消息生产
 
 ```java
-package org.apache.rocketmq.example.order2;
-
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.MessageQueueSelector;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageQueue;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /**
 * Producer，发送顺序消息
@@ -394,8 +391,6 @@ public class Producer {
 ### 2.2 顺序消费消息
 
 ```java
-package org.apache.rocketmq.example.order2;
-
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeOrderlyContext;
 import org.apache.rocketmq.client.consumer.listener.ConsumeOrderlyStatus;
@@ -869,7 +864,7 @@ RocketMQ日志提供log4j、log4j2和logback日志框架作为业务应用，下
 
 按下面样例使用log4j属性配置
 
-```
+```ini
 log4j.appender.mq=org.apache.rocketmq.logappender.log4j.RocketmqLog4jAppender
 log4j.appender.mq.Tag=yourTag
 log4j.appender.mq.Topic=yourLogTopic
@@ -881,7 +876,7 @@ log4j.appender.mq.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss} %-4r [%t] (%F
 
 按下面样例使用log4j xml配置来使用异步添加日志
 
-```
+```xml
 <appender name="mqAppender1"class="org.apache.rocketmq.logappender.log4j.RocketmqLog4jAppender">
   <param name="Tag" value="yourTag" />
   <param name="Topic" value="yourLogTopic" />
@@ -902,7 +897,7 @@ log4j.appender.mq.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss} %-4r [%t] (%F
 
 用log4j2时，配置如下，如果想要非阻塞，只需要使用异步添加引用即可
 
-```
+```xml
 <RocketMQ name="rocketmqAppender" producerGroup="yourLogGroup" nameServerAddress="yourRocketmqNameserverAddress"
    topic="yourLogTopic" tag="yourTag">
   <PatternLayout pattern="%d [%p] hahahah %c %m%n"/>
@@ -911,7 +906,7 @@ log4j.appender.mq.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss} %-4r [%t] (%F
 
 ### 7.3 logback样例
 
-```
+```xml
 <appender name="mqAppender1"class="org.apache.rocketmq.logappender.logback.RocketmqLogbackAppender">
   <tag>yourTag</tag>
   <topic>yourLogTopic</topic>

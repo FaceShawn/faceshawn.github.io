@@ -66,7 +66,7 @@ WebSocket 协议：
 
 （6）协议**标识符**是`ws`（如果加密，则为`wss`），服务器网址就是 URL。
 
-> ```markup
+> ```http
 > ws://example.com:80/some/path
 > ```
 
