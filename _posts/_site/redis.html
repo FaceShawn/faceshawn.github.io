@@ -1,5 +1,5 @@
 <blockquote>
-  <p>摘要：Redis 分布式缓存。</p>
+  <p>摘要：Redis 分布式缓存。主要分为：数据类型；线程模型，内存管理、持久化机制、事务；管道、集群、性能优化；缓存。</p>
 </blockquote>
 
 <!-- more -->
@@ -7,14 +7,6 @@
 <h3 id="目录">目录</h3>
 
 <p>[TOC]</p>
-
-<h3 id="redis-缓存数据库">Redis 缓存数据库</h3>
-
-<p>Redis：用 <strong>C 语言</strong>开发的数据库，数据存在内存中（即内存数据库），<strong>读写速度</strong>非常快。</p>
-
-<ul>
-  <li>默认端口号为 <code class="highlighter-rouge">6379</code>。</li>
-</ul>
 
 <p>主要分为三大类：</p>
 
@@ -24,6 +16,14 @@
   <li>管道、集群、性能优化</li>
   <li>缓存</li>
 </ol>
+
+<h3 id="redis-缓存数据库">Redis 缓存数据库</h3>
+
+<p>Redis：用 <strong>C 语言</strong>开发的数据库，数据存在内存中（即内存数据库），<strong>读写速度</strong>非常快。</p>
+
+<ul>
+  <li>默认端口号为 <code class="highlighter-rouge">6379</code>。</li>
+</ul>
 
 <h3 id="redis-缓存">Redis 缓存</h3>
 
@@ -39,7 +39,7 @@
 <p>用于：</p>
 
 <ol>
-  <li><strong>数据缓存</strong>：处理（大量数据的）<strong>高访问负载</strong>；提升用户体验、应对更多的用户。见上。应用场景有：
+  <li><strong>数据缓存</strong>：处理（大量数据的）<strong>高访问负载</strong>；提升用户体验、应对更多的用户。把一些查询慢，使用率高的<strong>热点数据</strong>做缓存处理，能快速提高接口响应时间。见上。应用场景有：
     <ol>
       <li><code class="highlighter-rouge">session、token</code>、序列化后的对象的缓存。</li>
       <li>计数：比如用户单位时间的请求数（简单<strong>限流</strong>可以用到）、页面单位时间的访问数。</li>
@@ -112,6 +112,10 @@
 </ol>
 
 <h4 id="spring-data-redis">Spring Data Redis</h4>
+
+<blockquote>
+  <p>见整合 Redis 缓存文档。</p>
+</blockquote>
 
 <p><img src="../assets/reddis_01-1757420904342.png" alt="reddis_01" style="zoom: 33%;" /></p>
 
@@ -189,43 +193,43 @@
 
 <h5 id="示例代码">示例代码</h5>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>private RedisTemplate&lt;String, Object&gt; redisTemplate;
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">private</span> <span class="n">RedisTemplate</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">redisTemplate</span><span class="o">;</span>
 
-// String
-redisTemplate.opsForValue().set(RedisConstantKey.MY_REDIS_VALUE.key, "人民");
-Object o = redisTemplate.opsForValue().get(RedisConstantKey.MY_REDIS_VALUE.key);
-if(Objects.nonNull(o)){
-     System.out.println(o.toString());
-}
+<span class="c1">// String</span>
+<span class="n">redisTemplate</span><span class="o">.</span><span class="na">opsForValue</span><span class="o">().</span><span class="na">set</span><span class="o">(</span><span class="n">RedisConstantKey</span><span class="o">.</span><span class="na">MY_REDIS_VALUE</span><span class="o">.</span><span class="na">key</span><span class="o">,</span> <span class="s">"人民"</span><span class="o">);</span>
+<span class="n">Object</span> <span class="n">o</span> <span class="o">=</span> <span class="n">redisTemplate</span><span class="o">.</span><span class="na">opsForValue</span><span class="o">().</span><span class="na">get</span><span class="o">(</span><span class="n">RedisConstantKey</span><span class="o">.</span><span class="na">MY_REDIS_VALUE</span><span class="o">.</span><span class="na">key</span><span class="o">);</span>
+<span class="k">if</span><span class="o">(</span><span class="n">Objects</span><span class="o">.</span><span class="na">nonNull</span><span class="o">(</span><span class="n">o</span><span class="o">)){</span>
+     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">o</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+<span class="o">}</span>
 
-// List
-List&lt;Object&gt; language = Lists.newArrayList("java", "c++", "python", "js");
-redisTemplate.opsForList().leftPushAll(RedisConstantKey.MY_REDIS_LIST.key, language);
+<span class="c1">// List</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">&gt;</span> <span class="n">language</span> <span class="o">=</span> <span class="n">Lists</span><span class="o">.</span><span class="na">newArrayList</span><span class="o">(</span><span class="s">"java"</span><span class="o">,</span> <span class="s">"c++"</span><span class="o">,</span> <span class="s">"python"</span><span class="o">,</span> <span class="s">"js"</span><span class="o">);</span>
+<span class="n">redisTemplate</span><span class="o">.</span><span class="na">opsForList</span><span class="o">().</span><span class="na">leftPushAll</span><span class="o">(</span><span class="n">RedisConstantKey</span><span class="o">.</span><span class="na">MY_REDIS_LIST</span><span class="o">.</span><span class="na">key</span><span class="o">,</span> <span class="n">language</span><span class="o">);</span>
 
-// Hash，通过putAll方法以map集合的形式添加键值对
-public void addHashData(String key, Map&lt;String, Object&gt; hashData) { // ?
-    redisTemplate.opsForHash().putAll(key, hashData);
-    Map newMap = new HashMap();  
-    newMap.put("map3","map3-3");  
-    newMap.put("map5","map5-5");
-    redisTemplate.opsForHash().putAll("hashValue", newMap);
-    map = redisTemplate.opsForHash().entries("hashValue");  
-}
+<span class="c1">// Hash，通过putAll方法以map集合的形式添加键值对</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">addHashData</span><span class="o">(</span><span class="n">String</span> <span class="n">key</span><span class="o">,</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">hashData</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// ?</span>
+    <span class="n">redisTemplate</span><span class="o">.</span><span class="na">opsForHash</span><span class="o">().</span><span class="na">putAll</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">hashData</span><span class="o">);</span>
+    <span class="n">Map</span> <span class="n">newMap</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">();</span>  
+    <span class="n">newMap</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"map3"</span><span class="o">,</span><span class="s">"map3-3"</span><span class="o">);</span>  
+    <span class="n">newMap</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"map5"</span><span class="o">,</span><span class="s">"map5-5"</span><span class="o">);</span>
+    <span class="n">redisTemplate</span><span class="o">.</span><span class="na">opsForHash</span><span class="o">().</span><span class="na">putAll</span><span class="o">(</span><span class="s">"hashValue"</span><span class="o">,</span> <span class="n">newMap</span><span class="o">);</span>
+    <span class="n">map</span> <span class="o">=</span> <span class="n">redisTemplate</span><span class="o">.</span><span class="na">opsForHash</span><span class="o">().</span><span class="na">entries</span><span class="o">(</span><span class="s">"hashValue"</span><span class="o">);</span>  
+<span class="o">}</span>
 
-// Set
-// RedisConstantKey.MY_REDIS_SET.key ?
-redisTemplate.opsForSet().add(RedisConstantKey.MY_REDIS_SET.key, "aa");
-redisTemplate.opsForSet().add(RedisConstantKey.MY_REDIS_SET.key, "bb");
-// 这里加入一个重复的值，set集合自动去重
-redisTemplate.opsForSet().add(RedisConstantKey.MY_REDIS_SET.key, "aa"); //?
+<span class="c1">// Set</span>
+<span class="c1">// RedisConstantKey.MY_REDIS_SET.key ?</span>
+<span class="n">redisTemplate</span><span class="o">.</span><span class="na">opsForSet</span><span class="o">().</span><span class="na">add</span><span class="o">(</span><span class="n">RedisConstantKey</span><span class="o">.</span><span class="na">MY_REDIS_SET</span><span class="o">.</span><span class="na">key</span><span class="o">,</span> <span class="s">"aa"</span><span class="o">);</span>
+<span class="n">redisTemplate</span><span class="o">.</span><span class="na">opsForSet</span><span class="o">().</span><span class="na">add</span><span class="o">(</span><span class="n">RedisConstantKey</span><span class="o">.</span><span class="na">MY_REDIS_SET</span><span class="o">.</span><span class="na">key</span><span class="o">,</span> <span class="s">"bb"</span><span class="o">);</span>
+<span class="c1">// 这里加入一个重复的值，set集合自动去重</span>
+<span class="n">redisTemplate</span><span class="o">.</span><span class="na">opsForSet</span><span class="o">().</span><span class="na">add</span><span class="o">(</span><span class="n">RedisConstantKey</span><span class="o">.</span><span class="na">MY_REDIS_SET</span><span class="o">.</span><span class="na">key</span><span class="o">,</span> <span class="s">"aa"</span><span class="o">);</span> <span class="c1">//?</span>
 
-Set&lt;Object&gt; members = redisTemplate.opsForSet().members(RedisConstantKey.MY_REDIS_SET.key);
-Iterator&lt;Object&gt; it = members.iterator();
-while (it.hasNext()){
-	System.out.println(it.next());
-}
+<span class="n">Set</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">&gt;</span> <span class="n">members</span> <span class="o">=</span> <span class="n">redisTemplate</span><span class="o">.</span><span class="na">opsForSet</span><span class="o">().</span><span class="na">members</span><span class="o">(</span><span class="n">RedisConstantKey</span><span class="o">.</span><span class="na">MY_REDIS_SET</span><span class="o">.</span><span class="na">key</span><span class="o">);</span>
+<span class="n">Iterator</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">&gt;</span> <span class="n">it</span> <span class="o">=</span> <span class="n">members</span><span class="o">.</span><span class="na">iterator</span><span class="o">();</span>
+<span class="k">while</span> <span class="o">(</span><span class="n">it</span><span class="o">.</span><span class="na">hasNext</span><span class="o">()){</span>
+	<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">it</span><span class="o">.</span><span class="na">next</span><span class="o">());</span>
+<span class="o">}</span>
 
-//Zset
+<span class="c1">//Zset</span>
 
 </code></pre></div></div>
 
@@ -266,7 +270,9 @@ while (it.hasNext()){
 
 <p>跳跃表是基于多指针有序链表实现的，可以看成多个有序链表。</p>
 
-<h4 id="用-string-还是-hash-存储对象">用 String 还是 Hash 存储对象</h4>
+<h4 id="应用场景">应用场景</h4>
+
+<h5 id="用-string-还是-hash-存储对象">用 String 还是 Hash 存储对象</h5>
 
 <ul>
   <li>如果对象中某些字段需要<strong>经常变动</strong>或者经常需要<strong>单独查询</strong>对象中的个别<strong>字段</strong>信息，适合用 <code class="highlighter-rouge">Hash</code>：String 存储的是<strong>序列化后</strong>的对象数据，存放的是<strong>整个对象</strong>。Hash 是对对象的<strong>每个字段</strong>单独存储，可以获取部分字段的信息，也可以修改或添加部分字段，节省网络流量。</li>
@@ -285,20 +291,30 @@ while (it.hasNext()){
   <li>用户 id 为 key，商品 id 为 field，商品数量为 value。</li>
 </ul>
 
-<h4 id="用-set-实现抽奖系统需要用到什么命令">用 Set 实现抽奖系统需要用到什么命令？</h4>
+<h5 id="用-set-实现抽奖系统">用 Set 实现抽奖系统</h5>
+
+<blockquote>
+  <p>需要用到什么命令？</p>
+</blockquote>
 
 <ul>
   <li><code class="highlighter-rouge">SPOP key count</code> ： 随机移除并获取指定集合中一个或多个元素，适合不允许重复中奖的场景。</li>
   <li><code class="highlighter-rouge">SRANDMEMBER key count</code> : 随机获取指定集合中指定数量的元素，适合允许重复中奖的场景。</li>
 </ul>
 
-<h4 id="用-zset-实现一个排行榜">用 ZSet 实现一个排行榜</h4>
+<h5 id="用-zset-实现排行榜">用 ZSet 实现排行榜</h5>
 
 <p><code class="highlighter-rouge">sorted set</code> 经常被用在各种排行榜的场景，比如直播间送礼物的排行榜、朋友圈的微信步数排行榜、王者荣耀中的段位排行榜、话题热度排行榜等等。</p>
 
-<p>相关的一些 Redis 命令: <code class="highlighter-rouge">ZRANGE</code> (从小到大排序) 、 <code class="highlighter-rouge">ZREVRANGE</code> （从大到小排序）、<code class="highlighter-rouge">ZREVRANK</code> (指定元素排名)。</p>
+<p>相关的一些 Redis 命令:</p>
 
-<h4 id="用-bitmap-统计活跃用户">用 Bitmap 统计活跃用户</h4>
+<ul>
+  <li><code class="highlighter-rouge">ZRANGE</code> (从小到大排序) 、</li>
+  <li><code class="highlighter-rouge">ZREVRANGE</code> （从大到小排序）、</li>
+  <li><code class="highlighter-rouge">ZREVRANK</code> (指定元素排名)。</li>
+</ul>
+
+<h5 id="用-bitmap-统计活跃用户">用 Bitmap 统计活跃用户</h5>
 
 <p>使用日期（精确到天）作为 key，用户 ID 为 offset，如果当日活跃过就设置为 1。</p>
 
@@ -328,7 +344,7 @@ while (it.hasNext()){
 <span class="o">(</span>integer<span class="o">)</span> 2
 </code></pre></div></div>
 
-<h4 id="用-hyperloglog-统计页面-uv">用 HyperLogLog 统计页面 UV</h4>
+<h5 id="用-hyperloglog-统计页面-uv">用 HyperLogLog 统计页面 UV</h5>
 
 <p>1、将访问指定页面的每个用户 ID 添加到 <code class="highlighter-rouge">HyperLogLog</code> 中。</p>
 
@@ -390,11 +406,13 @@ while (it.hasNext()){
   </li>
 </ul>
 
-<h4 id="redis-60-之前为什么不用多线程">Redis 6.0 之前为什么不用多线程？</h4>
+<h4 id="redis-60-之前不用多线程">Redis 6.0 之前不用多线程</h4>
 
 <blockquote>
   <p>其实，在 Redis 4.0 版本之后就引入了<strong>多线程</strong>来执行一些<strong>大键值对</strong>的异步删除操作。</p>
 </blockquote>
+
+<p>原因：</p>
 
 <ol>
   <li>单线程<strong>编程容易</strong>且更<strong>易维护</strong>，方便开发和调试；</li>
@@ -407,7 +425,9 @@ while (it.hasNext()){
   <li>多线程存在<strong>死锁</strong>、线程上下文切换等问题，甚至会影响性能。</li>
 </ol>
 
-<h4 id="redis-60-之后为什么引入多线程">Redis 6.0 之后为什么引入多线程？</h4>
+<h4 id="redis-60-之后引入多线程">Redis 6.0 之后引入多线程</h4>
+
+<p>原因：</p>
 
 <ol>
   <li>主要是为了<strong>提高网络 IO 读写</strong>性能（解决性能瓶颈）。</li>
@@ -418,7 +438,7 @@ while (it.hasNext()){
   <p>默认禁用，需手动打开。</p>
 </blockquote>
 
-<h4 id="事件">事件</h4>
+<h4 id="事件"><del>事件</del></h4>
 
 <h3 id="内存管理">内存管理</h3>
 
@@ -445,12 +465,12 @@ while (it.hasNext()){
   <li>另外， <code class="highlighter-rouge">persist</code> 命令可以移除一个键的过期时间。</li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt; exp key 60 # 数据在 60s 后过期，expire 命令
-(integer) 1
-&gt; setex key 60 value # 数据在 60s 后过期，用于String
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;</span> exp key 60 <span class="c"># 数据在 60s 后过期，expire 命令</span>
+<span class="o">(</span>integer<span class="o">)</span> 1
+<span class="o">&gt;</span> setex key 60 value <span class="c"># 数据在 60s 后过期，用于String</span>
 OK
-&gt; ttl key # 查看数据还有多久过期
-(integer) 56
+<span class="o">&gt;</span> ttl key <span class="c"># 查看数据还有多久过期</span>
+<span class="o">(</span>integer<span class="o">)</span> 56
 </code></pre></div></div>
 
 <h5 id="redis-判断数据过期">Redis 判断数据过期</h5>
@@ -570,11 +590,11 @@ OK
   <li><code class="highlighter-rouge">bgsave</code> : 子线程执行，不会阻塞主线程，<strong>默认</strong>选项。BG SAVE的核心是利用<code class="highlighter-rouge">fork</code> 和 <code class="highlighter-rouge">COW</code> 机制。</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># RDB
-#在900秒之后，如果至少有1个key发生变化，Redis就会自动触发bgsave命令创建快照。
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># RDB</span>
+<span class="c">#在900秒之后，如果至少有1个key发生变化，Redis就会自动触发bgsave命令创建快照。</span>
 save 900 1  
-save 300 10  #在300秒之后，如果至少有10个key发生变化。
-save 60 10000  #在60秒之后，如果至少有10000个key发生变化。
+save 300 10  <span class="c">#在300秒之后，如果至少有10个key发生变化。</span>
+save 60 10000  <span class="c">#在60秒之后，如果至少有10000个key发生变化。</span>
 </code></pre></div></div>
 
 <h5 id="cow-有什么缺陷">COW 有什么缺陷？</h5>
@@ -594,12 +614,12 @@ save 60 10000  #在60秒之后，如果至少有10000个key发生变化。
   <p>在 Redis 的配置文件中存在三种不同的 AOF 持久化方式：</p>
 </blockquote>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 默认情况下 Redis 没有开启 AOF方式的持久化，可以通过 appendonly 参数开启：
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 默认情况下 Redis 没有开启 AOF方式的持久化，可以通过 appendonly 参数开启：</span>
 appendonly yes
 
-appendfsync always    # 1.每次有数据修改发生时都会写入AOF文件,这样会严重降低Redis的速度
-appendfsync everysec  # 2.每秒钟同步一次，显式地将多个写命令同步到硬盘
-appendfsync no        # 3.让操作系统决定何时进行同步
+appendfsync always    <span class="c"># 1.每次有数据修改发生时都会写入AOF文件,这样会严重降低Redis的速度</span>
+appendfsync everysec  <span class="c"># 2.每秒钟同步一次，显式地将多个写命令同步到硬盘</span>
+appendfsync no        <span class="c"># 3.让操作系统决定何时进行同步</span>
 </code></pre></div></div>
 
 <p>为了兼顾数据和写入性能，用户可以考虑 <code class="highlighter-rouge">appendfsync everysec</code> 选项 ，让 Redis <strong>每秒同步一次</strong> AOF 文件，Redis 性能几乎没受到任何影响。</p>
@@ -724,15 +744,15 @@ appendfsync no        # 3.让操作系统决定何时进行同步
   <li>执行事务（<code class="highlighter-rouge">EXEC</code>）。</li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt; MULTI #开始事务
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;</span> MULTI <span class="c">#开始事务</span>
 OK
-&gt; SET USER "Guide哥" #命令入队(批量操作 Redis 的命令，先进先出（FIFO）的顺序执行)
+<span class="o">&gt;</span> SET USER <span class="s2">"Guide哥"</span> <span class="c">#命令入队(批量操作 Redis 的命令，先进先出（FIFO）的顺序执行)</span>
 QUEUED
-&gt; GET USER
+<span class="o">&gt;</span> GET USER
 QUEUED
-&gt; EXEC #执行事务
-1) OK
-2) "Guide哥"
+<span class="o">&gt;</span> EXEC <span class="c">#执行事务</span>
+1<span class="o">)</span> OK
+2<span class="o">)</span> <span class="s2">"Guide哥"</span>
 </code></pre></div></div>
 
 <h4 id="redis-支持原子性吗">Redis 支持原子性吗？</h4>
@@ -798,6 +818,12 @@ QUEUED
 </ul>
 
 <h3 id="redis-高可用">Redis 高可用</h3>
+
+<p>为了保障Redis的<strong>高可用</strong>，可以采用<strong>哨兵部署</strong>，<del>不是三个redis节点，</del>一主二从，同时部署三个哨兵节点，来实现故障转移，避免<strong>单点问题</strong>。</p>
+
+<ul>
+  <li>如果Redis存储的数据量很大，达到了单节点的Redis的性能瓶颈，也可以用Redis<strong>集群模式</strong>来实现分布式存储。</li>
+</ul>
 
 <p>Redis 高可用有两种模式，Sentinel 和 Cluster。</p>
 
@@ -1036,17 +1062,15 @@ QUEUED
 
 <p><strong>迁移过程中key的访问</strong>：因此在迁移过程中，一个槽的部分 key 可能在源节点，一部分在目标节点。因此如果请求过来，打到源节点，源节点发现已经迁移了，就会返回一个 ASK 错误，这个错误会引导客户端直接去访问目标节点。</p>
 
-<h4 id="集群">集群</h4>
-
-<h5 id="负载均衡算法">负载均衡算法</h5>
+<h5 id="负载均衡算法"><del>负载均衡算法</del></h5>
 
 <blockquote>
   <p>见分布式文档中的负载均衡部分。</p>
 </blockquote>
 
-<h5 id="负载均衡转发实现">负载均衡转发实现</h5>
+<h5 id="负载均衡转发实现"><del>负载均衡转发实现</del></h5>
 
-<h5 id="集群下的-session-管理">集群下的 Session 管理</h5>
+<h5 id="集群下的-session-管理"><del>集群下的 Session 管理</del></h5>
 
 <h3 id="性能优化">性能优化</h3>
 

@@ -78,7 +78,7 @@
 <table>
   <thead>
     <tr>
-      <th style="text-align: left">特        性</th>
+      <th style="text-align: left">特  性</th>
       <th style="text-align: left">quartz</th>
       <th style="text-align: left">elastic-job-lite</th>
       <th style="text-align: left">xxl-job</th>
@@ -94,7 +94,7 @@
       <td style="text-align: left">jdk、zookeeper、maven</td>
     </tr>
     <tr>
-      <td style="text-align: left">高     可用</td>
+      <td style="text-align: left">高可用</td>
       <td style="text-align: left"><strong>多节点</strong>部署，通过竞争数据库锁来保证只有一个节点执行任务</td>
       <td style="text-align: left">通过<strong>zookeeper</strong>的注册与发现，可以动态的添加服务器</td>
       <td style="text-align: left">基于竞争数据库锁保证只有一个节点执行任务，支持<strong>水平扩容</strong>。可以手动增加定时任务，启动和暂停任务，有监控</td>
@@ -223,7 +223,7 @@
   <li>创建 <code class="highlighter-rouge">#execute()</code> 方法，实现打印日志。同时，在该方法上，添加 <a href="https://github.com/spring-projects/spring-framework/blob/master/spring-context/src/main/java/org/springframework/scheduling/annotation/Scheduled.java"><code class="highlighter-rouge">@Scheduled</code></a> 注解，设置每 2 秒执行该方法。</li>
 </ul>
 
-<h4 id="scheduled">@Scheduled</h4>
+<h3 id="scheduled">@Scheduled</h3>
 
 <p>设置定时任务的执行计划。</p>
 
@@ -247,7 +247,7 @@
   <li><code class="highlighter-rouge">fixedRateString</code> 属性：<code class="highlighter-rouge">fixedRate</code> 的字符串形式。</li>
 </ul>
 
-<h4 id="应用配置文件">应用配置文件</h4>
+<h3 id="应用配置文件"><del>应用配置文件</del></h3>
 
 <h2 id="quartz">Quartz</h2>
 

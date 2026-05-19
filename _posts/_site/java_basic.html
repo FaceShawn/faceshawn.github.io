@@ -10,7 +10,7 @@
 
 <p>[TOC]</p>
 
-<h3 id="java-vs-c">Java VS C++</h3>
+<h3 id="javac">Java、C++</h3>
 
 <ol>
   <li><strong>纯面向对象</strong>的语言（封装、继承、多态）-&gt; <strong>低耦合</strong>的系统，易维护、复用、扩展；C++ <strong>兼容</strong> C，效率高但有面向过程。
@@ -22,8 +22,8 @@
   <li><strong>JVM</strong>：<strong>跨平台</strong>/平台无关，一次编译到处运行（很好的<strong>可移植性</strong>），<strong>字节码运行机制</strong>，既有编译又有解释；C++为编译型语言，C++11 Windows 下无法<a href="#数组">静态初始化数组</a>。</li>
   <li><strong>JVM</strong>：<strong>自动内存管理</strong>，没有指针（除 <code class="highlighter-rouge">Unsafe</code> 类），更安全、方便；C++ 要<strong>手动</strong>释放内存，虽然可自由管理内存，但指针易导致：
     <ol>
-      <li>野指针（指向垃圾内存的指针）：没有初始化直接使用而导致野指针；free 或 delete 后没有置为 NULL，当做合法指针使用导致野指针；</li>
-      <li>空指针 NPE；</li>
+      <li><strong>野指针</strong>（指向垃圾内存的指针）：没有初始化直接使用而导致野指针；free 或 delete 后没有置为 NULL，当做合法指针使用导致野指针；</li>
+      <li><strong>空指针 NPE</strong>；</li>
       <li>内存泄漏。</li>
     </ol>
   </li>
@@ -35,19 +35,19 @@
 
 <h3 id="jdkjrejvm-对比">JDK、JRE、JVM 对比</h3>
 
-<p><code class="highlighter-rouge">JDK (Java Development Kit)</code>，是一种功能齐全的 Java SDK，用于<strong>程序开发者</strong>创建、编译程序。</p>
+<p><code class="highlighter-rouge">JDK(Java Development Kit)</code>，是一种功能齐全的 Java SDK，用于<strong>程序开发者</strong>创建、编译程序。</p>
 
 <ol>
   <li><strong>Java 开发组件</strong>：<code class="highlighter-rouge">javac</code> 编译器、<code class="highlighter-rouge">jar</code> 打包工具、<code class="highlighter-rouge">javadoc</code> 文档生成器、<code class="highlighter-rouge">java-debuger（jdb）</code>调试工具、<code class="highlighter-rouge">javap -c</code> 反汇编；</li>
-  <li><code class="highlighter-rouge">JRE (JAVA Runtime Environment)</code>：包含<strong>普通用户</strong>运行 Java 程序所需的全部内容。
+  <li><code class="highlighter-rouge">JRE(JAVA Runtime Environment)</code>：包含<strong>普通用户</strong>运行 Java 程序所需的全部内容。
     <ol>
-      <li><code class="highlighter-rouge">JVM (JAVA Virtual Machine)</code>：是一个用于执行<strong>Java 字节码</strong>的虚拟机进程，针对不同系统有特定的实现；实现<strong>一次编译，到处运行</strong>；如 <code class="highlighter-rouge">HopSpot、JRockit、J9Vm</code>；</li>
-      <li>用于产品环境的 Java 类库。</li>
+      <li><code class="highlighter-rouge">JVM(JAVA Virtual Machine)</code>：是一个用于执行<strong>Java 字节码</strong>的虚拟机<strong>进程</strong>，针对不同系统有特定的实现；实现<strong>一次编译，到处运行</strong>；如 <code class="highlighter-rouge">HopSpot、JRockit、J9Vm</code>；</li>
+      <li>用于<strong>产品环境</strong>的 Java 类库。</li>
     </ol>
   </li>
 </ol>
 
-<p>Oracle JDK vs OpenJDK</p>
+<p>Oracle JDK、OpenJDK</p>
 
 <h2 id="基本语法">基本语法</h2>
 
@@ -56,8 +56,8 @@
 <p>注意：</p>
 
 <ul>
-  <li>虽然 <code class="highlighter-rouge">true</code>, <code class="highlighter-rouge">false</code>, 和 <code class="highlighter-rouge">null</code> 看起来像关键字，但实际上是字面值/量，同样也不可作为标识符。</li>
-  <li>标识符 <code class="highlighter-rouge">var</code>、<code class="highlighter-rouge">yield</code> 和 <code class="highlighter-rouge">record</code> 是受限标识符，因为在某些上下文中是不允许的。</li>
+  <li>虽然 <code class="highlighter-rouge">true</code>、<code class="highlighter-rouge">false</code>、 <code class="highlighter-rouge">null</code> 看起来像关键字，但实际上是字面值/量，同样也不可作为标识符。</li>
+  <li>标识符 <code class="highlighter-rouge">var</code>、<code class="highlighter-rouge">yield</code> 和 <code class="highlighter-rouge">record</code> 是<strong>受限标识符</strong>，因为在某些上下文中是不允许的。</li>
   <li><code class="highlighter-rouge">instanceof</code> 关键字：若对象为类（或接口、抽象类、父类）的<strong>实例</strong>，则返回 true。</li>
 </ul>
 
@@ -73,11 +73,11 @@
 
 <ul>
   <li><code class="highlighter-rouge">public </code>: 对所有类可见。</li>
-  <li><code class="highlighter-rouge">protected </code>: 对同一包内的类和所有子类可见。可以访问不同包的、从基类继承的 protected 变量、方法。
-    <ul>
+  <li><code class="highlighter-rouge">protected </code>: 对<strong>同一包内</strong>的类和所有子类可见。可以访问不同包的、从基类继承的 protected 变量、方法。
+    <ol>
       <li><strong>子类与基类在同一包中</strong>：被声明为 protected 的变量、方法和构造器能被同一个包中的任何其他类访问；</li>
       <li><strong>子类与基类不在同一包中</strong>：那么在子类中，子类实例可以访问其<strong>从基类继承</strong>而来的 protected 方法，而不能访问<strong>基类实例</strong>的protected方法。</li>
-    </ul>
+    </ol>
   </li>
   <li><code class="highlighter-rouge">default</code>（即<strong>默认</strong>，什么也不写）：在同一包内可见（只能访问<strong>同一包中</strong>的子孙类），不使用任何修饰符。</li>
   <li><code class="highlighter-rouge">private </code>: 在同一类内可见。</li>
@@ -90,8 +90,7 @@
       <th>使用对象</th>
       <th style="text-align: left">当前类</th>
       <th style="text-align: left">同一包内</th>
-      <th style="text-align: left">子孙类(同一包)</th>
-      <th style="text-align: left">子孙类(不同包)</th>
+      <th style="text-align: left">子孙类（不同包）</th>
       <th style="text-align: left">其他包</th>
     </tr>
   </thead>
@@ -103,12 +102,10 @@
       <td style="text-align: left">Y</td>
       <td style="text-align: left">Y</td>
       <td style="text-align: left">Y</td>
-      <td style="text-align: left">Y</td>
     </tr>
     <tr>
       <td style="text-align: left"><code class="highlighter-rouge">protected</code></td>
       <td>变量、方法，不能修饰类（外部类）</td>
-      <td style="text-align: left">Y</td>
       <td style="text-align: left">Y</td>
       <td style="text-align: left">Y</td>
       <td style="text-align: left">Y/N（<a href="https://www.runoob.com/java/java-modifier-types.html#protected-desc">说明</a>），可以访问从基类继承的</td>
@@ -117,7 +114,6 @@
     <tr>
       <td style="text-align: left"><strong><code class="highlighter-rouge">default</code></strong></td>
       <td><strong>类、接口</strong>、变量、方法</td>
-      <td style="text-align: left">Y</td>
       <td style="text-align: left">Y</td>
       <td style="text-align: left">Y</td>
       <td style="text-align: left"><strong>No</strong></td>
@@ -130,12 +126,9 @@
       <td style="text-align: left"><strong>No</strong></td>
       <td style="text-align: left"><strong>No</strong></td>
       <td style="text-align: left"><strong>No</strong></td>
-      <td style="text-align: left"><strong>No</strong></td>
     </tr>
   </tbody>
 </table>
-
-<h3 id="默认">默认</h3>
 
 <h2 id="常量和变量">常量和变量</h2>
 
@@ -146,25 +139,44 @@
 </blockquote>
 
 <ol>
-  <li><strong>定义</strong>（本质）：<strong>static 成员变量</strong>属于类，用类名调用，<strong>由类的所有对象共享</strong>，持久驻内存（方法区），下次调用保留原值；<strong>非 static 成员变量</strong>属于对象，用对象名调用；局部变量是在代码块/方法中定义的变量/方法参数。</li>
-  <li><strong>修饰符</strong>：成员变量都可以；局部变量不能被<strong>访问控制修饰符</strong>及 static 修饰，只能被 final 修饰。</li>
-  <li><strong>存储位置</strong>：static 成员变量属于类（即静态变量/类变量)，存于<strong>方法区</strong>，（非 static ）成员变量属于对象，存于堆内存；局部变量属于方法，存于 VM 栈中的局部变量表，基本类型变量直接存值，<strong>对象存放引用</strong>，指向堆内存中的对象本身。</li>
-  <li><strong>默认值</strong>/初始化时机：成员变量有默认值，在 JVM <strong>类加载</strong>时自动初始化（如未赋初值则取默认值）（例外：被 final 修饰的成员变量必须显式地赋值）；而局部变量（不自动初始化）必须显式地初始化，在字节码执行时才会运行方法中的（局部变量）代码。</li>
+  <li><strong>定义</strong>（本质）：
+    <ol>
+      <li><strong>static 成员变量</strong>属于类，用类名调用，<strong>由类的所有对象共享</strong>，持久驻内存（方法区），下次调用保留原值；</li>
+      <li><strong>非 static 成员变量</strong>属于对象，用对象名调用；</li>
+      <li>局部变量是在代码块/方法中定义的变量/方法参数。</li>
+    </ol>
+  </li>
+  <li><strong>存储位置</strong>：
+    <ol>
+      <li>static 成员变量属于类（即静态变量/类变量)，存于<strong>方法区</strong>，</li>
+      <li>（非 static ）成员变量属于对象，存于<strong>堆内存</strong>；</li>
+      <li>局部变量属于方法，存于 <strong>VM 栈</strong>中的局部变量表，基本类型变量直接存值，对象存放<strong>引用</strong>，指向堆内存中的对象本身。</li>
+    </ol>
+  </li>
+  <li><strong>默认值</strong>/初始化时机：
+    <ol>
+      <li>成员变量有默认值，在 JVM <strong>类加载</strong>时自动初始化（如未赋初值则取默认值）（例外：被 final 修饰的成员变量必须显式地赋值）；</li>
+      <li>而局部变量（不自动初始化）必须<strong>显式地初始化</strong>，在字节码执行时才会运行方法中的（局部变量）代码。</li>
+    </ol>
+  </li>
   <li><strong>生命周期</strong>：成员变量与类/对象一致；局部变量与方法一致。</li>
+  <li><strong>修饰符</strong>：成员变量都可以；局部变量不能被<strong>访问控制修饰符</strong>及 static 修饰，只能被 final 修饰。</li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public  class DataClass {
-    int age; // 成员变量/全局成员变量/实例变量
-    static String URL = "hello"; // 静态成员变量
-    static final String USER = "admin"; // 静态常量
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span>  <span class="kd">class</span> <span class="nc">DataClass</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">age</span><span class="o">;</span> <span class="c1">// 成员变量/全局成员变量/实例变量</span>
+    <span class="kd">static</span> <span class="n">String</span> <span class="n">URL</span> <span class="o">=</span> <span class="s">"hello"</span><span class="o">;</span> <span class="c1">// 静态成员变量</span>
+    <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">USER</span> <span class="o">=</span> <span class="s">"admin"</span><span class="o">;</span> <span class="c1">// 静态常量</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h3 id="final-关键字">final 关键字</h3>
 
-<p>final 核心思想：最终的、不可修改的；表示变量值不可变、方法不可覆盖、类不可继承。</p>
+<p>final 核心思想：最终的、<strong>不可修改</strong>的；表示变量值<strong>不可变</strong>、方法<strong>不可覆盖</strong>、类<strong>不可继承</strong>。</p>
 
-<h5 id="一修饰类不可被继承没有子类">一、修饰类：不可被继承（没有子类）</h5>
+<h4 id="一修饰类">一、修饰类</h4>
+
+<p>修饰类：不可被继承（没有子类）：</p>
 
 <ol>
   <li>final 修饰的类，所有成员方法被隐式指定为 final，（但成员变量不变）；</li>
@@ -181,7 +193,6 @@
     
     <span class="cm">/**
      * 业务错误码
-     *
      * @see ServiceErrorCodeRange
      */</span>
     <span class="kd">private</span> <span class="n">Integer</span> <span class="n">code</span><span class="o">;</span>
@@ -192,41 +203,49 @@
 <span class="o">}</span>
 </code></pre></div></div>
 
-<h5 id="二修饰方法不可重写可重载">二、修饰方法：不可<strong>重写</strong>，可重载</h5>
+<h4 id="二修饰方法">二、修饰方法</h4>
+
+<p>修饰方法：不可<strong>重写</strong>，可重载。</p>
 
 <p>作用：</p>
 
 <ol>
-  <li>用于防止子类<strong>覆盖</strong>父类方法的实现，安全；如：POJO 类的 setter 方法，不允许被覆写。</li>
+  <li>用于防止子类<strong>覆盖</strong>父类方法的实现，保证安全；如：POJO 类的 <strong>setter 方法</strong>，不允许被覆写。</li>
   <li>方法被转为<strong>内嵌</strong>，提高执行效率。</li>
 </ol>
 
-<p>private 方法都被隐式指定为 <code class="highlighter-rouge">private [final] </code>；final 也可修饰 private，但无意义。</p>
+<p>private 方法都被隐式指定为 <code class="highlighter-rouge">private [final] </code>；</p>
 
-<h5 id="三修饰变量值不可变">三、修饰变量：值不可变</h5>
+<ul>
+  <li>final 也可修饰 private，但无意义。</li>
+</ul>
+
+<h4 id="三修饰变量">三、修饰变量</h4>
+
+<p>修饰变量：值不可变。 =&gt; 成为常量。</p>
 
 <blockquote>
   <p>实质上是常量。JDK1.8 后改为存放在<strong>堆</strong>内存中。</p>
 </blockquote>
 
-<p>从<strong>变量类型</strong>分类：</p>
+<h5 id="从变量类型分类">从<strong>变量类型</strong>分类</h5>
 
 <ol>
-  <li>修饰基本类型或 String 类型的变量：使用前必须有且仅有一次初始化，初始化后值不可变；
+  <li>修饰<strong>基本类型</strong>或 <code class="highlighter-rouge">final String</code> 类型的变量：使用前必须<strong>有且仅有一次</strong>初始化，初始化后值不可变；
     <ul>
       <li>第二次赋值将抛出编译时错误（<code class="highlighter-rouge">Compiler Error: cannot assign a value to final variable</code>）。</li>
-      <li>若编译阶段已知其确切值，则会当做<strong>编译期常量</strong>（直接宏替换），存入调用（方法区）类的运行时常量池中。</li>
+      <li>若编译阶段已知其确切值，则会当做<strong>编译期常量</strong>（直接宏替换），存入调用类的<strong>运行时常量池</strong>中（方法区）。</li>
     </ul>
   </li>
-  <li>修饰引用类型变量：初始化后<strong>引用</strong>不可变（即不能指向另一个对象），但<strong>引用指向的对象的内容</strong>可变。即 <a href="#常用类">final 数组/String 类</a> / 集合可添加、删除元素。</li>
+  <li>修饰<strong>引用类型</strong>变量：初始化后<strong>引用</strong>不可变（即不能指向另一个对象），但<strong>引用指向的对象的内容</strong>可变。即 <a href="#常用类">final 数组 / String 类</a> / 集合<strong>内</strong>可添加、删除元素。</li>
 </ol>
 
-<p>从<strong>变量位置</strong>分类：</p>
+<h5 id="从变量位置分类">从<strong>变量位置</strong>分类</h5>
 
 <ol>
-  <li>修饰静态成员变量（类变量）=&gt; 即静态常量：只可在静态初始化块中/声明时赋初值；作用域是全局，不用创建对象，用类名直接访问；</li>
-  <li>修饰（实例）成员变量 =&gt; 即成员常量：只可在<strong>非静态</strong>初始化块中/声明时/<strong>每个构造器中</strong>赋初始值；</li>
-  <li>修饰局部变量 =&gt; 即局部常量：使用前赋值，不允许二次赋值。</li>
+  <li>修饰静态成员变量（类变量）=&gt; 即<strong>静态常量</strong>：只可在静态初始化块中/声明时赋初值；作用域是全局，不用创建对象，用类名直接访问；</li>
+  <li>修饰（实例）成员变量 =&gt; 即<strong>成员常量</strong>：只可在<strong>非静态</strong>初始化块中/声明时/<strong>每个构造器中</strong>赋初始值；</li>
+  <li>修饰局部变量 =&gt; 即<strong>局部常量</strong>：使用前赋值，不允许二次赋值。</li>
 </ol>
 
 <pre><code class="language-Java">// 访问静态常量
@@ -246,10 +265,10 @@ public class HelloWorld {
 
 <ul>
   <li>
-    <p>在 <code class="highlighter-rouge">foreach</code> 语句中可用 <code class="highlighter-rouge">final</code> 声明存储循环元素的变量；</p>
+    <p>在 <code class="highlighter-rouge">foreach</code> 语句中可用 <code class="highlighter-rouge">final</code> 声明存储<strong>循环元素</strong>的变量；</p>
   </li>
   <li>
-    <p>局部内部类和匿名内部类只能访问局部常量：因为外部类运行后局部变量会被回收，内部类延长局部变量 copy 的生命周期、用 <code class="highlighter-rouge">final</code> 保证二者一致。<code class="highlighter-rouge">JDK1.8</code> 后默认加 final。</p>
+    <p>局部<strong>内部类</strong>和匿名<strong>内部类</strong>只能访问局部常量：因为外部类运行后局部变量会被回收，内部类延长局部变量 copy 的生命周期、用 <code class="highlighter-rouge">final</code> 保证二者一致。<code class="highlighter-rouge">JDK1.8</code> 后默认加 final。</p>
   </li>
 </ul>
 
@@ -257,11 +276,13 @@ public class HelloWorld {
 
 <p>static 修饰的成员属于类，可被类的所有对象共享，加 static 不影响作用域。</p>
 
-<p><strong>只保存一份拷贝</strong>，可用类名调用。</p>
+<ul>
+  <li><strong>只保存一份拷贝</strong>，可用类名调用。</li>
+</ul>
 
-<h5 id="一修饰成员方法-即静态方法类方法">一、修饰成员方法（=&gt; 即静态方法、类方法）</h5>
+<h4 id="一修饰成员方法-即静态方法类方法">一、修饰成员方法（=&gt; 即静态方法、类方法）</h4>
 
-<p>不依赖任何对象，在类加载时（在方法区）分配内存，可通过类名直接访问；</p>
+<p>不依赖任何对象，在<strong>类加载</strong>时（在方法区）分配内存，可通过类名直接访问；</p>
 
 <ol>
   <li>只能访问类的静态成员（变量或方法）：<strong>因为</strong>非 static 成员在对象实例化前不存在，不能被 static 方法调用；</li>
@@ -272,11 +293,11 @@ public class HelloWorld {
 
 <ol>
   <li>Collections 类中的一些方法，如 <code class="highlighter-rouge">Objects.equals()</code>；</li>
-  <li>util 工具类中的方法，如 <a href="#常用类">Math 工具类</a>、<a href="#常用类">Arrays 工具类</a>的静态方法；</li>
+  <li>Hutool util 工具类中的方法，如 <a href="#常用类">Math 工具类</a>、<a href="#常用类">Arrays 工具类</a>的<strong>静态方法</strong>；</li>
   <li>单例模式的 <code class="highlighter-rouge">getInstance()</code>、工厂模式的 <code class="highlighter-rouge">create/build()</code>、日志 <code class="highlighter-rouge">Logger LOGGER = LoggerFactory.getLogger(Users.class)</code> 等。</li>
 </ol>
 
-<p><strong>构造器</strong>不是静态方法：</p>
+<h5 id="构造器不是静态方法"><strong>构造器</strong>不是静态方法</h5>
 
 <ol>
   <li>定义：（严格意义上）不是方法，只负责初始化；</li>
@@ -284,7 +305,7 @@ public class HelloWorld {
   <li>调用：构造器只能通过 <strong>new</strong>（或别的构造器）调用，不能通过方法调用。</li>
 </ol>
 
-<h5 id="二修饰成员变量-即静态变量类变量">二、修饰成员变量（=&gt; 即静态变量/类变量）</h5>
+<h4 id="二修饰成员变量-即静态变量类变量">二、修饰成员变量（=&gt; 即静态变量/类变量）</h4>
 
 <blockquote>
   <p>实质上就是全局变量；</p>
@@ -293,27 +314,31 @@ public class HelloWorld {
 <p>目的：作为<strong>共享变量</strong>使用；减少对象的创建；保留<strong>唯一副本</strong>。</p>
 
 <ol>
-  <li>使用方式：<strong>由类的所有对象共享</strong>，持久驻内存，下次调用保留原值；</li>
-  <li>调用方式：可用类名调用；</li>
+  <li>定义：<strong>static 成员变量</strong>属于类，用类名调用，<strong>由类的所有对象共享</strong>，持久驻内存（方法区），下次调用保留原值；</li>
   <li>存储位置/内存分配：static 成员变量属于类，存于方法区，（非 static ）成员变量属于对象，存于堆内存；</li>
+  <li>默认值</li>
   <li>生命周期：从<strong>类被加载</strong>开始，到类被 GC 彻底回收时。</li>
 </ol>
 
-<h5 id="三静态代码块">三、静态代码块</h5>
+<h4 id="三静态代码块">三、静态代码块</h4>
 
 <blockquote>
   <p>执行顺序：静态代码块 –&gt; 非静态代码块 –&gt; 构造器。</p>
 </blockquote>
 
-<p>定义在类中方法外，用于<strong>初始化</strong>静态变量：不管创建多少对象，静态代码块都只执行一次；</p>
+<p>定义在类中（方法外），用于<strong>初始化</strong>静态变量：不管创建多少对象，静态代码块都只执行一次；</p>
 
 <ul>
   <li>对于定义在它之后的静态变量，可赋值，但不能访问。如单例模式、定义枚举类。</li>
 </ul>
 
-<p>非静态代码块与构造函数的区别：非静态代码块是对<strong>所有对象</strong>进行统一初始化，而构造函数是给<strong>当前对象</strong>初始化。</p>
+<p>非静态代码块与构造函数的区别：</p>
 
-<h5 id="四静态内部类">四、静态内部类</h5>
+<ul>
+  <li>非静态代码块是对<strong>所有对象</strong>进行统一初始化，而构造函数是给<strong>当前对象</strong>初始化。</li>
+</ul>
+
+<h4 id="四静态内部类">四、静态内部类</h4>
 
 <blockquote>
   <p>static 只能修饰内部类。</p>
@@ -322,11 +347,13 @@ public class HelloWorld {
 <p>非静态内部类在编译完成后会隐含地保存一个引用，<strong>指向</strong>创建它的外部类，但静态内部类没有。意味着：</p>
 
 <ol>
-  <li>创建对象<strong>不依赖</strong>外部类创建的对象，可直接通过外部类创建；</li>
+  <li>创建对象<strong>不依赖</strong>外部类创建的<strong>对象</strong>，可直接通过外部类创建；</li>
   <li>不能使用任何外部类的非 static 成员变量/方法。</li>
 </ol>
 
 <p>如：<code class="highlighter-rouge">AB-BA</code> 死锁问题。</p>
+
+<p>静态内部类用于定义 DTO 传参。</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Schema</span><span class="o">(</span><span class="n">description</span> <span class="o">=</span> <span class="s">"RPC 服务 - 商品 SKU 更新库存 Request DTO"</span><span class="o">)</span>
 <span class="nd">@Data</span>
@@ -353,7 +380,7 @@ public class HelloWorld {
 <span class="o">}</span>
 </code></pre></div></div>
 
-<h5 id="五静态导入包">五、静态导入包</h5>
+<h4 id="五静态导入包">五、静态导入包</h4>
 
 <blockquote>
   <p>1.5 后的新特性， 格式为：<code class="highlighter-rouge">import static</code>；</p>
@@ -363,30 +390,36 @@ public class HelloWorld {
 
 <h3 id="final-vs-static-变量">final VS static 变量</h3>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class MyClass {
-	// 所有实例共享
-    public final double i = Math.random();  // 只有第一次赋值起作用
-    public static double j = Math.random(); // 赋值后全局起作用
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">MyClass</span> <span class="o">{</span>
+	<span class="c1">// 所有实例共享</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="kt">double</span> <span class="n">f</span> <span class="o">=</span> <span class="n">Math</span><span class="o">.</span><span class="na">random</span><span class="o">();</span>  <span class="c1">// 只有第一次赋值起作用</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">double</span> <span class="n">s</span> <span class="o">=</span> <span class="n">Math</span><span class="o">.</span><span class="na">random</span><span class="o">();</span> <span class="c1">// 赋值后全局起作用</span>
+<span class="o">}</span>
 
-MyClass cls1 = new MyClass();
-MyClass cls2 = new MyClass();
+<span class="n">MyClass</span> <span class="n">cls1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MyClass</span><span class="o">();</span>
+<span class="n">MyClass</span> <span class="n">cls2</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MyClass</span><span class="o">();</span>
 
-cls1.i == cls2.i; // false，两个i值不同
-cls1.j == cls2.j; // true， 两个j值相同
+<span class="n">cls1</span><span class="o">.</span><span class="na">f</span> <span class="o">==</span> <span class="n">cls2</span><span class="o">.</span><span class="na">f</span><span class="o">;</span> <span class="c1">// false，两个f值不同</span>
+<span class="n">cls1</span><span class="o">.</span><span class="na">s</span> <span class="o">==</span> <span class="n">cls2</span><span class="o">.</span><span class="na">s</span><span class="o">;</span> <span class="c1">// true， 两个s值相同，实质是同一个值</span>
 
-private static final Logger LOGGER = LoggerFactory.getLogger(UmsAdmin.class);
+<span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Logger</span> <span class="n">LOGGER</span> <span class="o">=</span> <span class="n">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="n">UmsAdmin</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
 </code></pre></div></div>
 
 <h2 id="数据类型">数据类型</h2>
 
-<h3 id="四大类八小类基本数据类型">四大类八小类基本数据类型</h3>
+<p>基本数据类型和引用类型的区别主要在于：</p>
+
+<ul>
+  <li>基本数据类型是分配在<strong>栈</strong>上的，而引用类型是分配在<strong>堆</strong>上的。</li>
+</ul>
+
+<h4 id="四大类八小类基本数据类型">四大类八小类基本数据类型</h4>
+
+<p>基本数据类型都是直接存储在内存中的 Java 虚拟机栈上的。</p>
 
 <blockquote>
   <p>primitive type，所占空间大小，默认值，取值范围。</p>
 </blockquote>
-
-<p>基本数据类型都是直接存储在内存中的 Java 虚拟机栈上的。</p>
 
 <p>基本数据类型对应的<a href="#包装类型和常量池缓存机制">包装类型</a>。</p>
 
@@ -414,26 +447,16 @@ private static final Logger LOGGER = LoggerFactory.getLogger(UmsAdmin.class);
   </li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>long price = 12.2L
-float price = 12.2F; 
-double price = 12.254(D);
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">long</span> <span class="n">price</span> <span class="o">=</span> <span class="mf">12.2</span><span class="n">L</span>
+<span class="kt">float</span> <span class="n">price</span> <span class="o">=</span> <span class="mf">12.2</span><span class="n">F</span><span class="o">;</span> 
+<span class="kt">double</span> <span class="n">price</span> <span class="o">=</span> <span class="mf">12.254</span><span class="o">(</span><span class="n">D</span><span class="o">);</span>
 </code></pre></div></div>
 
-<h3 id="三类引用数据类型">三类引用数据类型</h3>
+<h4 id="三类引用数据类型">三类引用数据类型</h4>
 
 <blockquote>
   <p>reference type</p>
 </blockquote>
-
-<p>用作方法的参数类型和返回类型。</p>
-
-<ol>
-  <li>数组</li>
-  <li>类</li>
-  <li>接口</li>
-</ol>
-
-<p>基本数据类型和引用类型的区别主要在于：基本数据类型是分配在<strong>栈</strong>上的，而引用类型是分配在<strong>堆</strong>上的。</p>
 
 <p>引用类型继承于<code class="highlighter-rouge">Object</code>类（也是引用类型），都是按照Java里面存储<strong>对象</strong>的内存模型来进行数据存储的：</p>
 
@@ -441,38 +464,35 @@ double price = 12.254(D);
   <li>“引用”（存放对象在内存堆上的地址）是存储在VM栈上的，而对象本身的值存储在内存堆上的。</li>
 </ul>
 
+<p>用作方法的参数和返回值的类型。</p>
+
+<ol>
+  <li>数组</li>
+  <li>类</li>
+  <li>接口</li>
+</ol>
+
 <h3 id="包装类">包装类</h3>
 
-<p>包装类（<code class="highlighter-rouge">wrapper class</code>），箱子；为了方便基本数据类型能和<strong>其它对象</strong>结合在一起使用，如一些常用的集合 <code class="highlighter-rouge">List</code> 和 <code class="highlighter-rouge">Set</code> 等要求存放的值必须为对象。</p>
+<p>包装类（<code class="highlighter-rouge">wrapper class</code>），箱子；</p>
+
+<ul>
+  <li>为了方便基本数据类型能和<strong>其它对象</strong>结合在一起使用，</li>
+  <li>如一些常用的集合 <code class="highlighter-rouge">List</code> 和 <code class="highlighter-rouge">Set</code> 等要求存放的值必须为对象。</li>
+</ul>
 
 <blockquote>
   <p>都是用 final 修饰，无法继承。</p>
 </blockquote>
 
-<h4 id="基本数据类型-vs-包装类型">基本数据类型 VS 包装类型</h4>
+<h4 id="包装类型">包装类型</h4>
 
-<p>区别：</p>
-
-<ol>
-  <li><strong>根本</strong>：一种数据类型；一种引用数据类型（面向对象的<strong>类</strong>），有类的特性（封装、继承、多态等）。</li>
-  <li><strong>存储位置</strong>：
-    <ol>
-      <li>基本数据类型定义的变量，用作<strong>局部变量</strong>（直接存放在 VM 栈的局部变量表中，占用空间小），用作 <strong><code class="highlighter-rouge">static</code> 成员变量</strong>（存放在方法区），用作<strong>非 <code class="highlighter-rouge">static</code> 成员变量</strong>（存放在堆中）；</li>
-      <li>而用包装类实例化的对象，一律存放在堆中。</li>
-    </ol>
-  </li>
-  <li><strong>默认值</strong>：基本数据类型有默认值（int = 0）且不是 <code class="highlighter-rouge">null</code>；包装类型若不赋值则为 <code class="highlighter-rouge">null</code>。</li>
-  <li>泛型：基本类型不可用于泛型；包装类型可以。</li>
-</ol>
-
-<h4 id="包装类型和常量池缓存机制">包装类型和常量池缓存机制</h4>
-
-<p><a href="#四大类八小类基本数据类型">基本数据类型</a>对应的包装类型，及其放入（方法区中运行时常量池）常量池的取值：</p>
+<p><a href="#四大类八小类基本数据类型">基本数据类型</a>对应的包装类型，及其放入（方法区中运行时）<strong>常量池</strong>的取值：</p>
 
 <ol>
   <li><code class="highlighter-rouge">Boolean</code>：<code class="highlighter-rouge">TRUE/FALSE</code> 两个常量，用于表示布尔值 <code class="highlighter-rouge">true 和 false</code>；
     <ul>
-      <li><code class="highlighter-rouge">Boolean.TRUE.equals(createReqVO.getDefaultStatus()</code></li>
+      <li><code class="highlighter-rouge">Boolean.TRUE.equals(createReqVO.getDefaultStatus())</code></li>
     </ul>
   </li>
   <li><strong><code class="highlighter-rouge">Character</code></strong>：[0, 127]，即7位ASCII码、最大7F Del；</li>
@@ -481,11 +501,29 @@ double price = 12.254(D);
   <li><code class="highlighter-rouge">String</code> 类型：所有<strong>字面量</strong>都会进入<a href="#数组">常量池</a>；</li>
 </ol>
 
+<h5 id="常量池缓存机制">常量池缓存机制</h5>
+
 <p>包装类在常量池的值会<strong>复用</strong>已有对象的缓存数据，可直接用 <code class="highlighter-rouge">==</code> 判断；其它范围的值，必须全部用 <code class="highlighter-rouge">equals()</code> 比较。如：</p>
 
 <ol>
   <li>对于 <code class="highlighter-rouge">Integer var = 40</code> 在 -128 至 127 间的赋值，会自动装箱（转为包装类对象），Integer 对象通过 <strong><code class="highlighter-rouge">IntegerCache.cache</code></strong> 产生，会复用（缓存中的）已有对象；此区间外的所有数据都在<strong>堆</strong>上产生，不复用已有对象。</li>
   <li>而通过 new，如 <code class="highlighter-rouge">Integer i2 = new Integer(40)</code> 会直接<strong>创建新对象</strong>（手动装箱）。</li>
+</ol>
+
+<h5 id="基本数据类型-vs-包装类型">基本数据类型 VS 包装类型</h5>
+
+<p>区别：</p>
+
+<ol>
+  <li><strong>根本</strong>：一种数据类型；一种引用数据类型（面向对象的<strong>类</strong>），有类的特性（封装、继承、多态等）。</li>
+  <li><strong>存储位置</strong>：
+    <ol>
+      <li>基本数据类型定义的变量，用作<strong>局部变量</strong>（直接存放在 VM 栈的局部变量表中，占用空间小），用作 <strong><code class="highlighter-rouge">static</code> 成员变量</strong>（存放在方法区），用作<strong>非 <code class="highlighter-rouge">static</code> 成员变量</strong>（存放在堆中）；</li>
+      <li>而用包装类实例化的对象，一律存放在<strong>堆中</strong>。</li>
+    </ol>
+  </li>
+  <li><strong>默认值</strong>：基本数据类型有默认值（int = 0）且不是 <code class="highlighter-rouge">null</code>；包装类型若不赋值则为 <code class="highlighter-rouge">null</code>。</li>
+  <li>泛型：基本类型不可用于泛型；包装类型可以。</li>
 </ol>
 
 <h4 id="自动装箱拆箱机制">自动装箱/拆箱机制</h4>
@@ -508,18 +546,23 @@ double price = 12.254(D);
   </li>
 </ol>
 
-<p>频繁装箱/拆箱，会严重影响系统的性能，应尽量避免不必要的装箱/拆箱操作。</p>
-
-<p>自动拆箱可能导致 NPE，需进行 NPE 检查。见下<a href="#数据类型转换">三目运算符</a>。</p>
+<p>缺点：</p>
 
 <ul>
-  <li>手动装箱：<code class="highlighter-rouge">Integer.valueOf(128)</code></li>
-  <li>手动拆箱：<code class="highlighter-rouge">变量.intValue()</code></li>
+  <li>频繁装箱/拆箱，会严重影响系统的<strong>性能</strong>，应尽量避免不必要的装箱/拆箱操作。</li>
+  <li>
+    <p>自动拆箱可能导致 NPE，需进行 NPE 检查。见下<a href="#数据类型转换">三目运算符</a>。</p>
+
+    <ul>
+      <li>手动装箱：<code class="highlighter-rouge">Integer.valueOf(128)</code></li>
+      <li>手动拆箱：<code class="highlighter-rouge">变量.intValue()</code></li>
+    </ul>
+  </li>
 </ul>
 
 <pre><code class="language-Java">// 装箱
 Integer i1 = new Integer(128); // 手动装箱，基本数据类型 =&gt; 堆内存中的包装类对象
-Integer i2 = 128; // 自动装箱，调用 Integer.valueOf(128)；Double、Float的valueOf()类似
+Integer i2 = 128; // 自动装箱，调用 Integer.valueOf(128); Double、Float的valueOf()类似
 
 // 比较包装类对象
 i1 == i2? // false，比较引用，常量池外的值不复用，两个不同对象的地址不同；若为[-128, 127]，则复用已有对象，地址相同，返回true
@@ -537,7 +580,7 @@ int subStrMinLen = Integer.MAX_VALUE;
 
 <p>继承自 <code class="highlighter-rouge">Object</code> 类的方法：</p>
 
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">String</span> <span class="n">str</span> <span class="o">=</span> <span class="err">”</span><span class="mi">128</span><span class="err">”</span><span class="o">;</span> <span class="c1">// 内容为纯数字</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">String</span> <span class="n">str</span> <span class="o">=</span> <span class="s">"128"</span><span class="o">;</span> <span class="c1">// 内容为纯数字</span>
 <span class="n">Integer</span> <span class="n">i1</span> <span class="o">=</span> <span class="n">Integer</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="n">str</span><span class="o">);</span> <span class="c1">// 字符串 =&gt; 包装类对象，类似手动装箱</span>
 <span class="n">String</span> <span class="n">str</span> <span class="o">=</span> <span class="n">i1</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>        <span class="c1">// 包装类对象 =&gt; 字符串</span>
 
@@ -566,16 +609,16 @@ int subStrMinLen = Integer.MAX_VALUE;
   <li><code class="highlighter-rouge">byte -&gt; short =&gt; int -&gt; long -&gt; float -&gt; double</code>；</li>
 </ol>
 
-<p><strong>强制类型转换</strong>：把一个范围大的数值或变量赋给另一个范围小的变量。如将 float 类型的变量赋值给 int 变量。</p>
+<p><strong>强制类型转换</strong>：把一个范围大的数值或变量赋给另一个<strong>范围小的</strong>变量。如将 float 类型的变量赋值给 int 变量。</p>
 
 <ol>
   <li>下转型（down-casting，也称为窄化）会造成精度损失；</li>
   <li>
-    <p>条件表达式（三目运算符）<code class="highlighter-rouge">condition ? 表达式1 : 表达式2 </code>中，表达式1 和 2 在<strong>类型对齐</strong>时，可能抛出因自动拆箱（和强制类型转换）导致 NPE 异常。如表达式 1 或 表达式 2 的值：</p>
+    <p>条件表达式（三目运算符）<code class="highlighter-rouge">condition ? 表达式1 : 表达式2 </code>中，表达式1 和 2 在<strong>类型对齐</strong>时，可能抛出因<strong>自动拆箱</strong>（和强制类型转换）导致 NPE 异常。如表达式 1 或 表达式 2 的值：</p>
 
     <ol>
       <li>任一个是基本数据类型；</li>
-      <li>类型不一致，会强制拆箱升级成表示范围更大的那个类型。</li>
+      <li>类型不一致，会<strong>强制拆箱</strong>升级成表示范围更大的那个类型。</li>
     </ol>
   </li>
 </ol>
@@ -590,46 +633,49 @@ int subStrMinLen = Integer.MAX_VALUE;
 
 <h3 id="运算符-equals">运算符 ==、equals()</h3>
 
-<p>比较大小。引用相等和对象相等的区别：</p>
+<p>都用于比较是否相等。区别：</p>
 
 <ul>
-  <li>引用相等：指的是变量指向的内存地址相等，用 <code class="highlighter-rouge">==</code> 比较；</li>
-  <li>对象相等：指的是内存中存放的内容相等，用 <code class="highlighter-rouge">equals()</code>比较；</li>
+  <li>引用相等：指的是<strong>变量指向的内存地址</strong>相等，用 <code class="highlighter-rouge">==</code> 比较；</li>
+  <li>对象相等：指的是<strong>内存中存放的内容</strong>相等，用 <code class="highlighter-rouge">equals()</code>比较；</li>
 </ul>
 
-<h5 id="运算符-">运算符 ==</h5>
+<h4 id="运算符-">运算符 ==</h4>
 
 <p><code class="highlighter-rouge">==</code> 比较的是变量指向的内存地址是否相等，即<strong>引用是否相等</strong>。</p>
 
-<p>对于 <code class="highlighter-rouge">==</code>，因为 Java 只有值传递，所以不管是比较基本数据类型，还是引用数据类型的变量，其本质比较的都是值，只是引用类型变量存的值是对象的地址。</p>
+<p>对于 <code class="highlighter-rouge">==</code>，因为 Java 只有值传递，所以不管是比较基本数据类型，还是引用数据类型的变量，其本质比较的都是值，只是<strong>引用类型变量</strong>存的值是对象的地址。</p>
 
 <ol>
-  <li>用于基本数据类型，直接比较其（vm 栈中）存储的值是否相等；</li>
-  <li>用于引用类型，比较两个引用是否指向同一个对象/同一块堆内存地址；
+  <li>用于<strong>基本数据类型</strong>，直接比较其（vm 栈中）存储的值是否相等；</li>
+  <li>用于<strong>引用类型</strong>，比较两个引用是否指向同一个对象/同一块堆内存地址；
     <ol>
       <li>除非是同一个 <code class="highlighter-rouge">new</code> 出来的对象，或经过赋值指向同一个对象，或（在字符串常量池中）指向同一块内存地址，才为 true，否则为 false。因为每 new 一次，都会重新开辟堆内存空间。</li>
       <li><code class="highlighter-rouge">null == null</code>：返回 true，null 既不是对象也不是一种类型，仅是一种特殊的值；</li>
       <li>比较 String 变量：<code class="highlighter-rouge">==</code> 比较的是内存地址，<code class="highlighter-rouge">equals()</code> 比较的是值；</li>
-      <li>比较对象：<code class="highlighter-rouge">==</code> 和 <code class="highlighter-rouge">equals()</code> 比较的都是内存地址，没有重写 <code class="highlighter-rouge">equals()</code> 方法的类都是调用的 Object 的 <code class="highlighter-rouge">equals()</code> 方法。</li>
+      <li>比较对象：<code class="highlighter-rouge">==</code> 和 <code class="highlighter-rouge">equals()</code> 比较的都是<strong>内存地址</strong>，没有重写 <code class="highlighter-rouge">equals()</code> 方法的类都是调用的 Object 的 <code class="highlighter-rouge">equals()</code> 方法。</li>
     </ol>
   </li>
   <li>表达式（包含算术运算）== 包装类（<a href="#数据类型转换">触发自动拆箱</a> =&gt; 基本数据类型）：比较的是数值。</li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>42 == 42.0? // 42.0下转型（窄化）为 int 42，返回true
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mi">42</span> <span class="o">==</span> <span class="mf">42.0</span><span class="o">?</span> <span class="c1">// 42.0下转型（窄化）为 int 42，返回true</span>
 </code></pre></div></div>
 
-<p>不能用 <code class="highlighter-rouge">==</code> <strong>比较大小</strong>的有：</p>
+<h5 id="不能用--比较大小的">不能用 <code class="highlighter-rouge">==</code> <strong>比较大小</strong>的</h5>
 
 <ol>
-  <li>基本类型的变量、值 == 引用类型（包装类）的变量、值；不能触发自动拆箱；</li>
-  <li>包装类之间；如果用，则比较的是变量指向的<strong>引用</strong>/内存地址是否相同，应该用equals() 比较两个对象的内容是否相同；</li>
-  <li>boolean 类型的变量、值 == 其他任意类型的变量、值；</li>
-  <li>浮点数 == 浮点数：若浮点数之间用 <code class="highlighter-rouge">==</code> 比较，会有浮点数精度陷阱，不精确；可以设置误差范围，或见 <a href="#常用类">BigDecimal 类</a>。</li>
-  <li>没有继承关系的两个引用类型之间；同上第2条。</li>
+  <li><strong>基本类型</strong>的变量、值 == 引用类型（包装类）的变量、值；不能触发自动拆箱；</li>
+  <li><strong>boolean 类型</strong>的变量、值 == 其他任意类型的变量、值；</li>
+  <li>没有<strong>继承关系</strong>的两个引用类型之间：
+    <ul>
+      <li><strong>包装类</strong>之间：如果用，则比较的是变量指向的<strong>引用</strong>/内存地址是否相同，应该用equals() 比较两个对象的内容是否相同；</li>
+    </ul>
+  </li>
+  <li><strong>浮点数</strong>之间：若浮点数之间用 <code class="highlighter-rouge">==</code> 比较，会有浮点数精度陷阱，不精确；可以设置误差范围，或见 <a href="#常用类">BigDecimal 类</a>。</li>
 </ol>
 
-<h5 id="equals">equals()</h5>
+<h4 id="equals">equals()</h4>
 
 <p><code class="highlighter-rouge">equals()</code> 用来比较两个对象（内存中）的内容是否相同，即<strong>对象是否相等</strong>。</p>
 
@@ -637,13 +683,13 @@ int subStrMinLen = Integer.MAX_VALUE;
   <li>不能用来比较<strong>两个基本数据类型</strong>的变量，应该用 <code class="highlighter-rouge">==</code>；</li>
   <li>对于引用类型：
     <ul>
-      <li>若没重写 equals() <code class="highlighter-rouge">&lt;==&gt;</code> equals() 继承自Object类，故每个对象都有 equals()，Object 中默认（直接调用 <code class="highlighter-rouge">==</code>）对比两个对象的地址是否相等；</li>
-      <li>多数情况下，重写 equals() <code class="highlighter-rouge">==&gt;</code> 比较对象存储的内容是否相等。如 String类、包装类、Date类等；</li>
+      <li>若没重写 equals() <code class="highlighter-rouge">==&gt;</code> equals() 继承自Object类，故每个对象都有 equals()，Object 中默认（直接调用 <code class="highlighter-rouge">==</code>）对比两个对象的地址是否相等；</li>
+      <li>多数情况下，重写 equals() <code class="highlighter-rouge">==&gt;</code> 比较对象存储的内容是否相等。如 <strong>String类、包装类、Date类</strong>等；</li>
     </ul>
   </li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Objects.equals(null, "hello"); // 避免空指针异常
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Objects</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="kc">null</span><span class="o">,</span> <span class="s">"hello"</span><span class="o">);</span> <span class="c1">// 避免空指针异常</span>
 </code></pre></div></div>
 
 <h5 id="重写-equals">重写 equals()</h5>
@@ -666,39 +712,39 @@ int subStrMinLen = Integer.MAX_VALUE;
   </li>
 </ol>
 
-<p>否则违背了【两个相等的对象必须有相等的哈希码】这一 Java 关键约定，进而影响散列表、HashMap 等。</p>
+<p>否则违背了【<strong>两个相等的对象</strong>必须有相等的哈希码】这一 Java 关键约定，进而影响散列表、HashMap 等。</p>
 
 <ol>
   <li>因为 Set 存储的是不重复的对象，依据 <code class="highlighter-rouge">hashCode()</code> 和 <code class="highlighter-rouge">equals()</code> 进行判断，所以 Set 存储的对象必须覆写这两种方法。</li>
   <li>String 因为覆写了 <code class="highlighter-rouge">hashCode()</code> 和 <code class="highlighter-rouge">equals()</code> 方法，所以可以愉快地将 String 对象作为 key 来使用。</li>
 </ol>
 
-<h5 id="string-变量中的应用">String 变量中的应用</h5>
+<h4 id="string-变量中的应用">String 变量中的应用</h4>
 
 <p><a href="#包装类型和常量池缓存机制">字符串常量池</a></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>String s1 = "ab"; // 将字面量"ab"放到常量池中，并将引用 s1 指向对象；推荐
-String s2 = "ab"; // 在常量池查找到"ab"的地址，并赋给s2
-s1 == s2? // true，s1和s2地址相同
-s1.equal(s2)? // true，比较字符串的内容
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">String</span> <span class="n">s1</span> <span class="o">=</span> <span class="s">"ab"</span><span class="o">;</span> <span class="c1">// 将字面量"ab"放到常量池中，并将引用 s1 指向对象；推荐</span>
+<span class="n">String</span> <span class="n">s2</span> <span class="o">=</span> <span class="s">"ab"</span><span class="o">;</span> <span class="c1">// 在常量池查找到"ab"的地址，并赋给s2</span>
+<span class="n">s1</span> <span class="o">==</span> <span class="n">s2</span><span class="o">?</span> 		<span class="c1">// true，s1和s2地址相同</span>
+<span class="n">s1</span><span class="o">.</span><span class="na">equal</span><span class="o">(</span><span class="n">s2</span><span class="o">)?</span> 	<span class="c1">// true，比较字符串的内容</span>
 
-String str1 = new String("ab"); // 在堆内存创建一个新对象，a 引用指向新对象
-String str2 = new String("ab"); // 在堆内存创建另一个新对象，b 引用指向新对象
-str1 == str2? // false，非同一对象
-str1.equals(str2)? // true，对象的内容一样
+<span class="n">String</span> <span class="n">str1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="s">"ab"</span><span class="o">);</span> <span class="c1">// 在堆内存创建一个新对象，str1 引用指向新对象</span>
+<span class="n">String</span> <span class="n">str2</span> <span class="o">=</span> <span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="s">"ab"</span><span class="o">);</span> <span class="c1">// 在堆内存创建另一个新对象，str2 引用指向新对象</span>
+<span class="n">str1</span> <span class="o">==</span> <span class="n">str2</span><span class="o">?</span> 		<span class="c1">// false，非同一对象</span>
+<span class="n">str1</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">str2</span><span class="o">)?</span> 	<span class="c1">// true，对象的内容一样</span>
 
-s1 != str1 // s1是常量池中的对象的引用，str1 是堆内存中的对象的引用，二者地址不同
-s1.equals(str1) // true，二者内容相同，重写 hashCode()
+<span class="n">s1</span> <span class="o">==</span> <span class="n">str1</span><span class="o">?</span> 	 <span class="c1">// false,s1是常量池中的对象的引用，str1是堆内存中的对象的引用，二者地址不同</span>
+<span class="n">s1</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">str1</span><span class="o">)?</span> <span class="c1">// true，二者内容相同，重写 hashCode()</span>
 
-String str3 = str2; // 引用传递，指向堆内存中的同一对象
-str3 == str2? // true
-str3 == s1? // false
-str3.equal(s1) // true
+<span class="n">String</span> <span class="n">str3</span> <span class="o">=</span> <span class="n">str2</span><span class="o">;</span> <span class="c1">// 引用传递，指向堆内存中的同一对象</span>
+<span class="n">str3</span> <span class="o">==</span> <span class="n">str2</span><span class="o">?</span> 	<span class="c1">// true</span>
+<span class="n">str3</span> <span class="o">==</span> <span class="n">s1</span><span class="o">?</span> 	<span class="c1">// false</span>
+<span class="n">str3</span><span class="o">.</span><span class="na">equal</span><span class="o">(</span><span class="n">s1</span><span class="o">)</span> 	<span class="c1">// true</span>
 </code></pre></div></div>
 
 <h3 id="数组">数组</h3>
 
-<h5 id="用法">用法</h5>
+<h4 id="用法">用法</h4>
 
 <ol>
   <li>声明：只得到一个存放数组的变量，并没有为数组元素分配内存空间；</li>
@@ -707,96 +753,101 @@ str3.equal(s1) // true
   <li>使用。</li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>int[] arr = new int[5]; // 声明 + 动态初始化，程序员指定数组的长度，由系统初始化每个元素的默认值，此处 int 默认值为0
-int[] num = new int[]{1, 2, 3, 5, 8};  // 一般不用
-int[] num = {1,2,3,5,8}; // 声明 + 静态初始化，程序员显式指定每个元素的初始值，由系统决定数组的长度
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span><span class="o">[]</span> <span class="n">arr</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="o">[</span><span class="mi">5</span><span class="o">];</span> <span class="c1">// 声明 + 动态初始化，程序员指定数组的长度，由系统初始化每个元素的默认值，此处 int 默认值为0</span>
+<span class="kt">int</span><span class="o">[]</span> <span class="n">num</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="o">[]{</span><span class="mi">1</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">3</span><span class="o">,</span> <span class="mi">5</span><span class="o">,</span> <span class="mi">8</span><span class="o">};</span>  <span class="c1">// 一般不用</span>
+<span class="kt">int</span><span class="o">[]</span> <span class="n">num</span> <span class="o">=</span> <span class="o">{</span><span class="mi">1</span><span class="o">,</span><span class="mi">2</span><span class="o">,</span><span class="mi">3</span><span class="o">,</span><span class="mi">5</span><span class="o">,</span><span class="mi">8</span><span class="o">};</span> <span class="c1">// 声明 + 静态初始化，程序员显式指定每个元素的初始值，由系统决定数组的长度</span>
 
-// 三种长度
-int n = nums.length; // 1. 数组的属性
-
-int n = str.length(); // 2. String 对象的方法
-
-List&lt;Integer&gt; list = new ArrayList&lt;&gt;(); // IDEA 的问题提示，工具栏和SonarLint 插件不建议使用显式类型实参
-int n = list.size(); // 3. 泛型集合的方法，vector、List等
+<span class="c1">// 三种长度</span>
+<span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">nums</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>  <span class="c1">// 1. 数组的属性</span>
+<span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="na">length</span><span class="o">();</span> <span class="c1">// 2. String 对象的方法</span>
+<span class="c1">// IDEA 的问题提示，工具栏和SonarLint 插件不建议使用显式类型实参</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
+<span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">list</span><span class="o">.</span><span class="na">size</span><span class="o">();</span>  <span class="c1">// 3. 泛型集合的方法，vector、List等</span>
 </code></pre></div></div>
 
 <p>当指定的下标值超出数组的总长度时，会拋出 <code class="highlighter-rouge">ArrayIndexOutOfBoundsException</code>（数组越界异常）。</p>
 
-<p>因为 Java <strong>类与类间</strong>支持继承，可能产生一个数组里可存放多种数据类型的假象。</p>
+<p>因为 Java <strong>类与类间</strong>支持继承，可能产生一个数组里可<strong>存放多种数据类型</strong>的假象。</p>
 
 <ul>
   <li>如一个水果数组，元素可是苹果或香蕉（都继承了水果），但元素类型还是水果。</li>
 </ul>
 
-<h5 id="数组list-接口arraylist-类">数组、List 接口、ArrayList 类</h5>
+<h4 id="数组listarraylist">数组、List、ArrayList</h4>
 
 <ol>
   <li>数组：大小固定，查找快；</li>
   <li>List：是接口；</li>
-  <li>ArrayList：是 List 的实现类，有序，以一定的顺序保存元素。</li>
+  <li>ArrayList 类：是 List 的实现类，有序，以一定的顺序保存元素。</li>
 </ol>
 
-<h5 id="array-类和-arrays-工具类">Array 类和 Arrays 工具类</h5>
+<h4 id="array-类和-arrays-工具类">Array 类和 Arrays 工具类</h4>
 
-<p>Array 类：提供静态方法，动态创建和访问数组。</p>
+<p>Array 类：提供<strong>静态方法</strong>，动态创建和访问数组。</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span><span class="o">[]</span> <span class="n">data</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="o">[</span><span class="mi">10</span><span class="o">];</span> <span class="c1">// 没有进行初始化，默认值为0</span>
 <span class="n">Array</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">data</span><span class="o">,</span> <span class="mi">7</span><span class="o">,</span> <span class="mi">6</span><span class="o">);</span>    <span class="c1">// 设置data[7]=6</span>
 </code></pre></div></div>
 
-<p>Arrays 类：提供静态方法，对数组进行操作。定义在 <code class="highlighter-rouge">java.util</code> 包中，主要实现数组元素的查找，内容填充、排序等。<a href="#常用类">常用类</a>。</p>
+<p>Arrays 类：提供<strong>静态方法</strong>，对数组进行操作。定义在 <code class="highlighter-rouge">java.util</code> 包中，主要实现数组元素的查找，内容填充、排序等。</p>
+
+<ul>
+  <li>其它工具类见 <a href="#常用类">常用类</a>。</li>
+</ul>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 以下静态方法均被 public static 修饰（省略）、均被重载多次，可用于各种类型的数组，如 float[]等</span>
 <span class="n">List</span> <span class="nf">asList</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">a</span><span class="o">)</span> <span class="c1">// 将数组转为集合</span>
 <span class="n">List</span> <span class="n">list</span> <span class="o">=</span> <span class="n">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span><span class="n">a</span><span class="o">);</span> <span class="c1">// 用法示例</span>
 
 <span class="kt">boolean</span> <span class="nf">equals</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">a</span><span class="o">,</span> <span class="kt">int</span><span class="o">[]</span> <span class="n">a2</span><span class="o">)</span> <span class="c1">// 判断两个数组是否相等</span>
-<span class="n">String</span> <span class="nf">toString</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">a</span><span class="o">)</span> <span class="c1">// 输出数组信息</span>
+<span class="n">String</span> <span class="nf">toString</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">a</span><span class="o">)</span> <span class="c1">// 用于输出数组信息</span>
 
 <span class="kt">void</span> <span class="nf">fill</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">a</span><span class="o">,</span> <span class="kt">int</span> <span class="n">val</span><span class="o">)</span>  <span class="c1">// 将指定内容填充到数组中</span>
 <span class="kt">int</span><span class="o">[]</span> <span class="nf">copyOf</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">a</span><span class="o">,</span> <span class="kt">int</span> <span class="n">n</span><span class="o">)</span> <span class="c1">// 拷贝，不改变参数内容，也可用于扩容</span>
 <span class="kt">int</span><span class="o">[]</span> <span class="nf">copyOfRange</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">a</span><span class="o">,</span> <span class="kt">int</span> <span class="n">fromIndex</span><span class="o">,</span> <span class="kt">int</span> <span class="n">toIndex</span><span class="o">)</span> <span class="c1">// 拷贝区间</span>
 
 <span class="kt">void</span> <span class="nf">sort</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">a</span><span class="o">)</span> <span class="c1">// 排序</span>
-<span class="c1">// 必须有序；对排序后的数组[fromIndex, toIndex]范围内进行二分检索。返回搜索值的索引；否则返回 -1</span>
-<span class="kt">int</span> <span class="nf">binarySearch</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">a</span><span class="o">,</span> <span class="o">[</span><span class="kt">int</span> <span class="n">fromIndex</span><span class="o">,</span> <span class="kt">int</span> <span class="n">toIndex</span><span class="o">,]</span> <span class="kt">int</span> <span class="n">key</span><span class="o">)</span>
-
-<span class="n">Arrays</span><span class="o">.</span><span class="na">stream</span><span class="o">()</span>
+<span class="c1">// 对排序后的数组[fromIndex, toIndex]范围内进行二分检索。返回搜索值的索引；否则返回 -1</span>
+<span class="kt">int</span> <span class="nf">binarySearch</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">a</span><span class="o">,</span> <span class="o">[</span><span class="kt">int</span> <span class="n">fromIndex</span><span class="o">,</span> <span class="kt">int</span> <span class="n">toIndex</span><span class="o">,]</span> <span class="kt">int</span> <span class="n">key</span><span class="o">)</span> <span class="c1">// 数组必须有序</span>
+    
+<span class="n">Arrays</span><span class="o">.</span><span class="na">stream</span><span class="o">();</span> <span class="c1">// 创建流</span>
 </code></pre></div></div>
 
 <h2 id="面向对象">面向对象</h2>
 
-<p>Object Oriented</p>
+<blockquote>
+  <p>Object Oriented</p>
+</blockquote>
 
 <h4 id="对象">对象</h4>
 
-<p>根据 JVM 规范：”对象是动态分配的类实例或数组”。实例是内存中的对象。</p>
+<p>根据 JVM 规范：”对象是<strong>动态分配</strong>的类实例或数组”。实例是内存中的对象。</p>
 
 <p>抽象：指将一类对象的共同特征提取出来构造类，<strong>类是对象（实例）的抽象</strong>。一切皆对象。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Student stu1 = new Student("小刘", 22); // 显式创建对象
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Student</span> <span class="n">stu1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Student</span><span class="o">(</span><span class="s">"小刘"</span><span class="o">,</span> <span class="mi">22</span><span class="o">);</span> <span class="c1">// 显式创建对象</span>
 
-String str1 = "Hello"; // 隐式创建对象
-String str2 = str1 + "Java";
+<span class="n">String</span> <span class="n">str1</span> <span class="o">=</span> <span class="s">"Hello"</span><span class="o">;</span> <span class="c1">// 隐式创建对象</span>
+<span class="n">String</span> <span class="n">str2</span> <span class="o">=</span> <span class="n">str1</span> <span class="o">+</span> <span class="s">"Java"</span><span class="o">;</span>
 
-// 匿名对象，对象只用一次，大多用作参数，需区别于单例模式
-new Person("张三", 30).tell();
+<span class="c1">// 匿名对象，对象只用一次，大多用作参数，需区别于单例模式</span>
+<span class="k">new</span> <span class="nf">Person</span><span class="o">(</span><span class="s">"张三"</span><span class="o">,</span> <span class="mi">30</span><span class="o">).</span><span class="na">tell</span><span class="o">();</span>
 </code></pre></div></div>
 
-<h3 id="面向对象思想">面向对象思想</h3>
-
-<blockquote>
-  <p>见面向对象思想文档。</p>
-</blockquote>
+<h3 id="面向对象-1">面向对象</h3>
 
 <p>面向对象和面向过程的主要区别在于：解决问题的方式不同；</p>
 
 <ul>
   <li>面向过程：把解决问题的过程拆成一个个方法并执行；</li>
-  <li><strong>面向对象</strong>：先抽象出对象，用对象执行方法的方式解决问题。一般更易维护、复用、扩展。如<a href="#包装类">包装类</a>，一切皆对象。</li>
+  <li><strong>面向对象</strong>：先抽象出对象，用<strong>对象执行方法</strong>的方式解决问题。一般更易维护、复用、扩展。如<a href="#包装类">包装类</a>，一切皆对象。</li>
 </ul>
 
-<p>主要包括：</p>
+<blockquote>
+  <p>见面向对象思想文档。</p>
+</blockquote>
+
+<p>面向对象思想主要包括：</p>
 
 <ol>
   <li>三大特性：封装、继承、多态。</li>
@@ -817,7 +868,7 @@ new Person("张三", 30).tell();
       <li>L 里氏替换</li>
       <li>I 接口<strong>隔离</strong></li>
       <li>D 依赖倒转</li>
-      <li>D 迪米特原则</li>
+      <li><del>D 迪米特原则</del></li>
       <li>H 合成/聚合复用</li>
     </ol>
   </li>
@@ -827,15 +878,23 @@ new Person("张三", 30).tell();
 
 <h4 id="封装">封装</h4>
 
-<p>定义：利用抽象数据类型将<strong>数据和基于数据的操作</strong>封装在一起，使其构成一个不可分割的独立实体。数据被保护在抽象数据类型的内部，尽可能地<strong>隐藏</strong>内部的细节，只保留一些对外的接口使其与外部发生联系。用户无需关心对象内部的细节，但可以通过对象对外提供的接口来访问该对象。</p>
+<p>定义：利用抽象数据类型将<strong>数据和基于数据的操作</strong>封装在一起，使其构成一个不可分割的独立实体。</p>
 
-<p>定义：指把对象的成员变量/属性隐藏在内部，不允许外部对象直接访问，通过（可被外界访问的）public 方法来操作属性。控制对外隐藏和暴露哪些数据。基本单位是类。如 <strong>POJO 类</strong>的 getter/setter 方法。</p>
+<ul>
+  <li>控制<strong>对外隐藏和暴露</strong>哪些数据：
+    <ol>
+      <li>指把对象的成员变量/属性隐藏在内部，不允许外部对象直接访问，</li>
+      <li>通过（可被外界访问的）public 方法来操作属性。</li>
+    </ol>
+  </li>
+  <li>基本单位是类。如 <strong>POJO 类</strong>的 getter/setter 方法。</li>
+</ul>
 
 <p>优点：</p>
 
 <ul>
   <li>减少<strong>耦合</strong>：可以独立地开发、测试、优化、使用、理解和修改</li>
-  <li>减轻维护的负担：可以更容易被理解，并且在调试的时候可以不影响其他模块</li>
+  <li>减轻维护的负担：可以更容易被理解，并且在调试时可以不影响其他模块</li>
   <li>有效地调节性能：可以通过剖析来确定哪些模块影响了系统的性能</li>
   <li>提高软件的<strong>可重用性</strong></li>
   <li>降低了构建大型系统的风险：即使整个系统不可用，但是这些独立的模块却有可能是可用的</li>
@@ -852,17 +911,17 @@ new Person("张三", 30).tell();
     <p>子类<strong>拥有</strong>父类所有的属性和方法（包括私有属性和私有方法），但无法访问父类中的<strong>私有属性和方法</strong>，仅拥有。</p>
 
     <ol>
-      <li>子类不能继承父类的构造器；</li>
-      <li>子类可重写父类的方法；继承应该遵循里氏替换原则，子类对象必须能够替换掉所有父类对象。</li>
-      <li>继承后变量和方法的访问顺序：就近原则。</li>
+      <li>子类不能继承父类的<strong>构造器</strong>；</li>
+      <li>子类可<strong>重写</strong>父类的方法；继承应该遵循<strong>里氏替换原则</strong>，子类对象必须能够替换掉所有父类对象。</li>
+      <li>继承后变量和方法的<strong>访问顺序</strong>：就近原则。</li>
     </ol>
   </li>
   <li>
     <p><strong>单继承</strong>（不支持多重继承）：程序结构更清晰、便于维护。多重继承会使类型转换、构造方法的调用顺序变复杂，影响性能。</p>
 
     <ol>
-      <li>若支持多重继承：类 C 继承自类 A 和类 B，如果类 A 和 B 都有自定义的成员方法 f()，则调用类 C.f() 会产生二义性；</li>
-      <li>通过实现多个接口、间接支持多重继承：接口由于只包含方法定义，不能有方法的实现，类 C 不能直接调用方法，需实现具体的 f() 才能调用，不会产生二义性。</li>
+      <li>若支持多重继承：类 C 继承自类 A 和类 B，如果类 A 和 B 都有自定义的成员方法 f()，则调用类 C.f() 会产生<strong>二义性</strong>；</li>
+      <li>通过<strong>实现多个接口</strong>、间接支持多重继承：接口由于<strong>只包含方法定义</strong>，（不能有方法的实现），类 C 不能直接调用方法，需实现具体的 f() 才能调用，不会产生二义性。</li>
     </ol>
   </li>
   <li>
@@ -874,19 +933,19 @@ new Person("张三", 30).tell();
 
 <ul>
   <li>重载（overload）：同一个类中，多个同名方法（根据<strong>不同的传参</strong>）执行不同的逻辑处理；</li>
-  <li>重写/覆盖、覆写（override）：子类<strong>继承</strong>父类已有的方法，并重新实现其内部逻辑、功能。遵循两同两小一大。</li>
+  <li>重写/覆盖、覆写（override）：子类<strong>继承</strong>父类已有的方法，并重新实现其内部逻辑、功能。遵循<strong>两同两小一大</strong>。</li>
 </ul>
 
 <p>区别：</p>
 
 <ol>
   <li>方法名都<strong>相同</strong>。</li>
-  <li>发生范围：重载在同一个类；重写在子类中。</li>
+  <li>发生范围：重载在同一个类；重写在<strong>子类</strong>中。</li>
   <li>参数列表（类型、个数、顺序） ：重载至少一个不同；重写一定<strong>相同</strong>。</li>
   <li>返回值类型、异常：重载可不同（只有<strong>返回值不同</strong>不算重载）；<strong>两小</strong>：重写子类的返回值类型、异常范围（<code class="highlighter-rouge">RunTimeException</code>）&lt;= 父类（<code class="highlighter-rouge">Exception</code>）。</li>
-  <li>访问修饰符：重载可不同；<strong>一大</strong>：重写，子类访问权限（只能是 <code class="highlighter-rouge">public，而非private</code>）&gt;= 父类（<code class="highlighter-rouge">protected</code>），即子类修饰符不能做更严格的限制；
+  <li>访问修饰符：重载可不同；<strong>一大</strong>：重写，子类访问权限（只能是 <code class="highlighter-rouge">public</code>，而非 <code class="highlighter-rouge">private</code>）&gt;= 父类（<code class="highlighter-rouge">protected</code>），即子类修饰符不能做更严格的限制；
     <ul>
-      <li>另外父类方法修饰符为 <code class="highlighter-rouge">private/final/static</code>或构造器时（都不能被继承），子类不能重写，但被 static 修饰的方法能被再次声明。</li>
+      <li>另外父类方法修饰符为 <code class="highlighter-rouge">private/final/static</code>或构造器时（都不能被继承），子类不能重写，但被 static 修饰的方法能被<strong>再次声明</strong>。</li>
       <li><a href="#反射机制">反射机制</a>。</li>
     </ul>
   </li>
@@ -895,19 +954,19 @@ new Person("张三", 30).tell();
 
 <h5 id="thissuper-关键字">this、super 关键字</h5>
 
-<p>this 代表当前（类的）对象的引用，指向本对象；super 代表对父类对象的引用，指向父类对象。</p>
+<p><code class="highlighter-rouge">this</code> 代表<strong>当前类</strong>对象的引用，指向本对象；<code class="highlighter-rouge">super</code> 代表对<strong>父类对象</strong>的引用，指向父类对象。</p>
 
 <ol>
-  <li>在构造器中，this用于区分（同名）成员变量与局部变量；</li>
+  <li>在构造器中，this用于区分（同名）<strong>成员变量与局部变量</strong>；</li>
   <li>this 调用本类中的其他构造方法、super() 调用父类中的其他构造方法时，必须处于构造器的首行，否则编译器会报错。</li>
-  <li>在 static 方法中，this、super 不可用。</li>
+  <li>在 <strong>static 方法</strong>中，this、super 不可用。</li>
 </ol>
 
 <p><code class="highlighter-rouge">super</code> 用于继承，主要用法：</p>
 
 <ol>
-  <li><code class="highlighter-rouge">super.成员变量/方法</code>：用于在子类中，调用父类的同名成员变量或方法；</li>
-  <li><code class="highlighter-rouge">super(param1, ...)</code>：用于在子类构造器（的第一行），<strong>显式地</strong>调用父类构造器；
+  <li><code class="highlighter-rouge">super.成员变量/方法</code>：用于在<strong>子类</strong>中，调用父类的同名成员变量或方法；</li>
+  <li><code class="highlighter-rouge">super(param1, ...)</code>：用于在<strong>子类构造器</strong>（的第一行），<strong>显式地</strong>调用父类构造器；
     <ol>
       <li>若父类有无参构造器，系统会自动调用 <code class="highlighter-rouge">super()</code>；</li>
       <li>若父类的构造器都带参，则必须用 <code class="highlighter-rouge">super(param1, ...)</code> 显式调用一次。</li>
@@ -917,23 +976,30 @@ new Person("张三", 30).tell();
 
 <h4 id="多态">多态</h4>
 
-<p>多态：即<strong>一个接口，多个方法</strong>。指多个子类继承并重写父类的同一属性或方法，或多个子类实现接口并覆盖接口中的同一方法，并将父类引用指向子类对象。</p>
+<p>多态：即<strong>一个接口，多个方法</strong>。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 引用的自动类型转换，指存在继承关系的对象类型转换
-Animal animal = new Dog(); // 向上转型，把Dog类型转换为Animal类型
-animal.run();
+<ul>
+  <li>指多个子类<strong>继承并重写</strong>父类的同一属性或方法，</li>
+  <li>或多个子类<strong>实现接口并覆盖</strong>接口中的同一方法，并将父类引用指向子类对象。</li>
+</ul>
 
-// 引用的强制类型转换，编译正常，运行可能报错ClassCastException类型转换异常，建议在强转前判断对象的真实类型
-Dog dog = (Dog) animal; // 向下转型，把Animal类型转换为Dog类型
-animal.run();
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 引用的自动类型转换，指存在继承关系的对象类型转换</span>
+<span class="n">Animal</span> <span class="n">animal</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Dog</span><span class="o">();</span> <span class="c1">// 向上转型，把Dog类型转换为Animal类型</span>
+<span class="n">animal</span><span class="o">.</span><span class="na">run</span><span class="o">();</span>
 
-Animal animal = new Cat();
-if (animal instanceof Cat) {
-    Cat cat = (Cat) animal; // 向下转型
-}
+<span class="c1">// 引用的强制类型转换，编译正常，运行可能报错ClassCastException类型转换异常，建议在强转前判断对象的真实类型</span>
+<span class="n">Dog</span> <span class="n">dog</span> <span class="o">=</span> <span class="o">(</span><span class="n">Dog</span><span class="o">)</span> <span class="n">animal</span><span class="o">;</span> <span class="c1">// 向下转型，把Animal类型转换为Dog类型</span>
+<span class="n">animal</span><span class="o">.</span><span class="na">run</span><span class="o">();</span>
+
+<span class="n">Animal</span> <span class="n">animal</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Cat</span><span class="o">();</span>
+<span class="k">if</span> <span class="o">(</span><span class="n">animal</span> <span class="k">instanceof</span> <span class="n">Cat</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">Cat</span> <span class="n">cat</span> <span class="o">=</span> <span class="o">(</span><span class="n">Cat</span><span class="o">)</span> <span class="n">animal</span><span class="o">;</span> <span class="c1">// 向下转型</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
-<p>实现多态有 3 个必要条件：</p>
+<h5 id="3-个必要条件">3 个必要条件</h5>
+
+<p>实现多态有 <strong>3 个必要条件</strong>：</p>
 
 <ol>
   <li>子类继承父类/实现接口；</li>
@@ -941,18 +1007,19 @@ if (animal instanceof Cat) {
   <li>父类引用指向子类对象（<strong>向上转型</strong>）或接口的引用变量指向其实现类的实例对象。</li>
 </ol>
 
-<p>分类：</p>
+<h5 id="分类">分类</h5>
 
 <ol>
   <li>编译时多态：是静态的，主要指<strong>方法重载</strong>。编译后变成不同的方法；</li>
   <li>运行时多态：是动态的，即通常所说的多态性。指程序中定义的<strong>对象引用</strong>所指向的<strong>具体类型</strong>在运行期间才确定。
     <ul>
-      <li>指继承父类和实现接口时，可用父类引用指向子类对象。<strong>引用类型变量</strong>发出的方法调用的到底是哪个类中的方法，必须在程序运行期间才能确定。</li>
+      <li>指继承父类和实现接口时，可用<strong>父类引用</strong>指向子类对象。</li>
+      <li><strong>引用类型变量</strong>发出的方法调用的到底是哪个类中的方法，必须在程序运行期间才能确定。</li>
     </ul>
   </li>
 </ol>
 
-<p>特征：</p>
+<h5 id="特征">特征</h5>
 
 <ol>
   <li>对于方法的调用：编译看左边，运行看右边？
@@ -964,11 +1031,13 @@ if (animal instanceof Cat) {
   <li>对于变量：编译、运行都看左边。</li>
 </ol>
 
+<h5 id="优缺点">优缺点</h5>
+
 <p>优势：</p>
 
 <ol>
-  <li>父类作为方法的形参（入参）用来传递对象；</li>
-  <li>便于类与类间解耦，右边对象可组件化切换，改换业务。</li>
+  <li>父类作为方法的<strong>形参</strong>（入参）用来传递对象；</li>
+  <li>便于类与类间<strong>解耦</strong>，右边对象可组件化切换，改换业务。</li>
 </ol>
 
 <p>劣势：</p>
@@ -979,123 +1048,160 @@ if (animal instanceof Cat) {
 
 <h3 id="值传递-vs-引用传递">值传递 VS 引用传递</h3>
 
-<p>Java中没有指针的概念，类似的是引用。</p>
+<blockquote>
+  <p>Java中没有指针的概念，类似的是引用。</p>
+</blockquote>
 
 <p>Java 中方法参数的传递方式是<strong>值传递</strong>：</p>
 
 <ol>
-  <li>值传递：Java方法（接收）传递的是实参值的（浅、深）<strong>拷贝</strong>，通过创建副本实现；方法对拷贝副本的修改不会影响实参值。？
+  <li><strong>值传递</strong>：将实参的（引用、浅、深）<strong>拷贝副本</strong>传递给 Java 方法的形参；方法对<strong>拷贝副本</strong>的修改不会影响实参值。
     <ol>
       <li>参数是基本类型时：传递的是基本类型的<strong>字面量值的拷贝</strong>，会创建副本；</li>
-      <li>参数是引用类型时：传递的是实参（所引用对象在堆中）<strong>地址值的拷贝</strong>，同样也会创建实参的副本（形参）；方法可修改引用指向的对象的状态，但这仍是按值调用而非引用调用。</li>
+      <li>参数是引用类型时：传递的是实参（所引用对象在堆中）<strong>地址值的拷贝</strong>（<strong>浅拷贝</strong>？），同样也会创建实参的副本（形参）；
+        <ul>
+          <li>方法可修改引用指向的对象内的属性（状态），但这仍是<strong>按值调用</strong>而非引用调用。</li>
+        </ul>
+      </li>
+      <li>Java 中有三种类型的<strong>对象拷贝</strong>：引用拷贝、浅拷贝 vs 深拷贝。？</li>
     </ol>
   </li>
-  <li>引用传递 ：方法接收的（直接）是实参所引用的对象（在堆中）的地址，不会创建副本，修改形参将影响实参。</li>
+  <li><strong>引用传递</strong>：实参所引用的对象（在堆中）的<strong>内存地址</strong>传递给方法的形参。
+    <ul>
+      <li>不会创建副本，修改形参将影响实参。</li>
+      <li>如，C++ 的<strong>指针</strong>。</li>
+    </ul>
+  </li>
 </ol>
+
+<p>交换 String 对象的内容：</p>
 
 <p><img src="../assets/java-value-passing-03.jpg" alt="引用数据类型参数2" style="zoom:60%;" /></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public class Person {
-    private String name;
-   // 省略构造函数、Getter/Setter方法
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Person</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="n">String</span> <span class="n">name</span><span class="o">;</span>
+   <span class="c1">// 省略构造函数、Getter/Setter方法</span>
+<span class="o">}</span>
 
-public static void swap(Person p1, Person p2) {
-    Person temp = p1;
-    p1 = p2;
-    p2 = temp; // p1、p1交换了存储的地址，不影响实参存储的地址
-}
+<span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">swap</span><span class="o">(</span><span class="n">Person</span> <span class="n">p1</span><span class="o">,</span> <span class="n">Person</span> <span class="n">p2</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">Person</span> <span class="n">temp</span> <span class="o">=</span> <span class="n">p1</span><span class="o">;</span>
+    <span class="n">p1</span> <span class="o">=</span> <span class="n">p2</span><span class="o">;</span>
+    <span class="n">p2</span> <span class="o">=</span> <span class="n">temp</span><span class="o">;</span> <span class="c1">// p1、p1仅仅交换了存储的地址，不影响实参存储的地址</span>
+<span class="o">}</span>
 
-public static void swapName(Person p1, Person p2) {
-    String temp = p1.name;
-    p1.name = p2.name;
-    p2.name = temp; //交换了p1、p2的属性值，浅拷贝？
-}
+<span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">swapName</span><span class="o">(</span><span class="n">Person</span> <span class="n">p1</span><span class="o">,</span> <span class="n">Person</span> <span class="n">p2</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">String</span> <span class="n">temp</span> <span class="o">=</span> <span class="n">p1</span><span class="o">.</span><span class="na">name</span><span class="o">;</span>
+    <span class="n">p1</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">p2</span><span class="o">.</span><span class="na">name</span><span class="o">;</span>
+    <span class="n">p2</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="n">temp</span><span class="o">;</span> <span class="c1">//交换了p1、p2的属性值，实参内容改变了。浅拷贝？</span>
+<span class="o">}</span>
 
-public static void main(String[] args) {
-    Person xiaoZhang = new Person("小张");
-    Person xiaoLi = new Person("小李");
-    // 值传递，不影响实参的指向/内容
-    swap(xiaoZhang, xiaoLi);
-    xiaoZhang.getName(); // 小张
-    xiaoLi.getName(); // 小李
-}
+<span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">Person</span> <span class="n">xiaoZhang</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Person</span><span class="o">(</span><span class="s">"小张"</span><span class="o">);</span>
+    <span class="n">Person</span> <span class="n">xiaoLi</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Person</span><span class="o">(</span><span class="s">"小李"</span><span class="o">);</span>
+    
+    <span class="c1">// 值传递，不影响实参的指向/内容</span>
+    <span class="n">swap</span><span class="o">(</span><span class="n">xiaoZhang</span><span class="o">,</span> <span class="n">xiaoLi</span><span class="o">);</span>
+    <span class="n">xiaoZhang</span><span class="o">.</span><span class="na">getName</span><span class="o">();</span> <span class="c1">// 小张</span>
+    <span class="n">xiaoLi</span><span class="o">.</span><span class="na">getName</span><span class="o">();</span> <span class="c1">// 小李</span>
+    
+    <span class="c1">//交换了p1、p2的属性值，实参内容改变了</span>
+    <span class="n">swaNamep</span><span class="o">(</span><span class="n">xiaoZhang</span><span class="o">,</span> <span class="n">xiaoLi</span><span class="o">);</span>
+    <span class="n">xiaoZhang</span><span class="o">.</span><span class="na">getName</span><span class="o">();</span> <span class="c1">// 小张</span>
+    <span class="n">xiaoLi</span><span class="o">.</span><span class="na">getName</span><span class="o">();</span> <span class="c1">// 小李</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
-<h3 id="引用拷贝浅拷贝-vs-深拷贝">引用拷贝、浅拷贝 vs 深拷贝</h3>
+<h4 id="引用拷贝浅拷贝-vs-深拷贝">引用拷贝、浅拷贝 vs 深拷贝</h4>
 
-<p>Java 中有三种类型的对象拷贝：三者在引用的地址值、引用的对象本身、引用的对象内部的对象属性逐次递进地<strong>创建副本</strong>；</p>
+<p>Java 中有三种类型的对象拷贝：</p>
+
+<ul>
+  <li>三者在变量、引用的<strong>对象本身</strong>、引用的对象<strong>内部的对象属性</strong>逐次递进地<strong>创建副本</strong>。</li>
+</ul>
 
 <p><img src="../assets/shallow_and_deep-copy.jpg" alt="浅拷贝、深拷贝、引用拷贝示意图" style="zoom:80%;" /></p>
 
-<p><strong>引用拷贝</strong>：在栈中创建一个变量副本，存储原变量所引用的对象（在堆中的）地址，不会创建对象副本；用在传参时即为引用传递，修改形参将影响实参。</p>
+<h5 id="引用拷贝">引用拷贝</h5>
 
-<p><strong>浅拷贝</strong>（Shallow Copy）：在堆上创建一个原变量所引用的<strong>对象的副本</strong>，可修改对象副本内部的属性：</p>
+<p>引用拷贝：在<strong>栈中</strong>创建一个<strong>变量副本</strong>，存储原变量所引用的对象（在堆中的）地址，不会创建对象副本。</p>
+
+<h5 id="浅拷贝">浅拷贝</h5>
+
+<p>浅拷贝（Shallow Copy）：在堆上创建一个原变量所引用的<strong>对象的副本</strong>，可修改对象副本内部的属性：</p>
 
 <ol>
-  <li>基本数据类型的变量，直接拷贝变量值（创建属性副本）；</li>
-  <li>引用类型的变量，创建对象副本并存储<strong>原内部引用</strong>的地址，不复制内部引用指向的对象本身。即拷贝对象和原对象共用同一个内部对象。</li>
+  <li>基本数据类型的变量，直接<strong>拷贝变量值</strong>（创建属性副本）；</li>
+  <li>引用类型的变量，创建<strong>对象副本</strong>并存储<strong>原内部引用</strong>的地址，不复制内部引用指向的对象本身。即拷贝对象和原对象共用同一个<strong>内部对象</strong>。</li>
 </ol>
 
-<p>实现方法：在当前类中实现 Clonable 接口并重写 <a href="#常用类">Object 类</a>的 <code class="highlighter-rouge">protected clone()</code>，在方法内直接调用父类的 <code class="highlighter-rouge">clone()</code> 方法，即 <code class="highlighter-rouge">return super.clone()</code>。</p>
+<p>实现方法：在当前类中实现 <strong>Clonable 接口</strong>、并<strong>重写</strong> <a href="#常用类">Object 类</a>的 <code class="highlighter-rouge">protected clone()</code>，在方法内直接调用父类的 <code class="highlighter-rouge">clone()</code> 方法，即 <code class="highlighter-rouge">return super.clone()</code>。</p>
 
-<p><img src="../assets/shallow_copy.png" alt="image" style="zoom: 90%;" /><img src="../assets/shallow_copy_string.png" style="zoom: 60%;" /></p>
+<p><img src="../assets/shallow_copy.png" alt="image" style="zoom: 90%;" /><img src="../assets/shallow_copy_string.png" style="zoom: 80%;" /></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Class Son implements Cloneable {
-	String name;
-	Father father;
-	....
-	@Override
-	protected Son clone() throws CloneNotSupportedException {
-		return super.clone();
-	}
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Class</span> <span class="n">Son</span> <span class="kd">implements</span> <span class="n">Cloneable</span> <span class="o">{</span>
+	<span class="n">String</span> <span class="n">name</span><span class="o">;</span>
+	<span class="n">Father</span> <span class="n">father</span><span class="o">;</span>
+	<span class="o">....</span>
+        
+	<span class="nd">@Override</span>
+	<span class="kd">protected</span> <span class="n">Son</span> <span class="nf">clone</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">CloneNotSupportedException</span> <span class="o">{</span>
+		<span class="k">return</span> <span class="kd">super</span><span class="o">.</span><span class="na">clone</span><span class="o">();</span>
+	<span class="o">}</span>
+<span class="o">}</span>
 
-// 浅拷贝时
-Father f = new Father("bigFather");
-Son s1 = new Son("son1", 13);
-s1.father = f;
-Son s2 = s1.clone();
+<span class="c1">// 浅拷贝时</span>
+<span class="n">Father</span> <span class="n">f</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Father</span><span class="o">(</span><span class="s">"bigFather"</span><span class="o">);</span>
+<span class="n">Son</span> <span class="n">s1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Son</span><span class="o">(</span><span class="s">"son1"</span><span class="o">,</span> <span class="mi">13</span><span class="o">);</span>
+<span class="n">s1</span><span class="o">.</span><span class="na">father</span> <span class="o">=</span> <span class="n">f</span><span class="o">;</span>
+<span class="n">Son</span> <span class="n">s2</span> <span class="o">=</span> <span class="n">s1</span><span class="o">.</span><span class="na">clone</span><span class="o">();</span>
 
-s1 == s2? // false，二者地址不同
-s1.father == s2.father? // true，二者内的father对象地址相同，为同一个father
-s1.name == s2.name? // true
-s1.name = "son222"; // 改变s1.name指向的String对象
-s1.name == s2.name? // false
+<span class="n">s1</span> <span class="o">==</span> <span class="n">s2</span><span class="o">?</span> <span class="c1">// false，二者地址不同</span>
+<span class="n">s1</span><span class="o">.</span><span class="na">father</span> <span class="o">==</span> <span class="n">s2</span><span class="o">.</span><span class="na">father</span><span class="o">?</span> <span class="c1">// true，二者内的father对象地址相同，为同一个father</span>
+<span class="n">s1</span><span class="o">.</span><span class="na">name</span> <span class="o">==</span> <span class="n">s2</span><span class="o">.</span><span class="na">name</span><span class="o">?</span> <span class="c1">// true</span>
+<span class="n">s1</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="s">"son222"</span><span class="o">;</span> <span class="c1">// 改变s1.name指向的String对象</span>
+<span class="n">s1</span><span class="o">.</span><span class="na">name</span> <span class="o">==</span> <span class="n">s2</span><span class="o">.</span><span class="na">name</span><span class="o">?</span> <span class="c1">// false</span>
 
-// 深拷贝时，地址均不同，均返回false
+<span class="c1">// 深拷贝时，地址均不同，均返回false</span>
 </code></pre></div></div>
 
-<p><strong>深拷贝</strong>（Deep Copy）：深拷贝会完全复制整个对象，包括对象所包含的内部对象。比浅拷贝速度慢且花销大。为对象内的所有数据均创建副本：</p>
+<h5 id="深拷贝">深拷贝</h5>
+
+<p>深拷贝（Deep Copy）：深拷贝会<strong>完全复制</strong>整个对象，包括对象所包含的<strong>内部对象</strong>。比浅拷贝速度慢且花销大。为对象内的所有数据均创建副本：</p>
 
 <ol>
   <li>对基本数据类型，直接创建并复制值；</li>
   <li>对引用数据类型，创建一个对象副本并复制（new）其内部的成员变量。</li>
 </ol>
 
-<p>通过序列化来实现深拷贝：适用于引用数量或层数太多时，原对象写入文件后拷贝给 clone 对象，修改原对象不会影响 clone 对象，因为 clone 对象是从这个媒介读取。</p>
+<p>通过<strong>序列化</strong>来实现深拷贝：适用于引用数量或层数太多时，原对象写入文件后拷贝给 clone 对象。</p>
 
-<p>实现方法：在当前类中实现 Cloneable 接口并重写 <code class="highlighter-rouge">clone()</code>，在方法内 new 一个当前类的新对象，即 <code class="highlighter-rouge">return new Student(name, subj.getName()); </code>。</p>
+<ul>
+  <li>修改原对象不会影响 clone 对象，因为 clone 对象是从这个媒介读取。</li>
+</ul>
 
-<p><img src="../assets/deep_copy_1.png" alt="" style="zoom:90%;" /></p>
+<p>实现方法：在当前类中实现 <strong>Cloneable 接口</strong>并重写 <code class="highlighter-rouge">clone()</code>，在方法内 <strong>new 一个当前类</strong>的新对象，即 <code class="highlighter-rouge">return new Student(name, subj.getName()); </code>。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Father clone()方法
-@Override
-protected Father clone() throws CloneNotSupportedException {
-    return (Father) super.clone();
-}
-// Son clone()方法
+<p><img src="../assets/deep_copy_1.png" alt="" style="zoom:100%;" /></p>
 
-@Override
-protected Son clone() throws CloneNotSupportedException {
-    Son son = (Son) super.clone(); // 待返回克隆的对象
-    son.name = new String(name);
-    son.father = father.clone();
-    return son;
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Father clone()方法</span>
+<span class="nd">@Override</span>
+<span class="kd">protected</span> <span class="n">Father</span> <span class="nf">clone</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">CloneNotSupportedException</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="o">(</span><span class="n">Father</span><span class="o">)</span> <span class="kd">super</span><span class="o">.</span><span class="na">clone</span><span class="o">();</span>
+<span class="o">}</span>
+<span class="c1">// Son clone()方法</span>
 
-// 地址均不同，均返回false
+<span class="nd">@Override</span>
+<span class="kd">protected</span> <span class="n">Son</span> <span class="nf">clone</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">CloneNotSupportedException</span> <span class="o">{</span>
+    <span class="n">Son</span> <span class="n">son</span> <span class="o">=</span> <span class="o">(</span><span class="n">Son</span><span class="o">)</span> <span class="kd">super</span><span class="o">.</span><span class="na">clone</span><span class="o">();</span> <span class="c1">// 待返回克隆的对象</span>
+    <span class="n">son</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="n">name</span><span class="o">);</span>
+    <span class="n">son</span><span class="o">.</span><span class="na">father</span> <span class="o">=</span> <span class="n">father</span><span class="o">.</span><span class="na">clone</span><span class="o">();</span>
+    <span class="k">return</span> <span class="n">son</span><span class="o">;</span>
+<span class="o">}</span>
+
+<span class="c1">// 地址均不同，均返回false</span>
 </code></pre></div></div>
+
+<h5 id="延迟拷贝">延迟拷贝</h5>
 
 <p>延迟拷贝（Lazy Copy）：二者组合</p>
 
@@ -1114,7 +1220,7 @@ protected Son clone() throws CloneNotSupportedException {
 <p><code class="highlighter-rouge">JDK1.8</code> 前接口中只有：</p>
 
 <ol>
-  <li>默认为抽象方法 <code class="highlighter-rouge">public abstract</code>；</li>
+  <li>默认为<strong>抽象方法</strong> <code class="highlighter-rouge">public abstract</code>；</li>
   <li>常量。</li>
 </ol>
 
@@ -1167,11 +1273,10 @@ protected Son clone() throws CloneNotSupportedException {
 
 <h4 id="抽象类">抽象类</h4>
 
-<p>抽象方法：只有声明，没有具体的实现。</p>
-
-<p>抽象类（abstract class）：包含抽象方法的类，不能用来创建对象。</p>
+<p>抽象类（abstract class）：包含<strong>抽象方法</strong>的类，不能用来创建对象。</p>
 
 <ul>
+  <li>抽象方法：只有声明，没有具体的实现。</li>
   <li>有抽象方法的类必须被声明为抽象类，而抽象类未必要有抽象方法。</li>
   <li>类继承抽象类或实现接口，要实现所有抽象方法，否则仍需被声明为抽象类。</li>
 </ul>
@@ -1188,7 +1293,7 @@ protected Son clone() throws CloneNotSupportedException {
 <p>同：</p>
 
 <ol>
-  <li>都不能直接例化，（但可定义抽象类和接口类型的引用）；（接口的实现类或抽象类的子类）需实现相应的方法后才能被例化。</li>
+  <li>都不能<strong>直接例化</strong>，（但可定义抽象类和接口类型的引用）：（接口的实现类或抽象类的子类）需实现相应的方法后才能被例化。</li>
   <li>都可包含抽象方法。</li>
   <li>都可有默认实现的方法（Java 8 可用 <code class="highlighter-rouge">default</code> 关键字在接口中定义默认方法）。</li>
 </ol>
@@ -1196,36 +1301,47 @@ protected Son clone() throws CloneNotSupportedException {
 <p>异：</p>
 
 <ol>
-  <li>一个类只能<strong>继承（extends）</strong>一个抽象<strong>类</strong>；但可<strong>实现（implements）</strong>多个接口。抽象类被设计<strong>用来被继承的</strong>（用于代码复用），接口被设计<strong>用来实现的</strong>。</li>
-  <li>接口比抽象类更抽象：抽象类可有静态方法、静态代码块、<strong>构造器</strong>；接口中 JDK1.8后可有静态方法，没有构造器。</li>
-  <li>抽象类可定义<strong>成员变量</strong>，默认 default，可在子类中被重新定义，也可被重新赋值；接口中的成员变量只能用 <code class="highlighter-rouge">public static finial</code> 修饰（JDK1.8 后默认为default），实际是常量，不能被修改且必须有初始值。</li>
-  <li>抽象类可有（普通成员）<strong>方法的具体实现</strong>；接口（只有public abstract方法定义，）不能有方法的具体实现。</li>
-  <li>抽象类中的方法可用 <code class="highlighter-rouge">private, protected, public</code> <strong>修饰</strong>；接口只能用 <code class="highlighter-rouge">public</code>。</li>
+  <li>定义：抽象类被设计<strong>用来被继承的</strong>（用于代码复用），接口被设计<strong>用来实现的</strong>。
+    <ul>
+      <li>一个类只能<strong>继承（extends）</strong>一个抽象<strong>类</strong>，但可<strong>实现（implements）</strong>多个接口。</li>
+    </ul>
+  </li>
+  <li>构造器：接口比抽象类更抽象：抽象类可有静态方法、静态代码块、<strong>构造器</strong>；接口中 JDK1.8后可有静态方法，没有构造器。</li>
+  <li>成员变量：抽象类可定义<strong>成员变量</strong>，默认 default，可在子类中被重新定义，也可被重新赋值；接口中的<strong>成员变量</strong>只能用 <code class="highlighter-rouge">public static finial</code> 修饰（JDK1.8 后默认为default），实际是<strong>常量</strong>，不能被修改且必须有初始值。</li>
+  <li>方法：抽象类可有（普通成员）<strong>方法的具体实现</strong>；接口（只有<code class="highlighter-rouge">public abstract</code>方法定义，）不能有方法的具体实现。</li>
+  <li>修饰符：抽象类中的方法可用 <code class="highlighter-rouge">private, protected, public</code> <strong>修饰</strong>；接口只能用 <code class="highlighter-rouge">public</code>。</li>
 </ol>
 
 <h3 id="内部类">内部类</h3>
 
 <ol>
-  <li>静态内部类：作为外部类的静态成员。public static，只加载一次，寄生和宿主的关系；只能访问外部类的静态成员。</li>
-  <li>成员内部类（实例内部类）：作为成员对象的内部类。可访问（private及以上）外部类的属性和方法。外部类想访问内部类属性或方法时，必须通过创建的内部类对象访问。外部类也可访问内部类属性。<strong>实例内部类对象属于外部对象，是外部对象实例化的成员变量</strong>；没有静态区，不能定义静态成员，能定义常量；<code class="highlighter-rouge">Outter.Inner o = new Outter().new Inner();</code>能访问外部类的静态成员和实例成员。</li>
-  <li>局部内部类：几乎不用。方法中的内部类。只能定义实例成员，不能定义静态成员。访问权限类似局部变量，只能访问外部类的final变量。</li>
-  <li><strong>匿名内部类</strong>：没有类名的局部内部类，只能用一次，只能访问外部类的final变量。new子类时重写父类的抽象方法可省略子类定义，立即返回匿名内部类对象；用于对象回调、创建接口对象来简化代码。</li>
+  <li><strong>静态内部类</strong>：作为外部类的<strong>静态成员</strong>。<code class="highlighter-rouge">public static</code>，只加载一次，寄生和宿主的关系；只能访问外部类的静态成员。</li>
+  <li><strong>成员内部类</strong>（实例内部类）：<strong>作为成员对象</strong>的内部类。
+    <ul>
+      <li>可访问（private及以上）外部类的属性和方法。</li>
+      <li>外部类想访问内部类属性或方法时，必须通过创建的内部类对象访问。外部类也可访问内部类属性。</li>
+      <li><strong>实例内部类对象属于外部对象，是外部对象实例化的成员变量</strong>；没有静态区，不能定义静态成员，能定义常量；<code class="highlighter-rouge">Outter.Inner o = new Outter().new Inner();</code></li>
+      <li>能访问外部类的静态成员和实例成员。</li>
+    </ul>
+  </li>
+  <li><del><strong>局部内部类</strong></del>：几乎不用。<strong>方法中的</strong>内部类。只能定义实例成员，不能定义静态成员。访问权限类似局部变量，只能访问外部类的final变量。</li>
+  <li><strong>匿名内部类</strong>：<strong>没有类名的</strong>局部内部类，只能用一次，只能访问外部类的final变量。new子类时重写父类的抽象方法可省略子类定义，立即返回匿名内部类对象；用于对象回调、创建接口对象来简化代码。</li>
 </ol>
 
 <h3 id="可变长参数">可变长参数</h3>
 
 <ul>
-  <li>在方法内部本质是一个数组</li>
+  <li>在方法内部本质是一个<strong>数组</strong>。</li>
   <li>只允许一个可变参数，只能放在最后。</li>
   <li>方法重载会优先匹配固定参数的方法，因为固定参数的方法匹配度更高。</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public static void method2(String arg1, String... args) {
-   // ....
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">method2</span><span class="o">(</span><span class="n">String</span> <span class="n">arg1</span><span class="o">,</span> <span class="n">String</span><span class="o">...</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+   <span class="c1">// ....</span>
+<span class="o">}</span>
 
-sum(1, 2, 4);
-sum(new int[] {1, 2, 4});
+<span class="n">sum</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">4</span><span class="o">);</span>
+<span class="n">sum</span><span class="o">(</span><span class="k">new</span> <span class="kt">int</span><span class="o">[]</span> <span class="o">{</span><span class="mi">1</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">4</span><span class="o">});</span>
 </code></pre></div></div>
 
 <h2 id="异常">异常</h2>
@@ -1234,19 +1350,19 @@ sum(new int[] {1, 2, 4});
 
 <h3 id="异常分类">异常分类</h3>
 
-<p><img src="../assets/types-of-exceptions-in-java.png" alt="Java 异常类层次结构图" style="zoom:70%;" /></p>
+<p><img src="../assets/types-of-exceptions-in-java.png" alt="Java 异常类层次结构图" style="zoom:80%;" /></p>
 
 <p>顶级父类 <code class="highlighter-rouge">java.lang.Throwable</code>：将异常层层抛给顶层，统一处理。</p>
 
 <h4 id="error">Error</h4>
 
-<p><code class="highlighter-rouge">Error</code>：程序无法处理的错误，无法通过 catch 捕获，只能尽量避免。发生时 JVM 一般会终止线程。</p>
+<p><code class="highlighter-rouge">Error</code>：程序无法处理的错误，无法通过 catch 捕获，只能尽量避免。发生时 JVM 一般会<strong>终止线程</strong>。</p>
 
 <ol>
-  <li><code class="highlighter-rouge">Java Virtual Machine Error</code>：JVM 运行错误；</li>
-  <li><code class="highlighter-rouge">OutOfMemoryError（OOM）</code></li>
-  <li><code class="highlighter-rouge">StackOverFlowError</code></li>
-  <li><code class="highlighter-rouge">NoClassDefFoundError</code>：类定义错误；</li>
+  <li><code class="highlighter-rouge">Java Virtual Machine Error</code>：JVM 运行错误。</li>
+  <li><code class="highlighter-rouge">OutOfMemoryError</code>：OOM 内存溢出，见 JVM 文档。</li>
+  <li><code class="highlighter-rouge">StackOverFlowError</code>：栈溢出。</li>
+  <li><code class="highlighter-rouge">NoClassDefFoundError</code>：类定义错误。</li>
   <li><code class="highlighter-rouge">AssertionError</code></li>
   <li><code class="highlighter-rouge">IOError</code></li>
 </ol>
@@ -1263,9 +1379,9 @@ sum(new int[] {1, 2, 4});
 
 <ol>
   <li><code class="highlighter-rouge">IOException</code></li>
-  <li><code class="highlighter-rouge">ClassNotFoundException</code></li>
+  <li><code class="highlighter-rouge">ClassNotFoundException</code>：如果 JVM 在<a href="#序列化">反序列化</a>时找不到该类，则抛出此异常。</li>
   <li><code class="highlighter-rouge">SQLException</code></li>
-  <li><code class="highlighter-rouge">InterruptedException</code>：线程被另一个线程中断；</li>
+  <li><code class="highlighter-rouge">InterruptedException</code>：线程被另一个线程<strong>中断</strong>；</li>
   <li><code class="highlighter-rouge">IllegalAccessException</code>：访问类被拒绝；</li>
   <li><code class="highlighter-rouge">NoSuchMethodException</code>：通过反射机制调用的方法不存在；</li>
   <li>及用户自定义的 Exception 异常。</li>
@@ -1273,29 +1389,39 @@ sum(new int[] {1, 2, 4});
 
 <h5 id="unchecked-exception">Unchecked Exception</h5>
 
-<p><code class="highlighter-rouge">unchecked exceptions</code>（不受检查异常）：即使不处理也可正常通过编译。包括<code class="highlighter-rouge">RunTimeException</code> （运行时异常）及其子类；日常开发中经常用到；</p>
+<p><code class="highlighter-rouge">unchecked exceptions</code>（不受检查异常）：即使不处理也可正常通过编译。</p>
+
+<ul>
+  <li>包括<code class="highlighter-rouge">RunTimeException</code> （运行时异常）及其子类；日常开发中经常用到。</li>
+</ul>
+
+<h6 id="runtimeexception">RunTimeException</h6>
+
+<blockquote>
+  <p>即通常所说的异常。</p>
+</blockquote>
 
 <ol>
-  <li><code class="highlighter-rouge">NullPointerException（NPE）</code>：需进行 NPE 检查，使用 JDK8 的 <a href="#常用类">Optional 类</a>来防止 NPE 问题。可能出现 NPE 的有：
+  <li><code class="highlighter-rouge">NullPointerException(NPE)</code>：需进行 NPE 检查，使用 JDK8 的 <a href="#常用类">Optional 类</a>来防止 NPE 问题。可能出现 NPE 的有：
     <ol>
       <li>返回类型为基本数据类型，return 包装数据类型的对象（为 null）时，自动拆箱（找不到对应的 int 类型）可能产生 NPE，如 <code class="highlighter-rouge">public int getXxx() { return Integer 对象; }</code>；
         <ol>
-          <li>条件表达式/三目运算符在<a href="#数据类型转换">类型对齐</a>时；</li>
-          <li>所有的 POJO 类属性必须使用包装数据类型（没有初值，提醒使用者必须显式地赋值，自己保证 NPE 检查和入库检查），所有的局部变量推荐使用基本数据类型。</li>
+          <li>条件表达式/<strong>三目运算符</strong>在<a href="#数据类型转换">类型对齐</a>时；</li>
+          <li>所有的 <strong>POJO 类属性</strong>必须使用包装数据类型（没有初值，提醒使用者必须显式地赋值，自己保证 NPE 检查和入库检查），所有的<strong>局部变量</strong>推荐使用基本数据类型。</li>
         </ol>
       </li>
-      <li>数据库查询结果可能为 null；如，当某一列的值全是 NULL 时， <del>count(col) 的返回结果为 0，</del>但 sum(col) 的返回结果为 NULL，解决：<code class="highlighter-rouge">SELECT IF(ISNULL(SUM(col)), 0, SUM(col)) FROM table;</code></li>
-      <li>集合里的元素即使 isNotEmpty，取出的数据元素也可能为 null；Map 集合类（<code class="highlighter-rouge">HashMap、CurrentHashMap、HashTable、TreeMap</code>）的 Key/Value是否允许存储 null 值；</li>
-      <li>远程调用返回对象时，一律要进行空指针判断；</li>
-      <li>对于 Session 中获取的数据；</li>
+      <li><strong>数据库查询结果</strong>可能为 null；如，当某一列的值全是 NULL 时， <del>count(col) 的返回结果为 0，</del>但 sum(col) 的返回结果为 NULL，解决：<code class="highlighter-rouge">SELECT IF(ISNULL(SUM(col)), 0, SUM(col)) FROM table;</code></li>
+      <li><strong>集合里的元素</strong>即使 isNotEmpty，取出的数据元素也可能为 null；Map 集合类（<code class="highlighter-rouge">HashMap、CurrentHashMap、HashTable、TreeMap</code>）的 Key/Value是否允许存储 null 值；</li>
+      <li><strong>远程调用</strong>返回对象时，一律要进行空指针判断；</li>
+      <li>对于 <strong>Session</strong> 中获取的数据；</li>
       <li><strong>级联（链式）调用</strong> <code class="highlighter-rouge">obj.getA().getB().getC()</code>，一连串调用；</li>
     </ol>
   </li>
   <li><code class="highlighter-rouge">ArrayIndexOutOfBoundsException</code>：数组下标越界；</li>
-  <li><code class="highlighter-rouge">ArrayStoreException</code>：向类型不兼容的数组元素赋值；</li>
+  <li><code class="highlighter-rouge">ArrayStoreException</code>：向<strong>类型不兼容</strong>的数组元素赋值；</li>
   <li><code class="highlighter-rouge">ClassCastException</code>：类型转换异常；</li>
-  <li><code class="highlighter-rouge">MethodArgumentNotValidException</code>：Hibenate Validator 验证框架 <code class="highlighter-rouge">@Valid</code> 参数验证失败；</li>
-  <li><code class="highlighter-rouge">NumberFormateException</code>：字符串转为数字时格式错误；</li>
+  <li><code class="highlighter-rouge">MethodArgumentNotValidException</code>：<strong>Hibenate Validator</strong> 验证框架 <code class="highlighter-rouge">@Valid</code> 参数验证失败；</li>
+  <li><del><code class="highlighter-rouge">NumberFormateException</code></del>：字符串转为数字时格式错误；</li>
   <li><code class="highlighter-rouge">ArithmeticException</code>：算数错误；</li>
   <li><code class="highlighter-rouge">SecurityException</code> ：安全错误，如权限不够；</li>
   <li><code class="highlighter-rouge">UnsupportedOperationException</code>：不支持的操作错误，如重复创建同一用户；</li>
@@ -1313,9 +1439,11 @@ sum(new int[] {1, 2, 4});
     <span class="k">if</span> <span class="o">(</span><span class="n">ex</span> <span class="k">instanceof</span> <span class="n">MissingServletRequestParameterException</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">return</span> <span class="nf">missingServletRequestParameterExceptionHandler</span><span class="o">((</span><span class="n">MissingServletRequestParameterException</span><span class="o">)</span> <span class="n">ex</span><span class="o">);</span>
     <span class="o">}</span>
+    <span class="c1">//</span>
     <span class="k">if</span> <span class="o">(</span><span class="n">ex</span> <span class="k">instanceof</span> <span class="n">MethodArgumentTypeMismatchException</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">return</span> <span class="nf">methodArgumentTypeMismatchExceptionHandler</span><span class="o">((</span><span class="n">MethodArgumentTypeMismatchException</span><span class="o">)</span> <span class="n">ex</span><span class="o">);</span>
     <span class="o">}</span>
+    <span class="c1">//</span>
     <span class="k">if</span> <span class="o">(</span><span class="n">ex</span> <span class="k">instanceof</span> <span class="n">MethodArgumentNotValidException</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">return</span> <span class="nf">methodArgumentNotValidExceptionExceptionHandler</span><span class="o">((</span><span class="n">MethodArgumentNotValidException</span><span class="o">)</span> <span class="n">ex</span><span class="o">);</span>
     <span class="o">}</span>
@@ -1325,6 +1453,7 @@ sum(new int[] {1, 2, 4});
     <span class="k">if</span> <span class="o">(</span><span class="n">ex</span> <span class="k">instanceof</span> <span class="n">ConstraintViolationException</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">return</span> <span class="nf">constraintViolationExceptionHandler</span><span class="o">((</span><span class="n">ConstraintViolationException</span><span class="o">)</span> <span class="n">ex</span><span class="o">);</span>
     <span class="o">}</span>
+    <span class="c1">//</span>
     <span class="k">if</span> <span class="o">(</span><span class="n">ex</span> <span class="k">instanceof</span> <span class="n">ValidationException</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">return</span> <span class="nf">validationException</span><span class="o">((</span><span class="n">ValidationException</span><span class="o">)</span> <span class="n">ex</span><span class="o">);</span>
     <span class="o">}</span>
@@ -1334,12 +1463,14 @@ sum(new int[] {1, 2, 4});
     <span class="k">if</span> <span class="o">(</span><span class="n">ex</span> <span class="k">instanceof</span> <span class="n">NoHandlerFoundException</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">return</span> <span class="nf">noHandlerFoundExceptionHandler</span><span class="o">((</span><span class="n">NoHandlerFoundException</span><span class="o">)</span> <span class="n">ex</span><span class="o">);</span>
     <span class="o">}</span>
+    <span class="c1">//</span>
     <span class="k">if</span> <span class="o">(</span><span class="n">ex</span> <span class="k">instanceof</span> <span class="n">HttpRequestMethodNotSupportedException</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">return</span> <span class="nf">httpRequestMethodNotSupportedExceptionHandler</span><span class="o">((</span><span class="n">HttpRequestMethodNotSupportedException</span><span class="o">)</span> <span class="n">ex</span><span class="o">);</span>
     <span class="o">}</span>
     <span class="k">if</span> <span class="o">(</span><span class="n">ex</span> <span class="k">instanceof</span> <span class="n">HttpMediaTypeNotSupportedException</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">return</span> <span class="nf">httpMediaTypeNotSupportedExceptionHandler</span><span class="o">((</span><span class="n">HttpMediaTypeNotSupportedException</span><span class="o">)</span> <span class="n">ex</span><span class="o">);</span>
     <span class="o">}</span>
+    <span class="c1">//</span>
     <span class="k">if</span> <span class="o">(</span><span class="n">ex</span> <span class="k">instanceof</span> <span class="n">ServiceException</span><span class="o">)</span> <span class="o">{</span>
         <span class="k">return</span> <span class="nf">serviceExceptionHandler</span><span class="o">((</span><span class="n">ServiceException</span><span class="o">)</span> <span class="n">ex</span><span class="o">);</span>
     <span class="o">}</span>
@@ -1358,7 +1489,7 @@ sum(new int[] {1, 2, 4});
 <h3 id="throwable-类的常用方法">Throwable 类的常用方法</h3>
 
 <ol>
-  <li><code class="highlighter-rouge">void printStackTrace()</code>：在控制台上打印 <code class="highlighter-rouge">Throwable</code> 对象封装的异常信息；</li>
+  <li><code class="highlighter-rouge">void printStackTrace()</code>：在控制台上打印 <code class="highlighter-rouge">Throwable</code> 对象封装的<strong>异常信息</strong>；</li>
   <li><code class="highlighter-rouge">String getMessage()</code>：返回异常发生时的<strong>简要描述</strong>；
     <ul>
       <li><code class="highlighter-rouge">String getLocalizedMessage()</code>：默认返回<code class="highlighter-rouge">getMessage()</code>；若用 <code class="highlighter-rouge">Throwable</code> 的子类覆盖此方法，返回异常对象的本地化信息。</li>
@@ -1366,7 +1497,7 @@ sum(new int[] {1, 2, 4});
     </ul>
   </li>
   <li><code class="highlighter-rouge">String toString()</code>：返回异常发生时的详细信息；</li>
-  <li><code class="highlighter-rouge">ex.getCause()</code>：返回此异常的原因。当原因不存在或未知时，返回 null。</li>
+  <li><code class="highlighter-rouge">ex.getCause()</code>：返回此异常的<strong>原因</strong>。当原因不存在或未知时，返回 null。</li>
 </ol>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">private</span> <span class="kt">void</span> <span class="nf">buildExceptionLog</span><span class="o">(</span><span class="n">ApiErrorLogCreateReqDTO</span> <span class="n">errorLog</span><span class="o">,</span> <span class="n">HttpServletRequest</span> <span class="n">request</span><span class="o">,</span> <span class="n">Throwable</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
@@ -1402,21 +1533,21 @@ sum(new int[] {1, 2, 4});
 
 <h3 id="try-catch-finally">try-catch-finally</h3>
 
-<p><code class="highlighter-rouge">try</code> 块： 用于捕获异常。其后可接多个 <code class="highlighter-rouge">catch</code> 块；如果没有 <code class="highlighter-rouge">catch</code> 块，则必须跟一个 <code class="highlighter-rouge">finally</code> 块。</p>
+<p><strong><code class="highlighter-rouge">try</code> 块</strong>： 用于<strong>捕获异常</strong>。其后可接多个 <code class="highlighter-rouge">catch</code> 块；如果没有 <code class="highlighter-rouge">catch</code> 块，则必须跟一个 <code class="highlighter-rouge">finally</code> 块。</p>
 
-<p><code class="highlighter-rouge">catch</code> 块 ：用于处理 try 捕获到的异常。</p>
-
-<ul>
-  <li>JVM 在方法栈中查找能处理该类型异常的对象。捕捉异常并处理的代价远大于直接抛出。</li>
-</ul>
-
-<p><code class="highlighter-rouge">throw</code> 块：一般用在方法内部（出现异常的地方），由开发者定义，当程序语句出现问题后，创建异常对象并（立即主动）抛出异常（提交给 JVM）。</p>
+<p><strong><code class="highlighter-rouge">catch</code> 块</strong> ：用于<strong>处理</strong> try 捕获到的异常。</p>
 
 <ul>
-  <li><code class="highlighter-rouge">throws</code>：一般用在方法声明上，代表可能会抛出的异常列表。</li>
+  <li>JVM 在方法栈中查找能处理该类型异常的对象。捕捉异常并处理的<strong>代价</strong>远大于直接抛出。</li>
 </ul>
 
-<p><code class="highlighter-rouge">finally</code> 块：无论是否捕获或处理异常，语句最终一定执行；当在 <code class="highlighter-rouge">try</code> 块或 <code class="highlighter-rouge">catch</code> 块中遇到 <code class="highlighter-rouge">return</code> 语句时，在方法返回前执行。常用于回收、释放资源。</p>
+<p><strong><code class="highlighter-rouge">throw</code> 块</strong>：一般用在方法内部（出现异常的地方），由开发者定义，当程序语句出现问题后，创建异常对象并（立即主动）<strong>抛出异常</strong>（提交给 JVM）。</p>
+
+<ul>
+  <li><code class="highlighter-rouge">throws</code>：一般用在<strong>方法声明</strong>上，代表可能会抛出的异常列表。</li>
+</ul>
+
+<p><strong><code class="highlighter-rouge">finally</code> 块</strong>：无论是否捕获或处理异常，语句最终一定执行；当在 <code class="highlighter-rouge">try</code> 块或 <code class="highlighter-rouge">catch</code> 块中遇到 <code class="highlighter-rouge">return</code> 语句时，在<strong>方法返回前</strong>执行。常用于回收、释放资源。</p>
 
 <ul>
   <li>以下情况不会执行 <code class="highlighter-rouge">finally</code> 块，而是直接结束：
@@ -1436,59 +1567,69 @@ sum(new int[] {1, 2, 4});
   <li>不要在 finally 语句块中使用 <code class="highlighter-rouge">return</code>：当 try 和 finally 语句中都有 return 语句时，finally 块中的会覆盖 try/catch 中的。</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>try {
-    System.out.println("Try to do something");
-    throw new RuntimeException("RuntimeException");
-} catch (Exception e) {
-    System.out.println("Catch Exception -&gt; " + e.getMessage());
-} finally {
-    System.out.println("Finally");
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">try</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"1.Try to do something"</span><span class="o">);</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="s">"2.RuntimeException"</span><span class="o">);</span>
+<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"3.Catch Exception -&gt; "</span> <span class="o">+</span> <span class="n">e</span><span class="o">.</span><span class="na">getMessage</span><span class="o">());</span>
+<span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"4.Finally"</span><span class="o">);</span>
+<span class="o">}</span>
 
-输出：
-Try to do something
-Catch Exception -&gt; RuntimeException
-Finally
+<span class="c1">// 输出：</span>
+<span class="c1">// 1.Try to do something</span>
+<span class="c1">// 3.Catch Exception -&gt; 2.RuntimeException</span>
+<span class="c1">// 4.Finally</span>
 
-try{
-} catch (FileNotFoundException e) {
-    // 打印异常堆栈
-    e.printStackTrace();
-} catch (Exception e) {
-    e.printStackTrace();
-}
+<span class="k">try</span><span class="o">{</span>
+<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">FileNotFoundException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// 打印异常堆栈</span>
+    <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h3 id="try-with-resources">try-with-resources</h3>
 
-<p>Java 7 之后，面对必须要关闭的资源，应优先使用 <code class="highlighter-rouge">try-with-resources</code> 而不是<code class="highlighter-rouge">try-finally</code>。代码更简短、清晰，产生的异常对也更有用。</p>
+<p>Java 7 之后，面对必须要关闭的资源，应优先使用 <code class="highlighter-rouge">try-with-resources</code> 而不是<code class="highlighter-rouge">try-finally</code>。</p>
 
 <ul>
-  <li>类似于<code class="highlighter-rouge">InputStream</code>、<code class="highlighter-rouge">OutputStream</code> 、<code class="highlighter-rouge">Scanner</code> 、<code class="highlighter-rouge">PrintWriter</code> 等资源调用<code class="highlighter-rouge">close()</code>方法来手动关闭。</li>
+  <li>
+    <p>代码更简短、清晰，产生的异常对也更有用。</p>
+  </li>
+  <li>
+    <p>类似于<code class="highlighter-rouge">InputStream</code>、<code class="highlighter-rouge">OutputStream</code> 、<code class="highlighter-rouge">Scanner</code> 、<code class="highlighter-rouge">PrintWriter</code> 等资源调用<code class="highlighter-rouge">close()</code>方法来手动关闭。</p>
+  </li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>try (Scanner scanner = new Scanner(new File("test.txt"))) {
-    while (scanner.hasNext()) {
-        System.out.println(scanner.nextLine());
-    }
-} catch (FileNotFoundException fnfe) {
-    fnfe.printStackTrace();
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">try</span> <span class="o">(</span><span class="n">Scanner</span> <span class="n">scanner</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Scanner</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="s">"test.txt"</span><span class="o">)))</span> <span class="o">{</span>
+    <span class="k">while</span> <span class="o">(</span><span class="n">scanner</span><span class="o">.</span><span class="na">hasNext</span><span class="o">())</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">scanner</span><span class="o">.</span><span class="na">nextLine</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">FileNotFoundException</span> <span class="n">fnfe</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">fnfe</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h2 id="泛型">泛型</h2>
 
-<p>泛型（Generics）参数：即参数化类型：<数据类型>。编译器可对泛型参数进行检测，通过泛型参数指定传入的对象类型。只是一个占位符，必须在传递类型后才能使用。常用 `E，T，K，V，?（通配符）`表示，用于对象具体类型不确定的情况。</数据类型></p>
+<p>泛型（Generics）参数：即参数化类型：<数据类型>。编译器可对泛型参数进行检测，通过泛型参数**指定**传入的对象类型。</数据类型></p>
+
+<ul>
+  <li>只是一个占位符，必须在传递类型后才能使用。常用 <code class="highlighter-rouge">E，T，K，V，?（通配符）</code>表示，用于对象具体类型不确定的情况。</li>
+  <li>泛型没有<strong>继承关系</strong>：虽然 BMW 和 BENZ 都继承了 Car，但 <code class="highlighter-rouge">ArraryList&lt;BMW&gt;</code> 和<code class="highlighter-rouge">ArraryList&lt;BENZ&gt; </code> 与 <code class="highlighter-rouge">ArraryList&lt;Car&gt;</code>无关。</li>
+</ul>
+
+<p>例如：</p>
 
 <ol>
-  <li>自定义接口通用返回结果 <code class="highlighter-rouge">CommonResult&lt;T&gt;</code> 通过参数 <code class="highlighter-rouge">T</code> 可根据具体的返回类型动态指定结果的数据类型；</li>
+  <li>自定义接口<strong>通用返回结果</strong> <code class="highlighter-rouge">CommonResult&lt;T&gt;</code> 通过参数 <code class="highlighter-rouge">T</code> 可根据具体的返回类型、<strong>动态指定</strong>结果的数据类型；</li>
   <li>定义 <code class="highlighter-rouge">Excel</code> 处理类 <code class="highlighter-rouge">ExcelUtil&lt;T&gt;</code> 用于动态指定 <code class="highlighter-rouge">Excel</code> 导出的数据类型；</li>
-  <li>构建集合工具类（参考 <code class="highlighter-rouge">Collections</code> 中的 <code class="highlighter-rouge">sort</code>, <code class="highlighter-rouge">binarySearch</code> 方法）。</li>
+  <li>构建<strong>集合工具类</strong>（参考 <code class="highlighter-rouge">Collections</code> 中的 <code class="highlighter-rouge">sort</code>, <code class="highlighter-rouge">binarySearch</code> 方法）。</li>
 </ol>
 
-<p>泛型没有继承关系：虽然 BMW 和 BENZ 都继承了 Car，但 <code class="highlighter-rouge">ArraryList&lt;BMW&gt;</code> 和<code class="highlighter-rouge">ArraryList&lt;BENZ&gt; </code> 与 <code class="highlighter-rouge">ArraryList&lt;Car&gt;</code>无关。</p>
-
-<h4 id="使用方式">使用方式</h4>
+<h3 id="使用方式">使用方式</h3>
 
 <p>3种使用方式：</p>
 
@@ -1503,66 +1644,73 @@ try{
   <li>泛型方法；</li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 泛型接口
-public interface Generator&lt;E&gt; {
-	public T method();
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 泛型接口</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Generator</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="o">{</span>
+	<span class="kd">public</span> <span class="n">T</span> <span class="nf">method</span><span class="o">();</span>
+<span class="o">}</span>
 
-// 泛型的上下限：
-// 泛型通配符&lt;? extends T&gt;来接收返回的数据，此写法的泛型集合不能使用 add 方法；
-// 而&lt;? super T&gt;不能使用 get() 方法，两者在接口调用赋值时易出错。
-public static void run(ArrayList&lt;? extends Car&gt;) {
-}
-public static void run(ArrayList&lt;? super Car&gt;) {
-}
+<span class="c1">// 泛型的上下限：</span>
+<span class="c1">// 泛型通配符&lt;? extends T&gt;来接收返回的数据，此写法的泛型集合不能使用 add 方法；</span>
+<span class="c1">// 而&lt;? super T&gt;不能使用 get() 方法，两者在接口调用赋值时易出错。</span>
+<span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">(</span><span class="n">ArrayList</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="n">Car</span><span class="o">&gt;)</span> <span class="o">{</span>
+<span class="o">}</span>
+<span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">(</span><span class="n">ArrayList</span><span class="o">&lt;?</span> <span class="kd">super</span> <span class="n">Car</span><span class="o">&gt;)</span> <span class="o">{</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h2 id="反射机制">反射机制</h2>
 
-<h4 id="反射">反射</h4>
+<h3 id="反射">反射</h3>
 
-<p>反射：将（类/接口的）<code class="highlighter-rouge">.class 字节码文件</code> 加载进 JVM （的方法区）时，会（在堆中）创建一个对应的 <code class="highlighter-rouge">java.lang.Class 对象</code>，用来映射类中的各种成分。用于在<strong>运行期/时</strong>获取<strong>Class 类对象</strong>及其类内部详细信息（成员方法、属性、构造函数等）、及<strong>反向控制</strong>实例对象的能力。</p>
+<p>反射：（在<strong>运行期/时</strong>）获取<strong>Class 类对象</strong>及其<strong>类内部详细信息</strong>（成员方法、属性、构造函数等）、及<strong>反向控制</strong>实例对象的能力。</p>
 
 <ul>
-  <li>通过Class实例获取 <code class="highlighter-rouge">class</code> 信息的方法称为反射。</li>
-  <li>这种动态获取类信息及调用对象方法的功能称为Java语言的<strong>反射机制</strong>。</li>
+  <li>
+    <p>将（类/接口的）<code class="highlighter-rouge">.class</code> 字节码文件<strong>加载进 JVM</strong> （的方法区）时，会（在<strong>堆中</strong>）创建一个对应的 <strong><code class="highlighter-rouge">java.lang.Class</code> 对象</strong>，用来映射类中的各种成分。</p>
+  </li>
+  <li>这种<strong>动态获取类信息</strong>及调用对象方法的功能称为Java语言的<strong>反射机制</strong>。</li>
+  <li>反射是线程安全的。</li>
 </ul>
 
 <p><img src="../assets/java-basic-reflection-3.png" alt="img" style="zoom:80%;" /></p>
 
-<h5 id="应用场景">应用场景</h5>
+<h4 id="应用场景">应用场景</h4>
 
-<p>多用于<strong>框架</strong>的底层原理，是框架的灵魂。通过反射可在运行时分析类及执行类中方法；获取、调用任意一个类的所有属性和方法。</p>
+<p>多用于<strong>框架</strong>的底层原理，是框架的灵魂。通过反射可在运行时<strong>分析类</strong>及执行类中方法，获取、调用任意一个类的所有属性和方法。</p>
 
 <ol>
   <li>Spring/Spring Boot、MyBatis 等<strong>框架</strong>中都大量使用反射机制，框架中<strong>动态代理</strong>的实现也依赖反射；
     <ul>
-      <li>动态代理机制：JDK提供的（如 <code class="highlighter-rouge">Proxy.newProxyInstance()</code> ）没有实现类、但在运行期动态创建接口对象的方式。通过 <code class="highlighter-rouge">Proxy</code> 创建代理对象，然后将接口方法“代理”给 <code class="highlighter-rouge">InvocationHandler</code> 完成的。</li>
+      <li><strong>动态代理机制</strong>：JDK提供的（如 <code class="highlighter-rouge">Proxy.newProxyInstance()</code> ）没有实现类、但在运行期<strong>动态创建接口对象</strong>的方式。通过 <code class="highlighter-rouge">Proxy</code> 创建代理对象，然后将接口方法“代理”给 <code class="highlighter-rouge">InvocationHandler</code> 完成的。</li>
       <li>MyBatis 通过<strong>反射</strong>创建对象，同时用反射给对象的属性逐一赋值并返回。<code class="highlighter-rouge">&lt;resultMap&gt; </code> 元素。</li>
     </ul>
   </li>
-  <li><strong>注解</strong>的实现用到反射。Spring 中通过 <code class="highlighter-rouge">@Component</code> 注解声明一个类为 Spring Bean、 通过 <code class="highlighter-rouge">@Value </code> 注解就读取到配置文件中的值：基于反射分析类，获取到类/属性/方法/参数上的注解，之后就可做进一步的处理。</li>
+  <li><strong>注解</strong>的实现用到反射。
+    <ul>
+      <li>如，Spring 中通过 <strong><code class="highlighter-rouge">@Component</code> 注解</strong>声明一个类为 Spring Bean、 通过 <strong><code class="highlighter-rouge">@Value </code> 注解</strong>就读取到配置文件中的值：基于反射分析类，获取到类/属性/方法/参数上的注解，之后就可做进一步的处理。</li>
+    </ul>
+  </li>
   <li><code class="highlighter-rouge">toString()</code> 里重写并打印类信息。</li>
 </ol>
 
-<h5 id="优缺点">优缺点</h5>
+<h4 id="优缺点-1">优缺点</h4>
 
 <ul>
   <li>
     <p>优点 ：代码更灵活；为各种框架提供<strong>开箱即用</strong>的功能提供便利；</p>
   </li>
   <li>
-    <p>缺点 ：不安全。如，可无视（发生在编译时的）泛型参数的安全检查；性能稍差。</p>
+    <p>缺点 ：不安全。如，可无视（发生在编译时的）<strong>泛型参数</strong>的安全检查；<strong>性能</strong>稍差。</p>
   </li>
 </ul>
 
-<h4 id="获取-class-类对象">获取 Class 类对象</h4>
+<h3 id="获取-class-类对象">获取 Class 类对象</h3>
 
 <p>获取 Class 对象的方式有：</p>
 
 <ol>
   <li>
-    <p>（一般不知道具体类），知道具体类的情况下：<code class="highlighter-rouge">类名.class</code>。Class 对象不会进行初始化（不执行静态代码块和静态对象）；</p>
+    <p>（一般不知道具体类），知道<strong>具体类</strong>的情况下：<code class="highlighter-rouge">类名.class</code>。Class 对象不会进行<strong>初始化</strong>（不执行静态代码块和静态对象）；</p>
   </li>
   <li>
     <p><code class="highlighter-rouge">实例对象.getClass()</code>，继承自 <code class="highlighter-rouge">Object.getClass()</code>；</p>
@@ -1573,93 +1721,129 @@ public static void run(ArrayList&lt;? super Car&gt;) {
   <li>
     <p><del>通过类加载器<code class="highlighter-rouge">xxxClassLoader.loadClass(类路径？)</code>。Class 对象不会进行初始化。</del></p>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ClassLoader.getSystemClassLoader().loadClass("cn.javaguide.User");
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Logger</span> <span class="n">LOGGER</span> <span class="o">=</span> <span class="n">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="n">UmsAdmin</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+   
+<span class="n">ClassLoader</span><span class="o">.</span><span class="na">getSystemClassLoader</span><span class="o">().</span><span class="na">loadClass</span><span class="o">(</span><span class="s">"cn.javaguide.User"</span><span class="o">);</span>
 </code></pre></div>    </div>
   </li>
 </ol>
 
-<h4 id="反射的使用--常用类基本操作">反射的使用 / 常用类基本操作</h4>
+<h3 id="反射的使用--常用类基本操作">反射的使用 / 常用类基本操作</h3>
 
 <p>可通过以下类调用反射API（<a href="https://javaguide.cn/java/basis/reflection.html#%E5%8F%8D%E5%B0%84%E7%9A%84%E4%B8%80%E4%BA%9B%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C">JavaGuide 反射的一些基本操作</a>）：</p>
 
+<h4 id="class-类"><code class="highlighter-rouge">Class</code> 类</h4>
+
+<p><code class="highlighter-rouge">Class</code> 类：可获得（Class 对象所表示的）<strong>类的属性、方法</strong>，是一个 Java 中的泛型类型。</p>
+
+<ul>
+  <li>用于封装被加载到 JVM 中的类和接口的信息。</li>
+</ul>
+
+<p>常用方法有：</p>
+
 <ol>
-  <li><code class="highlighter-rouge">Class</code> 类：可获得（Class 对象所表示的）类的属性、方法，是一个 Java 中的泛型类型。用于封装被加载到 JVM 中的类和接口的信息。常用方法有：
-    <ol>
-      <li><code class="highlighter-rouge">Class&lt;?&gt; getClass()</code>：获取类引用；</li>
-      <li><code class="highlighter-rouge">getSimpleName()</code>：获取类名，用于 <code class="highlighter-rouge">toString()</code> 打印 OBJOs 的类名；</li>
-      <li><code class="highlighter-rouge">getName()</code>：获取全限定类名；</li>
-      <li><code class="highlighter-rouge">newInstance()</code>：实例化；</li>
-      <li>getPackage()</li>
-      <li><code class="highlighter-rouge">Class getSuperclass()</code>：获取父类类型；</li>
-      <li>Class[] getInterfaces()：获取当前类实现的所有接口；</li>
-      <li>Constructor&lt;?&gt;[] getConstructors()</li>
-      <li><code class="highlighter-rouge">Fileds[] getFileds()</code></li>
+  <li><code class="highlighter-rouge">Class&lt;?&gt; getClass()</code>：获取<strong>类引用</strong>；</li>
+  <li><code class="highlighter-rouge">getName()</code>：获取全限定类名；
+    <ul>
+      <li><code class="highlighter-rouge">getSimpleName()</code>：获取类名，用于 <code class="highlighter-rouge">toString()</code> 打印 POJOs 的类名；</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">newInstance()</code>：实例化；</li>
+  <li>getPackage()</li>
+  <li><code class="highlighter-rouge">Class getSuperclass()</code>：获取父类类型；</li>
+  <li>Class[] getInterfaces()：获取当前类实现的所有接口；</li>
+</ol>
+
+<p>获取构造器、字段和方法：后续再用 <code class="highlighter-rouge">Construct</code> 类、<code class="highlighter-rouge">Filed</code> 类、<code class="highlighter-rouge">Method</code> 类处理。</p>
+
+<ol>
+  <li>Constructor&lt;?&gt;[] getConstructors()</li>
+  <li><code class="highlighter-rouge">Fileds[] getFileds()</code>
+    <ul>
       <li><code class="highlighter-rouge">Field getField(String name)</code>：获取公有字段；</li>
       <li><code class="highlighter-rouge">getDeclaredFields</code>：用于获取所有声明的字段，包括公有和私有字段；</li>
-      <li>Method[] getMethods()</li>
+    </ul>
+  </li>
+  <li>Method[] getMethods()
+    <ul>
       <li>Method getMethod(String name, Class&lt;?&gt;… parameterTypes)</li>
-    </ol>
-  </li>
-  <li><code class="highlighter-rouge">Construct</code> 类：获取（Class对象所表示的）类的构造方法，可在运行时动态创建对象。</li>
-  <li><code class="highlighter-rouge">Field</code> 类：获取（Class对象所表示的）类的成员变量，及对它的（运行时）动态修改权限（包含private）。
-    <ol>
-      <li><code class="highlighter-rouge">setAccessible(true)</code>：为了调用 private 方法而取消安全检查；<a href="#常用类">String 类的定义</a>；</li>
-      <li><code class="highlighter-rouge">getName()</code>：返回字段名称，如<code class="highlighter-rouge">"id"</code>；</li>
-      <li><code class="highlighter-rouge">getType()</code>：返回字段类型，也是一个<code class="highlighter-rouge">Class</code>实例，如，<code class="highlighter-rouge">String.class</code>；</li>
-      <li><code class="highlighter-rouge">int getModifiers()</code>：返回字段的修饰符，不同的bit表示不同的含义。</li>
-    </ol>
-  </li>
-  <li><code class="highlighter-rouge">Method</code> 类：获取（Class对象所表示的）类的成员方法，可动态调用对象的方法（包含private）。
-    <ol>
-      <li><code class="highlighter-rouge">Object invoke(Object obj, Object... args)</code>：JVM 调用包装在当前 Method 对象obj 中的方法，并传入方法调用的参数 args。调用静态方法时传入的第一个参数为<code class="highlighter-rouge">null</code>；</li>
-      <li><code class="highlighter-rouge">getName()</code>：返回方法名称，如：<code class="highlighter-rouge">"getScore"</code>；</li>
-      <li><code class="highlighter-rouge">getReturnType()</code>：返回方法返回值类型，也是一个Class实例，如：<code class="highlighter-rouge">String.class</code>；</li>
-      <li><code class="highlighter-rouge">getParameterTypes()</code>：返回方法的参数类型，是一个Class数组，如：<code class="highlighter-rouge">{String.class, int.class}</code>；</li>
-      <li><code class="highlighter-rouge">int getModifiers()</code>：返回方法的修饰符，不同的bit表示不同的含义。</li>
-    </ol>
+    </ul>
   </li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/**
+<h4 id="construct-类"><code class="highlighter-rouge">Construct</code> 类</h4>
+
+<p><code class="highlighter-rouge">Construct</code> 类：获取（Class对象所表示的）类的构造方法，可在运行时动态创建对象。</p>
+
+<h4 id="field-类"><code class="highlighter-rouge">Field</code> 类</h4>
+
+<p><code class="highlighter-rouge">Field</code> 类：获取（Class对象所表示的）类的<strong>成员变量</strong>，及对它的（运行时）动态修改权限（包含private）。</p>
+
+<ol>
+  <li><code class="highlighter-rouge">setAccessible(true)</code>：为了调用 <strong>private 方法</strong>而<strong>取消安全检查</strong>；<a href="#常用类">String 类的定义</a>；</li>
+  <li><code class="highlighter-rouge">getName()</code>：返回字段名称，如<code class="highlighter-rouge">"id"</code>；</li>
+  <li><code class="highlighter-rouge">getType()</code>：返回字段类型，也是一个<code class="highlighter-rouge">Class</code>实例，如，<code class="highlighter-rouge">String.class</code>；</li>
+  <li><code class="highlighter-rouge">int getModifiers()</code>：返回字段的修饰符，不同的bit表示不同的含义。</li>
+</ol>
+
+<h4 id="method-类"><code class="highlighter-rouge">Method</code> 类</h4>
+
+<p><code class="highlighter-rouge">Method</code> 类：获取（Class对象所表示的）类的<strong>成员方法</strong>，可动态调用对象的方法（包含private）。</p>
+
+<ol>
+  <li><strong><code class="highlighter-rouge">Object invoke(Object obj, Object... args)</code></strong>：JVM 调用包装在当前 Method 对象obj 中的方法，并传入方法调用的参数 args。
+    <ul>
+      <li>调用静态方法时传入的第一个参数为<code class="highlighter-rouge">null</code>；</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">getName()</code>：返回方法名称，如：<code class="highlighter-rouge">"getScore"</code>；</li>
+  <li><code class="highlighter-rouge">getReturnType()</code>：返回方法返回值类型，也是一个Class实例，如：<code class="highlighter-rouge">String.class</code>；</li>
+  <li><code class="highlighter-rouge">getParameterTypes()</code>：返回方法的参数类型，是一个Class数组，如：<code class="highlighter-rouge">{String.class, int.class}</code>；</li>
+  <li><code class="highlighter-rouge">int getModifiers()</code>：返回方法的修饰符，不同的bit表示不同的含义。</li>
+</ol>
+
+<h4 id="代码示例">代码示例</h4>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
  * 建立和插入关系表操作
  *
  * @param dao       可以操作的dao
  * @param dataList  要插入的数据
  * @param productId 建立关系的id
- */
-private void relateAndInsertList(Object dao, List dataList, Long productId) {
-    try {
-        if (CollectionUtils.isEmpty(dataList)) return;
-        for (Object item : dataList) {
-            Method setId = item.getClass().getMethod("setId", Long.class);
-            setId.invoke(item, (Long) null);
-        }
-        Method insertList = dao.getClass().getMethod("insertList", List.class);
-        insertList.invoke(dao, dataList);
+ */</span>
+<span class="kd">private</span> <span class="kt">void</span> <span class="nf">relateAndInsertList</span><span class="o">(</span><span class="n">Object</span> <span class="n">dao</span><span class="o">,</span> <span class="n">List</span> <span class="n">dataList</span><span class="o">,</span> <span class="n">Long</span> <span class="n">productId</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">CollectionUtils</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">(</span><span class="n">dataList</span><span class="o">))</span> <span class="k">return</span><span class="o">;</span>
+        <span class="k">for</span> <span class="o">(</span><span class="n">Object</span> <span class="n">item</span> <span class="o">:</span> <span class="n">dataList</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">Method</span> <span class="n">setId</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="na">getClass</span><span class="o">().</span><span class="na">getMethod</span><span class="o">(</span><span class="s">"setId"</span><span class="o">,</span> <span class="n">Long</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+            <span class="n">setId</span><span class="o">.</span><span class="na">invoke</span><span class="o">(</span><span class="n">item</span><span class="o">,</span> <span class="o">(</span><span class="n">Long</span><span class="o">)</span> <span class="kc">null</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="n">Method</span> <span class="n">insertList</span> <span class="o">=</span> <span class="n">dao</span><span class="o">.</span><span class="na">getClass</span><span class="o">().</span><span class="na">getMethod</span><span class="o">(</span><span class="s">"insertList"</span><span class="o">,</span> <span class="n">List</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+        <span class="n">insertList</span><span class="o">.</span><span class="na">invoke</span><span class="o">(</span><span class="n">dao</span><span class="o">,</span> <span class="n">dataList</span><span class="o">);</span>
         
-        /**
+        <span class="cm">/**
          * 获取指定参数，并对参数进行修改
-         */
-        Class&lt;?&gt; targetClass = Class.forName("cn.javaguide.User");
-        Field field = targetClass.getDeclaredField("value");
-        // 为了对类中的参数进行修改，取消安全检查
-        field.setAccessible(true);
-        field.set(targetObject, "JavaGuide");
-        field.setAccessible(false); //？
-    } catch (Exception e) {
-        LOGGER.warn("创建产品出错:{}", e.getMessage());
-        throw new RuntimeException(e.getMessage());
-    }
-}
+         */</span>
+        <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">targetClass</span> <span class="o">=</span> <span class="n">Class</span><span class="o">.</span><span class="na">forName</span><span class="o">(</span><span class="s">"cn.javaguide.User"</span><span class="o">);</span>
+        <span class="n">Field</span> <span class="n">field</span> <span class="o">=</span> <span class="n">targetClass</span><span class="o">.</span><span class="na">getDeclaredField</span><span class="o">(</span><span class="s">"value"</span><span class="o">);</span>
+        <span class="c1">// 为了对类中的参数进行修改，取消安全检查</span>
+        <span class="n">field</span><span class="o">.</span><span class="na">setAccessible</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span> <span class="c1">//</span>
+        <span class="n">field</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">targetObject</span><span class="o">,</span> <span class="s">"JavaGuide"</span><span class="o">);</span>
+        <span class="n">field</span><span class="o">.</span><span class="na">setAccessible</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="na">warn</span><span class="o">(</span><span class="s">"创建产品出错:{}"</span><span class="o">,</span> <span class="n">e</span><span class="o">.</span><span class="na">getMessage</span><span class="o">());</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="na">getMessage</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
-<h4 id="执行流程及原理">执行流程及原理</h4>
+<h3 id="执行流程及原理">执行流程及原理</h3>
 
 <ul>
-  <li>反射是线程安全的；</li>
-  <li>反射用<strong>软引用</strong> relectionData 缓存 class 信息，避免每次都重新从 JVM 获取带来的开销；</li>
+  <li>用<strong>软引用</strong> relectionData 缓存 class 信息，避免每次都重新从 JVM 获取带来的开销；</li>
   <li>当找到需要的方法，会copy一份，而不是用原来的实例，从而保证数据隔离；</li>
-  <li>调度反射方法，最终是由 JVM 执行 <code class="highlighter-rouge">invoke0()</code> 执行；</li>
+  <li>调度反射方法，最终是由 JVM <strong>执行 <code class="highlighter-rouge">invoke0()</code></strong> 执行；</li>
 </ul>
 
 <h2 id="注解">注解</h2>
@@ -1675,8 +1859,12 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
 <p>注解只有被解析后才会生效，常见的解析方法有两种：</p>
 
 <ol>
-  <li>编译期直接扫描：编译器在编译代码时，扫描对应的注解并处理，如 <code class="highlighter-rouge">@Override</code> 注解，编译器在编译时就会检测当前的方法是否重写了父类对应的方法。</li>
-  <li>运行期通过反射处理：框架中自带的注解（如 Spring 框架的 <code class="highlighter-rouge">@Value</code> 、<code class="highlighter-rouge">@Component</code>）。</li>
+  <li>编译期直接扫描：编译器在编译代码时，扫描对应的注解并处理。
+    <ul>
+      <li>如 <strong><code class="highlighter-rouge">@Override</code> 注解</strong>：编译器在编译时就会检测当前的方法是否重写了父类对应的方法。</li>
+    </ul>
+  </li>
+  <li>运行期通过<strong>反射</strong>处理：框架中自带的注解（如 Spring 框架的 <code class="highlighter-rouge">@Value</code> 、<code class="highlighter-rouge">@Component</code>）。</li>
 </ol>
 
 <h4 id="注解分类">注解分类</h4>
@@ -1690,26 +1878,26 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
     <ol>
       <li><code class="highlighter-rouge">@Override</code>：检查该方法是否正确实现了覆写；</li>
       <li><code class="highlighter-rouge">@Deprecated</code>：标记过时（已弃用）方法。如果使用该方法，会报编译警告；</li>
-      <li><code class="highlighter-rouge">@SuppressWarnings</code>：告诉编译器忽略此处代码产生的警告；</li>
+      <li><code class="highlighter-rouge">@SuppressWarnings</code>：告诉编译器<strong>忽略</strong>此处代码产生的警告；</li>
     </ol>
   </li>
   <li>
-    <p>元注解：作用在其他注解上的注解，用于定义其它注解（ <code class="highlighter-rouge">@interface</code> 类型的类）。</p>
+    <p><strong>元注解</strong>：作用在其他注解上的注解，用于定义其它注解（ <code class="highlighter-rouge">@interface</code> 类型的类）。</p>
 
     <ol>
       <li>
         <p><code class="highlighter-rouge">@Target</code>：标记注解作用在哪种成员上：</p>
 
-        <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  /** Class, interface (including annotation type), or enum declaration */
-  TYPE,
-  FIELD, METHOD, PARAMETER,
-  CONSTRUCTOR,
-  LOCAL_VARIABLE,
-  ANNOTATION_TYPE,
-  PACKAGE,
-  // since 1.8
-  TYPE_PARAMETER,
-  TYPE_USE
+        <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="cm">/** Class, interface (including annotation type), or enum declaration */</span>
+  <span class="n">TYPE</span><span class="o">,</span>
+  <span class="n">FIELD</span><span class="o">,</span> <span class="n">METHOD</span><span class="o">,</span> <span class="n">PARAMETER</span><span class="o">,</span>
+  <span class="n">CONSTRUCTOR</span><span class="o">,</span>
+  <span class="n">LOCAL_VARIABLE</span><span class="o">,</span>
+  <span class="n">ANNOTATION_TYPE</span><span class="o">,</span>
+  <span class="n">PACKAGE</span><span class="o">,</span>
+  <span class="c1">// since 1.8</span>
+  <span class="n">TYPE_PARAMETER</span><span class="o">,</span>
+  <span class="n">TYPE_USE</span>
 </code></pre></div>        </div>
       </li>
       <li>
@@ -1729,26 +1917,26 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
       </li>
     </ol>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> @Target({ElementType.FIELD, ElementType.TYPE})
- @Retention(RetentionPolicy.SOURCE)
- public @interface Setter {
- }
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nd">@Target</span><span class="o">({</span><span class="n">ElementType</span><span class="o">.</span><span class="na">FIELD</span><span class="o">,</span> <span class="n">ElementType</span><span class="o">.</span><span class="na">TYPE</span><span class="o">})</span>
+ <span class="nd">@Retention</span><span class="o">(</span><span class="n">RetentionPolicy</span><span class="o">.</span><span class="na">SOURCE</span><span class="o">)</span>
+ <span class="kd">public</span> <span class="nd">@interface</span> <span class="n">Setter</span> <span class="o">{</span>
+ <span class="o">}</span>
 </code></pre></div>    </div>
   </li>
   <li>
     <p>从 Java 7 开始，额外添加了 3 个注解：</p>
 
     <ol>
-      <li><code class="highlighter-rouge">@SafeVarargs</code>： 忽略任何使用参数为泛型变量的方法或构造函数调用产生的警告。</li>
-      <li><code class="highlighter-rouge">@FunctionalInterface</code>：Java 8 开始支持，标识匿名函数或函数式接口。</li>
-      <li><code class="highlighter-rouge">@Repeatable</code>：Java 8 开始支持，标识注解可在同一个声明上使用多次。</li>
+      <li><code class="highlighter-rouge">@SafeVarargs</code>： 忽略任何使用<strong>参数</strong>为泛型变量的方法或构造函数调用产生的警告。</li>
+      <li><code class="highlighter-rouge">@FunctionalInterface</code>：Java 8 开始支持，标识<strong>匿名函数</strong>或函数式接口。</li>
+      <li><code class="highlighter-rouge">@Repeatable</code>：Java 8 开始支持，标识注解可在同一个声明上<strong>使用多次</strong>。</li>
     </ol>
   </li>
   <li>
     <p>在程序运行期能读取的注解。在加载后一直存在于JVM中，最常用。如：</p>
 
     <ul>
-      <li><code class="highlighter-rouge">@PostConstruct</code>标注的方法会在调用构造方法后自动被调用（这是 Java 代码读取该注解实现的功能，JVM 并不会识别该注解）。</li>
+      <li><code class="highlighter-rouge">@PostConstruct</code>标注的方法会在<strong>调用构造方法后</strong>自动被调用（这是 Java 代码读取该注解实现的功能，JVM 并不会识别该注解）。</li>
     </ul>
   </li>
 </ol>
@@ -1757,25 +1945,39 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
 
 <h3 id="序列化">序列化</h3>
 
-<p>定义</p>
+<p>目的：<strong>持久化 Java 对象</strong>，将对象存储到文件系统、数据库、内存中，或<strong>通过网络</strong>传输对象；</p>
 
 <ul>
   <li>序列化： 将对象（包括对象的类型信息、存储在对象中的数据及其类型）转换成<strong>二进制字节流</strong>的过程；</li>
   <li>反序列化：在内存中新建对象。如果 JVM 在反序列化时找不到该类，则抛出一个 <code class="highlighter-rouge">ClassNotFoundException</code> <a href="#异常">异常</a>。</li>
 </ul>
 
-<p>目的：<strong>持久化 Java 对象</strong>，将对象存储到文件系统、数据库、内存中，或<strong>通过网络</strong>传输对象；</p>
+<p>整个过程都是 <strong>JVM 独立</strong>的：</p>
 
-<p>整个过程都是 <strong>JVM 独立</strong>的，即，在一个平台上序列化的对象可在另一个（完全不同的）平台上反序列化该对象。</p>
+<ul>
+  <li>即，在一个平台上序列化的对象可在另一个（完全不同的）平台上反序列化该对象。</li>
+</ul>
 
-<p>序列化和反序列化对应 OSI 七层协议模型中的<strong>表示层</strong>：主要就是对应用层的用户数据进行处理转换为二进制流。属于 TCP/IP 四层模型中<strong>应用层</strong>的一部分。</p>
+<p>序列化和反序列化，对应 OSI 七层协议模型中的<strong>表示层</strong>、属于 TCP/IP 四层模型中<strong>应用层</strong>的一部分：</p>
+
+<ul>
+  <li>主要就是对应用层的用户数据进行处理转换为<strong>二进制流</strong>。</li>
+</ul>
 
 <h4 id="常见应用场景">常见应用场景</h4>
 
 <ol>
-  <li>将内存中的对象存储到<strong>文件</strong>中时需进行序列化，将对象从文件中读取出来需进行反序列化。比较常见，如用 Mybatis 框架编写持久层 insert 对象数据到数据库中时；</li>
-  <li>将对象存储到<strong>缓存数据库</strong>（如 Redis）时需用到序列化，将对象从缓存数据库中读取出来需反序列化；</li>
-  <li>对象在进行<strong>网络传输</strong>（如远程方法调用 RPC ）之前需先被序列化，接收到序列化的对象之后进行反序列化；用 <strong>Socket 套接字</strong>在网络中传送对象时，如用 RPC 协议进行网络通信时；</li>
+  <li>将内存中的对象存储到<strong>文件</strong>中时需进行序列化，将对象从文件中读取出来需进行反序列化。
+    <ul>
+      <li>比较常见，如用 <strong>Mybatis 框架</strong>编写持久层 <strong>insert 对象数据</strong>到数据库中时；</li>
+      <li>将对象存储到<strong>缓存数据库</strong>（如 Redis）时需用到序列化，将对象从缓存数据库中读取出来需反序列化；</li>
+    </ul>
+  </li>
+  <li>对象在进行<strong>网络传输</strong>（如远程方法调用 RPC ）之前需先被序列化，接收到序列化的对象之后进行反序列化。
+    <ul>
+      <li>用 <strong>Socket 套接字</strong>在网络中传送对象时，如用 RPC 协议进行网络通信时；</li>
+    </ul>
+  </li>
 </ol>
 
 <h4 id="具体实现">具体实现</h4>
@@ -1783,23 +1985,35 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
 <p>常见序列化协议：</p>
 
 <ol>
-  <li>文本类序列化：可读性较好，但性能较差，一般不会选择；JSON、XML</li>
+  <li>文本类序列化：可读性较好，但性能较差，一般不会选择；<code class="highlighter-rouge">JSON、XML</code>
+    <ul>
+      <li>Jackson 序列化：见 Spring MVC 文档。</li>
+    </ul>
+  </li>
   <li>基于二进制的序列化协议：</li>
   <li>JDK 自带的序列化；</li>
   <li>Kryo：推荐；</li>
   <li>Protobuf</li>
   <li>hessian</li>
-  <li>Jackson 序列化：见 Spring MVC 文档。</li>
 </ol>
 
 <p>JDK 自带序列化的实现：</p>
 
 <blockquote>
-  <p>几乎不直接用此方式，主要原因有：不支持<strong>跨语言</strong>调用；相比于其他序列化框架性能更差，序列化后的字节数组体积较大，导致传输成本加大。</p>
+  <p>几乎不直接用此方式，主要原因有：</p>
+
+  <ul>
+    <li>不支持<strong>跨语言</strong>调用；</li>
+    <li>相比于其他序列化框架<strong>性能</strong>更差，序列化后的<strong>字节数组</strong>体积较大，导致传输成本加大。</li>
+  </ul>
 </blockquote>
 
 <ul>
-  <li>用于序列化和反序列化的类必须<strong>实现 <code class="highlighter-rouge">java.io.Serializable</code> 接口</strong>：用于实现 Java 类的序列化操作而提供的一个<strong>语义级别</strong>的接口。没有任何方法或字段，只是用于<strong>标识可序列化的语义</strong>。</li>
+  <li>用于序列化和反序列化的类必须<strong>实现 <code class="highlighter-rouge">java.io.Serializable</code> 接口</strong>：
+    <ul>
+      <li>用于实现 Java 类的序列化操作而提供的一个<strong>语义级别</strong>的接口。没有任何方法或字段，只是用于<strong>标识可序列化的语义</strong>。</li>
+    </ul>
+  </li>
   <li>实现了 Serializable 接口的类可被 ObjectOutputStream 转换为字节流，也可通过 ObjectInputStream 再将其解析为对象。</li>
 </ul>
 
@@ -1819,17 +2033,20 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
 
 <h4 id="trasient-关键字transient">trasient 关键字、<code class="highlighter-rouge">@transient</code></h4>
 
-<p>作用：阻止实例中（用 <code class="highlighter-rouge">trasient</code> 修饰的）属性序列化；当对象被反序列化时，被 <code class="highlighter-rouge">transient</code> 修饰的变量值不会被持久化和恢复。</p>
+<p>作用：<strong>阻止</strong>实例中（用 <code class="highlighter-rouge">trasient</code> 修饰的）属性序列化；当对象被反序列化时，被 <code class="highlighter-rouge">transient</code> 修饰的变量值不会<strong>被持久化</strong>和恢复。</p>
 
 <p>对象中如果有属性<strong>不想被序列化</strong>，可以属性前添加关键字 <code class="highlighter-rouge">transient</code>、或使用 <code class="highlighter-rouge">@transient</code> 修饰。</p>
 
 <ol>
-  <li>一旦变量被transient修饰，变量将不再是对象持久化的一部分，该变量内容在序列化后无法获得访问。</li>
+  <li>一旦变量被transient修饰，变量将不再是对象持久化的一部分，该变量内容在序列化后无法获得访问。
+    <ol>
+      <li>被transient关键字修饰的<strong>成员变量</strong>不能被序列化，（修饰的对象需实现 Serializable 接口，在反序列化后变量值将会被置成默认值）；</li>
+    </ol>
+  </li>
   <li>只能修饰<strong>变量</strong>，而不能修饰方法和类、<strong>局部变量</strong>。</li>
-  <li>被transient关键字修饰的<strong>成员变量</strong>不能被序列化，（修饰的对象需实现 Serializable 接口，在反序列化后变量值将会被置成默认值）；</li>
   <li><strong>静态变量</strong>不管是否被transient修饰，均不能被序列化。
     <ol>
-      <li>序列化保存的是对象状态，静态变量保存的是类状态，不属于任何对象，因此静态变量不<strong>能被序列化</strong>。</li>
+      <li>序列化保存的是<strong>对象状态</strong>，静态变量保存的是<strong>类状态</strong>，不属于任何对象，因此静态变量不<strong>能被序列化</strong>。</li>
       <li>如果反序列化后类中 static 变量还有值，则为当前 JVM 中对应 static 变量的值。</li>
     </ol>
   </li>
@@ -1837,8 +2054,15 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
 
 <h4 id="serialversionuid">serialVersionUID</h4>
 
+<p><code class="highlighter-rouge">serialVersionUID</code>：适用于JAVA<strong>序列化机制</strong>。简单来说，通过判断类的<code class="highlighter-rouge">serialVersionUID</code>来验证版本一致。</p>
+
 <ul>
-  <li>显式地定义 <code class="highlighter-rouge">serialVersionUID</code>：在<strong>反序列化</strong>时，JVM 会把传来的字节流中的 <code class="highlighter-rouge">serialVersionUID</code> 与本地相应实体（类）的（<code class="highlighter-rouge">serialVersionUID</code>）进行比较，如果相同就认为是同一个类。</li>
+  <li>显式地定义 <code class="highlighter-rouge">serialVersionUID</code>：在<strong>反序列化</strong>时，JVM 会把传来的<strong>字节流</strong>中的 <code class="highlighter-rouge">serialVersionUID</code> 与本地相应<strong>实体类</strong>的（<code class="highlighter-rouge">serialVersionUID</code>）进行比较，
+    <ol>
+      <li>如果相同说明是一致的（认为是同一个类），可以进行反序列化，</li>
+      <li>否则会出现反序列化版本一致的异常，即是<code class="highlighter-rouge">InvalidCastException</code>。</li>
+    </ol>
+  </li>
   <li>序列化类新增属性时，不要修改 <code class="highlighter-rouge">serialVersionUID</code> 字段，避免反序列失败；如果完全不兼容升级，避免反序列化混乱，需修改。</li>
 </ul>
 
@@ -1847,21 +2071,27 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
 
 <h3 id="java-io-流">Java I/O 流</h3>
 
-<p>IO 即 <code class="highlighter-rouge">Input/Output</code>，输入和输出。数据输入到计算机内存的过程即输入，反之输出到外部存储（如数据库，文件，远程主机）的过程即输出。数据传输过程类似于水流，因此称为 IO 流。</p>
+<p>IO 即 <code class="highlighter-rouge">Input/Output</code>，输入和输出。</p>
 
-<p>IO 流在 Java 中分为输入流和输出流，而根据数据的处理方式又分为字节流和字符流。Java IO 流的  4 个抽象类基类：</p>
+<ul>
+  <li>数据输入到<strong>计算机内存</strong>的过程即输入，反之输出到<strong>外部存储</strong>（如数据库，文件，远程主机）的过程即输出。</li>
+  <li>数据传输过程类似于水流，因此称为 <strong>IO 流</strong>。</li>
+</ul>
+
+<p>IO 流在 Java 中分为输入流和输出流，而根据<strong>数据的处理方式</strong>又分为字节流和字符流。</p>
+
+<p>Java IO 流的  4 个抽象类基类：</p>
 
 <ol>
-  <li><code class="highlighter-rouge">InputStream</code>（字节输入流）：用于从源头（通常是文件）读取数据（字节信息）到内存中；
+  <li><code class="highlighter-rouge">InputStream</code>（字节输入流）：用于从源头（通常是文件）读取数据（字节信息）<strong>到内存中</strong>；
     <ol>
-      <li>
-        <p><code class="highlighter-rouge">read()</code> 方法：返回输入流中下一个字节的数据。</p>
-      </li>
-      <li>
-        <p><code class="highlighter-rouge">FileInputStream</code>：常用的字节输入流对象，指定文件路径，可直接读取单字节数据，也可读取至字节数组中。通常会配合 <code class="highlighter-rouge">BufferedInputStream</code>。</p>
-      </li>
-      <li>
-        <p><code class="highlighter-rouge">BufferedInputStream</code>（字节缓冲输入流）：不是一个一个字节的读取，而是先将读取到的字节存放在缓存区，并从内部缓冲区中单独读取字节。大幅减少了 IO 次数，提高了读取效率。<code class="highlighter-rouge">BufferedInputStream</code> 内部维护了一个缓冲区，通过源码可知实际就是一个字节数组。</p>
+      <li><code class="highlighter-rouge">read()</code> 方法：返回输入流中下一个字节的数据。</li>
+      <li><code class="highlighter-rouge">FileInputStream</code>：常用的字节输入流对象，指定文件路径，可直接读取单字节数据，也可读取至字节数组中。通常会配合 <code class="highlighter-rouge">BufferedInputStream</code>。</li>
+      <li><code class="highlighter-rouge">BufferedInputStream</code>（字节缓冲输入流）：不是一个一个字节的读取，而是先将读取到的字节存放在缓存区，并从内部缓冲区中单独读取字节。
+        <ul>
+          <li><code class="highlighter-rouge">BufferedInputStream</code> 内部维护了一个缓冲区，通过源码可知实际就是一个字节数组。</li>
+          <li>大幅减少了 IO 次数，提高了读取效率。</li>
+        </ul>
       </li>
     </ol>
   </li>
@@ -1869,7 +2099,7 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
     <p><code class="highlighter-rouge">OutputStream</code>（字节输出流）</p>
 
     <ul>
-      <li><code class="highlighter-rouge">BufferedOutputStream</code>（字节缓冲输出流）：缓冲流将数据加载至缓冲区，一次性读取/写入多个字节，从而避免频繁的 IO 操作，提高流的传输效率。</li>
+      <li><code class="highlighter-rouge">BufferedOutputStream</code>（字节缓冲输出流）：缓冲流将数据加载至缓冲区，一次性读取/写入多个字节，从而避免<strong>频繁的 IO 操</strong>作，提高流的传输效率。</li>
     </ul>
   </li>
   <li>
@@ -1888,7 +2118,7 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
   </li>
 </ol>
 
-<h5 id="objectinputstream-类"><code class="highlighter-rouge">ObjectInputStream</code> 类</h5>
+<h4 id="objectinputstream-类"><code class="highlighter-rouge">ObjectInputStream</code> 类</h4>
 
 <blockquote>
   <p>和 <code class="highlighter-rouge">ObjectOutputStream</code> 类</p>
@@ -1896,7 +2126,11 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
 
 <ol>
   <li><code class="highlighter-rouge">public final Object writeObject() throws IOException</code> 方法：序列化一个对象，并发送到输出流；//?</li>
-  <li><code class="highlighter-rouge">public final Object readObject() throws IOException,  ClassNotFoundException</code> 方法：从流中取出下一个对象，并反序列化。返回值为Object，因此需转成合适的数据类型。</li>
+  <li><code class="highlighter-rouge">public final Object readObject() throws IOException,  ClassNotFoundException</code> 方法：从流中取出下一个对象，并反序列化。
+    <ul>
+      <li>返回值为Object，因此需转成合适的数据类型。</li>
+    </ul>
+  </li>
 </ol>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Employee</span> <span class="n">e</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Employee</span><span class="o">();</span>
@@ -1913,7 +2147,7 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
 <span class="o">....</span>
 </code></pre></div></div>
 
-<h3 id="java-io-中的设计模式">Java I/O 中的设计模式</h3>
+<h3 id="java-io-中的设计模式"><del>Java I/O 中的设计模式</del></h3>
 
 <ol>
   <li>装饰器</li>
@@ -1924,55 +2158,66 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
 
 <h3 id="io-模型">I/O 模型</h3>
 
-<p><img src="../assets/冯诺依曼体系结构.jpeg" alt="冯诺依曼体系结构" style="zoom: 18%;" /></p>
+<p><img src="../assets/冯诺依曼体系结构.jpeg" alt="冯诺依曼体系结构" style="zoom: 25%;" /></p>
 
-<p>日常开发过程中接触最多的就是 磁盘 IO（读写文件） 和 网络 IO（网络请求和响应）。</p>
+<p>日常开发过程中接触最多的就是 <strong>磁盘 IO</strong>（读写文件） 和 <strong>网络 IO</strong>（网络请求和响应）。</p>
 
 <p>I/O 模型：</p>
 
 <ol>
   <li>同步阻塞 I/O：应用程序发起 read 调用后，会一直阻塞，直到内核把数据拷贝到用户空间。
     <ul>
-      <li>BIO (Blocking I/O)</li>
+      <li><code class="highlighter-rouge">BIO(Blocking I/O)</code></li>
     </ul>
   </li>
   <li>同步非阻塞 I/O</li>
-  <li>I/O 多路复用
+  <li><strong>I/O 多路复用</strong>
     <ul>
-      <li><strong>NIO</strong> (<code class="highlighter-rouge">Non-blocking/New I/O</code>)：支持面向缓冲，基于通道的 I/O 操作方法。 用于高负载、高并发的（网络）应用；</li>
+      <li>Redis 单线程模型</li>
+      <li><strong>NIO</strong> (<code class="highlighter-rouge">Non-blocking/New I/O</code>)：支持面向缓冲，基于通道的 I/O 操作方法。 用于高负载、高并发的（网络）应用；
+        <ul>
+          <li>见 RPC 框架文档。</li>
+        </ul>
+      </li>
     </ul>
   </li>
   <li>信号驱动 I/O</li>
   <li>异步 I/O
     <ul>
-      <li>AIO (Asynchronous I/O)</li>
+      <li>AIO (<code class="highlighter-rouge">Asynchronous I/O</code>)</li>
     </ul>
   </li>
 </ol>
 
-<h2 id="socket-网络编程">Socket 网络编程</h2>
+<h2 id="socket-网络编程"><del>Socket 网络编程</del></h2>
 
-<blockquote>
+<p>Spring MVC 中的 WebSocket</p>
 
-</blockquote>
+<ul>
+  <li>见 WebSocket 文档。</li>
+</ul>
 
 <h2 id="stream-流">Stream 流</h2>
 
 <p>新增了 <code class="highlighter-rouge">java.util.stream</code> 包。</p>
 
-<p>Stream（流）是一个来自<strong>数据源</strong>的<strong>元素队列</strong>并支持<strong>聚合操作</strong>。流是一种新的<strong>数据处理模型</strong>，可以对数据进行<strong>并行处理</strong>，提高程序的性能。</p>
+<p>Stream（流）是一个（来自<strong>数据源</strong>的）<strong>元素队列</strong>并支持<strong>聚合操作</strong>。流是一种新的<strong>数据处理模型</strong>，可以对数据进行<strong>并行处理</strong>，提高程序的性能。</p>
 
 <ul>
-  <li><strong>数据源</strong> 流的来源，可以是集合，数组，I/O channel， 产生器generator 等。</li>
-  <li><strong>元素</strong>是特定类型的对象，形成一个队列。 Java中的Stream并不会存储元素，而是按需计算。</li>
-  <li><strong>聚合操作</strong> 类似SQL语句一样的操作， 比如 <code class="highlighter-rouge">filter, map, reduce, find, match, sorted</code> 等。</li>
+  <li><strong>数据源</strong>：流的来源，可以是集合，数组，I/O channel， 产生器generator 等。</li>
+  <li><strong>元素</strong>：是特定类型的对象，形成一个队列。 Java中的Stream并<strong>不会存储元素</strong>，而是按需计算。</li>
+  <li><strong>聚合操作</strong>：类似SQL语句一样的操作， 比如 <code class="highlighter-rouge">filter, map, reduce, find, match, sorted</code> 等。</li>
 </ul>
 
 <p>Stream 可以执行非常复杂的<strong>查找、过滤和映射数据</strong>等操作。使用Stream API 对集合数据进行操作，就类似于使用 SQL 执行的数据库查询。</p>
 
 <ul>
   <li>简而言之，Stream API 提供了一种<strong>高效且易于使用</strong>的<strong>处理数据的方式</strong>。</li>
-  <li>只用简单的调用API函数即可，更方便。可以保证速度、和准确率。尤其是在算法题中，For循环和数据结构的使用会让代码看着很乱。</li>
+  <li>只用简单的调用API函数即可，更方便。可以保证速度、和准确率。
+    <ul>
+      <li>尤其是在算法题中，<strong>For循环</strong>和数据结构的使用会让代码看着很乱。</li>
+    </ul>
+  </li>
 </ul>
 
 <p>特点：</p>
@@ -2013,12 +2258,12 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
 <ol>
   <li>使用<code class="highlighter-rouge">Collection</code>下的<code class="highlighter-rouge">Stream stream()</code> 、<code class="highlighter-rouge">parallelStream()</code>方法：为集合<strong>创建</strong>串行、并行流。</li>
   <li>使用 <a href="#常用类">Arrays</a> 中的<code class="highlighter-rouge">Arrays.stream()</code>方法：<strong>将数组转换成流</strong>。</li>
-  <li>使用 Stream中的<strong>静态方法</strong>：<code class="highlighter-rouge">of()</code>、<code class="highlighter-rouge">iterate()</code>、<code class="highlighter-rouge">generate()</code>。</li>
+  <li>使用 Stream 中的<strong>静态方法</strong>：<code class="highlighter-rouge">of()</code>、<code class="highlighter-rouge">iterate()</code>、<code class="highlighter-rouge">generate()</code>。</li>
   <li>使用 <code class="highlighter-rouge">BufferedReader.lines() </code>方法，将每行内容转成流。</li>
   <li>使用 <code class="highlighter-rouge">Pattern.splitAsStream() </code>方法，将字符串分隔成流。</li>
 </ol>
 
-<h5 id="collectionstream">Collection.stream()</h5>
+<h5 id="collection-接口的-stream">Collection 接口的 stream()</h5>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="err"> </span><span class="n">list</span><span class="err"> </span><span class="o">=</span><span class="err"> </span><span class="k">new</span><span class="err"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
 <span class="n">Stream</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="err"> </span><span class="n">stream</span><span class="err"> </span><span class="o">=</span><span class="err"> </span><span class="n">list</span><span class="o">.</span><span class="na">stream</span><span class="o">();</span><span class="err"> </span><span class="c1">//获取一个顺序流</span>
@@ -2033,7 +2278,12 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
 
 <ol>
   <li><code class="highlighter-rouge">Array.Stream()</code>返回的是一个<strong>元素序列</strong>，且支持顺序和并行的聚合操作。</li>
-  <li>其实可以把它理解为<strong>包装类</strong>，对于Int来说，元素序列类型为OptionalInt，包装类为Integer，它们在各自的领域各司其职，只不过Int类型和Integer类型可以自动转化。所以在上面还需要调用getAsInt()函数来进行转化Int类型。</li>
+  <li>其实可以把它理解为<strong>包装类</strong>。
+    <ul>
+      <li>对于Int来说，元素序列类型为OptionalInt，包装类为Integer，它们在各自的领域各司其职，只不过Int类型和Integer类型可以自动转化。</li>
+      <li>所以在上面还需要调用getAsInt()函数来进行转化Int类型。</li>
+    </ul>
+  </li>
 </ol>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Integer</span><span class="o">[]</span><span class="err"> </span><span class="n">nums</span><span class="err"> </span><span class="o">=</span><span class="err"> </span><span class="k">new</span><span class="err"> </span><span class="n">Integer</span><span class="o">[</span><span class="mi">10</span><span class="o">];</span>
@@ -2084,7 +2334,7 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
 
 <ul>
   <li><strong>map：</strong> 接收<strong>一个函数</strong>作为参数，该函数会被应用到<strong>每个元素</strong>上，并将其<strong>映射</strong>成一个<strong>新的元素</strong>。</li>
-  <li><strong>flatMap：</strong> 接收一个函数作为参数，将流中的每个值都换成另一个流，然后把所有流连接成一个流。</li>
+  <li><strong>flatMap：</strong> 接收一个函数作为参数，将流中的每个值都换成另一个流，然后把所有流<strong>连接成一个流</strong>。</li>
 </ul>
 
 <p>map() 用法：将流中的元素<strong>转换</strong>为另外一个流中的元素，转换前后元素个数不变。</p>
@@ -2108,7 +2358,9 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
     <span class="k">if</span> <span class="o">(</span><span class="n">CollUtil</span><span class="o">.</span><span class="na">isNotEmpty</span><span class="o">(</span><span class="n">relationList</span><span class="o">))</span> <span class="o">{</span>
         <span class="n">String</span> <span class="n">keyPrefix</span> <span class="o">=</span> <span class="n">REDIS_DATABASE</span> <span class="o">+</span> <span class="s">":"</span> <span class="o">+</span> <span class="n">REDIS_KEY_RESOURCE_LIST</span> <span class="o">+</span> <span class="s">":"</span><span class="o">;</span>
         <span class="c1">// 将keyPrefix + relation.getAdminId()放到list中</span>
-        <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">keys</span> <span class="o">=</span> <span class="n">relationList</span><span class="o">.</span><span class="na">stream</span><span class="o">().</span><span class="na">map</span><span class="o">(</span><span class="n">relation</span> <span class="o">-&gt;</span> <span class="n">keyPrefix</span> <span class="o">+</span> <span class="n">relation</span><span class="o">.</span><span class="na">getAdminId</span><span class="o">()).</span><span class="na">collect</span><span class="o">(</span><span class="n">Collectors</span><span class="o">.</span><span class="na">toList</span><span class="o">());</span> 
+        <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">keys</span> <span class="o">=</span> <span class="n">relationList</span><span class="o">.</span><span class="na">stream</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">map</span><span class="o">(</span><span class="n">relation</span> <span class="o">-&gt;</span>  <span class="n">keyPrefix</span> <span class="o">+</span> <span class="n">relation</span><span class="o">.</span><span class="na">getAdminId</span><span class="o">())</span>
+            <span class="o">.</span><span class="na">collect</span><span class="o">(</span><span class="n">Collectors</span><span class="o">.</span><span class="na">toList</span><span class="o">());</span> 
         <span class="n">redisService</span><span class="o">.</span><span class="na">del</span><span class="o">(</span><span class="n">keys</span><span class="o">);</span>
     <span class="o">}</span>
 <span class="o">}</span>
@@ -2231,32 +2483,9 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
 <span class="n">Random</span> <span class="n">random</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Random</span><span class="o">();</span>
 <span class="n">random</span><span class="o">.</span><span class="na">ints</span><span class="o">().</span><span class="na">limit</span><span class="o">(</span><span class="mi">10</span><span class="o">).</span><span class="na">forEach</span><span class="o">(</span><span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">::</span><span class="n">println</span><span class="o">);</span>
 
+<span class="n">Collection</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">toMails</span><span class="o">;</span>
 <span class="k">if</span> <span class="o">(</span><span class="n">CollUtil</span><span class="o">.</span><span class="na">isNotEmpty</span><span class="o">(</span><span class="n">toMails</span><span class="o">))</span> <span class="o">{</span>
     <span class="n">toMails</span><span class="o">.</span><span class="na">stream</span><span class="o">().</span><span class="na">filter</span><span class="o">(</span><span class="nl">Validator:</span><span class="o">:</span><span class="n">isEmail</span><span class="o">).</span><span class="na">forEach</span><span class="o">(</span><span class="nl">toMailSet:</span><span class="o">:</span><span class="n">add</span><span class="o">);</span>
-<span class="o">}</span>
-
-
-<span class="nd">@Slf4j</span>
-<span class="nd">@Component</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MailProducer</span> <span class="o">{</span>
-
-    <span class="nd">@Resource</span>
-    <span class="kd">private</span> <span class="n">ApplicationContext</span> <span class="n">applicationContext</span><span class="o">;</span>
-
-    <span class="cm">/**
-     * 发送 {@link MailSendMessage} 消息
-     */</span>
-    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">sendMailSendMessage</span><span class="o">(</span><span class="n">Long</span> <span class="n">sendLogId</span><span class="o">,</span>
-                                    <span class="n">Collection</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">toMails</span><span class="o">,</span> <span class="n">Collection</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">ccMails</span><span class="o">,</span> <span class="n">Collection</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">bccMails</span><span class="o">,</span>
-                                    <span class="n">Long</span> <span class="n">accountId</span><span class="o">,</span> <span class="n">String</span> <span class="n">nickname</span><span class="o">,</span> <span class="n">String</span> <span class="n">title</span><span class="o">,</span> <span class="n">String</span> <span class="n">content</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">MailSendMessage</span> <span class="n">message</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MailSendMessage</span><span class="o">()</span>
-                <span class="o">.</span><span class="na">setLogId</span><span class="o">(</span><span class="n">sendLogId</span><span class="o">)</span>
-                <span class="o">.</span><span class="na">setToMails</span><span class="o">(</span><span class="n">toMails</span><span class="o">).</span><span class="na">setCcMails</span><span class="o">(</span><span class="n">ccMails</span><span class="o">).</span><span class="na">setBccMails</span><span class="o">(</span><span class="n">bccMails</span><span class="o">)</span>
-                <span class="o">.</span><span class="na">setAccountId</span><span class="o">(</span><span class="n">accountId</span><span class="o">).</span><span class="na">setNickname</span><span class="o">(</span><span class="n">nickname</span><span class="o">)</span>
-                <span class="o">.</span><span class="na">setTitle</span><span class="o">(</span><span class="n">title</span><span class="o">).</span><span class="na">setContent</span><span class="o">(</span><span class="n">content</span><span class="o">);</span>
-        <span class="n">applicationContext</span><span class="o">.</span><span class="na">publishEvent</span><span class="o">(</span><span class="n">message</span><span class="o">);</span>
-    <span class="o">}</span>
-
 <span class="o">}</span>
 </code></pre></div></div>
 
@@ -2269,7 +2498,9 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
     <span class="n">MEMBER</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="s">"会员"</span><span class="o">),</span> <span class="c1">// 面向 c 端，普通用户</span>
     <span class="n">ADMIN</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="s">"管理员"</span><span class="o">);</span> <span class="c1">// 面向 b 端，管理后台</span>
 
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Integer</span><span class="o">[]</span> <span class="n">ARRAYS</span> <span class="o">=</span> <span class="n">Arrays</span><span class="o">.</span><span class="na">stream</span><span class="o">(</span><span class="n">values</span><span class="o">()).</span><span class="na">map</span><span class="o">(</span><span class="nl">UserTypeEnum:</span><span class="o">:</span><span class="n">getValue</span><span class="o">).</span><span class="na">toArray</span><span class="o">(</span><span class="n">Integer</span><span class="o">[]::</span><span class="k">new</span><span class="o">);</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Integer</span><span class="o">[]</span> <span class="n">ARRAYS</span> <span class="o">=</span> <span class="n">Arrays</span><span class="o">.</span><span class="na">stream</span><span class="o">(</span><span class="n">values</span><span class="o">())</span>
+        <span class="o">.</span><span class="na">map</span><span class="o">(</span><span class="nl">UserTypeEnum:</span><span class="o">:</span><span class="n">getValue</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">toArray</span><span class="o">(</span><span class="n">Integer</span><span class="o">[]::</span><span class="k">new</span><span class="o">);</span>
 
     <span class="kd">private</span> <span class="kd">final</span> <span class="n">Integer</span> <span class="n">value</span><span class="o">;</span>
     <span class="kd">private</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">name</span><span class="o">;</span>
@@ -2279,9 +2510,19 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
 <h5 id="reduce-规约操作">reduce() 规约操作</h5>
 
 <ul>
-  <li><code class="highlighter-rouge">Optional&lt;T&gt; reduce(BinaryOperator&lt;T&gt; accumulator)</code>：第一次执行时，accumulator函数的第一个参数为流中的第一个元素，第二个参数为流中元素的第二个元素；第二次执行时，第一个参数为第一次函数执行的结果，第二个参数为流中的第三个元素；依次类推。</li>
+  <li><code class="highlighter-rouge">Optional&lt;T&gt; reduce(BinaryOperator&lt;T&gt; accumulator)</code>：
+    <ol>
+      <li>第一次执行时，accumulator函数的第一个参数为流中的第一个元素，第二个参数为流中元素的第二个元素；</li>
+      <li>第二次执行时，第一个参数为第一次<strong>函数执行的结果</strong>，第二个参数为流中的<strong>第三个元素</strong>；依次类推。</li>
+    </ol>
+  </li>
   <li><code class="highlighter-rouge">T reduce(T identity, BinaryOperator&lt;T&gt; accumulator)</code>：流程跟上面一样，只是第一次执行时，<code class="highlighter-rouge">accumulator</code>函数的第一个参数为identity，而第二个参数为流中的第一个元素。</li>
-  <li><code class="highlighter-rouge">&lt;U&gt; U reduce(U identity,BiFunction&lt;U, ? super T, U&gt; accumulator,BinaryOperator&lt;U&gt; combiner)</code>：在串行流(stream)中，该方法跟第二个方法一样，即第三个参数combiner不会起作用。在并行流(parallelStream)中,我们知道流被<code class="highlighter-rouge">fork join</code>出多个线程进行执行，此时每个线程的执行流程就跟第二个方法<code class="highlighter-rouge">reduce(identity,accumulator)</code>一样，而第三个参数combiner函数，则是将每个线程的执行结果当成一个新的流，然后使用第一个方法<code class="highlighter-rouge">reduce(accumulator)</code>流程进行规约。</li>
+  <li><code class="highlighter-rouge">&lt;U&gt; U reduce(U identity,BiFunction&lt;U, ? super T, U&gt; accumulator,BinaryOperator&lt;U&gt; combiner)</code>：
+    <ul>
+      <li>在串行流(stream)中，该方法跟第二个方法一样，即第三个参数combiner不会起作用。</li>
+      <li>在并行流(parallelStream)中,我们知道流被<code class="highlighter-rouge">fork join</code>出多个线程进行执行，此时每个线程的执行流程就跟第二个方法<code class="highlighter-rouge">reduce(identity,accumulator)</code>一样，而第三个参数combiner函数，则是将每个线程的执行结果当成一个新的流，然后使用第一个方法<code class="highlighter-rouge">reduce(accumulator)</code>流程进行规约。</li>
+    </ul>
+  </li>
 </ul>
 
 <div class="language-kotlin highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//经过测试，当元素个数小于24时，并行时线程数等于元素个数，当大于等于24时，并行时线程数为16
@@ -2352,7 +2593,7 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
 <h6 id="collectors-工具库">Collectors 工具库</h6>
 
 <blockquote>
-  <p><code class="highlighter-rouge">Collector</code> 工具库：<code class="highlighter-rouge">Collectors</code></p>
+  <p><code class="highlighter-rouge">Collector</code> 工具库：<code class="highlighter-rouge">Collectors</code>。Java8引入了流(<code class="highlighter-rouge">Stream</code>)处理，新类 <code class="highlighter-rouge">java.util.stream.Collectors</code>。</p>
 </blockquote>
 
 <p>实现了很多<strong>归约操作</strong>。</p>
@@ -2363,7 +2604,7 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
   <li><code class="highlighter-rouge">Collectors.toSet()</code></li>
   <li><code class="highlighter-rouge">Collectors.toMap(Student::getName, Student::getAge)</code></li>
   <li><code class="highlighter-rouge">Collectors.joining()</code></li>
-  <li>聚合操作：
+  <li><strong>聚合操作</strong>：
     <ol>
       <li><code class="highlighter-rouge">Collectors.counting()</code></li>
       <li><code class="highlighter-rouge">Collectors.maxBy(Integer::compare)</code></li>
@@ -2421,7 +2662,13 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
 </span><span class="nx">Integer</span> <span class="nx">allAge</span> <span class="o">=</span> <span class="k">list</span><span class="o">.</span><span class="nx">stream</span><span class="p">()</span><span class="o">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">Student</span><span class="o">::</span><span class="na">getAge</span><span class="p">)</span><span class="o">.</span><span class="nx">collect</span><span class="p">(</span><span class="nx">Collectors</span><span class="o">.</span><span class="nx">reducing</span><span class="p">(</span><span class="nx">Integer</span><span class="o">::</span><span class="na">sum</span><span class="p">))</span><span class="o">.</span><span class="nx">get</span><span class="p">();</span> <span class="c1">//40
 </span></code></pre></div></div>
 
-<h6 id="collectorstolist-"><code class="highlighter-rouge">Collectors.toList() </code></h6>
+<h6 id="collectorstolist"><code class="highlighter-rouge">Collectors.toList()</code></h6>
+
+<p><code class="highlighter-rouge">Collectors.toList()</code>方法用于将流转换为列表(List)。这个方法在处理数据过滤、映射等操作后，能方便地<strong>收集结果</strong>到列表中。</p>
+
+<ul>
+  <li>例如，通过filter筛选出大于2的数，然后使用<code class="highlighter-rouge">Collectors.toList()</code>，可以得到一个新的只包含符合条件的数的列表。这是一个高效且灵活的编程方式。</li>
+</ul>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">List</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;</span> <span class="nx">strings</span> <span class="o">=</span> <span class="nx">Arrays</span><span class="p">.</span><span class="nx">asList</span><span class="p">(</span><span class="s2">"abc"</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="s2">"bc"</span><span class="p">,</span> <span class="s2">"efg"</span><span class="p">,</span> <span class="s2">"abcd"</span><span class="p">,</span><span class="s2">""</span><span class="p">,</span> <span class="s2">"jkl"</span><span class="p">);</span>
 
@@ -2514,7 +2761,7 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
 
 <h2 id="jdk18-新特性">JDK1.8 新特性</h2>
 
-<h3 id="interface">Interface</h3>
+<h3 id="接口-1">接口</h3>
 
 <ul>
   <li>interface 中的方法可用 <code class="highlighter-rouge">default</code> 或 <code class="highlighter-rouge">static</code> 修饰，这样就可有方法体，实现类也不必重写此方法。</li>
@@ -2574,6 +2821,8 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">java.util.Collections</span><span class="o">;</span>
 
+<span class="c1">//创建可变的列表</span>
+<span class="n">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span><span class="n">nums</span><span class="o">);</span>
 <span class="kt">int</span> <span class="n">min</span> <span class="o">=</span> <span class="o">(</span><span class="kt">int</span><span class="o">)</span> <span class="n">Collections</span><span class="o">.</span><span class="na">min</span><span class="o">(</span><span class="n">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span><span class="n">numbers</span><span class="o">));</span>
 
 <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">10</span><span class="o">;</span>
@@ -2581,18 +2830,7 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
 
 <span class="c1">// 交换 nums[0] 和 nums[1]</span>
 <span class="n">Collections</span><span class="o">.</span><span class="na">swap</span><span class="o">(</span><span class="n">nums</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="mi">1</span><span class="o">);</span>
-
-<span class="c1">//创建可变的列表</span>
-<span class="n">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span><span class="n">nums</span><span class="o">);</span>
 </code></pre></div></div>
-
-<h5 id="collectorstolist">Collectors.toList()</h5>
-
-<p>Java8引入了流(<code class="highlighter-rouge">Stream</code>)处理，新类 <code class="highlighter-rouge">java.util.stream.Collectors</code>，<code class="highlighter-rouge">Collectors.toList()</code>方法用于将流转换为列表(List)。这个方法在处理数据过滤、映射等操作后，能方便地收集结果到列表中。</p>
-
-<ul>
-  <li>例如，通过filter筛选出大于2的数，然后使用<code class="highlighter-rouge">Collectors.toList()</code>，可以得到一个新的只包含符合条件的数的列表。这是一个高效且灵活的编程方式。</li>
-</ul>
 
 <h3 id="object-类">Object 类</h3>
 
@@ -2604,61 +2842,61 @@ private void relateAndInsertList(Object dao, List dataList, Long productId) {
 
 <ol>
   <li>
-    <p><code class="highlighter-rouge">toString()</code>：默认返回<strong>（带包的）类全名<code class="highlighter-rouge">@</code>当前对象在堆内存的地址</strong>（类的名字实例的哈希码的 16 进制的字符串），通常重写来返回对象的内容；如<code class="highlighter-rouge">"org.webtree.www.User@Hello"</code>。</p>
+    <p><code class="highlighter-rouge">toString()</code>：默认返回<strong>（带包的）类全名<code class="highlighter-rouge">@</code>当前对象在堆内存的地址</strong>（类的名字实例的哈希码 16 进制字符串），通常重写来返回对象的内容；如<code class="highlighter-rouge">"org.webtree.www.User@Hello"</code>。</p>
   </li>
   <li>
-    <p><code class="highlighter-rouge">equals()</code>：默认比较 2 个对象的内存地址是否相等，String 类对该方法进行了重写，用于比较字符串的内容是否相等。</p>
+    <p><code class="highlighter-rouge">equals()</code>：默认比较 2 个对象的<strong>内存地址</strong>是否相等，String 类对该方法进行了重写，用于比较字符串的内容是否相等。</p>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> // 方法一：
- @Override
- public boolean equals(Object obj) {
-     if (obj instanceof Student) {
-    	    Student stu = (Student)obj;
-      	return this.name.equals(stu.name); // this.name 无判空
-     } else {
-      	return false;
-     }
- }
- // 方法二：IDEA自动生成
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c1">// 方法一：</span>
+ <span class="nd">@Override</span>
+ <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">equals</span><span class="o">(</span><span class="n">Object</span> <span class="n">obj</span><span class="o">)</span> <span class="o">{</span>
+     <span class="k">if</span> <span class="o">(</span><span class="n">obj</span> <span class="k">instanceof</span> <span class="n">Student</span><span class="o">)</span> <span class="o">{</span>
+    	    <span class="n">Student</span> <span class="n">stu</span> <span class="o">=</span> <span class="o">(</span><span class="n">Student</span><span class="o">)</span><span class="n">obj</span><span class="o">;</span>
+      	<span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">name</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">stu</span><span class="o">.</span><span class="na">name</span><span class="o">);</span> <span class="c1">// this.name 无判空</span>
+     <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+      	<span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+     <span class="o">}</span>
+ <span class="o">}</span>
+ <span class="c1">// 方法二：Lombok 插件自动生成</span>
 </code></pre></div>    </div>
   </li>
   <li>
     <p><code class="highlighter-rouge">clone()</code>：用于创建并返回当前对象的一份拷贝。慎用，默认是<a href="#多态">浅拷贝</a>，若想实现深拷贝需覆写 clone() 方法实现成员对象的<strong>深度遍历式拷贝</strong>。</p>
   </li>
   <li>
-    <p><code class="highlighter-rouge">finalize()</code>：实例被<strong>垃圾回收器</strong>回收时触发的操作；当 GC 准备好释放对象占用空间时，首先会调用 finalize()，并在下一次垃圾回收动作发生时真正回收对象占用的内存。</p>
+    <p><code class="highlighter-rouge">finalize()</code>：实例被<strong>垃圾回收器</strong>回收时触发的操作；当 GC 准备好<strong>释放对象占用空间</strong>时，首先会调用 finalize()，并在下一次垃圾回收动作发生时真正回收对象占用的内存。</p>
   </li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// native 方法
-// 用于返回当前运行时对象的 Class 对象，使用了 final 关键字修饰，故不允许子类重写。
-public final native Class&lt;?&gt; getClass()
-// 用于返回对象的哈希码，主要用在哈希表中，如 JDK 中的 HashMap。
-public native int hashCode()
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// native 方法</span>
+<span class="c1">// 用于返回当前运行时对象的 Class 对象，使用了 final 关键字修饰，故不允许子类重写。</span>
+<span class="kd">public</span> <span class="kd">final</span> <span class="kd">native</span> <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">getClass</span><span class="o">()</span>
+<span class="c1">// 用于返回对象的哈希码，主要用在哈希表中，如 JDK 中的 HashMap。</span>
+<span class="kd">public</span> <span class="kd">native</span> <span class="kt">int</span> <span class="nf">hashCode</span><span class="o">()</span>
 </code></pre></div></div>
 
 <h4 id="objects-类">Objects 类</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Objects.equals(o1, o2); // 推荐
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Objects</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">o1</span><span class="o">,</span> <span class="n">o2</span><span class="o">);</span> <span class="c1">// 推荐</span>
 </code></pre></div></div>
 
 <h3 id="character-类">Character 类</h3>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 字符不是字母和数字的情况，用于忽略空格和标点
-if (!Character.isLetterOrDigit(s.charAt(left))) {
-  left++;
-}
-// 判断二者是否相等，忽略大小写
-Character.toLowerCase(s.charAt(left));
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 字符不是字母和数字的情况，用于忽略空格和标点</span>
+<span class="k">if</span> <span class="o">(!</span><span class="n">Character</span><span class="o">.</span><span class="na">isLetterOrDigit</span><span class="o">(</span><span class="n">s</span><span class="o">.</span><span class="na">charAt</span><span class="o">(</span><span class="n">left</span><span class="o">)))</span> <span class="o">{</span>
+  <span class="n">left</span><span class="o">++;</span>
+<span class="o">}</span>
+<span class="c1">// 判断二者是否相等，忽略大小写</span>
+<span class="n">Character</span><span class="o">.</span><span class="na">toLowerCase</span><span class="o">(</span><span class="n">s</span><span class="o">.</span><span class="na">charAt</span><span class="o">(</span><span class="n">left</span><span class="o">));</span>
 
-str = Character.toString(‘c’);
+<span class="n">str</span> <span class="o">=</span> <span class="n">Character</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="err">‘</span><span class="n">c</span><span class="err">’</span><span class="o">);</span>
 </code></pre></div></div>
 
 <h3 id="string-类">String 类</h3>
 
 <p><del>String类有11种构造方法：</del></p>
 
-<h5 id="string-类定义">String 类定义</h5>
+<h4 id="string-类定义">String 类定义</h4>
 
 <p>String 是用 <a href="#常量和变量">private final</a> 修饰的<strong>字符数组</strong>保存，<strong>每次都</strong>创建新对象（多了会导致性能降低）。String 类是不可变类，一旦创建，其值不可改变，适用于<strong>不常改变长度</strong>的字符串，<code class="highlighter-rouge">str.length()</code>。</p>
 
@@ -2669,20 +2907,20 @@ str = Character.toString(‘c’);
 
 <p>二者配合可以保证用 String 类声明的对象的值不可变。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>private [final] char value[];
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">private</span> <span class="o">[</span><span class="kd">final</span><span class="o">]</span> <span class="kt">char</span> <span class="n">value</span><span class="o">[];</span>
 
-// 通过反射修改String中的字符
-String str = “Hello World”; 
-// 获取String类中的value字段
-Field val = String.class.getDeclaredField(“value”);
-// 改变value属性的访问权限
-val.setAccessible(true);
-// 获取s对象上的属性value数组
-char[] value = (char[]) val.get(str);
-// 改变value所引用的数组中的第5个字符
-value[5] = ‘_’; // 变为 Hello_World
+<span class="c1">// 通过反射修改String中的字符</span>
+<span class="n">String</span> <span class="n">str</span> <span class="o">=</span> <span class="err">“</span><span class="n">Hello</span> <span class="n">World</span><span class="err">”</span><span class="o">;</span> 
+<span class="c1">// 获取String类中的value字段</span>
+<span class="n">Field</span> <span class="n">val</span> <span class="o">=</span> <span class="n">String</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">getDeclaredField</span><span class="o">(</span><span class="err">“</span><span class="n">value</span><span class="err">”</span><span class="o">);</span>
+<span class="c1">// 改变value属性的访问权限</span>
+<span class="n">val</span><span class="o">.</span><span class="na">setAccessible</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+<span class="c1">// 获取s对象上的属性value数组</span>
+<span class="kt">char</span><span class="o">[]</span> <span class="n">value</span> <span class="o">=</span> <span class="o">(</span><span class="kt">char</span><span class="o">[])</span> <span class="n">val</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">str</span><span class="o">);</span>
+<span class="c1">// 改变value所引用的数组中的第5个字符</span>
+<span class="n">value</span><span class="o">[</span><span class="mi">5</span><span class="o">]</span> <span class="o">=</span> <span class="err">‘</span><span class="n">_</span><span class="err">’</span><span class="o">;</span> <span class="c1">// 变为 Hello_World</span>
 
-String t = value.toString(); //?
+<span class="n">String</span> <span class="n">t</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span> <span class="c1">//?</span>
 </code></pre></div></div>
 
 <p><strong>运算符重载</strong>：Java 语言本身并不支持<a href="#多态">运算符重载</a>，<code class="highlighter-rouge">+</code> 和 <code class="highlighter-rouge">+=</code> 是专门为 String 类重载过的运算符，也是 Java 中仅有的两个重载过的运算符。</p>
@@ -2694,25 +2932,25 @@ String t = value.toString(); //?
   <li>没有保存的话，在常量池中创建一个指向该字符串对象的引用并返回。</li>
 </ol>
 
-<h5 id="创建字符串对象的方式">创建字符串对象的方式</h5>
+<h4 id="创建字符串对象的方式">创建字符串对象的方式</h4>
 
 <p>见 <a href="#数组">字符串常量池与  equals()</a></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>String s1 = "ab"; // 将字面量"ab"放到常量池中，并将引用变量 s1 指向常量池中字面量的地址；推荐
-String str1 = new String("ab"); // 在堆内存创建一个新对象，a 引用指向新对象
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">String</span> <span class="n">s1</span> <span class="o">=</span> <span class="s">"ab"</span><span class="o">;</span> <span class="c1">// 将字面量"ab"放到常量池中，并将引用变量 s1 指向常量池中字面量的地址；推荐</span>
+<span class="n">String</span> <span class="n">str1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="s">"ab"</span><span class="o">);</span> <span class="c1">// 在堆内存创建一个新对象，a 引用指向新对象</span>
 
-s1 != str1 // s1是常量池中的对象的引用，str1 是堆内存中的对象的引用，二者地址不同
-s1.equals(str1) // true，二者内容相同，重写 hashCode()
+<span class="n">s1</span> <span class="o">!=</span> <span class="n">str1</span> <span class="c1">// s1是常量池中的对象的引用，str1 是堆内存中的对象的引用，二者地址不同</span>
+<span class="n">s1</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">str1</span><span class="o">)</span> <span class="c1">// true，二者内容相同，重写 hashCode()</span>
 
-// 字符数组
-char value[] = { ’H‘, ’e‘, ’l‘, ’l‘, ’o‘ };
-char[] value = ; // 均可
+<span class="c1">// 字符数组</span>
+<span class="kt">char</span> <span class="n">value</span><span class="o">[]</span> <span class="o">=</span> <span class="o">{</span> <span class="err">’</span><span class="n">H</span><span class="err">‘</span><span class="o">,</span> <span class="err">’</span><span class="n">e</span><span class="err">‘</span><span class="o">,</span> <span class="err">’</span><span class="n">l</span><span class="err">‘</span><span class="o">,</span> <span class="err">’</span><span class="n">l</span><span class="err">‘</span><span class="o">,</span> <span class="err">’</span><span class="n">o</span><span class="err">‘</span> <span class="o">};</span>
+<span class="kt">char</span><span class="o">[]</span> <span class="n">value</span> <span class="o">=</span> <span class="o">;</span> <span class="c1">// 均可</span>
 
-String str = new String(value); // 用字符数组构造字符串对象
-String str = String.valueOf(value);
+<span class="n">String</span> <span class="n">str</span> <span class="o">=</span> <span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="n">value</span><span class="o">);</span> <span class="c1">// 用字符数组构造字符串对象</span>
+<span class="n">String</span> <span class="n">str</span> <span class="o">=</span> <span class="n">String</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="n">value</span><span class="o">);</span>
 </code></pre></div></div>
 
-<h5 id="string-类不可变的优缺点">String 类不可变的优缺点</h5>
+<h4 id="string-类不可变的优缺点">String 类不可变的优缺点</h4>
 
 <p><strong>一、好处</strong>：</p>
 
@@ -2736,7 +2974,7 @@ String str = String.valueOf(value);
 
 <p><strong>二、缺点</strong>：每次修改 String 对象都会产生新对象，占用内存。如 String 对象的 <code class="highlighter-rouge">+</code> <strong>拼接操作</strong>直接生成新常量，并把 String 对象引用指向新常量。</p>
 
-<h5 id="final-string">final String</h5>
+<h4 id="final-string">final String</h4>
 
 <p>字符常量 VS 字符串常量</p>
 
@@ -2744,15 +2982,15 @@ String str = String.valueOf(value);
   <li>
     <p>形式：字符常量 char 是<strong>单引号</strong>引起的一个字符，属于基本类型变量；字符串常量 final String 是<strong>双引号</strong>引起的 0 或若干个字符，属于对象。二者可相互转换。</p>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> // char 在 Java 中占两个字节
- char ch = ‘a’;
- String str = “hello”;
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c1">// char 在 Java 中占两个字节</span>
+ <span class="kt">char</span> <span class="n">ch</span> <span class="o">=</span> <span class="err">‘</span><span class="n">a</span><span class="err">’</span><span class="o">;</span>
+ <span class="n">String</span> <span class="n">str</span> <span class="o">=</span> <span class="err">“</span><span class="n">hello</span><span class="err">”</span><span class="o">;</span>
       
- // char 和 String 相互转换
- char ch = str.charAt(0);
- str = Character.toString(‘c’);
- str = new Character(‘c’).toString();
- str = “” + ‘c’;
+ <span class="c1">// char 和 String 相互转换</span>
+ <span class="kt">char</span> <span class="n">ch</span> <span class="o">=</span> <span class="n">str</span><span class="o">.</span><span class="na">charAt</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+ <span class="n">str</span> <span class="o">=</span> <span class="n">Character</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="err">‘</span><span class="n">c</span><span class="err">’</span><span class="o">);</span>
+ <span class="n">str</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Character</span><span class="o">(</span><span class="err">‘</span><span class="n">c</span><span class="err">’</span><span class="o">).</span><span class="na">toString</span><span class="o">();</span>
+ <span class="n">str</span> <span class="o">=</span> <span class="err">“”</span> <span class="o">+</span> <span class="err">‘</span><span class="n">c</span><span class="err">’</span><span class="o">;</span>
 </code></pre></div>    </div>
   </li>
   <li>
@@ -2767,26 +3005,26 @@ String str = String.valueOf(value);
 
 <ul>
   <li>String str 为变量，虽然 String 类被 final 修饰，但 str 仍为变量；</li>
-  <li>final String str 为编译期常量；</li>
+  <li>final String str 为<strong>编译期常量</strong>；</li>
   <li><a href="#数据类型转换">== 比较引用的地址</a></li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 字面量"hello2"是常量，存入字符串常量池中;
-// a为变量，指向常量池中字面量的地址
-String a = "hello2";
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 字面量"hello2"是常量，存入字符串常量池中;</span>
+<span class="c1">// a为变量，指向常量池中字面量的地址</span>
+<span class="n">String</span> <span class="n">a</span> <span class="o">=</span> <span class="s">"hello2"</span><span class="o">;</span>
 
-// b为编译期常量，指向常量池中的地址
-final String b = "hello";
-// c为变量
-String c = "hello"; 
+<span class="c1">// b为编译期常量，指向常量池中的地址</span>
+<span class="kd">final</span> <span class="n">String</span> <span class="n">b</span> <span class="o">=</span> <span class="s">"hello"</span><span class="o">;</span>
+<span class="c1">// c为变量</span>
+<span class="n">String</span> <span class="n">c</span> <span class="o">=</span> <span class="s">"hello"</span><span class="o">;</span> 
 
-// true，b是常量，在编译期间就计算出了b+2=”hello2”，在常量池中找到已有地址，与a相同
-a == b + 2;
-// false，c是变量，在编译期间不能确定其值，在堆中新建对象”hello”？，+运算得到新变量 “hello2”，二者地址不同
-a == c + 2;
+<span class="c1">// true，b是常量，在编译期间就计算出了b+2=”hello2”，在常量池中找到已有地址，与a相同</span>
+<span class="n">a</span> <span class="o">==</span> <span class="n">b</span> <span class="o">+</span> <span class="mi">2</span><span class="o">;</span>
+<span class="c1">// false，c是变量，在编译期间不能确定其值，在堆中新建对象”hello”？，+运算得到新变量 “hello2”，二者地址不同</span>
+<span class="n">a</span> <span class="o">==</span> <span class="n">c</span> <span class="o">+</span> <span class="mi">2</span><span class="o">;</span>
 </code></pre></div></div>
 
-<h5 id="可变字符串类-stringbuilderstringbuffer">可变字符串类 StringBuilder、StringBuffer</h5>
+<h4 id="stringbuilderstringbuffer">StringBuilder、StringBuffer</h4>
 
 <p>Java 提供了两个可变字符串类 <code class="highlighter-rouge">StringBuilder</code> 和 <code class="highlighter-rouge">StringBuffer</code>。　　</p>
 
@@ -2798,7 +3036,7 @@ a == c + 2;
 
 <p>因此在通常情况下，如果需要创建一个内容可变的字符串对象，则应该优先考虑使用 <code class="highlighter-rouge">StringBuilder</code> 类。</p>
 
-<p><strong>拼接字符串</strong>：</p>
+<h5 id="拼接字符串">拼接字符串</h5>
 
 <p><code class="highlighter-rouge">StringBuffer</code> 就是为了解决<strong>大量拼接字符串时</strong>产生很多<strong>临时对象</strong>问题而提供的一个类。它提供了 <code class="highlighter-rouge">append</code> 和 <code class="highlighter-rouge">add</code> 方法，可以将字符串添加到已有序列的末尾或指定位置。<del>本质是一个线程安全的可修改的字符序列。</del></p>
 
@@ -2810,22 +3048,22 @@ a == c + 2;
   <li>在循环内用 <code class="highlighter-rouge">+</code> 拼接 <code class="highlighter-rouge">String</code> 对象，会导致创建过多的 <code class="highlighter-rouge">StringBuilder</code> <strong>临时对象</strong>，造成内存资源浪费。可直接使用 <code class="highlighter-rouge">StringBuilder</code> 调用 <code class="highlighter-rouge">append()</code> 方法代替。</li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 转为StringBuilder对象
-String str = "num is:";
-// 1.[X] 通过强制类型转换
-StringBuilder strBuilder = (StringBuilder)str;
-// 2. 通过构造函数
-StringBuilder strBuilder = new StringBuilder(str);
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 转为StringBuilder对象</span>
+<span class="n">String</span> <span class="n">str</span> <span class="o">=</span> <span class="s">"num is:"</span><span class="o">;</span>
+<span class="c1">// 1.[X] 通过强制类型转换</span>
+<span class="n">StringBuilder</span> <span class="n">strBuilder</span> <span class="o">=</span> <span class="o">(</span><span class="n">StringBuilder</span><span class="o">)</span><span class="n">str</span><span class="o">;</span>
+<span class="c1">// 2. 通过构造函数</span>
+<span class="n">StringBuilder</span> <span class="n">strBuilder</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringBuilder</span><span class="o">(</span><span class="n">str</span><span class="o">);</span>
   
-for (int i = 0; i &lt; 1000; i++) {
-   strBuilder.append(','); // 用`+`会产生大量临时StringBuilder对象
-   strBuilder.append(i);
-}
+<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">1000</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+   <span class="n">strBuilder</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="sc">','</span><span class="o">);</span> <span class="c1">// 用`+`会产生大量临时StringBuilder对象</span>
+   <span class="n">strBuilder</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+<span class="o">}</span>
 
-// 替换指定下标位置的单个字符；
-strBuilder.setCharAt(1, 'X');
+<span class="c1">// 替换指定下标位置的单个字符；</span>
+<span class="n">strBuilder</span><span class="o">.</span><span class="na">setCharAt</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="sc">'X'</span><span class="o">);</span>
 
-return strBuilder.toString();
+<span class="k">return</span> <span class="n">strBuilder</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
 </code></pre></div></div>
 
 <p>参考：</p>
@@ -2852,9 +3090,7 @@ return strBuilder.toString();
       <li>当访问不存在的下标时会发生 <code class="highlighter-rouge">StringIndexOutOfBoundsException</code>（下标越界异常）；</li>
     </ul>
   </li>
-  <li>
-    <p><code class="highlighter-rouge">int indexOf(**int** ch, [int fromIndex])</code>：从指定位置开始，获取 ch 第一次出现的索引；未找到 ch 则返回 -1；</p>
-
+  <li><code class="highlighter-rouge">int indexOf(**int** ch, [int fromIndex])</code>：从指定位置开始，获取 ch 第一次出现的索引；未找到 ch 则返回 -1；
     <ul>
       <li>
         <p><code class="highlighter-rouge">int indexOf(**String** str, [int fromIndex])</code></p>
@@ -3439,25 +3675,27 @@ return strBuilder.toString();
 
 <h4 id="hutool">hutool</h4>
 
+<p>见 SSM 框架、SpringMVC 文档。</p>
+
 <h3 id="biginteger-类">BigInteger 类</h3>
 
 <p>64 位 long 整型是最大的整数类型，超过这个范围就会有数值溢出的风险；</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>long l = Long.MAX_VALUE;
-l + 1; // -9223372036854775808
-l + 1 == Long.MIN_VALUE; // true
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">long</span> <span class="n">l</span> <span class="o">=</span> <span class="n">Long</span><span class="o">.</span><span class="na">MAX_VALUE</span><span class="o">;</span>
+<span class="n">l</span> <span class="o">+</span> <span class="mi">1</span><span class="o">;</span> <span class="c1">// -9223372036854775808</span>
+<span class="n">l</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">Long</span><span class="o">.</span><span class="na">MIN_VALUE</span><span class="o">;</span> <span class="c1">// true</span>
 </code></pre></div></div>
 
 <p>BigInteger 内部使用 int[] 数组来存储任意大小的整形数据。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//？
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//？</span>
 </code></pre></div></div>
 
 <h3 id="bigdecimal-类">BigDecimal 类</h3>
 
 <p>作用：为了避免精度丢失，可用 <code class="highlighter-rouge">Big'Decimal</code> 来进行<strong>浮点数间的运算和比较大小</strong>；</p>
 
-<h5 id="浮点数精度陷阱">浮点数精度陷阱</h5>
+<h4 id="浮点数精度陷阱">浮点数精度陷阱</h4>
 
 <p>二进制无法精确表示浮点数：由于计算机（用<strong>尾数 + 阶码</strong>的编码方式）保存浮点数，二进制<strong>尾数</strong>宽度有限，无限循环的小数存储在计算机时，只能被截断；计算机内存放的值与实际值存在误差，导致浮点数精度陷阱。</p>
 
@@ -3473,9 +3711,9 @@ l + 1 == Long.MIN_VALUE; // true
   </li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 输出1.10000000000888178
-// 0.1无法准确的表示为double
-BigDecimal a = new BigDecimal(1.1);
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 输出1.10000000000888178</span>
+<span class="c1">// 0.1无法准确的表示为double</span>
+<span class="n">BigDecimal</span> <span class="n">a</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BigDecimal</span><span class="o">(</span><span class="mf">1.1</span><span class="o">);</span>
 </code></pre></div></div>
 
 <p>因此，浮点数间的等值判断，</p>
@@ -3487,30 +3725,30 @@ BigDecimal a = new BigDecimal(1.1);
 
 <p><a href="http://kaito-kidd.com/2018/08/08/computer-system-float-point/">计算机系统基础（四）浮点数</a></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//e.g.1 减法
-float a = 1.0F - 0.9F; // 0.100000024，在计算机内4Byte，32bit，1符号位8指数位23有效数字，用"尾数+阶码"的编码方式，二进制无法精确表示大部分的十进制小数
-float b = 0.9F - 0.8F; // 0.099999964
-a == b？// 预期返回true，实际为false
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//e.g.1 减法</span>
+<span class="kt">float</span> <span class="n">a</span> <span class="o">=</span> <span class="mf">1.0</span><span class="n">F</span> <span class="o">-</span> <span class="mf">0.9</span><span class="n">F</span><span class="o">;</span> <span class="c1">// 0.100000024，在计算机内4Byte，32bit，1符号位8指数位23有效数字，用"尾数+阶码"的编码方式，二进制无法精确表示大部分的十进制小数</span>
+<span class="kt">float</span> <span class="n">b</span> <span class="o">=</span> <span class="mf">0.9</span><span class="n">F</span> <span class="o">-</span> <span class="mf">0.8</span><span class="n">F</span><span class="o">;</span> <span class="c1">// 0.099999964</span>
+<span class="n">a</span> <span class="o">==</span> <span class="n">b</span><span class="err">？</span><span class="c1">// 预期返回true，实际为false</span>
 
-//e.g.2 累加
-float f1 = 0.0f;
-for (int i = 0; i &lt; 11; it+) {
-    f1 += 0.1f; // 自加11次，输出 1.1000001？，有误差
-}
-float f2 = 0.1f * 11; // 乘以11，输出 1.1
-f1 == f2? // 返回false
+<span class="c1">//e.g.2 累加</span>
+<span class="kt">float</span> <span class="n">f1</span> <span class="o">=</span> <span class="mf">0.0f</span><span class="o">;</span>
+<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">11</span><span class="o">;</span> <span class="n">it</span><span class="o">+)</span> <span class="o">{</span>
+    <span class="n">f1</span> <span class="o">+=</span> <span class="mf">0.1f</span><span class="o">;</span> <span class="c1">// 自加11次，输出 1.1000001？，有误差</span>
+<span class="o">}</span>
+<span class="kt">float</span> <span class="n">f2</span> <span class="o">=</span> <span class="mf">0.1f</span> <span class="o">*</span> <span class="mi">11</span><span class="o">;</span> <span class="c1">// 乘以11，输出 1.1</span>
+<span class="n">f1</span> <span class="o">==</span> <span class="n">f2</span><span class="o">?</span> <span class="c1">// 返回false</span>
 </code></pre></div></div>
 
-<h5 id="浮点数精度陷阱的解决">浮点数精度陷阱的解决</h5>
+<h5 id="解决">解决</h5>
 
 <ol>
   <li>
     <p>指定一个误差范围，两个浮点数的差值在此范围内，则认为是相等的。缺点：仍有误差，只是误差较小。</p>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> float diff = 1e-6F;
- if (Math.abs(a - b) &lt; diff) {
-     System.out.println(”true“); 
- }
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="kt">float</span> <span class="n">diff</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span><span class="n">F</span><span class="o">;</span>
+ <span class="k">if</span> <span class="o">(</span><span class="n">Math</span><span class="o">.</span><span class="na">abs</span><span class="o">(</span><span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="o">)</span> <span class="o">&lt;</span> <span class="n">diff</span><span class="o">)</span> <span class="o">{</span>
+     <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="err">”</span><span class="kc">true</span><span class="err">“</span><span class="o">);</span> 
+ <span class="o">}</span>
 </code></pre></div>    </div>
   </li>
   <li>
@@ -3524,56 +3762,58 @@ f1 == f2? // 返回false
   </li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>BigDecimal a = new BigDecimal("1.0"); 
-BigDecimal b = new BigDecimal("0.9");
-BigDecimal c = new BigDecimal("0.8");
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">BigDecimal</span> <span class="n">a</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BigDecimal</span><span class="o">(</span><span class="s">"1.0"</span><span class="o">);</span> 
+<span class="n">BigDecimal</span> <span class="n">b</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BigDecimal</span><span class="o">(</span><span class="s">"0.9"</span><span class="o">);</span>
+<span class="n">BigDecimal</span> <span class="n">c</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BigDecimal</span><span class="o">(</span><span class="s">"0.8"</span><span class="o">);</span>
 
-BigDecimal x = a.subtract(b); // 0.1，减法
-BigDecimal y = b.subtract(c); // 0.1
+<span class="n">BigDecimal</span> <span class="n">x</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="na">subtract</span><span class="o">(</span><span class="n">b</span><span class="o">);</span> <span class="c1">// 0.1，减法</span>
+<span class="n">BigDecimal</span> <span class="n">y</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="na">subtract</span><span class="o">(</span><span class="n">c</span><span class="o">);</span> <span class="c1">// 0.1</span>
 
-// 大小比较
-x.compareTo(y) // true，只比较值、忽略精度
-Objects.equals(x, y) // 会比较值和精度，例如1.0与1.00返回false
+<span class="c1">// 大小比较</span>
+<span class="n">x</span><span class="o">.</span><span class="na">compareTo</span><span class="o">(</span><span class="n">y</span><span class="o">)</span> <span class="c1">// true，只比较值、忽略精度</span>
+<span class="n">Objects</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">x</span><span class="o">,</span> <span class="n">y</span><span class="o">)</span> <span class="c1">// 会比较值和精度，例如1.0与1.00返回false</span>
 </code></pre></div></div>
 
-<h5 id="常见方法">常见方法</h5>
+<h4 id="常见方法">常见方法</h4>
 
-<p>加减乘除：</p>
+<h5 id="加减乘除">加减乘除</h5>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>BigDecimal a = new BigDecimal("1.0");
-BigDecimal b = new BigDecimal("0.9");
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">BigDecimal</span> <span class="n">a</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BigDecimal</span><span class="o">(</span><span class="s">"1.0"</span><span class="o">);</span>
+<span class="n">BigDecimal</span> <span class="n">b</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BigDecimal</span><span class="o">(</span><span class="s">"0.9"</span><span class="o">);</span>
 
-// 加减乘除
-a.add(b); // 1.9
-a.subtract(b); // 0.1
-a.multiply(b); // 0.90
-a.divide(b); // 无法除尽，抛出 ArithmeticException 异常
-a.divide(b, 2, RoundingMode.HALF_UP); // 1.11，其中 scale 表示要保留几位小数；roundingMode 代表保留规则，不要选择 UNNECESSARY，否则很可能会遇到 ArithmeticException（无法除尽出现无限循环小数的时候）
+<span class="c1">// 加减乘除</span>
+<span class="n">a</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">b</span><span class="o">);</span> <span class="c1">// 1.9</span>
+<span class="n">a</span><span class="o">.</span><span class="na">subtract</span><span class="o">(</span><span class="n">b</span><span class="o">);</span> <span class="c1">// 0.1</span>
+<span class="n">a</span><span class="o">.</span><span class="na">multiply</span><span class="o">(</span><span class="n">b</span><span class="o">);</span> <span class="c1">// 0.90</span>
+<span class="n">a</span><span class="o">.</span><span class="na">divide</span><span class="o">(</span><span class="n">b</span><span class="o">);</span> <span class="c1">// 无法除尽，抛出 ArithmeticException 异常</span>
+<span class="n">a</span><span class="o">.</span><span class="na">divide</span><span class="o">(</span><span class="n">b</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="n">RoundingMode</span><span class="o">.</span><span class="na">HALF_UP</span><span class="o">);</span> <span class="c1">// 1.11，其中 scale 表示要保留几位小数；roundingMode 代表保留规则，不要选择 UNNECESSARY，否则很可能会遇到 ArithmeticException（无法除尽出现无限循环小数的时候）</span>
 
-// 设置保留几位小数及保留规则
-BigDecimal c = a.setScale(3, RoundingMode.HALF_DOWN);
+<span class="c1">// 设置保留几位小数及保留规则</span>
+<span class="n">BigDecimal</span> <span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="na">setScale</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="n">RoundingMode</span><span class="o">.</span><span class="na">HALF_DOWN</span><span class="o">);</span>
 
-BigDecimal.doubleValue(); // 返回double
+<span class="n">BigDecimal</span><span class="o">.</span><span class="na">doubleValue</span><span class="o">();</span> <span class="c1">// 返回double</span>
 </code></pre></div></div>
 
-<p>其他方法：</p>
+<h5 id="其他方法">其他方法</h5>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//保留小数位（newScale：保留几位小数，roundingMode：舍入模式）
-BigDecimal setScale(int newScale, int roundingMode)
-//取余运算
-BigDecimal remainder(BigDecimal divisor);
-//求相反数
-BigDecimal negate();
-//比较大小（左边比右边数大返回1，相等返回0，比右边小返回-1）
-int compareTo(BigDecimal val);
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//保留小数位（newScale：保留几位小数，roundingMode：舍入模式）</span>
+<span class="n">BigDecimal</span> <span class="nf">setScale</span><span class="o">(</span><span class="kt">int</span> <span class="n">newScale</span><span class="o">,</span> <span class="kt">int</span> <span class="n">roundingMode</span><span class="o">)</span>
+<span class="c1">//取余运算</span>
+<span class="n">BigDecimal</span> <span class="nf">remainder</span><span class="o">(</span><span class="n">BigDecimal</span> <span class="n">divisor</span><span class="o">);</span>
+<span class="c1">//求相反数</span>
+<span class="n">BigDecimal</span> <span class="nf">negate</span><span class="o">();</span>
+<span class="c1">//比较大小（左边比右边数大返回1，相等返回0，比右边小返回-1）</span>
+<span class="kt">int</span> <span class="nf">compareTo</span><span class="o">(</span><span class="n">BigDecimal</span> <span class="n">val</span><span class="o">);</span>
 
-//将BigDecimal对象中的值以整数返回
-int intValue() 
-double doubleValue()
-float floatValue()
-long longValue()
-String toString()
+<span class="c1">//将BigDecimal对象中的值以整数返回</span>
+<span class="kt">int</span> <span class="nf">intValue</span><span class="o">()</span> 
+<span class="kt">double</span> <span class="nf">doubleValue</span><span class="o">()</span>
+<span class="kt">float</span> <span class="nf">floatValue</span><span class="o">()</span>
+<span class="kt">long</span> <span class="nf">longValue</span><span class="o">()</span>
+<span class="n">String</span> <span class="nf">toString</span><span class="o">()</span>
 </code></pre></div></div>
+
+<h5 id="舍入模式">舍入模式</h5>
 
 <p>舍入模式（Rounding Mode）：是<code class="highlighter-rouge">BigDecimal</code>类中的静态变量，包括了八种常见舍入规则，比如四舍五入法、银行家舍入法等。</p>
 
@@ -3618,24 +3858,24 @@ String toString()
 
 <p>继承Enum类</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Sex s = Sex.BOY;
-s.ordinal();// index
-Sex.values();//all values
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Sex</span> <span class="n">s</span> <span class="o">=</span> <span class="n">Sex</span><span class="o">.</span><span class="na">BOY</span><span class="o">;</span>
+<span class="n">s</span><span class="o">.</span><span class="na">ordinal</span><span class="o">();</span><span class="c1">// index</span>
+<span class="n">Sex</span><span class="o">.</span><span class="na">values</span><span class="o">();</span><span class="c1">//all values</span>
 </code></pre></div></div>
 
 <h3 id="正则表达式-pattern-类">正则表达式 Pattern 类</h3>
 
 <p>适合做校验</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>"hello".matches("\\d{4,}");
-"he2kele4we".splite("\\d+");
-"he2kele4we".replaceAll("\\d+", "/");
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">"hello"</span><span class="o">.</span><span class="na">matches</span><span class="o">(</span><span class="s">"\\d{4,}"</span><span class="o">);</span>
+<span class="s">"he2kele4we"</span><span class="o">.</span><span class="na">splite</span><span class="o">(</span><span class="s">"\\d+"</span><span class="o">);</span>
+<span class="s">"he2kele4we"</span><span class="o">.</span><span class="na">replaceAll</span><span class="o">(</span><span class="s">"\\d+"</span><span class="o">,</span> <span class="s">"/"</span><span class="o">);</span>
 
-Pattern pt = Pattern.compile("\\d+");
-Matcher mt = pt.matcher("hjeiji@jhj@".);
-while(matcher.find()) {
-  matcher.group();
-}
+<span class="n">Pattern</span> <span class="n">pt</span> <span class="o">=</span> <span class="n">Pattern</span><span class="o">.</span><span class="na">compile</span><span class="o">(</span><span class="s">"\\d+"</span><span class="o">);</span>
+<span class="n">Matcher</span> <span class="n">mt</span> <span class="o">=</span> <span class="n">pt</span><span class="o">.</span><span class="na">matcher</span><span class="o">(</span><span class="s">"hjeiji@jhj@"</span><span class="o">.);</span>
+<span class="k">while</span><span class="o">(</span><span class="n">matcher</span><span class="o">.</span><span class="na">find</span><span class="o">())</span> <span class="o">{</span>
+  <span class="n">matcher</span><span class="o">.</span><span class="na">group</span><span class="o">();</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h3 id="system-类">System 类</h3>

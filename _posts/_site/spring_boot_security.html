@@ -10,7 +10,7 @@
 
 <h2 id="整合-spring-security-权限">整合 Spring Security 权限</h2>
 
-<h4 id="添加依赖">添加依赖</h4>
+<h3 id="添加依赖">添加依赖</h3>
 
 <p>在 <code class="highlighter-rouge">pom.xml</code> 中</p>
 
@@ -20,7 +20,7 @@
 <span class="nt">&lt;/dependency&gt;</span>
 </code></pre></div></div>
 
-<h4 id="spring-boot-配置">Spring Boot 配置</h4>
+<h3 id="spring-boot-配置">Spring Boot 配置</h3>
 
 <p>在Spring Boot应用程序中，可以通过在<code class="highlighter-rouge">application.properties</code>文件或<code class="highlighter-rouge">application.yml</code>文件中配置Spring Security。</p>
 
@@ -52,7 +52,7 @@
       <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
 </code></pre></div></div>
 
-<h4 id="添加配置类">添加配置类</h4>
+<h3 id="添加配置类">添加配置类</h3>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SecurityConfig.java</span>
 
@@ -118,11 +118,11 @@
 
 <p><img src="../assets/8fdccbc24a2225db315a8800cdfe1c09.png" alt="img" style="zoom:80%;" /></p>
 
-<h5 id="示例一"><strong>示例一</strong></h5>
+<h4 id="示例一">示例一</h4>
 
 <p>自定义 Spring Security 的配置，实现<strong>权限控制</strong>。</p>
 
-<h6 id="securityconfig">SecurityConfig</h6>
+<h5 id="securityconfig">SecurityConfig</h5>
 
 <p>在 <a href="https://github.com/YunaiV/SpringBoot-Labs/tree/master/lab-01-spring-security/lab-01-springsecurity-demo-role/src/main/java/cn/iocoder/springboot/lab01/springsecurity/config"><code class="highlighter-rouge">cn.iocoder.springboot.lab01.springsecurity.config</code></a> 包下，创建 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-01-spring-security/lab-01-springsecurity-demo-role/src/main/java/cn/iocoder/springboot/lab01/springsecurity/config/SecurityConfig.java">SecurityConfig</a> 配置类，继承 <a href="https://github.com/spring-projects/spring-security/blob/master/config/src/main/java/org/springframework/security/config/annotation/web/configuration/WebSecurityConfigurerAdapter.java">WebSecurityConfigurerAdapter</a> 抽象类，实现 Spring Security 在 Web 场景下的自定义配置。</p>
 
@@ -138,7 +138,7 @@
 <span class="o">}</span>
 </code></pre></div></div>
 
-<h6 id="重写-configureauthenticationmanagerbuilder-auth-方法">重写 <code class="highlighter-rouge">#configure(AuthenticationManagerBuilder auth)</code> 方法</h6>
+<h5 id="重写-configureauthenticationmanagerbuilder-auth-方法">重写 <code class="highlighter-rouge">#configure(AuthenticationManagerBuilder auth)</code> 方法</h5>
 
 <p>重写 <code class="highlighter-rouge">#configure(AuthenticationManagerBuilder auth)</code> 方法，实现 <a href="https://github.com/spring-projects/spring-security/blob/master/core/src/main/java/org/springframework/security/authentication/AuthenticationManager.java">AuthenticationManager</a> 认证管理器。</p>
 
@@ -179,7 +179,7 @@
   <li><code class="highlighter-rouge">&lt;Z&gt;</code> 处，配置了「admin/admin」和「normal/normal」两个用户，分别对应 ADMIN 和 NORMAL 角色。相比<a href="https://www.iocoder.cn/Spring-Boot/Spring-Security/#">「2. 快速入门」</a>来说，可以配置更多的用户。</li>
 </ul>
 
-<h5 id="重写-configurehttpsecurity-http-方法">重写 <code class="highlighter-rouge">#configure(HttpSecurity http)</code> 方法</h5>
+<h6 id="重写-configurehttpsecurity-http-方法">重写 <code class="highlighter-rouge">#configure(HttpSecurity http)</code> 方法</h6>
 
 <p>然后，重写 <code class="highlighter-rouge">#configure(HttpSecurity http)</code> 方法，主要配置 URL 的权限控制。</p>
 
@@ -238,11 +238,11 @@
   </li>
 </ul>
 
-<h5 id="示例二">示例二</h5>
+<h4 id="示例二">示例二</h4>
 
 <p>使用 Spring Security 的注解，实现权限控制。</p>
 
-<h6 id="331-securityconfig">3.3.1 SecurityConfig</h6>
+<h5 id="331-securityconfig">3.3.1 SecurityConfig</h5>
 
 <p>修改 <a href="https://github.com/YunaiV/SpringBoot-Labs/blob/master/lab-01-spring-security/lab-01-springsecurity-demo-role/src/main/java/cn/iocoder/springboot/lab01/springsecurity/config/SecurityConfig.java">SecurityConfig</a> 配置类，增加 <a href="https://docs.spring.io/spring-security/site/docs/current/api/org/springframework/security/config/annotation/method/configuration/EnableGlobalMethodSecurity.html"><code class="highlighter-rouge">@EnableGlobalMethodSecurity</code></a> 注解，开启对 Spring Security 注解的方法，进行权限验证。</p>
 
@@ -251,7 +251,7 @@
 <span class="kd">public</span> <span class="kd">class</span> <span class="nc">SecurityConfig</span> <span class="kd">extends</span> <span class="n">WebSecurityConfigurerAdapter</span>
 </code></pre></div></div>
 
-<h6 id="democontroller">DemoController</h6>
+<h5 id="democontroller">DemoController</h5>
 
 <ul>
   <li>
@@ -268,7 +268,7 @@
   </li>
 </ul>
 
-<h4 id="添加-jwttokenutil-工具类">添加 <code class="highlighter-rouge">JwtTokenUtil</code> 工具类</h4>
+<h3 id="添加-jwttokenutil-工具类">添加 <code class="highlighter-rouge">JwtTokenUtil</code> 工具类</h3>
 
 <blockquote>
   <p>用于生成、解析、验证<code class="highlighter-rouge">JwtToken </code> 的工具类；</p>
@@ -285,7 +285,7 @@
   </li>
 </ul>
 
-<h4 id="登录注册功能实现">登录注册功能实现</h4>
+<h3 id="登录注册功能实现">登录注册功能实现</h3>
 
 <blockquote>
   <p>如果没有<strong>自定义</strong>登录界面，所以默认会使用 <a href="https://github.com/spring-projects/spring-security/blob/master/web/src/main/java/org/springframework/security/web/authentication/ui/DefaultLoginPageGeneratingFilter.java">DefaultLoginPageGeneratingFilter</a> 类，生成上述界面。</p>
@@ -335,7 +335,7 @@
   <li><a href="https://blog.csdn.net/qq_34963264/article/details/126684715">Swagger2.7升级到3.0后的若干问题</a></li>
 </ol>
 
-<h5 id="直接在-swagger-中填入认证信息">直接在 Swagger 中填入认证信息</h5>
+<h4 id="直接在-swagger-中填入认证信息">直接在 Swagger 中填入认证信息</h4>
 
 <p><strong>认证方式二</strong>、直接在 Swagger 中填入认证信息，这样就不用从外部去获取 access_token 了。</p>
 
@@ -343,7 +343,7 @@
   <li>主要是 SecurityScheme 不同。这里采用了 OAuthBuilder 来构建，构建时即得配置 token 的获取地址。仅限于 OAuth2 模式。</li>
 </ul>
 
-<h5 id="swagger-配置实现自带-authorization--头">Swagger 配置实现自带 <code class="highlighter-rouge">Authorization </code> 头</h5>
+<h4 id="swagger-配置实现自带-authorization--头">Swagger 配置实现自带 <code class="highlighter-rouge">Authorization </code> 头</h4>
 
 <p><strong>认证方式一</strong>、修改 Swagger 的配置，实现调用接口自带 <code class="highlighter-rouge">Authorization </code> 头，通过 <code class="highlighter-rouge">Authorize</code> 按钮设置 Token，即可访问需登录的接口。</p>
 
@@ -688,11 +688,7 @@
 
 <h3 id="spring-session--mongodb">Spring Session + MongoDB</h3>
 
-<h3 id="整合-spring-session--spring-security">整合 Spring Session + Spring Security</h3>
-
-<h2 id="整合-oauth2">整合 OAuth2</h2>
-
-<h2 id="整合-jwt">整合 JWT</h2>
+<h2 id="整合-spring-session--spring-security">整合 Spring Session + Spring Security</h2>
 
 <h2 id="项目实战">项目实战</h2>
 

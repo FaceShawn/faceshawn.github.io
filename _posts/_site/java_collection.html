@@ -1,5 +1,5 @@
 <blockquote>
-  <p>摘要：Java高级之集合框架/容器类，包括List、Queue、Set、Map。</p>
+  <p>摘要：Java 高级之集合框架/容器类，包括 List、Queue、Set、Map。</p>
 </blockquote>
 
 <!-- more -->
@@ -21,28 +21,6 @@
   <li>而集合只能保存对象的引用，对象本身存放在堆或方法区。基本数据类型在栈上分配内存，随时被回收，通过自动装箱可把基本类型转为包装类，存放在集合中。</li>
 </ul>
 
-<h3 id="集合容器继承关系图">集合容器继承关系图</h3>
-
-<p><img src="../assets/1362965-20190118094735724-2129767713.png" alt="img" style="zoom: 88%;" /></p>
-
-<p><img src="../assets/1362965-20190118095106326-273814633.png" alt="img" style="zoom:80%;" /></p>
-
-<h3 id="listqueueset-vs-map-接口">List、Queue、Set VS Map 接口</h3>
-
-<p>List、Queue、Set 接口继承自 Collection 接口：</p>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public interface List&lt;E&gt; extends Collection&lt;E&gt; {}
-</code></pre></div></div>
-
-<ol>
-  <li><code class="highlighter-rouge">List</code>：有序、可重复，允许多个 <code class="highlighter-rouge">null</code> 元素；可用 <code class="highlighter-rouge">iterator</code> 遍历或 <code class="highlighter-rouge">get(index)</code> 随机访问特定元素；</li>
-  <li><code class="highlighter-rouge">Queue</code>：有序、可重复，允许多个 <code class="highlighter-rouge">null</code> 元素；<strong>先进先出</strong>，用于排队；</li>
-  <li><code class="highlighter-rouge">Set</code>：无序、不可重复，最多只能有一个 <code class="highlighter-rouge">null</code> 元素；只可用 <code class="highlighter-rouge">iterator</code> 遍历；</li>
-  <li><code class="highlighter-rouge">Map</code>：无序、<code class="highlighter-rouge">key</code> 不可重复 <code class="highlighter-rouge">value</code> 可重复，允许一个 <code class="highlighter-rouge">key</code> 和多个 <code class="highlighter-rouge">value</code> 为 <code class="highlighter-rouge">null</code>。</li>
-</ol>
-
-<p><img src="../assets/collection-impl.gif" alt="collection-impl" style="zoom: 88%;" /></p>
-
 <h3 id="collection-接口及分类">Collection 接口及分类</h3>
 
 <blockquote>
@@ -62,6 +40,28 @@
 <span class="n">Collection</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">&gt;</span> <span class="n">orderIds</span> <span class="o">=</span> <span class="n">singleton</span><span class="o">(</span><span class="n">orderId</span><span class="o">);</span>
 </code></pre></div></div>
 
+<h4 id="集合容器继承关系图">集合容器继承关系图</h4>
+
+<p><img src="../assets/1362965-20190118094735724-2129767713.png" alt="img" style="zoom: 88%;" /></p>
+
+<p><img src="../assets/1362965-20190118095106326-273814633.png" alt="img" style="zoom:80%;" /></p>
+
+<h4 id="listqueuesetmap-接口">List、Queue、Set、Map 接口</h4>
+
+<p>List、Queue、Set 接口继承自 Collection 接口：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">List</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="kd">extends</span> <span class="n">Collection</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="o">{}</span>
+</code></pre></div></div>
+
+<ol>
+  <li><code class="highlighter-rouge">List</code>：<strong>有序、可重复，允许多个 <code class="highlighter-rouge">null</code> 元素</strong>；可用 <code class="highlighter-rouge">iterator</code> 遍历或 <code class="highlighter-rouge">get(index)</code> 随机访问特定元素；</li>
+  <li><code class="highlighter-rouge">Queue</code>：<strong>有序、可重复，允许多个 <code class="highlighter-rouge">null</code> 元素</strong>；<strong>先进先出</strong>，用于排队；</li>
+  <li><code class="highlighter-rouge">Set</code>：无序、不可重复，最多只能有一个 <code class="highlighter-rouge">null</code> 元素；只可用 <code class="highlighter-rouge">iterator</code> 遍历；</li>
+  <li><code class="highlighter-rouge">Map</code>：无序、<code class="highlighter-rouge">key</code> 不可重复 <code class="highlighter-rouge">value</code> 可重复，允许一个 <code class="highlighter-rouge">key</code> 和多个 <code class="highlighter-rouge">value</code> 为 <code class="highlighter-rouge">null</code>。</li>
+</ol>
+
+<p><img src="../assets/collection-impl.gif" alt="collection-impl" style="zoom: 50%;" /></p>
+
 <h4 id="一list-接口">一、List 接口</h4>
 
 <ol>
@@ -78,7 +78,12 @@
   <li><code class="highlighter-rouge">LinkedList</code> 类</li>
   <li><code class="highlighter-rouge">Vector</code> 类
     <ul>
-      <li><code class="highlighter-rouge">Stack</code> 类：如 <code class="highlighter-rouge">Stack&lt;Integer&gt; stack = new Stack&lt;&gt;()</code> 但一般用 <code class="highlighter-rouge">Deque&lt;Integer&gt; stack = new ArrayDeque&lt;&gt;()</code> 来实现，效率更高。</li>
+      <li><code class="highlighter-rouge">Stack</code> 类：
+        <ul>
+          <li>如 <code class="highlighter-rouge">Stack&lt;Integer&gt; stack = new Stack&lt;&gt;()</code></li>
+          <li>但一般用 <code class="highlighter-rouge">Deque&lt;Integer&gt; stack = new ArrayDeque&lt;&gt;()</code> 来实现，效率更高。</li>
+        </ul>
+      </li>
     </ul>
   </li>
 </ol>
@@ -95,8 +100,8 @@
   <li><code class="highlighter-rouge">Pri'orityQueue</code> 类，<strong>优先级队列</strong>、非阻塞式：用 Object[] 数组实现<strong>二叉堆</strong>；</li>
   <li><code class="highlighter-rouge">BlockingQueue</code> <strong>阻塞队列</strong>：非常适合用于作为数据共享的通道；<strong>并发</strong>
     <ol>
-      <li>广泛用在生产者-消费者模式：提供了可阻塞的插入和移除方法。当队列容器已满，生产者线程会被阻塞，直到队列未满；当队列容器为空时，消费者线程会被阻塞，直至队列非空时为止。</li>
-      <li>作为 <code class="highlighter-rouge">workqueue</code> 参数传入构造器 <code class="highlighter-rouge">ThreadPoolExecutor()</code> 创建线程池；</li>
+      <li>广泛用在<strong>生产者-消费者</strong>模式：提供了可阻塞的插入和移除方法。当队列容器已满，生产者线程会被阻塞，直到队列未满；当队列容器为空时，消费者线程会被阻塞，直至队列非空时为止。</li>
+      <li>作为 <code class="highlighter-rouge">workqueue</code> 参数传入构造器 <code class="highlighter-rouge">ThreadPoolExecutor()</code> 创建<strong>线程池</strong>；</li>
       <li>实现：
         <ol>
           <li><code class="highlighter-rouge">ArrayBlockingDeque</code> 类</li>
@@ -122,15 +127,20 @@
 <h4 id="四map-接口">四、Map 接口</h4>
 
 <ol>
-  <li><code class="highlighter-rouge">HashMap</code> 类：实现了Map接口，存储键值对；底层是 <strong>数组和链表</strong>（链表散列/<strong>链表数组</strong>，用于解决哈希冲突）；键不可重复、值可重复，允许一个 key 和多个 value 为null；用 <code class="highlighter-rouge">put()</code> 添加元素、<code class="highlighter-rouge">containsKey()</code>；比 HashSet 快（因为是使用唯一的键来获取对象）；非线程安全；
+  <li><code class="highlighter-rouge">HashMap</code> 类：实现了Map接口，存储键值对；底层是 <strong>数组和链表</strong>（链表散列/<strong>链表数组</strong>，用于解决<strong>哈希冲突</strong>）；键不可重复、值可重复，允许一个 key 和多个 value 为null；用 <code class="highlighter-rouge">put()</code> 添加元素、<code class="highlighter-rouge">containsKey()</code>；比 HashSet 快（因为是使用唯一的键来获取对象）；非线程安全；
     <ol>
       <li><code class="highlighter-rouge">LinkedHashMap</code> 类：JDK1.8 后在解决哈希冲突时先进行<strong>数组扩容</strong>；</li>
-      <li><strong><code class="highlighter-rouge">ConcurrentHashMap</code> 类</strong>：<strong>线程安全</strong>的 HashMap，JDK1.8底层采用<strong>数组+链表/红黑二叉树</strong>实现。用 <strong>CAS</strong> 添加新节点，用 <strong>synchronized</strong> 锁定链表或红黑树的首节点。唯一区别是其中的核心数据如 value 及链表都是 <code class="highlighter-rouge">volatile</code>（窝le滔）修饰的，保证了获取时的可见性；key 和 value 都<strong>不允许为 null</strong>。</li>
+      <li><strong><code class="highlighter-rouge">ConcurrentHashMap</code> 类</strong>：<strong>线程安全</strong>的 HashMap，JDK1.8底层采用<strong>数组+链表/红黑二叉树</strong>实现。
+        <ul>
+          <li>用 <strong>CAS</strong> 添加新节点，用 <strong>synchronized</strong> 锁定链表或红黑树的首节点。</li>
+          <li>唯一区别是其中的核心数据如 value 及链表都是 <code class="highlighter-rouge">volatile</code>（窝le滔）修饰的，保证了获取时的可见性；key 和 value 都<strong>不允许为 null</strong>。</li>
+        </ul>
+      </li>
       <li><code class="highlighter-rouge">ConcurrentSkipListMap</code> : <strong>跳表</strong>的实现。是一个 Map，用跳表的数据结构进行快速查找。</li>
     </ol>
   </li>
-  <li><code class="highlighter-rouge">HashTable</code> 类：<strong>基本淘汰不用</strong>；<strong>线程安全</strong>，内部的方法基本都经过 synchronized 修饰；数组+链表组成；key 和 value 都<strong>不允许为 null</strong>，否则抛出 NPE；</li>
-  <li><code class="highlighter-rouge">TreeMap</code> 类：实现 <code class="highlighter-rouge">SortMap</code> 接口；基于红黑树（自平衡的排序二叉树）<code class="highlighter-rouge">=&gt;</code> 对8个包装类、String <strong>根据 Key</strong> 自动升序（默认从大到小）排序，可定制排序方式；</li>
+  <li><del><code class="highlighter-rouge">HashTable</code> 类</del>：<strong>基本淘汰不用</strong>；<strong>线程安全</strong>，内部的方法基本都经过 synchronized 修饰；数组+链表组成；key 和 value 都<strong>不允许为 null</strong>，否则抛出 NPE；</li>
+  <li><code class="highlighter-rouge">TreeMap</code> 类：实现 <code class="highlighter-rouge">SortMap</code> 接口；基于<strong>红黑树</strong>（自平衡的排序二叉树）<code class="highlighter-rouge">=&gt;</code> 对8个包装类、String <strong>根据 Key</strong> 自动升序（默认从大到小）排序，可定制排序方式；</li>
 </ol>
 
 <table>
@@ -159,7 +169,7 @@
       <td><strong>分段锁技术</strong></td>
     </tr>
     <tr>
-      <td>2. Hashtable</td>
+      <td>2. <del>Hashtable</del></td>
       <td>不允许为null</td>
       <td>不允许为null</td>
       <td><strong>Dictionary</strong></td>
@@ -188,7 +198,9 @@
 <span class="n">putIfAbsent</span><span class="o">()</span> <span class="c1">// </span>
 </code></pre></div></div>
 
-<h4 id="线程不安全的集合">线程不安全的集合</h4>
+<h4 id="线程安全">线程安全</h4>
+
+<h5 id="线程不安全的集合">线程不安全的集合</h5>
 
 <p>注意，以下都是<strong>线程不安全</strong>的：</p>
 
@@ -198,7 +210,7 @@
   <li><code class="highlighter-rouge">HashMap, TreeMap</code></li>
 </ol>
 
-<h4 id="线程安全的集合">线程安全的集合</h4>
+<h5 id="线程安全的集合">线程安全的集合</h5>
 
 <blockquote>
   <p>见多线程文档中#实现线程安全的方法#使用<strong>线程安全的集合</strong>、并发容器类。</p>
@@ -206,12 +218,12 @@
 
 <p>使用<strong>线程安全的集合</strong>、并发容器类：</p>
 
-<ul>
+<ol>
   <li><code class="highlighter-rouge">CopyOnWriteArrayList</code></li>
   <li><code class="highlighter-rouge">BlockingQueue</code>、<code class="highlighter-rouge">ConcurrentLinkedQueue</code>、</li>
   <li><code class="highlighter-rouge">ConcurrentHashMap</code>、<code class="highlighter-rouge">ConcurrentSkipListMap</code> 、</li>
   <li><code class="highlighter-rouge">Collections.synchorizedList</code><strong>同步容器</strong>。</li>
-</ul>
+</ol>
 
 <h4 id="collection-接口方法">Collection 接口方法</h4>
 
@@ -226,9 +238,9 @@
 
 <h3 id="list">List</h3>
 
-<h4 id="arraylist-vs-linkedlist">ArrayList VS LinkedList</h4>
+<h4 id="arraylistlinkedlist">ArrayList、LinkedList</h4>
 
-<p>二者都不是线程安全的</p>
+<p>二者都不是线程安全的。</p>
 
 <ol>
   <li><strong>底层实现方式</strong>：ArrayList 基于<strong>动态</strong>数组；LinkedList 基于<strong>双向链表</strong>（通过 <code class="highlighter-rouge">getLast()</code> 源码可见为双向）。</li>
@@ -266,7 +278,7 @@
 <span class="c1">// 初始化一个包含元素 1, 3, 5 的 ArrayList nums</span>
 <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">nums</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;(</span><span class="n">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="mi">3</span><span class="o">,</span> <span class="mi">5</span><span class="o">));</span>
 
-<span class="err">工具类</span> <span class="n">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">()</span> <span class="err">把数组转换成集合时，不能用其修改集合的方法，</span> <span class="n">add</span><span class="o">/</span><span class="n">remove</span><span class="o">/</span><span class="n">clear</span><span class="err">，一般只用来遍历</span>
+<span class="c1">//工具类 Arrays.asList() 把数组转换成集合时，不能用其修改集合的方法， add/remove/clear，一般只用来遍历</span>
 
 <span class="kn">import</span> <span class="nn">java.util.Collections</span><span class="o">;</span>
 
@@ -360,61 +372,61 @@
   </li>
 </ul>
 
-<h5 id="deque-双端队列">Deque 双端队列</h5>
+<h4 id="deque-双端队列">Deque 双端队列</h4>
 
 <p><code class="highlighter-rouge">Deque</code> 是一个比 <code class="highlighter-rouge">Stack</code> 和 <code class="highlighter-rouge">Queue</code> 功能更强大的接口，同时实现了栈和队列的功能。<code class="highlighter-rouge">ArrayDeque</code> 和 <code class="highlighter-rouge">LinkedList</code> 实现了 <code class="highlighter-rouge">Deque</code> 接口。</p>
 
 <p><img src="../assets/deque_method.png" alt="img" style="zoom:100%;" /></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import java.util.Queue;
-import java.util.Deque;
-import java.util.LinkedList;
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">java.util.Queue</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Deque</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.LinkedList</span><span class="o">;</span>
 
-public interface Deque&lt;E&gt; extends Queue&lt;E&gt; {
-    // *** Deque methods ***
-    // 在头部插入元素，队列满返回false；用于Deque实现类为有限容量时
-    boolean offerFirst(E e);
-    boolean offerLast(E e);
-    E pollFirst();
-    E pollLast();
-    E peekFirst();
-    E peekLast();
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Deque</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="kd">extends</span> <span class="n">Queue</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="c1">// *** Deque methods ***</span>
+    <span class="c1">// 在头部插入元素，队列满返回false；用于Deque实现类为有限容量时</span>
+    <span class="kt">boolean</span> <span class="nf">offerFirst</span><span class="o">(</span><span class="n">E</span> <span class="n">e</span><span class="o">);</span>
+    <span class="kt">boolean</span> <span class="nf">offerLast</span><span class="o">(</span><span class="n">E</span> <span class="n">e</span><span class="o">);</span>
+    <span class="n">E</span> <span class="nf">pollFirst</span><span class="o">();</span>
+    <span class="n">E</span> <span class="nf">pollLast</span><span class="o">();</span>
+    <span class="n">E</span> <span class="nf">peekFirst</span><span class="o">();</span>
+    <span class="n">E</span> <span class="nf">peekLast</span><span class="o">();</span>
 
-    // void addFirst(E e); // 在头部插入元素，队列满返回异常
-    // void addLast(E e);
-    // E removeFirst();
-    // E removeLast();
-    // E getFirst();
-    // E getLast();
+    <span class="c1">// void addFirst(E e); // 在头部插入元素，队列满返回异常</span>
+    <span class="c1">// void addLast(E e);</span>
+    <span class="c1">// E removeFirst();</span>
+    <span class="c1">// E removeLast();</span>
+    <span class="c1">// E getFirst();</span>
+    <span class="c1">// E getLast();</span>
     
-    // 返回true表示元素存在于队列，且删除成功；返回false表示元素不存在于队列中，且队列没有改变。
-    boolean removeFirstOccurrence(Object o);
-    boolean removeLastOccurrence(Object o);
+    <span class="c1">// 返回true表示元素存在于队列，且删除成功；返回false表示元素不存在于队列中，且队列没有改变。</span>
+    <span class="kt">boolean</span> <span class="nf">removeFirstOccurrence</span><span class="o">(</span><span class="n">Object</span> <span class="n">o</span><span class="o">);</span>
+    <span class="kt">boolean</span> <span class="nf">removeLastOccurrence</span><span class="o">(</span><span class="n">Object</span> <span class="n">o</span><span class="o">);</span>
     
-    // *** Queue methods ***
-    boolean offer(E e);
-    E poll();
-    E peek();
-    // boolean add(E e);
-    // E remove();  
-    // E element();
+    <span class="c1">// *** Queue methods ***</span>
+    <span class="kt">boolean</span> <span class="nf">offer</span><span class="o">(</span><span class="n">E</span> <span class="n">e</span><span class="o">);</span>
+    <span class="n">E</span> <span class="nf">poll</span><span class="o">();</span>
+    <span class="n">E</span> <span class="nf">peek</span><span class="o">();</span>
+    <span class="c1">// boolean add(E e);</span>
+    <span class="c1">// E remove();  </span>
+    <span class="c1">// E element();</span>
     
-    // *** Stack methods ***
-    void push(E e);
-    E pop();
+    <span class="c1">// *** Stack methods ***</span>
+    <span class="kt">void</span> <span class="nf">push</span><span class="o">(</span><span class="n">E</span> <span class="n">e</span><span class="o">);</span>
+    <span class="n">E</span> <span class="nf">pop</span><span class="o">();</span>
 
-    // *** Collection methods ***
-    // 在Deque接口下没有，但Deque继承了Collections接口，因此方法有定义，使用不会报错
-    boolean remove(Object o);
-    boolean contains(Object o);
-    int size();
-    bool isEmpty();
-    Iterator&lt;E&gt; iterator();
-    Iterator&lt;E&gt; descendingIterator();
-}
+    <span class="c1">// *** Collection methods ***</span>
+    <span class="c1">// 在Deque接口下没有，但Deque继承了Collections接口，因此方法有定义，使用不会报错</span>
+    <span class="kt">boolean</span> <span class="nf">remove</span><span class="o">(</span><span class="n">Object</span> <span class="n">o</span><span class="o">);</span>
+    <span class="kt">boolean</span> <span class="nf">contains</span><span class="o">(</span><span class="n">Object</span> <span class="n">o</span><span class="o">);</span>
+    <span class="kt">int</span> <span class="nf">size</span><span class="o">();</span>
+    <span class="n">bool</span> <span class="nf">isEmpty</span><span class="o">();</span>
+    <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="nf">iterator</span><span class="o">();</span>
+    <span class="n">Iterator</span><span class="o">&lt;</span><span class="n">E</span><span class="o">&gt;</span> <span class="nf">descendingIterator</span><span class="o">();</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
-<h3 id="hashcode-vs-equals">hashCode() VS equals()</h3>
+<h3 id="hashcodeequals">hashCode()、equals()</h3>
 
 <p><code class="highlighter-rouge">hashCode()</code>：用于确定本对象在哈希表中的索引位置（如内存地址 =&gt; 整数），大大减少 <code class="highlighter-rouge">equals()</code> 的调用次数，从而提高效率。如 <code class="highlighter-rouge">HashSet、HashMap 及 HashTable</code> 等散列集合。</p>
 
@@ -423,7 +435,7 @@ public interface Deque&lt;E&gt; extends Queue&lt;E&gt; {
   <li>是本地方法，即用 c/c++ 实现。</li>
 </ul>
 
-<p><code class="highlighter-rouge">hashCode()</code> VS <code class="highlighter-rouge">equals()</code>：</p>
+<h5 id="hashcode-vs-equals"><code class="highlighter-rouge">hashCode()</code> VS <code class="highlighter-rouge">equals()</code></h5>
 
 <p><strong>两个对象相等</strong>（引用指向同一个对象，对象的内存地址相等）：</p>
 
@@ -436,6 +448,8 @@ public interface Deque&lt;E&gt; extends Queue&lt;E&gt; {
     </ol>
   </li>
 </ul>
+
+<h5 id="重写-equals">重写 equals()</h5>
 
 <p>重写 equals() 时必须重写 hashCode()：</p>
 
@@ -458,7 +472,7 @@ public interface Deque&lt;E&gt; extends Queue&lt;E&gt; {
   <li>直接为集合设置比较器 Comparable 对象，重写比较方法，二者都有时用集合。</li>
 </ol>
 
-<h5 id="set-如何去重">Set 如何去重</h5>
+<h4 id="set-如何去重">Set 如何去重</h4>
 
 <blockquote>
   <p>Set 通过重写 hashCode 和 equals 实现去重。</p>
@@ -480,64 +494,64 @@ public interface Deque&lt;E&gt; extends Queue&lt;E&gt; {
   </li>
 </ul>
 
-<h5 id="hashmap-vs-hashset">HashMap VS HashSet</h5>
+<h4 id="hashmap-vs-hashset">HashMap VS HashSet</h4>
 
 <p>HashMap比HashSet快，因为是使用唯一的键来获取对象</p>
 
-<h5 id="常用方法">常用方法</h5>
+<h4 id="常用方法">常用方法</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import java.util.hashset; // 引入 HashSet 类
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">java.util.hashset</span><span class="o">;</span> <span class="c1">// 引入 HashSet 类</span>
 
-HashSet sites = new HashSet&lt;&gt;(); // 经典代码
-sites.add("Google");
-sites.remove("Taobao");
-sites.contains("Taobao")
-sites.size();
-sites.clear();  
-for (String i : sites) {
-    System.out.println(i);
-}
+<span class="n">HashSet</span> <span class="n">sites</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashSet</span><span class="o">&lt;&gt;();</span> <span class="c1">// 经典代码</span>
+<span class="n">sites</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">"Google"</span><span class="o">);</span>
+<span class="n">sites</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="s">"Taobao"</span><span class="o">);</span>
+<span class="n">sites</span><span class="o">.</span><span class="na">contains</span><span class="o">(</span><span class="s">"Taobao"</span><span class="o">)</span>
+<span class="n">sites</span><span class="o">.</span><span class="na">size</span><span class="o">();</span>
+<span class="n">sites</span><span class="o">.</span><span class="na">clear</span><span class="o">();</span>  
+<span class="k">for</span> <span class="o">(</span><span class="n">String</span> <span class="n">i</span> <span class="o">:</span> <span class="n">sites</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+<span class="o">}</span>
 
-// 1. 重写 compareTo()
-class Employee implements Comparatable&lt;Employee&gt;
-{
-  @Override
-  publicint compareTo(Employee o) {
-    if (this.age &gt; o.age) {
-      return 1;
-    } else if(this.age &lt; o.age) {
-      return -1;
-    } else {
-      return 0;
-    }
-    //return this.age - o.age; // 差序算法
-  }
-}
-TreeSet&lt;String&gt; sets = new TreeSet&lt;&gt;();
+<span class="c1">// 1. 重写 compareTo()</span>
+<span class="kd">class</span> <span class="nc">Employee</span> <span class="kd">implements</span> <span class="n">Comparatable</span><span class="o">&lt;</span><span class="n">Employee</span><span class="o">&gt;</span>
+<span class="o">{</span>
+  <span class="nd">@Override</span>
+  <span class="n">publicint</span> <span class="nf">compareTo</span><span class="o">(</span><span class="n">Employee</span> <span class="n">o</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">age</span> <span class="o">&gt;</span> <span class="n">o</span><span class="o">.</span><span class="na">age</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">return</span> <span class="mi">1</span><span class="o">;</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="k">if</span><span class="o">(</span><span class="k">this</span><span class="o">.</span><span class="na">age</span> <span class="o">&lt;</span> <span class="n">o</span><span class="o">.</span><span class="na">age</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="o">;</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+      <span class="k">return</span> <span class="mi">0</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="c1">//return this.age - o.age; // 差序算法</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+<span class="n">TreeSet</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">sets</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TreeSet</span><span class="o">&lt;&gt;();</span>
 
-// 2. 重写 compare()
-Set&lt;Employee&gt; e1 = new TreeSet&lt;&gt;(new Comparator&lt;Employee&gt;() {
-  @Override
-  public int compare(Employee o1, Employee o2) {
-    return o1.getAge() - o2.getAge();
-  }
-});
+<span class="c1">// 2. 重写 compare()</span>
+<span class="n">Set</span><span class="o">&lt;</span><span class="n">Employee</span><span class="o">&gt;</span> <span class="n">e1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TreeSet</span><span class="o">&lt;&gt;(</span><span class="k">new</span> <span class="n">Comparator</span><span class="o">&lt;</span><span class="n">Employee</span><span class="o">&gt;()</span> <span class="o">{</span>
+  <span class="nd">@Override</span>
+  <span class="kd">public</span> <span class="kt">int</span> <span class="nf">compare</span><span class="o">(</span><span class="n">Employee</span> <span class="n">o1</span><span class="o">,</span> <span class="n">Employee</span> <span class="n">o2</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">o1</span><span class="o">.</span><span class="na">getAge</span><span class="o">()</span> <span class="o">-</span> <span class="n">o2</span><span class="o">.</span><span class="na">getAge</span><span class="o">();</span>
+  <span class="o">}</span>
+<span class="o">});</span>
 </code></pre></div></div>
 
 <h3 id="map">Map</h3>
 
-<h5 id="hashmap-vs-hashtable">HashMap VS HashTable</h5>
+<h4 id="hashmap-vs-hashtable">HashMap VS HashTable</h4>
 
 <ol>
   <li><code class="highlighter-rouge">null</code>：HashMap 允许一个key和多个value为null；HashTable 键值均不允许为 null，否则会抛出 <code class="highlighter-rouge">NullPointerException</code>；</li>
   <li>线程安全：HashMap 是非线程安全的；HashTable 是线程安全的。</li>
 </ol>
 
-<h5 id="hashmap-vs-hashtree">HashMap VS HashTree</h5>
+<h4 id="hashmap-vs-hashtree"><del>HashMap VS HashTree</del></h4>
 
-<h5 id="hashmap-源码分析">HashMap 源码分析</h5>
+<h4 id="hashmap-源码分析"><del>HashMap 源码分析</del></h4>
 
-<h5 id="map-常用api">Map 常用API</h5>
+<h4 id="map-常用api">Map 常用API</h4>
 
 <pre><code class="language-Java">import java.util.HashMap;
 import java.util.Map;

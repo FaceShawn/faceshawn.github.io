@@ -77,9 +77,9 @@ elasticsearch-plugin install https://get.infini.cloud/elasticsearch/analysis-ik/
   </li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#在行首添加
-export JAVA_HOME="D:\Develop\Java\jdk\jdk1.8.0_311"
-export PATH="$PATH:$JAVA_HOME\bin"
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#在行首添加</span>
+<span class="nb">export </span><span class="nv">JAVA_HOME</span><span class="o">=</span><span class="s2">"D:</span><span class="se">\D</span><span class="s2">evelop</span><span class="se">\J</span><span class="s2">ava</span><span class="se">\j</span><span class="s2">dk</span><span class="se">\j</span><span class="s2">dk1.8.0_311"</span>
+<span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">"</span><span class="nv">$PATH</span><span class="s2">:</span><span class="nv">$JAVA_HOME</span><span class="se">\b</span><span class="s2">in"</span>
 </code></pre></div></div>
 
 <p>logstash 启动：</p>
@@ -118,19 +118,17 @@ export PATH="$PATH:$JAVA_HOME\bin"
 
 <ul>
   <li>是 <code class="highlighter-rouge">Simple Logging Facade for Java</code> 的缩写，意为Java 的简单日志门面</li>
-  <li>
-    <p>生成名为 <code class="highlighter-rouge">log</code> 的<strong>静态常量日志对象</strong>。</p>
+  <li>生成名为 <code class="highlighter-rouge">log</code> 的<strong>静态常量日志对象</strong>。</li>
+</ul>
 
-    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Slf4j</span> <span class="c1">//加在类上</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Slf4j</span> <span class="c1">//加在类上</span>
 <span class="kd">public</span> <span class="kd">class</span> <span class="nc">GlobalExceptionHandler</span> <span class="o">{</span>
   <span class="c1">// 等价于</span>
   <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">org</span><span class="o">.</span><span class="na">slf4j</span><span class="o">.</span><span class="na">Logger</span> <span class="n">log</span> <span class="o">=</span> <span class="n">org</span><span class="o">.</span><span class="na">slf4j</span><span class="o">.</span><span class="na">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="n">GlobalExceptionHandler</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
   <span class="c1">// 可以直接在类中调用</span>
   <span class="n">log</span><span class="o">.</span><span class="na">warn</span><span class="o">(</span><span class="s">"[serviceExceptionHandler]\n\t{}"</span><span class="o">,</span> <span class="n">stackTrace</span><span class="o">);</span>
 <span class="o">}</span>
-</code></pre></div>    </div>
-  </li>
-</ul>
+</code></pre></div></div>
 
 <p><img src="../assets/lombok_slf4j.png" alt="@Slf4j 示例" /></p>
 
@@ -229,19 +227,19 @@ export PATH="$PATH:$JAVA_HOME\bin"
   <p><a href="https://juejin.cn/post/6844903641535479821">看完这个不会配置 logback ，请你吃瓜！</a></p>
 </blockquote>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>private static final Logger LOGGER = LoggerFactory.getLogger(HelloController.class);
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Logger</span> <span class="n">LOGGER</span> <span class="o">=</span> <span class="n">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="n">HelloController</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
 
-@Autowired
-private TestLogService testLogService;
+<span class="nd">@Autowired</span>
+<span class="kd">private</span> <span class="n">TestLogService</span> <span class="n">testLogService</span><span class="o">;</span>
 
-//一、通过控制台打印日志
-@GetMapping("/hello")
-public String hello(){
-    LOGGER.info("this is info");
-    LOGGER.error("this is error");
-    testLogService.printLogToSpecialPackage();
-    return "hello spring boot";
-}
+<span class="c1">//一、通过控制台打印日志</span>
+<span class="nd">@GetMapping</span><span class="o">(</span><span class="s">"/hello"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="n">String</span> <span class="nf">hello</span><span class="o">(){</span>
+    <span class="n">LOGGER</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"this is info"</span><span class="o">);</span>
+    <span class="n">LOGGER</span><span class="o">.</span><span class="na">error</span><span class="o">(</span><span class="s">"this is error"</span><span class="o">);</span>
+    <span class="n">testLogService</span><span class="o">.</span><span class="na">printLogToSpecialPackage</span><span class="o">();</span>
+    <span class="k">return</span> <span class="s">"hello spring boot"</span><span class="o">;</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h3 id="用-aop-输出日志">用 AOP 输出日志</h3>

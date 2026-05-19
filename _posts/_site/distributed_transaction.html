@@ -1,0 +1,2046 @@
+<blockquote>
+  <p>摘要：用于解决分库分表带来的问题。本质上，目的就是为了保证（分布式系统中）不同数据库的数据一致性。CAP 定理和 BASE 理论，Paxos 算法和 Raft 算法。</p>
+</blockquote>
+
+<!-- more -->
+
+<hr />
+
+<h2 id="目录">目录</h2>
+
+<p>[TOC]</p>
+
+<h2 id="本地事务">本地事务</h2>
+
+<h3 id="mysql-本地事务">MySQL 本地事务</h3>
+
+<blockquote>
+  <p>见 MySQL 文档中。</p>
+</blockquote>
+
+<h3 id="spring-事务">Spring 事务</h3>
+
+<blockquote>
+  <p>见 Spring 文档中。</p>
+</blockquote>
+
+<h2 id="分布式事务">分布式事务</h2>
+
+<h3 id="分布式环境的事务复杂性">分布式环境的事务复杂性</h3>
+
+<p>当本地事务要扩展到分布式时，它的复杂性进一步增加了。</p>
+
+<h4 id="存储端的多样性">存储端的多样性</h4>
+
+<p>本地事务的情况下，所有数据都会落到同一个DB中，但是在分布式的情况下，就会出现数据可能要落到多个DB，或者还会落到Redis，落到MQ等中。</p>
+
+<p><img src="../assets/27ff420eb5034c5eb4d5fc576506930f.png" alt="在这里插入图片描述" style="zoom: 50%;" /></p>
+
+<h4 id="事务链路的延展性">事务链路的延展性</h4>
+
+<p>本地事务的情况下，通常所有事务相关的业务操作，会被封装到一个Service方法中。</p>
+
+<ul>
+  <li>而在分布式的情况下，请求链路被延展、拉长，一个操作会被<strong>拆分成</strong>多个服务，呈现线状或网状，依靠网络通信构建成一个整体。在这种情况下，事务无疑变得更复杂。</li>
+</ul>
+
+<p><img src="../assets/10841c598d2d42b2814a5cd173e4584d.png" alt="在这里插入图片描述" style="zoom: 67%;" /></p>
+
+<p>基于上述两个复杂性，期望有一个统一的分布式事务方案，能够像本地事务一样，以几乎无侵入的方式，满足各种<strong>存储介质</strong>、各种复杂链路，是不现实的。</p>
+
+<p>至少，在当前，还没有一个十分成熟的解决方案。</p>
+
+<ul>
+  <li>所以，一般情况下，在分布式下，事务会<strong>被拆分</strong>解决，并根据不同的情况，采用不同的解决方案。</li>
+</ul>
+
+<h3 id="分布式事务-1">分布式事务</h3>
+
+<p>分布式事务：指<strong>事务的参与者</strong>、支持事务的服务器、资源服务器、事务管理器<strong>分别位于</strong>不同的分布式系统的不同节点上。</p>
+
+<ul>
+  <li>简单的说，在分布式系统上，就是一次大的操作由不同的<strong>小操作</strong>组成，分布在<strong>不同的服务器</strong>上，且属于不同的应用。分布式事务需保证这些小操作要么全部成功，要么全部失败。</li>
+  <li>本质上，目的就是为了保证（分布式系统中）不同数据库的<strong>数据一致性</strong>。</li>
+  <li>分布式事务是相对本地事务而言的：
+    <ol>
+      <li>对于本地事务，利用数据库本身的事务机制，就可以保证事务的<strong>ACID特性</strong>。</li>
+      <li>分布式事务其实就是将对同一库事务的概念，扩大到了对<strong>多个库</strong>的事务。
+        <ul>
+          <li>对于分布式事务而言，即使不能都很好的满足 <strong>ACID特性</strong>，也要考虑支持到什么程度。</li>
+        </ul>
+      </li>
+    </ol>
+  </li>
+  <li>用于解决分库分表带来的问题。</li>
+</ul>
+
+<p>举个例子：在电商网站中，用户对商品进行下单，需要在<strong>订单表</strong>中创建一条订单数据，同时需要在<strong>库存表</strong>中修改当前商品的剩余库存数量。</p>
+
+<ul>
+  <li>一定要保证这两步操作（添加、修改）<strong>同时操作成功</strong>或失败，否则业务就会出现问题。</li>
+</ul>
+
+<h3 id="分布式数据一致性">分布式（数据）一致性</h3>
+
+<p>（分布式）数据不一致问题：生产者一定发出去了消息，或者消费者一定消费了消息。如</p>
+
+<ul>
+  <li>
+    <p>订单系统创建完订单后，再发送消息给下游系统。</p>
+  </li>
+  <li>
+    <p>如果订单创建成功，但是消息没有成功发送出去，下游系统就无法感知这个事情，导致<strong>数据不一致</strong>。</p>
+  </li>
+</ul>
+
+<p>分布式一致性问题：分布式场景下，一个流程同时包含多个服务时，</p>
+
+<ul>
+  <li>比如电商下单场景，需要<strong>订单服务</strong>进行订单生成、<strong>库存服务</strong>扣减库存、<strong>支付服务</strong>进行支付、<strong>物流服务</strong>更新物流信息、等。</li>
+  <li>如果某一个服务执行失败，或者网络不通引起的请求丢失，那么整个系统可能出现<strong>数据不一致</strong>的原因。</li>
+</ul>
+
+<p>分布式一致性的<strong>根本原因</strong>在于：<strong>数据的分布式操作</strong>引起的，本地事务无法保障<strong>数据的原子性</strong>。</p>
+
+<p>分布式一致性问题的解决思路有两种：</p>
+
+<ol>
+  <li>一种是分布式事务：直接解决问题。
+    <ul>
+      <li>可以使用<strong>事务消息</strong> + <strong>事务反查机制</strong>。</li>
+    </ul>
+  </li>
+  <li>一种是尽量通过<strong>业务流程避免</strong>分布式事务。即通过解决出问题的地方（解决提问题的人）。
+    <ul>
+      <li>其实在真实业务场景中，如果业务规避不是很麻烦的前提下，就是<strong>最优雅</strong>的解决方案。</li>
+    </ul>
+  </li>
+</ol>
+
+<h3 id="典型场景">典型场景</h3>
+
+<p>典型的分布式事务场景有：</p>
+
+<h4 id="1-跨库事务">1. 跨库事务</h4>
+
+<p>跨库事务指的是，一个应用某个服务（功能）需要同时操作<strong>多个数据库</strong>，不同的库中存储不同的<strong>业务数据</strong>。</p>
+
+<p><img src="../assets/41d745f75e994beba6a38731e5dcb8d9.png" alt="在这里插入图片描述" style="zoom:50%;" /></p>
+
+<h4 id="2-分库分表">2. 分库分表</h4>
+
+<p>通常一个库数据量比较大或者预期未来的数据量比较大，都会进行<strong>水平拆分</strong>，也就是分库分表。</p>
+
+<p>如下图，将数据库B拆分成了2个库：</p>
+
+<p><img src="../assets/2e622b8409eb46e9975f180b813913b1.png" alt="在这里插入图片描述" style="zoom:50%;" /></p>
+
+<p>对于分库分表的情况，一般开发人员都会使用一些<strong>数据库中间件</strong>来降低sql操作的复杂性。</p>
+
+<p>如，对于sql：<code class="highlighter-rouge">insert into user(id,name) values (1,"tianshouzhi"),(2,"wangxiaoxiao")</code>。</p>
+
+<ul>
+  <li>
+    <p>这条sql是操作单库的语法，单库情况下，可以保证<strong>事务的一致性</strong>。</p>
+  </li>
+  <li>
+    <p>但是由于现在进行了分库分表，希望将1号记录插入分库1，2号记录插入分库2。所以数据库中间件要将其<strong>改写</strong>为2条sql，分别插入两个不同的分库。</p>
+    <ul>
+      <li>此时要保证两个库要不都成功，要不都失败，因此基本上所有的<strong>数据库中间件</strong>都面临着<strong>分布式事务</strong>的问题。</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="3-微服务化跨服务">3. 微服务化、跨服务</h4>
+
+<p>微服务架构下，</p>
+
+<ul>
+  <li>例如某个应用同时操作了9个库，这样应用的业务逻辑必然非常复杂，对于开发人员是极大的挑战，应该<strong>拆分</strong>成不同的<strong>独立服务</strong>，以简化业务逻辑。</li>
+  <li>拆分后，独立服务之间通过<strong>RPC框架</strong>来进行<strong>远程调用</strong>，实现彼此的通信。</li>
+</ul>
+
+<p>下图演示了一个3个服务之间彼此调用的架构：</p>
+
+<p><img src="../assets/7e1a094618224db880e8999ca8ce6559.png" alt="在这里插入图片描述" style="zoom: 67%;" /></p>
+
+<ul>
+  <li>Service A完成某个功能需要<strong>直接操作数据库</strong>，同时需要调用Service B和Service C，而Service B又同时操作了2个数据库，Service C也操作了一个库。</li>
+  <li>需要保证这些<strong>跨服务</strong>的、<strong>对多个数据库的操作</strong>要不都成功，要不都失败。实际上这可能是<strong>最典型</strong>的分布式事务场景。</li>
+</ul>
+
+<h2 id="cap-定理和-base-理论">CAP 定理和 BASE 理论</h2>
+
+<blockquote>
+  <p>分布式系统的最大难点，就是各个节点的状态如何同步。CAP 定理是这方面的基本定理，也是理解分布式系统的起点。</p>
+
+  <p>CAP 是分布式系统设计基本定理，BASE 是 CAP 理论中 AP 方案的延伸。</p>
+
+  <p>另外，ACID 是数据库事务完整性的理论。</p>
+</blockquote>
+
+<h4 id="cap-定理">CAP 定理</h4>
+
+<p>CAP 定理：对于一个分布式系统来说，当设计读写操作时，只能同时满足CAP中的两个。</p>
+
+<ol>
+  <li><code class="highlighter-rouge">Consistency</code>（<strong>一致性</strong>）：数据在多个副本之间能够保持一致。所有节点访问同一份最新的<strong>数据副本</strong>。</li>
+  <li><code class="highlighter-rouge">Availability</code>（<strong>可用性</strong>）：每次请求（非故障的节点）在合理的时间内返回<strong>非错</strong>（不是错误或超时）<strong>的响应</strong>。</li>
+  <li><code class="highlighter-rouge">Partition Tolerance</code>（<strong>分区容错性</strong>）：分布式系统出现<strong>网络分区</strong>故障时，仍能对外提供（满足一致性和可用性的）服务，除非整个网络环境都发生了故障。</li>
+</ol>
+
+<p><img src="../assets/cap.webp" alt="图片" style="zoom: 40%;" /></p>
+
+<h4 id="ca-架构">CA 架构</h4>
+
+<p>网络分区：分布式系统中，因故障（某些网络节点间不再连通），整个网络分成几块孤立区域。</p>
+
+<ul>
+  <li>（绝大部分时候），没有网络分区（网络分区是正常的），<strong>CA 模型</strong>：即不需保证 P 时，C 和 A 能同时保证。如，集群数据库、xFS文件系统。</li>
+  <li>对于<strong>分布式系统</strong>，分区是必然存在的。当发生<strong>网络分区</strong>时，如果要继续对外提供服务，一定要满足<strong>分区容错性 P</strong>，那么强一致性（<code class="highlighter-rouge">Consistency</code>）和可用性（<code class="highlighter-rouge">Availability</code>）只能 2 选 1、只能满足其中一个。如，某个节点在进行写操作：
+    <ol>
+      <li>为了保证一致性 C， 必须要禁止其他节点的<strong>读写操作</strong>，这和可用性 A 冲突。</li>
+      <li>为了保证可用性 A，其他节点的<strong>读写操作</strong>正常的话，和一致性 C 冲突。</li>
+    </ol>
+  </li>
+</ul>
+
+<h4 id="cp-架构和-ap-架构">CP 架构和 AP 架构</h4>
+
+<ol>
+  <li>一致性 C（<strong>CP 架构</strong>，放弃 A 可用性，如 <code class="highlighter-rouge">ZooKeeper</code>、<code class="highlighter-rouge">HBase</code>），用于需确保强一致性的场景，如银行。
+    <ul>
+      <li>常见应用：分布式数据库、分布式锁。</li>
+      <li>任何时刻对 <code class="highlighter-rouge">ZooKeeper</code> 注册中心的<strong>读请求</strong>都能得到一致性的结果，但不保证每次请求的可用性，如在 Leader 选举过程中或半数以上的机器不可用时，服务就是不可用的。</li>
+    </ul>
+  </li>
+  <li>可用性 A（<strong>AP 架构</strong>，放弃 C 一致性，如<code class="highlighter-rouge">Cassandra</code>、<code class="highlighter-rouge">Eureka</code>尤瑞卡）。
+    <ul>
+      <li>常见应用：Web缓存、DNS。</li>
+      <li><code class="highlighter-rouge">Eureka</code> 注册中心中不存在 Leader 节点，<strong>每个节点都是一样的</strong>、平等的。保证即使大部分节点挂掉也不会影响正常提供服务，只要有一个节点可用就行，不过这个节点上的数据可能并<strong>不是最新的</strong>（不保证一致性 C）。</li>
+      <li>扩展出 BASE 理论。</li>
+    </ul>
+  </li>
+</ol>
+
+<p>注意：</p>
+
+<ul>
+  <li>注册中心 <code class="highlighter-rouge">Nacos </code>同时支持 CP 和 AP 架构 。</li>
+</ul>
+
+<h4 id="base-理论">BASE 理论</h4>
+
+<p><strong>BASE 核心思想</strong>：即使无法做到强一致性，但每个应用都可根据自身业务特点，采用适当的方式来使系统达到<strong>最终一致性 E</strong>。</p>
+
+<ul>
+  <li>即，牺牲数据的一致性（<code class="highlighter-rouge">Consistency</code>）来满足系统的<strong>可用性</strong>（<code class="highlighter-rouge">Availability</code>），系统中一部分数据不可用或不一致时，仍需保持系统整体“主要可用”。</li>
+  <li>本质上是对 <strong>AP 方案</strong>的延伸和补充：AP 方案只是在系统发生分区时放弃一致性，而不是永远放弃一致性。在<strong>分区故障</strong>恢复后，系统应达到最终一致性。</li>
+</ul>
+
+<p>BASE：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">Basically Available</code>（<strong>BA 基本可用</strong>） ：指分布式系统在出现不可预知故障时，<strong>允许损失部分可用性</strong>。
+    <ul>
+      <li><strong>响应时间</strong>上的损失：正常情况下，处理用户请求需 0.5s 返回结果，但由于系统出现故障，变为 3 s。</li>
+      <li><strong>系统功能</strong>上的降级：正常情况下，用户可用系统的全部功能，但由于系统访问量剧增，系统的部分<strong>非核心功能</strong>无法使用。</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">Soft-state</code>（<strong>S 软状态</strong>） ：允许系统中的数据存在<strong>中间状态</strong>（CAP 理论中的数据不一致），且不会影响系统的整体可用性，即允许系统在不同节点的数据副本间进行数据同步的过程<strong>存在延时</strong>。</li>
+  <li><code class="highlighter-rouge">Eventually Consistent</code>（<strong>E 最终一致性</strong>）：强调的是系统中所有的数据副本、在<strong>经过一段时间的同步后</strong>，最终能达到一致的状态。本质是保证最终数据能达到一致，而不需实时保证。</li>
+</ol>
+
+<p><strong>最终一致性</strong>的具体方式是：</p>
+
+<ol>
+  <li><strong>读时修复</strong> : 在读取数据时，检测数据的不一致，进行修复。如 Cassandra 的 Read Repair 实现，具体来说，在向 Cassandra 系统查询数据时，如果检测到不同节点的副本数据不一致，系统就自动修复数据。</li>
+  <li><strong>写时修复</strong> : 在写入数据，检测数据的不一致时，进行修复。如 Cassandra 的 Hinted Handoff 实现。具体来说，Cassandra 集群的节点间远程写数据的时候，<strong>如果写失败</strong>就将数据缓存下来，然后定时重传，修复数据的不一致性。推荐，对性能消耗较低。</li>
+  <li><strong>异步修复</strong> : 最常用的方式，通过定时对账检测副本数据的一致性，并修复。</li>
+</ol>
+
+<h3 id="base-与-cap">BASE 与 CAP</h3>
+
+<p>关系：</p>
+
+<p>BASE理论是对CAP中 <strong>一致性</strong>（<code class="highlighter-rouge">Consistency</code>）和<strong>可用性</strong>（<code class="highlighter-rouge">Availability</code>）权衡的结果，其来源于对大规模互联网系统分布式实践的总结， 是基于CAP定理逐步演化而来的。</p>
+
+<ul>
+  <li>BASE理论的核心思想是：即使无法做到<strong>强一致性</strong>，但每个应用都可以根据自身业务特点，采用适当的方式来使系统达到<strong>最终一致性</strong>。</li>
+</ul>
+
+<p>BASE理论其实就是对CAP理论的延伸和补充，主要是<strong>对AP的补充</strong>。牺牲数据的强一致性，来保证数据的可用性，虽然存在中间装填，但数据最终一致。</p>
+
+<h3 id="acid-和-base">ACID 和 BASE</h3>
+
+<p>区别：</p>
+
+<ul>
+  <li>ACID 是传统数据库常用的设计理念，追求<strong>强一致性</strong>模型。</li>
+  <li>BASE 支持的是大型分布式系统，提出通过牺牲强一致性获得<strong>高可用性</strong>。</li>
+</ul>
+
+<p>联系：ACID 和 BASE 代表了两种截然相反的设计哲学，在分布式系统设计的场景中，系统组件对一致性要求是不同的，因此 ACID 和 BASE 又会结合使用。</p>
+
+<h2 id="paxos-算法和-raft-算法">Paxos 算法和 Raft 算法</h2>
+
+<blockquote>
+  <p>分布式算法。</p>
+</blockquote>
+
+<h4 id="basic-paxos-算法">Basic Paxos 算法</h4>
+
+<p>Paxos 算法：<strong>基于消息传递</strong> 且具有 <strong>高效容错特性</strong> 的一致性算法，目前公认的解决 <strong>分布式一致性问题</strong> 最有效的经典算法之一。</p>
+
+<ul>
+  <li>
+    <p>但非常难理解和实现。不是一致性算法、而是<strong>共识算法</strong>。</p>
+  </li>
+  <li>
+    <p>描述的是多节点间如何就某个值（提案 Value）达成共识。</p>
+  </li>
+</ul>
+
+<p>Paxos 算法存在 3 个重要的角色：</p>
+
+<ol>
+  <li><strong>提议者（Proposer）</strong>：也叫协调者（coordinator），提议者提出提案，用于投票表决。
+    <ul>
+      <li>负责接受<strong>客户端</strong>发起的提议，然后尝试让接受者接受（<strong>达成共识</strong>），同时保证即使多个提议间产生了冲突，算法也能进行下去。</li>
+    </ul>
+  </li>
+  <li><strong>接受者（Acceptor）</strong>：也叫投票员（voter），负责对提议者的提议投票，并接受达成共识的提案。
+    <ul>
+      <li>同时需记住自己的投票历史；向学习者<strong>通知结果</strong>。</li>
+    </ul>
+  </li>
+  <li><strong>学习者（Learner）</strong>：被告知投票的结果，接受达成共识的提案。
+    <ul>
+      <li>如果有超过半数接受者就某个提议达成了共识，那么学习者就需接受这个提议，<strong>处理请求</strong>，作出运算、并将结果返回给客户端。</li>
+    </ul>
+  </li>
+</ol>
+
+<p><img src="../assets/Basic_Paxos" alt="img" style="zoom: 67%;" /></p>
+
+<p>缺点：假如有多个提议者互不相让，那么就可能导致整个提议的过程进入了<strong>死循环</strong>。</p>
+
+<p>因此，引入了 Multi Paxos 的算法思想。</p>
+
+<h4 id="multi-paxos-思想">Multi-Paxos 思想</h4>
+
+<p>Multi-Paxos <strong>思想</strong>： 在多个提议者的情况下，选出一个Leader（领导者），由领导者作为唯一的提议者，这样就可以解决提议者冲突的问题。核心是通过多个 Basic Paxos 实例，就一系列值达成共识。</p>
+
+<ol>
+  <li>
+    <p>针对没有恶意节点的情况，<strong>Raft 算法</strong>、ZAB 协议、 Fast Paxos 算法都是基于 Paxos 算法改进而来；</p>
+
+    <ul>
+      <li><strong>Raft 算法</strong>是更易理解和实现的分布式一致性算法，是Multi-Paxos的变种。</li>
+    </ul>
+  </li>
+  <li>
+    <p>针对存在恶意节点的情况，一般用工作量证明（POW，<code class="highlighter-rouge">Proof-of-Work</code>）、权益证明（PoS，<code class="highlighter-rouge">Proof-of-Stake </code>）等<strong>共识算法</strong>。</p>
+
+    <ul>
+      <li>
+        <p>共识是可容错系统中的一个基本问题：即使面对故障，服务器也可在共享状态上达成一致。</p>
+      </li>
+      <li><strong>共识算法</strong>：允许一组节点像整体一样一起工作，即使其中的一些节点出现故障也能继续工作下去。其正确性主要是源于<strong>复制状态机的性质</strong>：一组<code class="highlighter-rouge">Server</code>的状态机计算相同状态的副本，即使有一部分的<code class="highlighter-rouge">Server</code>宕机了仍能继续运行。</li>
+      <li>最典型应用就是区块链，需解决的核心问题是 <strong>拜占庭将军问题</strong>。</li>
+    </ul>
+  </li>
+</ol>
+
+<h4 id="raft-算法">Raft 算法</h4>
+
+<p><code class="highlighter-rouge">Raft</code> 是一个 <strong>易于理解的一致性算法</strong>。过程如同选举一样，<strong>参选者</strong> 需要说服 <strong>大多数选民</strong> (Server) 投票给他，一旦选定后就跟随其操作。</p>
+
+<ul>
+  <li>和 <code class="highlighter-rouge">Paxos</code> 目标相同，都是为了实现 <strong>一致性</strong> 产生的。<code class="highlighter-rouge">Paxos</code> 和 <code class="highlighter-rouge">Raft</code> 的区别在于选举的 <strong>具体过程</strong> 不同。</li>
+</ul>
+
+<p><code class="highlighter-rouge">Raft</code> 协议将 <code class="highlighter-rouge">Server</code> 进程分为三种角色：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">Leader</code>（领导者）：领导者由跟随者投票选出。</li>
+  <li><code class="highlighter-rouge">Follower</code>（跟随者）：刚开始没有 <strong>领导者</strong>，所有集群中的 <strong>参与者</strong> 都是 <strong>跟随者</strong>。</li>
+  <li><code class="highlighter-rouge">Candidate</code>（候选人）</li>
+</ol>
+
+<p>Raft算法的工作流程：</p>
+
+<ol>
+  <li>首先开启一轮大选。在大选期间 <strong>所有跟随者</strong> 都能参与竞选，这时所有跟随者的角色就变成了 <strong>候选人</strong>，民主投票选出领袖后就开始了这届领袖的任期；</li>
+  <li>然后选举结束，所有除 <strong>领导者</strong> 的 <strong>候选人</strong> 又变回 <strong>跟随者</strong> 服从领导者领导。</li>
+</ol>
+
+<p>应用：</p>
+
+<ul>
+  <li>RocketMQ 的自动主从切换（Controller 模式）。</li>
+</ul>
+
+<p>参考：<a href="https://github.com/Snailclimb/JavaGuide/blob/main/docs/distributed-system/theorem&amp;algorithm&amp;protocol/raft-algorithm.md">Raft 算法解读</a></p>
+
+<h2 id="分布式事务分类">分布式事务分类</h2>
+
+<p>分布式事务实现方案必须要考虑<strong>性能</strong>的问题：</p>
+
+<ul>
+  <li>如果为了严格保证ACID特性，导致性能严重下降，那么对于一些要求快速响应的业务，是无法接受的。</li>
+</ul>
+
+<p>分布式事务<strong>实现方案</strong>，从类型上去分为：</p>
+
+<ol>
+  <li>刚性事务：满足CAP的CP理论。</li>
+  <li>柔性事务：满足BASE理论（基本可用，最终一致）。</li>
+</ol>
+
+<p><img src="../47fe991869254dfdb2ab3791fe7fd15f.png" alt="在这里插入图片描述" style="zoom: 33%;" /></p>
+
+<p><img src="../assets/aedd7c177c93444984c0834c0e698cda.png" alt="在这里插入图片描述" /></p>
+
+<h3 id="seata">Seata</h3>
+
+<p>Seata 是一款开源的分布式事务解决方案，致力于提供高性能和简单易用的分布式事务服务。</p>
+
+<ul>
+  <li>Seata 将为用户提供了 <strong>XA、AT、TCC、SAGA</strong> 事务模式，为用户打造一站式的分布式解决方案。</li>
+</ul>
+
+<h3 id="参考">参考：</h3>
+
+<ul>
+  <li>
+    <p>https://blog.csdn.net/a745233700/article/details/122402303</p>
+  </li>
+  <li>
+    <p>分布式事务（CAP）：https://www.cnblogs.com/crazymakercircle/p/13917517.html#autoid-h2-8-2-0</p>
+  </li>
+  <li>
+    <p>详细方案及示意图参考：<a href="https://mp.weixin.qq.com/s/nLwHEmVGtl-2FDugMqYs3A?poc_token=HMnhnWijFwwTVIChiqnBJATa4Btx4vn1lb4ski9F">分布式八股文（背诵版）</a></p>
+  </li>
+</ul>
+
+<h2 id="刚性事务">刚性事务</h2>
+
+<p>刚性事务：指的是，要使分布式事务，达到像<strong>本地事务</strong>一样，具备数据<strong>强一致性</strong>。</p>
+
+<ul>
+  <li>从CAP来看，就是说，要达到CP状态。</li>
+  <li>特点为：通常无业务改造，强一致性，原生支持回滚/隔离性，低并发，适合<strong>短事务</strong>。</li>
+  <li>
+    <p>全局事务模型 DTP（Data Tools Platform）</p>
+  </li>
+  <li>包括：XA 协议（2PC、JTA、JTS）、3PC。</li>
+</ul>
+
+<p>缺点：由于同步阻塞，处理<strong>效率低</strong>，不适合大型网站分布式场景。</p>
+
+<ol>
+  <li><strong>2PC</strong> 两阶段提交：思路可以概括为，参与者将操作成败<strong>通知协调者</strong>，再由协调者根据所有参与者的反馈情况、决定各参与者是否要提交操作还是回滚操作。</li>
+  <li><strong>3PC</strong> 三阶段提交：是 <code class="highlighter-rouge">2PC</code> 的一种改进版本 ，为解决两阶段提交协议的<strong>单点故障</strong>和<strong>同步阻塞</strong>问题。有三个阶段：<code class="highlighter-rouge">CanCommit</code>，<code class="highlighter-rouge">PreCommit</code>，<code class="highlighter-rouge">DoCommit</code>。</li>
+</ol>
+
+<h3 id="xa-规范">XA 规范</h3>
+
+<h4 id="xa-模型">XA 模型</h4>
+
+<p>X/Open <strong>DTP</strong>（<code class="highlighter-rouge">Distributed Transaction Process</code>）模型：是一个分布式事务模型。</p>
+
+<ul>
+  <li>主要使用了两段提交（<strong>2PC</strong> - Two-Phase-Commit）来保证分布式事务的完整性。</li>
+</ul>
+
+<p>在 X/Open DTP 模型里面，有三个角色：</p>
+
+<ol>
+  <li>AP（<code class="highlighter-rouge">Application</code>，应用程序）：也就是<strong>业务层</strong>。哪些操作属于<strong>一个事务</strong>，就是AP定义的。</li>
+  <li>TM（<code class="highlighter-rouge">Transaction Manager</code>，事务管理器）：接收AP的事务请求，对<strong>全局事务</strong>进行管理，管理事务分支状态，协调RM的处理，通知RM哪些操作属于哪些全局事务以及事务分支等等。
+    <ul>
+      <li>这个也是整个事务调度模型的<strong>核心部分</strong>。</li>
+    </ul>
+  </li>
+  <li>RM（<code class="highlighter-rouge">Resource Manager</code>，资源管理器）：一般是<strong>数据库</strong>，也可以是其他的，如<strong>消息队列</strong>（如JMS 数据源）、文件系统等。</li>
+</ol>
+
+<p><img src="../assets/1dfb088c88074769ade484035ccc6426.png" alt="在这里插入图片描述" style="zoom:50%;" /></p>
+
+<blockquote>
+  <p>AP自己操作TM，当需要事务时，AP向TM请求发起事务，TM负责整个事务的提交，回滚等。</p>
+</blockquote>
+
+<p>XA之所以需要引入事务管理器是因为：在分布式系统中，从理论上讲，两台机器理论上无法达到一致的状态，需要引入一个单点进行协调。</p>
+
+<ul>
+  <li>事务管理器控制着全局事务，管理事务生命周期，并协调资源。</li>
+  <li>资源管理器负责控制和管理实际资源（如<a href="http://lib.csdn.net/base/mysql">数据库</a>或JMS队列）</li>
+</ul>
+
+<h4 id="xa-规范-1">XA 规范</h4>
+
+<p>用非常官方的话来说:</p>
+
+<ul>
+  <li>XA 规范（XA Specification） 是 X/Open 组织定义的<strong>分布式事务处理</strong>（DTP，<code class="highlighter-rouge">Distributed Transaction Processing</code>）标准。</li>
+  <li>XA 规范 描述了（全局的）<strong>事务管理器</strong>与（局部的）<strong>资源管理器</strong>之间的通信接口。
+    <ul>
+      <li>在TM与多个RM之间形成一个<strong>双向通信桥梁</strong>，从而在多个数据库资源下保证ACID四个特性。</li>
+      <li><del>目的是允许的多个资源（如数据库，应用服务器，消息队列等）在同一事务中访问，这样可以使 ACID 属性跨越应用程序而保持有效。</del></li>
+    </ul>
+  </li>
+  <li>XA 规范 使用两阶段提交（2PC，Two-Phase Commit）协议来保证所有资源同时提交或回滚任何特定的事务。</li>
+  <li>XA 规范 在上世纪 90 年代初就被提出。目前，几乎所有主流的数据库（如Oracle, DB2,mysql等）都对 XA 规范 提供了支持，都可以作为RM。</li>
+</ul>
+
+<p>XA是数据库的分布式事务，<strong>强一致性</strong>，在整个过程中，数据一直处于锁住状态。</p>
+
+<ul>
+  <li>即从prepare到commit、rollback的整个过程中，TM一直把持折着<strong>数据库的锁</strong>。</li>
+  <li>如果有其他人要修改数据库的该条数据，就必须等待锁的释放，存在<strong>长事务</strong>风险。</li>
+</ul>
+
+<h5 id="操作函数">操作函数</h5>
+
+<p>以下的函数使事务管理器可以对资源管理器进行的操作：
+1）xa_open,xa_close：建立和关闭与资源管理器的连接。
+2）xa_start,xa_end：开始和结束一个本地事务。
+3）xa_prepare,xa_commit,xa_rollback：预提交、提交和回滚一个本地事务。
+4）xa_recover：回滚一个已进行预提交的事务。
+5）<strong>ax_开头</strong>的函数：使资源管理器可以动态地在事务管理器中进行注册，并可以对XID(TRANSACTION IDS)进行操作。
+6）ax_reg,ax_unreg；允许一个资源管理器在一个TMS(TRANSACTION MANAGER SERVER)中动态注册或撤消注册。</p>
+
+<h5 id="xa各个阶段的处理流程">XA各个阶段的处理流程</h5>
+
+<p><img src="../assets/e1e23c60c8e44096b13281b718f6531f.png" alt="在这里插入图片描述" style="zoom:50%;" /></p>
+
+<h4 id="xa协议的实现">XA协议的实现</h4>
+
+<h5 id="2pc3pc协议">2PC/3PC协议</h5>
+
+<ul>
+  <li>
+    <p>两阶段提交（2PC）协议：是XA规范定义的 数据一致性协议。</p>
+  </li>
+  <li>
+    <p>三阶段提交（3PC）协议：对 2PC协议的一种扩展。</p>
+  </li>
+</ul>
+
+<h5 id="seata-1">Seata</h5>
+
+<blockquote>
+  <p>Seata , <a href="https://seata.io/zh-cn/">官网</a> , <a href="https://github.com/seata/seata">github</a> , 1万多星</p>
+</blockquote>
+
+<p>Seata 是一款开源的分布式事务解决方案，致力于在微服务架构下提供高性能和简单易用的分布式事务服务。提供了 AT、TCC、SAGA 和 XA 事务模式。</p>
+
+<h6 id="seata-at-模式">Seata AT 模式</h6>
+
+<p>Seata AT 模式是增强型2pc模式。</p>
+
+<p>AT 模式： 两阶段提交协议的演变，没有一直锁表</p>
+
+<ul>
+  <li>一阶段：业务数据和回滚日志记录在同一个本地事务中提交，释放本地锁和连接资源</li>
+  <li>二阶段：提交异步化，非常快速地完成。或回滚通过一阶段的回滚日志进行反向补偿</li>
+</ul>
+
+<h5 id="jta-规范">JTA 规范</h5>
+
+<p>作为java平台上事务规范 JTA（Java Transaction API）也定义了对XA事务的支持。</p>
+
+<ul>
+  <li>
+    <p>实际上，JTA是基于<strong>XA架构</strong>上建模的。</p>
+  </li>
+  <li>
+    <p>在JTA 中，事务管理器抽象为<code class="highlighter-rouge">javax.transaction.TransactionManager</code>接口，并通过底层事务服务（即 <strong>JTS</strong>）实现。</p>
+  </li>
+</ul>
+
+<p>像很多其他的java规范一样，JTA仅仅定义了接口，具体的实现则是由供应商(如J2EE厂商)负责提供，目前JTA的实现主要由以下几种：</p>
+
+<ol>
+  <li>J2EE容器所提供的JTA实现（JBoss）</li>
+  <li>独立的JTA实现：如 JOTM，Atomikos。</li>
+</ol>
+
+<p>这些实现可以应用在那些不使用J2EE应用服务器的环境里用以提供分布事事务保证。如Tomcat、Jetty以及普通的java应用。</p>
+
+<h6 id="jts规范">JTS规范</h6>
+
+<p>事务是编程中必不可少的一项内容，基于此，为了规范事务开发，Java增加了关于事务的规范，即JTA和JTS</p>
+
+<ul>
+  <li>
+    <p>JTA定义了一套接口，其中约定了几种主要的角色：TransactionManager、UserTransaction、Transaction、XAResource，并定义了这些角色之间需要遵守的规范，如Transaction的委托给TransactionManager等。</p>
+  </li>
+  <li>
+    <p>JTS也是一组规范，上面提到JTA中需要角色之间的交互，那应该如何交互？JTS就是约定了交互细节的规范。</p>
+  </li>
+</ul>
+
+<p>总体上来说JTA更多的是从框架的角度来约定程序角色的接口，而JTS则是从具体实现的角度来约定程序角色之间的接口，两者各司其职。</p>
+
+<h6 id="atomikos分布式事务实现"><strong>Atomikos分布式事务实现</strong></h6>
+
+<p>Atomikos公司旗下有两款著名的分布事务产品：</p>
+
+<ul>
+  <li>TransactionEssentials：开源的免费产品</li>
+  <li>ExtremeTransactions：商业版，需要收费</li>
+</ul>
+
+<p>这两个产品的关系如下图所示：</p>
+
+<p><img src="../assets/633036bb44b041369a1075b7e5200d5a.png" alt="在这里插入图片描述" style="zoom:50%;" /></p>
+
+<p>可以看到，在开源版本中支持JTA/XA、JDBC、JMS的事务。</p>
+
+<p>atomikos也支持与spring事务整合。</p>
+
+<p>spring事务管理器的顶级抽象是PlatformTransactionManager接口，其提供了个重要的实现类：</p>
+
+<ul>
+  <li>DataSourceTransactionManager：用于实现本地事务</li>
+  <li><strong>JTATransactionManager</strong>：用于实现分布式事务</li>
+</ul>
+
+<p>显然，在这里需要配置的是JTATransactionManager。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">JTAService</span> <span class="o">{</span>  
+    <span class="nd">@Autowired</span>   
+    <span class="kd">private</span> <span class="n">UserMapper</span> <span class="n">userMapper</span><span class="o">;</span><span class="c1">//操作db_user库   </span>
+    <span class="nd">@Autowired</span>  
+    <span class="kd">private</span> <span class="n">AccountMapper</span> <span class="n">accountMapper</span><span class="o">;</span><span class="c1">//操作db_account库  </span>
+
+    <span class="nd">@Transactional</span>   
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">insert</span><span class="o">()</span> <span class="o">{</span>    
+        <span class="n">User</span> <span class="n">user</span> <span class="o">=</span> <span class="k">new</span> <span class="n">User</span><span class="o">();</span>     
+        <span class="n">user</span><span class="o">.</span><span class="na">setName</span><span class="o">(</span><span class="s">"wangxiaoxiao"</span><span class="o">);</span>     
+        <span class="n">userMapper</span><span class="o">.</span><span class="na">insert</span><span class="o">(</span><span class="n">user</span><span class="o">);</span>  
+        <span class="c1">//模拟异常，spring回滚后，db_user库中user表中也不会插入记录     </span>
+        <span class="n">Account</span> <span class="n">account</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Account</span><span class="o">();</span>     
+        <span class="n">account</span><span class="o">.</span><span class="na">setUserId</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="na">getId</span><span class="o">());</span>    
+        <span class="n">account</span><span class="o">.</span><span class="na">setMoney</span><span class="o">(</span><span class="mi">123456789</span><span class="o">);</span>    
+        <span class="n">accountMapper</span><span class="o">.</span><span class="na">insert</span><span class="o">(</span><span class="n">account</span><span class="o">);</span> 
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h5 id="xa的主要限制">XA的主要限制</h5>
+
+<ul>
+  <li>必须要拿到所有数据源，而且数据源还要支持XA协议。目前MySQL中只有InnoDB存储引擎支持XA协议。</li>
+  <li>性能比较差，要把所有涉及到的数据都要锁定，是强一致性的，会产生长事务。</li>
+</ul>
+
+<h5 id="lcn2pc">LCN（2pc）</h5>
+
+<blockquote>
+  <p>TX-LCN ， <a href="https://www.txlcn.org/zh-cn/docs/preface.html">官方文档</a> ， <a href="https://github.com/codingapi/tx-lcn">github</a> , 3千多星 。</p>
+</blockquote>
+
+<ul>
+  <li>5.0以后由于框架兼容了<strong>LCN（2pc）、TCC、TXC</strong> 三种事务模式，为了区分LCN模式，特此将LCN分布式事务改名为TX-LCN分布式事务框架。</li>
+</ul>
+
+<p>TX-LCN定位于一款事务协调性框架，框架其本身并不生产事务，而是本地事务的协调者，从而达到事务一致性的效果。</p>
+
+<p>TX-LCN 主要有两个模块，Tx-Client(TC) ，Tx-Manager™.</p>
+
+<ul>
+  <li>TM （Tx-Manager）：是独立的服务，是分布式事务的控制方，协调分布式事务的提交，回滚</li>
+  <li>TC（Tx-Client）：由业务系统集成，事务发起方、参与方都由TxClient端来控制</li>
+</ul>
+
+<h4 id="xa规范的问题">XA规范的问题</h4>
+
+<p>但是XA规范在1994年就出现了，至今没有大规模流行起来，必然有他一定的缺陷：</p>
+
+<ol>
+  <li>数据锁定：数据在事务未结束前，为了保障一致性，根据数据隔离级别进行锁定。</li>
+  <li>协议阻塞：本地事务在全局事务 没 commit 或 callback前都是阻塞等待的。</li>
+  <li>性能损耗高：主要体现在事务协调增加的RT成本，并发事务数据使用锁进行竞争阻塞。</li>
+</ol>
+
+<p>XA协议比较简单，而且一旦商业数据库实现了XA协议，使用分布式事务的成本也比较低。</p>
+
+<ul>
+  <li>但是，XA也有致命的缺点，那就是<strong>性能</strong>不理想，特别是在交易下单链路，往往并发量很高，XA无法满足<strong>高并发场景</strong>。</li>
+  <li>XA目前在商业数据库支持的比较理想，在mysql中支持的不太理想，mysql的XA实现，没有记录prepare阶段日志，<strong>主备切换</strong>会导致主库与备库数据不一致。许多nosql也没有支持XA，这让XA的应用场景变得非常狭隘。</li>
+</ul>
+
+<p>其实也并非不用，例如在IBM大型机上基于CICS很多跨资源是基于XA协议实现的分布式事务，事实上XA也算分布式事务处理的规范了，但在为什么互联网中很少使用，究其原因有以下几个：</p>
+
+<ul>
+  <li>性能（阻塞性协议，增加响应时间、锁时间、死锁）；</li>
+  <li>数据库支持完善度（MySQL 5.7之前都有缺陷）；</li>
+  <li>协调者依赖独立的J2EE中间件（早期重量级Weblogic、Jboss、后期轻量级Atomikos、Narayana和Bitronix）；</li>
+  <li>运维复杂，DBA缺少这方面经验；</li>
+  <li>并不是所有资源都支持XA协议；</li>
+</ul>
+
+<p>准确讲XA是一个规范、协议，它只是定义了一系列的接口，只是目前大多数实现XA的都是数据库或者MQ，所以提起XA往往多指基于资源层的底层分布式事务解决方案。其实现在也有些数据分片框架或者中间件也支持XA协议，毕竟它的兼容性、普遍性更好。</p>
+
+<h3 id="2pc标准xa模型">2PC（标准XA模型）</h3>
+
+<p>2PC即Two-Phase Commit，二阶段提交。</p>
+
+<p>2pc解决的是分布式数据强一致性问题：</p>
+
+<ul>
+  <li>
+    <p>顾名思义，两阶段提交在处理分布式事务时分为两个阶段：voting（投票阶段，有的地方会叫做prepare阶段）和commit阶段。</p>
+  </li>
+  <li>
+    <p>2pc中存在两个角色，事务协调者（seata、atomikos、lcn）和事务参与者，事务参与者通常是指应用的数据库。</p>
+  </li>
+</ul>
+
+<p><img src="../assets/155b10b3835a4062bc86e135fc865ebc.png" alt="在这里插入图片描述" style="zoom: 67%;" /></p>
+
+<h4 id="详解三个阶段">详解：三个阶段</h4>
+
+<p>广泛应用在数据库领域，为了使得基于分布式架构的所有节点可以在进行事务处理时能够保持原子性和一致性。</p>
+
+<ul>
+  <li>绝大部分关系型数据库，都是基于2PC完成分布式的事务处理。</li>
+</ul>
+
+<p>顾名思义，2PC分为两个阶段处理：</p>
+
+<ol>
+  <li>阶段一：提交事务请求、</li>
+  <li>阶段二：协调者在阶段二决定是否最终执行事务提交操作。这一阶段包含两种情形：
+    <ol>
+      <li>如果所有参与者 reply Yes，那么执行事务提交。</li>
+      <li>如果阶段一等待超时或者出现异常（存在某一参与者向协调者发送No响应），则中断事务。
+        <ul>
+          <li>协调者只要无法收到所有参与者的Yes响应，就会中断事务。</li>
+        </ul>
+      </li>
+    </ol>
+  </li>
+</ol>
+
+<h5 id="阶段一提交事务请求">阶段一：提交事务请求</h5>
+
+<ol>
+  <li>事务询问。协调者向所有参与者发送事务内容，询问是否可以执行提交操作，并开始等待各参与者进行响应；</li>
+  <li>执行事务。各参与者节点，执行事务操作，并将<strong>Undo和Redo操作</strong>计入本机事务日志；</li>
+  <li>各参与者向<strong>协调者</strong>反馈事务问询的响应。成功执行返回Yes，否则返回No。</li>
+</ol>
+
+<h5 id="阶段二执行事务提交">阶段二：执行事务提交</h5>
+
+<h6 id="执行事务提交">执行事务提交</h6>
+
+<ol>
+  <li>发送提交请求。协调者向所有参与者发送Commit请求；</li>
+  <li>事务提交。参与者收到Commit请求后，会<strong>正式执行事务提交操作</strong>，并在完成提交操作之后，释放在整个事务执行期间占用的资源；</li>
+  <li>反馈事务提交结果。参与者在完成事务提交后，写协调者发送Ack消息确认；</li>
+  <li>完成事务。协调者在收到所有参与者的Ack后，完成事务。</li>
+</ol>
+
+<p><img src="../assets/ef98585ddb544d82815fb528a9c7a10a.png" alt="在这里插入图片描述" style="zoom: 50%;" /></p>
+
+<h6 id="中断事务">中断事务</h6>
+
+<ol>
+  <li>发送回滚请求。协调者向所有参与者发送Rollback请求；</li>
+  <li>回滚。参与者收到请求后，利用本机Undo信息，执行Rollback操作。并在回滚结束后释放该事务所占用的系统资源；</li>
+  <li>反馈回滚结果。参与者在完成回滚操作后，向协调者发送Ack消息；</li>
+  <li>中断事务。协调者收到所有参与者的回滚Ack消息后，完成事务中断。</li>
+</ol>
+
+<p><img src="../assets/2b32cd0fa5b34d3f8ec1086dc88d759d.png" alt="在这里插入图片描述" style="zoom: 50%;" /></p>
+
+<h4 id="适用场景">适用场景</h4>
+
+<blockquote>
+  <p>特点：适合单体应用</p>
+</blockquote>
+
+<p>2PC 方案中，有一个事务管理器的角色，负责协调多个数据库（资源管理器）的事务。</p>
+
+<ul>
+  <li>事务管理器先问问各个数据库你准备好了吗？如果每个数据库都回复 ok，那么就正式提交事务，在各个数据库上执行操作；</li>
+  <li>如果任何其中一个数据库回答不 ok，那么就回滚事务。</li>
+</ul>
+
+<p><img src="../assets/6097a288b3d04c299f0e7ed7517682eb.png" alt="在这里插入图片描述" style="zoom: 67%;" /></p>
+
+<p>2PC 方案比较适合单体应用里，<strong>跨多个库</strong>的分布式事务，而且因为严重依赖于数据库层面来搞定复杂的事务，效率很低，绝对不适合<strong>高并发</strong>的场景。</p>
+
+<p>2PC 方案实际<strong>很少用</strong>，一般来说某个系统内部如果出现跨多个库的这么一个操作，是不合规的。</p>
+
+<ul>
+  <li>现在微服务，一个大的系统分成几百个服务，几十个服务。</li>
+  <li>一般来说，我们的规定和规范，是要求每个服务只能操作自己对应的一个数据库。</li>
+</ul>
+
+<p>如果要操作别的服务对应的库，不允许直连别的服务的库，违反微服务架构的规范。</p>
+
+<ul>
+  <li>随便交叉胡乱访问，几百个服务的话，全体乱套，这样的一套服务是没法管理的，没法治理的，可能会出现数据被别人改错，自己的库被别人写挂等情况。</li>
+</ul>
+
+<p>如果要操作别人的服务的库，必须是通过调用别的服务的接口来实现，绝对不允许交叉访问别人的数据库。</p>
+
+<h4 id="优缺点">优缺点</h4>
+
+<p>2PC具有明显的优缺点：</p>
+
+<p>优点主要体现在实现原理简单；</p>
+
+<blockquote>
+  <p>XA-两阶段提交协议中会遇到的一些问题</p>
+</blockquote>
+
+<p>缺点比较多：</p>
+
+<ul>
+  <li>性能问题：
+    <ul>
+      <li>2PC的提交在执行过程中，所有参与事务操作的逻辑都处于阻塞状态，也就是说，各个参与者都在等待其他参与者响应，无法进行其他操作；</li>
+      <li>从流程上我们可以看得出，其最大缺点就在于它的执行过程中间，节点都处于阻塞状态。各个操作数据库的节点此时都占用着数据库资源，只有当所有节点准备完毕，事务协调者才会通知进行全局提交，参与者进行本地事务提交后才会释放资源。这样的过程会比较漫长，对性能影响比较大。</li>
+    </ul>
+  </li>
+  <li>协调者单点故障问题：
+    <ul>
+      <li>协调者是个<strong>单点</strong>，一旦出现问题，其他参与者将无法释放事务资源，也无法完成事务操作；</li>
+      <li>事务协调者是整个XA模型的核心，一旦事务协调者节点挂掉，会导致参与者收不到提交或回滚的通知，从而导致参与者节点始终处于事务无法完成的中间状态。</li>
+    </ul>
+  </li>
+  <li>丢失消息导致的数据不一致问题：
+    <ul>
+      <li>当执行事务提交过程中，如果协调者向所有参与者发送Commit请求后，发生局部网络异常或者协调者在尚未发送完Commit请求，即出现崩溃，最终导致只有部分参与者收到、执行请求。于是整个系统将会出现数据不一致的情形；</li>
+      <li>在第二个阶段，如果发生局部网络问题，一部分事务参与者收到了提交消息，另一部分事务参与者没收到提交消息，那么就会导致节点间数据的不一致问题。</li>
+    </ul>
+  </li>
+  <li>保守。2PC没有完善的容错机制，当参与者出现故障时，协调者无法快速得知这一失败，只能严格依赖超时设置来决定是否进一步的执行提交还是中断事务。</li>
+</ul>
+
+<p>实际上分布式事务是一件非常复杂的事情，两阶段提交只是通过增加了事务协调者（Coordinator）的角色来通过2个阶段的处理流程来解决分布式系统中一个事务需要跨多个服务节点的数据一致性问题。但是从异常情况上考虑，这个流程也并不是那么的无懈可击。</p>
+
+<p>假设如果在第二个阶段中Coordinator在接收到Partcipant的”Vote_Request”后挂掉了或者网络出现了异常，那么此时Partcipant节点就会一直处于本地事务挂起的状态，从而长时间地占用资源。当然这种情况只会出现在极端情况下，然而作为一套健壮的软件系统而言，异常Case的处理才是真正考验方案正确性的地方。</p>
+
+<h3 id="3pc">3PC</h3>
+
+<p>针对2PC的缺点，研究者提出了3PC，即<code class="highlighter-rouge">Three-Phase Commit</code>。</p>
+
+<p>作为2PC的改进版，3PC将原有的两阶段过程，重新划分为<code class="highlighter-rouge">CanCommit、PreCommit、do Commit</code>三个阶段。</p>
+
+<h4 id="详解三个阶段-1">详解：三个阶段</h4>
+
+<p><img src="../assets/83a6804b16db4d5199a1487a1579d360.png" alt="在这里插入图片描述" style="zoom:50%;" /></p>
+
+<h5 id="阶段一cancommit">阶段一：CanCommit</h5>
+
+<ol>
+  <li>事务询问。协调者向所有参与者发送包含事务内容的canCommit的请求，询问是否可以执行事务提交，并等待应答；</li>
+  <li>各参与者反馈事务询问。正常情况下，如果参与者认为可以顺利执行事务，则返回Yes，否则返回No。</li>
+</ol>
+
+<h5 id="阶段二precommit">阶段二：PreCommit</h5>
+
+<p>在本阶段，协调者会根据上一阶段的反馈情况来决定是否可以执行事务的PreCommit操作。有以下两种可能：</p>
+
+<h6 id="执行事务预提交">执行事务预提交</h6>
+
+<ol>
+  <li>发送预提交请求。协调者向所有节点发出PreCommit请求，并进入prepared阶段；</li>
+  <li>事务预提交。参与者收到PreCommit请求后，会执行事务操作，并将Undo和Redo日志写入本机事务日志；</li>
+  <li>各参与者成功执行事务操作，同时将反馈以Ack响应形式发送给协调者，同事等待最终的Commit或Abort指令。</li>
+</ol>
+
+<h6 id="中断事务-1">中断事务</h6>
+
+<p>加入任意一个参与者向协调者发送No响应，或者等待超时，协调者在没有得到所有参与者响应时，即可以中断事务：</p>
+
+<ol>
+  <li>发送中断请求。 协调者向所有参与者发送Abort请求；</li>
+  <li>中断事务。无论是收到协调者的Abort请求，还是等待协调者请求过程中出现超时，参与者都会中断事务；</li>
+</ol>
+
+<h5 id="阶段三docommit">阶段三：doCommit</h5>
+
+<p>在这个阶段，会真正的进行事务提交，同样存在两种可能。</p>
+
+<h6 id="执行提交"><strong>执行提交</strong></h6>
+
+<ol>
+  <li>发送提交请求。假如协调者收到了所有参与者的Ack响应，那么将从预提交转换到提交状态，并向所有参与者，发送doCommit请求；</li>
+  <li>事务提交。参与者收到doCommit请求后，会正式执行事务提交操作，并在完成提交操作后释放占用资源；</li>
+  <li>反馈事务提交结果。参与者将在完成事务提交后，向协调者发送Ack消息；</li>
+  <li>完成事务。协调者接收到所有参与者的Ack消息后，完成事务。</li>
+</ol>
+
+<h6 id="中断事务-2"><strong>中断事务</strong></h6>
+
+<p>在该阶段，假设正常状态的协调者接收到任一个参与者发送的No响应，或在超时时间内，仍旧没收到反馈消息，就会中断事务：</p>
+
+<ol>
+  <li>发送中断请求。协调者向所有的参与者发送abort请求；</li>
+  <li>事务回滚。参与者收到abort请求后，会利用阶段二中的Undo消息执行事务回滚，并在完成回滚后释放占用资源；</li>
+  <li>反馈事务回滚结果。参与者在完成回滚后向协调者发送Ack消息；</li>
+  <li>中端事务。协调者接收到所有参与者反馈的Ack消息后，完成事务中断。</li>
+</ol>
+
+<h4 id="优缺点-1">优缺点</h4>
+
+<ul>
+  <li>
+    <p>优点：3PC有效降低了2PC带来的参与者阻塞范围，并且能够在出现单点故障后继续达成一致；</p>
+  </li>
+  <li>
+    <p>缺点：但3PC带来了新的问题，在参与者收到preCommit消息后，如果<strong>网络出现分区</strong>，协调者和参与者无法进行后续的通信。这种情况下，参与者在<strong>等待超时</strong>后，依旧会执行事务提交，这样会导致数据的不一致。</p>
+  </li>
+</ul>
+
+<h3 id="2pc和3pc的区别">2PC和3PC的区别</h3>
+
+<p>三阶段提交协议在协调者和参与者中都引入 <strong>超时机制</strong>，并且把两阶段提交协议的第一个阶段拆分成了两步：询问，然后再锁资源，最后真正提交。</p>
+
+<p>三阶段提交的三个阶段分别为：can_commit，pre_commit，do_commit。</p>
+
+<p><img src="../assets/0d8ecbbc111c4b93b4d7b785320a6490.png" alt="在这里插入图片描述" /></p>
+
+<ul>
+  <li>在doCommit阶段，如果参与者无法及时接收到来自协调者的doCommit或者abort请求时，会在等待超时之后，继续进行事务的提交。
+    <ul>
+      <li>其实这个应该是基于概率来决定的，当进入第三阶段时，说明参与者在第二阶段已经收到了PreCommit请求，那么协调者产生PreCommit请求的前提条件是他在第二阶段开始之前，收到所有参与者的CanCommit响应都是Yes。</li>
+      <li>（一旦参与者收到了PreCommit，意味他知道大家其实都同意修改了）</li>
+      <li>所以，一句话概括就是，当进入第三阶段时， 由于网络超时等原因，虽然参与者没有收到commit或者abort响应，但是他有理由相信：成功提交的几率很大。</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="3pc主要解决单点故障问题">3PC主要解决单点故障问题</h4>
+
+<p>相对于2PC，3PC主要解决的单点故障问题，并减少阻塞。</p>
+
+<ul>
+  <li>因为一旦参与者无法及时收到来自协调者的信息之后，他会默认执行commit。而不会一直持有事务资源并处于阻塞状态。</li>
+</ul>
+
+<p>但是这种机制也会导致数据一致性问题，因为，由于网络原因，协调者发送的abort响应没有及时被参与者接收到，那么参与者在等待超时之后执行了commit操作。这样就和其他接到abort命令并执行回滚的参与者之间存在数据不一致的情况。</p>
+
+<h4 id="3pc-相对于-2pc-优化了什么">3PC 相对于 2PC 优化了什么</h4>
+
+<p>相比较2PC而言，3PC对于协调者（Coordinator）和参与者（Partcipant）都设置了超时时间，而2PC只有协调者才拥有超时机制。这解决了一个什么问题呢？</p>
+
+<ul>
+  <li>
+    <p>这个优化点，主要是避免了参与者在长时间无法与协调者节点通讯（协调者挂掉了）的情况下，无法释放资源的问题，因为参与者自身拥有超时机制会在超时后，自动进行本地commit从而进行释放资源。而这种机制也侧面降低了整个事务的阻塞时间和范围。</p>
+  </li>
+  <li>
+    <p>另外，通过CanCommit、PreCommit、DoCommit三个阶段的设计，相较于2PC而言，多设置了一个<strong>缓冲阶段</strong>保证了在最后提交阶段之前各参与节点的状态是一致的。</p>
+  </li>
+</ul>
+
+<p>以上就是3PC相对于2PC的一个提高（相对缓解了2PC中的前两个问题），但是3PC依然没有完全解决数据不一致的问题。</p>
+
+<ul>
+  <li>假如在 DoCommit 过程，参与者A无法接收协调者的通信，那么参与者A会自动提交，但是提交失败了，其他参与者成功了，此时数据就会不一致。</li>
+</ul>
+
+<h2 id="柔性事务">柔性事务</h2>
+
+<blockquote>
+  <p>在电商领域等互联网场景下，刚性事务在数据库性能和处理能力上都暴露出了瓶颈。</p>
+
+  <p>柔性事务有两个特性：基本可用和柔性状态。</p>
+
+  <ul>
+    <li>基本可用：是指分布式系统出现故障时<strong>允许损失一部分的可用性</strong>。</li>
+    <li>柔性状态：是指允许系统存在<strong>中间状态</strong>，这个中间状态不会影响系统整体的可用性，比如数据库读写分离的<strong>主从同步延迟</strong>等。柔性事务的一致性指的是最终一致性。</li>
+  </ul>
+</blockquote>
+
+<p>柔性事务：指的是不要求强一致性，而是要求<strong>最终一致性</strong>，允许有中间状态。</p>
+
+<ul>
+  <li>
+    <p>也就是Base理论，换句话说，就是AP状态。</p>
+  </li>
+  <li>
+    <p>特点为：有业务改造，最终一致性，实现补偿接口，实现资源锁定接口，高并发，适合长事务。</p>
+  </li>
+</ul>
+
+<h4 id="分类">分类</h4>
+
+<p>柔性事务主要分为：补偿型事务都是<strong>同步</strong>的，通知型事务都是<strong>异步</strong>的。</p>
+
+<ul>
+  <li><strong>通知型</strong>事务：
+    <ul>
+      <li><strong>异步确保型</strong>：本地事务消息、消息事务（半消息）
+        <ol>
+          <li><strong>本地消息表</strong>：核心思想是将分布式事务拆分成本地事务进行处理。</li>
+          <li><strong>MQ 事务消息</strong>：原理是将两个事务通过<strong>消息队列</strong>进行异步解耦。如 RocketMQ 的<strong>分布式事务消息</strong>。</li>
+        </ol>
+      </li>
+      <li><strong>最大努力通知</strong>型：适用于一些对<strong>最终一致性、实时性</strong>要求没那么高的业务，比如支付通知，短信通知。</li>
+    </ul>
+  </li>
+  <li><strong>补偿型</strong>事务：
+    <ul>
+      <li>TCC/FMT：</li>
+      <li>Saga（状态机模式、Aop模式）；</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="通知型事务">通知型事务</h3>
+
+<p>通知型事务的主流实现是通过<strong>MQ（消息队列）</strong>来通知其他事务参与者自己事务的执行状态，引入MQ组件，有效的将事务参与者进行解耦，各参与者都可以异步执行，所以通知型事务又被称为<strong>异步事务</strong>。</p>
+
+<p>通知型事务主要适用于那些需要异步更新数据，并且对数据的实时性要求较低的场景，主要包含：</p>
+
+<ul>
+  <li><strong>异步确保型事务</strong>：指将一系列同步的事务操作修改为基于<strong>消息队列</strong>异步执行的操作，来避免分布式事务中<strong>同步阻塞</strong>带来的数据操作性能的下降。
+    <ul>
+      <li>主要适用于<strong>内部系统</strong>的数据最终一致性保障。因为内部相对比较可控，如<strong>订单和购物车</strong>、收货与清算、支付与结算等等场景；</li>
+    </ul>
+  </li>
+  <li><strong>最大努力通知</strong>：目标，就是发起通知方通过一定的机制，最大努力将业务处理结果通知到接收方。
+    <ul>
+      <li>主要用于<strong>外部系统</strong>，因为外部的网络环境更加复杂和不可信，所以只能尽最大努力去通知实现数据最终一致性，比如<strong>充值平台与运营商</strong>、支付对接、商户通知等<strong>跨平台、跨企业</strong>、跨网络系统级别（对接）的<strong>系统间业务交互场景</strong>；</li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="../assets/fa183dd9c2a74cb2a00d2c965ea76132.png" alt="在这里插入图片描述" style="zoom: 67%;" /></p>
+
+<h4 id="最大努力通知-vs-异步确保型事务">最大努力通知 <strong>VS</strong> 异步确保型事务</h4>
+
+<p>最大努力通知事务，其实是基于异步确保型事务发展而来适用于外部对接的一种业务实现。他们主要有的是业务差别，如下：</p>
+
+<ul>
+  <li>从<strong>参与者</strong>来说：最大努力通知事务适用于跨平台、跨企业的系统间业务交互；异步确保型事务更适用于同网络体系的内部服务交付。</li>
+  <li>从<strong>消息层面</strong>说：最大努力通知事务需要主动推送并提供多档次时间的重试机制来保证数据的通知；而异步确保型事务只需要消息消费者主动去消费。</li>
+  <li>从<strong>数据层面</strong>说：最大努力通知事务还需额外的定期校验机制对数据进行兜底，保证数据的最终一致性；而异步确保型事务只需保证消息的可靠投递即可，自身无需对数据进行兜底处理。</li>
+</ul>
+
+<h4 id="异步确保型事务">异步确保型事务</h4>
+
+<h5 id="mq事务消息-vs-本地消息表">MQ事务消息 VS 本地消息表</h5>
+
+<p>二者的共性：</p>
+
+<p>1、 事务消息都依赖MQ进行事务通知，所以都是异步的。
+2、 事务消息在投递方都是存在重复投递的可能，需要有配套的机制去降低重复投递率，实现更友好的消息投递去重。
+3、 事务消息的消费方，因为投递重复的无法避免，因此需要进行消费去重设计或者服务幂等设计。</p>
+
+<p>二者的区别：</p>
+
+<p>MQ事务消息：</p>
+
+<ul>
+  <li>需要MQ支持半消息机制或者类似特性，在重复投递上具有比较好的去重处理；</li>
+  <li>具有比较大的业务侵入性，需要业务方进行改造，提供对应的本地操作成功的回查功能；</li>
+</ul>
+
+<p>DB本地消息表：</p>
+
+<ul>
+  <li>使用了数据库来存储事务消息，降低了对MQ的要求，但是增加了存储成本；</li>
+  <li>事务消息使用了异步投递，增大了消息重复投递的可能性；</li>
+</ul>
+
+<p><img src="../assets/2c09b551764443a8b5048b2a85dabbe5.png" alt="在这里插入图片描述" /></p>
+
+<h5 id="mq事务消息方案">MQ事务消息方案</h5>
+
+<p>基于MQ的事务消息方案主要依靠MQ的<strong>半消息机制</strong>来实现投递消息和参与者自身本地事务的一致性保障。</p>
+
+<ul>
+  <li>半消息机制实现原理其实借鉴的2PC的思路，是二阶段提交的广义拓展。</li>
+</ul>
+
+<blockquote>
+  <p><strong>半消息</strong>：在原有队列消息执行后的逻辑，如果后面的本地逻辑出错，则不发送该消息，如果通过则告知MQ发送；</p>
+</blockquote>
+
+<p>流程</p>
+
+<p><img src="../assets/0153d017b73742d987c2efd19e946fc3.png" alt="在这里插入图片描述" /></p>
+
+<ol>
+  <li>事务发起方首先发送半消息到MQ；</li>
+  <li>MQ通知发送方消息发送成功；</li>
+  <li>在发送半消息成功后执行本地事务；</li>
+  <li>根据本地事务执行结果返回commit或者是rollback；</li>
+  <li>如果消息是rollback, MQ将丢弃该消息不投递；如果是commit，MQ将会消息发送给消息订阅方；</li>
+  <li>订阅方根据消息执行本地事务；</li>
+  <li>订阅方执行本地事务成功后再从MQ中将该消息标记为已消费；</li>
+  <li>如果执行本地事务过程中，执行端挂掉，或者超时，MQ服务器端将不停的询问producer来获取事务状态；</li>
+  <li>Consumer端的消费成功机制有MQ保证；</li>
+</ol>
+
+<h6 id="使用示例">使用示例</h6>
+
+<p>举个例子，假设存在业务规则：某笔订单成功后，为用户加一定的积分。</p>
+
+<p>在这条规则里，管理订单数据源的服务为<strong>事务发起方</strong>，管理积分数据源的服务为<strong>事务跟随者</strong>。</p>
+
+<p>从这个过程可以看到，基于消息队列实现的事务存在以下操作：</p>
+
+<ul>
+  <li>订单服务创建订单，提交本地事务</li>
+  <li>订单服务发布一条消息</li>
+  <li>积分服务收到消息后加积分</li>
+</ul>
+
+<p><img src="../assets/fbb5c3141f504a09aca84a43d35bfedb.png" alt="在这里插入图片描述" style="zoom: 67%;" /></p>
+
+<p>可以看到它的整体流程是比较简单的，同时业务开发工作量也不大：</p>
+
+<ul>
+  <li>编写订单服务里<strong>订单创建</strong>的逻辑</li>
+  <li>编写积分服务里<strong>增加积分</strong>的逻辑</li>
+</ul>
+
+<p>可以看到该事务形态过程简单，性能消耗小，发起方与跟随方之间的流量峰谷可以使用队列填平，同时业务开发工作量也基本与单机事务没有差别，都不需要编写<strong>反向</strong>的业务逻辑过程.</p>
+
+<ul>
+  <li>因此基于消息队列实现的事务是除了单机事务外最优先考虑使用的形态。</li>
+</ul>
+
+<h6 id="基于-rocketmq-实现">基于 RocketMQ 实现</h6>
+
+<blockquote>
+  <p>有一些第三方的MQ是支持事务消息的，这些消息队列，支持半消息机制，比如RocketMQ，ActiveMQ。</p>
+
+  <ul>
+    <li>但是有一些常用的MQ也不支持事务消息，比如 RabbitMQ 和 Kafka 都不支持。</li>
+  </ul>
+</blockquote>
+
+<p>以阿里的 RocketMQ 中间件为例实现 MQ 异步确保型事务，其思路大致为：</p>
+
+<ol>
+  <li>producer（本例中指A系统）发送半消息到broker。
+    <ul>
+      <li>这个半消息不是说消息内容不完整， 它包含完整的消息内容， 在producer端和普通消息的发送逻辑一致。</li>
+    </ul>
+  </li>
+  <li>broker存储半消息，半消息存储逻辑与普通消息一致，只是属性有所不同。
+    <ul>
+      <li>topic是固定的<code class="highlighter-rouge">RMQ_SYS_TRANS_HALF_TOPIC</code>，queueId也是固定为0。</li>
+      <li>这个tiopic中的消息对消费者是不可见的，所以里面的消息永远不会被消费。这就保证了在半消息提交成功之前，消费者是消费不到这个半消息的。</li>
+    </ul>
+  </li>
+  <li>
+    <p>broker端半消息存储成功并返回后，A系统执行本地事务，并根据本地事务的执行结果来决定半消息的提交状态为提交或者回滚。</p>
+  </li>
+  <li>
+    <p>A系统发送结束半消息的请求，并带上<strong>提交状态</strong>（提交 or 回滚）。</p>
+  </li>
+  <li>broker端收到请求后，首先从<code class="highlighter-rouge">RMQ_SYS_TRANS_HALF_TOPIC</code>的queue中查出该消息，设置为完成状态。
+    <ol>
+      <li>如果消息状态为提交，则把半消息从<code class="highlighter-rouge">RMQ_SYS_TRANS_HALF_TOPIC</code>队列中复制到这个消息原始topic的queue中去（之后这条消息就能被正常消费了）；</li>
+      <li>如果消息状态为回滚，则什么也不做。</li>
+    </ol>
+  </li>
+  <li>producer发送的半消息结束请求是 oneway 的（也就是发送后就不管了），只靠这个是无法保证半消息<strong>一定被提交</strong>的。
+    <ol>
+      <li>rocketMq提供了一个兜底方案，这个方案叫<strong>消息反查机制</strong>：Broker启动时，会启动一个<code class="highlighter-rouge">TransactionalMessageCheckService</code> 任务，该任务会定时从半消息队列中读出所有超时未完成的半消息，针对每条未完成的消息，Broker会给对应的Producer发送一个消息反查请求，根据反查结果来决定这个半消息是需要提交还是回滚，或者后面继续来反查。</li>
+    </ol>
+  </li>
+  <li>consumer（本例中指B系统）消费消息，执行本地数据变更（至于B是否能消费成功、消费失败是否重试，这属于正常消息消费需要考虑的问题）。</li>
+</ol>
+
+<p><img src="../assets/eaf4d380ca674d36b90772af8bde5e34.png" alt="在这里插入图片描述" /></p>
+
+<p>在rocketMq中，不论是producer收到broker存储半消息成功返回后执行本地事务，还是broker向producer反查消息状态，都是通过<strong>回调机制</strong>完成，把producer端的代码贴出来你就明白了：</p>
+
+<p><img src="../assets/e7d221b7da6a40f4b672e89c5fdd2388.png" alt="在这里插入图片描述" /></p>
+
+<p>半消息发送时，会传入一个回调类TransactionListener，使用时必须实现其中的两个方法，</p>
+
+<ol>
+  <li><code class="highlighter-rouge">executeLocalTransaction</code> 方法会在broker返回半消息存储成功后执行，我们会在其中<strong>执行本地事务</strong>；</li>
+  <li><code class="highlighter-rouge">checkLocalTransaction</code>方法会在broker向producer发起反查时执行，我们会在其中<strong>查询库表状态</strong>。</li>
+</ol>
+
+<p>两个方法的返回值都是消息状态，就是告诉broker应该提交或者回滚半消息。</p>
+
+<p><img src="../assets/3d1afe7947ad4bd3a5839dbd6ea0f56a.png" alt="在这里插入图片描述" /></p>
+
+<h5 id="本地消息表方案">本地消息表方案</h5>
+
+<blockquote>
+  <p>有时候目前的MQ组件并不支持<strong>事务消息</strong>，或者想尽量少的侵入业务方。这时需要另外一种方案“基于DB本地消息表“。</p>
+</blockquote>
+
+<p>本地消息表最初由eBay 提出来解决分布式事务的问题。是目前业界使用的比较多的方案之一，核心思想就是将分布式事务<strong>拆分</strong>成本地事务进行处理。</p>
+
+<h6 id="本地消息表流程">本地消息表流程：</h6>
+
+<p><img src="../assets/d54cee4af2134dd7b78fd7fb4f8e8e29.png" alt="在这里插入图片描述" /></p>
+
+<p>发送消息方：</p>
+
+<ul>
+  <li>需要有一个消息表，记录着消息状态相关信息。</li>
+  <li>业务数据和消息表在同一个数据库，要保证它俩在同一个本地事务。直接利用本地事务，将业务数据和事务消息直接写入数据库。</li>
+  <li>在本地事务中处理完业务数据和写消息表操作后，通过写消息到 MQ 消息队列。使用专门的投递工作线程进行事务消息投递到MQ，根据投递ACK去删除事务消息表记录</li>
+  <li>消息会发到消息消费方，如果发送失败，即进行重试。</li>
+</ul>
+
+<p>消息消费方：</p>
+
+<ul>
+  <li>处理消息队列中的消息，完成自己的业务逻辑。</li>
+  <li>如果本地事务处理成功，则表明已经处理成功了。</li>
+  <li>如果本地事务处理失败，那么就会重试执行。</li>
+  <li>如果是业务层面的失败，给消息生产方发送一个业务补偿消息，通知进行回滚等操作。</li>
+</ul>
+
+<p>生产方和消费方定时扫描本地消息表，把还没处理完成的消息或者失败的消息再发送一遍。如果有靠谱的自动对账补账逻辑，这种方案还是非常实用的。</p>
+
+<h6 id="本地消息表优缺点"><strong>本地消息表优缺点：</strong></h6>
+
+<p>优点：</p>
+
+<ul>
+  <li>本地消息表建设成本比较低，实现了可靠消息的传递确保了分布式事务的最终一致性。</li>
+  <li>无需提供回查方法，进一步减少的业务的侵入。</li>
+  <li>在某些场景下，还可以进一步利用注解等形式进行解耦，有可能实现无业务代码侵入式的实现。</li>
+</ul>
+
+<p>缺点：</p>
+
+<ul>
+  <li>本地消息表与业务耦合在一起，难于做成通用性，不可独立伸缩。</li>
+  <li>本地消息表是基于数据库来做的，而数据库是要读写磁盘IO的，因此在高并发下是有性能瓶颈的</li>
+</ul>
+
+<h4 id="最大努力通知">最大努力通知</h4>
+
+<p>最大努力通知型的最终一致性：</p>
+
+<blockquote>
+  <p>本质是通过引入<strong>定期校验机制</strong>实现最终一致性，对业务的侵入性较低，适合于对最终一致性敏感度比较低、业务链路较短的场景。</p>
+</blockquote>
+
+<p>因为核心要点一致，都是为了保证消息的一致性投递，所以，最大努力通知事务在投递流程上跟异步确保型是一样的，因此也有<strong>两个分支</strong>：</p>
+
+<ol>
+  <li>基于MQ自身的事务消息方案</li>
+  <li>基于DB的本地事务消息表方案</li>
+</ol>
+
+<h5 id="mq事务消息方案-1">MQ事务消息方案</h5>
+
+<p>要实现最大努力通知，可以采用 MQ 的 <strong>ACK 机制</strong>。</p>
+
+<p>最大努力通知事务在投递之前，跟异步确保型流程都差不多，关键在于<strong>投递后的处理</strong>。</p>
+
+<p>因为异步确保型在于内部的事务处理，所以MQ和系统是直连并且无需严格的权限、安全等方面的思路设计。最大努力通知事务在于第三方系统的对接，所以最大努力通知事务有几个特性：</p>
+
+<ul>
+  <li>业务主动方在完成业务处理后，向业务被动方(第三方系统)发送通知消息，允许存在<strong>消息丢失</strong>。</li>
+  <li>业务主动方提供递增多挡位时间间隔(5min、10min、30min、1h、24h)，用于失败重试调用业务被动方的接口；在通知N次之后就不再通知，报警+记日志+人工介入。</li>
+  <li>业务被动方提供<strong>幂等</strong>的服务接口，防止通知重复消费。</li>
+  <li>业务主动方需要有<strong>定期校验机制</strong>，对业务数据进行兜底；防止业务被动方无法履行责任时进行业务回滚，确保数据最终一致性。</li>
+</ul>
+
+<p><img src="../assets/07635bd7d5b14c28a79df06a8d34b37a.png" alt="在这里插入图片描述" /></p>
+
+<ol>
+  <li>业务活动的主动方，在完成业务处理之后，向业务活动的被动方发送消息，允许消息丢失。</li>
+  <li>主动方可以设置时间阶梯型通知规则，在通知失败后按规则重复通知，直到通知N次后不再通知。</li>
+  <li>主动方提供校对查询接口给被动方按需校对查询，用于恢复丢失的业务消息。</li>
+  <li>业务活动的被动方如果正常接收了数据，就正常返回响应，并结束事务。</li>
+  <li>如果被动方没有正常接收，根据定时策略，向业务活动主动方查询，恢复丢失的业务消息。</li>
+</ol>
+
+<p>特点：</p>
+
+<ol>
+  <li>用到的服务模式：可查询操作、幂等操作；</li>
+  <li>被动方的处理结果不影响主动方的处理结果；</li>
+  <li>适用于对业务最终一致性的时间敏感度低的系统；</li>
+  <li>适合跨企业的系统间的操作，或者企业内部比较独立的系统间的操作，比如银行通知、商户通知等；</li>
+</ol>
+
+<h5 id="本地消息表方案-1">本地消息表方案</h5>
+
+<p>要实现最大努力通知，可以采用 定期检查本地消息表的机制 。</p>
+
+<p><img src="../assets/36aef242d84b409a9a3ceb7d82b87662.png" alt="在这里插入图片描述" /></p>
+
+<p>发送消息方：</p>
+
+<ul>
+  <li>需要有一个消息表，记录着消息状态相关信息。</li>
+  <li>业务数据和消息表在同一个数据库，要保证它俩在同一个本地事务。直接利用本地事务，将业务数据和事务消息直接写入数据库。</li>
+  <li>在本地事务中处理完业务数据和写消息表操作后，通过写消息到 MQ 消息队列。使用专门的投递工作线程进行事务消息投递到MQ，根据投递ACK去删除事务消息表记录</li>
+  <li>消息会发到消息消费方，如果发送失败，即进行重试。</li>
+  <li>生产方定时扫描本地消息表，把还没处理完成的消息或者失败的消息再发送一遍。如果有靠谱的自动对账补账逻辑，这种方案还是非常实用的。</li>
+</ul>
+
+<p>最大努力通知事务在于第三方系统的对接，所以最大努力通知事务有几个特性：</p>
+
+<ul>
+  <li>业务主动方在完成业务处理后，向业务被动方(第三方系统)发送通知消息，允许存在消息丢失。</li>
+  <li>业务主动方提供递增多挡位时间间隔(5min、10min、30min、1h、24h)，用于失败重试调用业务被动方的接口；在通知N次之后就不再通知，报警+记日志+人工介入。</li>
+  <li>业务被动方提供幂等的服务接口，防止通知重复消费。</li>
+  <li>业务主动方需要有定期校验机制，对业务数据进行兜底；防止业务被动方无法履行责任时进行业务回滚，确保数据最终一致性。</li>
+</ul>
+
+<h4 id="通知型事务的问题">通知型事务的问题</h4>
+
+<p>通知型事务，是无法解决<strong>本地事务执行和消息发送的一致性</strong>问题的。</p>
+
+<ul>
+  <li>因为消息发送是一个网络通信的过程，发送消息的过程就有可能出现发送失败、或者超时的情况。</li>
+  <li>超时有可能发送成功了，有可能发送失败了，消息的发送方是无法确定的，所以此时消息发送方无论是提交事务还是回滚事务，都有可能不一致性出现。</li>
+</ul>
+
+<p>所以，通知型事务的难度在于： <strong>投递消息和参与者本地事务</strong>的一致性保障。</p>
+
+<h5 id="消息发送一致性">消息发送一致性</h5>
+
+<p>消息中间件在分布式系统中的核心作用就是：<strong>异步通讯、应用解耦和并发缓冲</strong>（也叫作流量削峰）。</p>
+
+<ul>
+  <li>在分布式环境下，需要通过网络进行通讯，就引入了数据传输的不确定性，也就是CAP理论中的分区容错性。</li>
+</ul>
+
+<p>消息发送一致性是指<strong>产生消息的业务动作与消息发送动作一致</strong>：也就是说如果业务操作成功，那么由这个业务操作所产生的消息一定要发送出去，否则就丢失。</p>
+
+<p>常规MQ消息处理流程和特点：</p>
+
+<p><img src="../assets/e3735223ce4f4a059f640eb9e0cbb9fa.png" alt="在这里插入图片描述" /></p>
+
+<p>常规的MQ队列处理流程无法实现消息的一致性。所以，需要借助<strong>半消息、本地消息表</strong>，保障一致性。</p>
+
+<h5 id="消息重复发送问题和业务接口幂等性设计">消息重复发送问题和业务接口幂等性设计</h5>
+
+<p><img src="../assets/5080680c67e745edab5ecd4752e6955b.png" alt="在这里插入图片描述" style="zoom:80%;" /></p>
+
+<p>对于未确认的消息，采用按规则重新投递的方式进行处理。</p>
+
+<p>对于以上流程，消息重复发送会导致业务处理接口出现重复调用的问题。</p>
+
+<ul>
+  <li>消息消费过程中消息重复发送的主要原因就是消费者成功接收处理完消息后，消息中间件没有及时更新投递状态导致的。</li>
+  <li>如果允许消息重复发送，那么消费方应该实现业务接口的幂等性设计。</li>
+</ul>
+
+<h3 id="补偿型事务">补偿型事务</h3>
+
+<h4 id="引入"><del>引入</del></h4>
+
+<p>但是基于消息实现的事务并不能解决所有的业务场景，例如以下场景：某笔订单完成时，同时扣掉用户的现金。</p>
+
+<p>这里事务发起方是管理订单库的服务，但对整个事务是否提交并不能只由订单服务决定，因为还要确保用户有足够的钱，才能完成这笔交易，而这个信息在管理现金的服务里。这里可以引入基于补偿实现的事务，其流程如下：</p>
+
+<ol>
+  <li>创建订单数据，但暂不提交本地事务</li>
+  <li>订单服务发送远程调用到现金服务，以扣除对应的金额</li>
+  <li>上述步骤成功后提交订单库的事务</li>
+</ol>
+
+<p>以上这个是正常成功的流程，异常流程需要回滚的话，将额外发送远程调用到现金服务以加上之前扣掉的金额。</p>
+
+<p>以上流程比基于消息队列实现的事务的流程要复杂，同时开发的工作量也更多：</p>
+
+<ul>
+  <li>编写订单服务里创建订单的逻辑</li>
+  <li>编写现金服务里扣钱的逻辑</li>
+  <li>编写现金服务里补偿返还的逻辑</li>
+</ul>
+
+<p>可以看到，该事务流程相对于基于消息实现的分布式事务更为复杂，需要额外开发相关的业务回滚方法，也失去了服务间流量削峰填谷的功能。</p>
+
+<ul>
+  <li>但其仅仅只比基于消息的事务复杂多一点，若不能使用基于消息队列的最终一致性事务，那么可以优先考虑使用基于补偿的事务形态。</li>
+</ul>
+
+<h4 id="什么是补偿模式">什么是补偿模式？</h4>
+
+<p>补偿模式：使用一个额外的<strong>协调服务</strong>来协调各个需要保证一致性的业务服务，协调服务按顺序调用各个业务微服务，如果某个业务服务<strong>调用异常</strong>（包括业务异常和技术异常）就取消之前所有已经调用成功的业务服务。</p>
+
+<p>补偿模式大致有TCC，和Saga两种细分的方案。</p>
+
+<h3 id="tcc-事务模型">TCC 事务模型</h3>
+
+<p><strong>TCC</strong>（<code class="highlighter-rouge">Try Confirm Cancel</code>）模式、补偿事务：是 2PC 两阶段提交的一个变种。针对每个操作，都需要有一个其对应的<strong>确认和取消</strong>操作（当操作成功时调用确认操作，当操作失败时调用取消操作）。</p>
+
+<ul>
+  <li>类似于二阶段提交，只不过是这里的提交和回滚是<strong>针对业务</strong>上的，所以基于TCC实现的分布式事务也可以看做是对业务的一种补偿机制。</li>
+  <li>TCC 提出了一种新的事务模型，基于业务层面的事务定义，锁粒度完全由业务自己控制，目的是解决复杂业务中，<strong>跨表跨库</strong>等大颗粒度资源锁定的问题。</li>
+  <li>TCC 把事务运行过程分成 Try、Confirm / Cancel 两个阶段，每个阶段的逻辑由业务代码控制，避免了<strong>长事务</strong>，可以获取更高的性能。</li>
+</ul>
+
+<p>TCC 分布式事务模型包括三部分：</p>
+
+<ol>
+  <li>
+    <p><strong>主业务服务</strong>：是整个业务活动的发起方，服务的编排者，负责<strong>发起并完成</strong>整个业务活动。</p>
+  </li>
+  <li><strong>从业务服务</strong>：是整个业务活动的<strong>参与方</strong>，负责提供 TCC 业务操作，实现<strong>初步操作(Try)、确认操作(Confirm)、取消操作(Cancel)</strong>三个接口，供主业务服务调用。</li>
+  <li><strong>业务活动管理器</strong>：管理控制整个业务活动，包括：
+    <ol>
+      <li>记录维护 TCC 全局事务的<strong>事务状态</strong>和每个从业务服务的<strong>子事务状态</strong>，</li>
+      <li>并在业务活动<strong>提交时</strong>调用所有从业务服务的 <strong>Confirm 操作</strong>，</li>
+      <li>在业务活动<strong>取消时</strong>调用所有从业务服务的 <strong>Cancel 操作</strong>。</li>
+    </ol>
+  </li>
+</ol>
+
+<h4 id="工作流程">工作流程</h4>
+
+<p>TCC 分布式事务模型相对于 XA 等传统模型，其特征在于：</p>
+
+<ul>
+  <li>它<strong>不依赖资源管理器(</strong>RM)对分布式事务的支持，而是通过<strong>对业务逻辑的分解</strong>来实现分布式事务。</li>
+</ul>
+
+<p>TCC 模型认为对于业务系统中一个特定的业务逻辑，其对外提供服务时，必须接受一些不确定性，即对业务逻辑初步操作的调用仅是一个临时性操作，调用它的主业务服务保留了后续的取消权。</p>
+
+<ul>
+  <li>如果主业务服务认为全局事务应该回滚，它会要求取消之前的临时性操作，这就对应从业务服务的取消操作。</li>
+  <li>而当主业务服务认为全局事务应该提交时，它会放弃之前临时性操作的取消权，这对应从业务服务的确认操作。每一个初步操作，最终都会被确认或取消。</li>
+</ul>
+
+<p>因此，针对一个具体的业务服务，TCC 分布式事务模型需要业务系统提供三段业务逻辑：</p>
+
+<ol>
+  <li>初步操作 <strong>Try 阶段</strong>： 调用 Try 接口，尝试执行业务。完成<strong>所有业务检查</strong>，预留必须的业务资源。</li>
+  <li><strong>Confirm 或 Cancel 阶段</strong>： 两者是互斥的，只能进入其中一个，并且都满足幂等性（保证一笔分布式事务有且只能成功一次），允许失败重试。
+    <ol>
+      <li>确认操作 Confirm： 对业务系统做确认提交，确认执行业务操作。真正执行的业务逻辑，不作任何业务检查，只使用 Try 阶段预留的业务资源。
+        <ul>
+          <li>因此，只要 Try 操作成功，Confirm 必须能成功。</li>
+        </ul>
+      </li>
+      <li>取消操作 Cancel：在业务执行错误，需要回滚的状态下执行业务取消，释放 （Try 阶段）预留的业务资源。</li>
+    </ol>
+  </li>
+</ol>
+
+<p>Try 阶段失败可以 Cancel，如果 Confirm 和 Cancel 阶段失败了怎么办？</p>
+
+<ul>
+  <li>TCC 中会添加<strong>事务日志</strong>，如果 Confirm 或者 Cancel 阶段出错，则会<strong>进行重试</strong>，所以这两个阶段需要支持幂等；如果重试失败，则需要人工介入进行恢复和处理等。</li>
+</ul>
+
+<p><img src="../assets/dbea27cab23c466c85b1b8474e1a25c8.png" alt="在这里插入图片描述" style="zoom:67%;" /></p>
+
+<p>TCC 分布式事务模型包括三部分：</p>
+
+<p><img src="../assets/62c12088f57c489b9c1ef09f852423ff.png" alt="在这里插入图片描述" /></p>
+
+<h4 id="tcc-事务案例">TCC 事务案例</h4>
+
+<p>然而基于补偿的事务形态也并非能实现所有的需求，如以下场景：某笔订单完成时，同时扣掉用户的现金，但交易未完成，也未被取消时，不能让客户看到钱变少了。</p>
+
+<p>这时可以引入TCC，其流程如下：</p>
+
+<ol>
+  <li>订单服务创建订单</li>
+  <li>订单服务发送远程调用到现金服务，冻结客户的现金</li>
+  <li>提交订单服务数据</li>
+  <li>订单服务发送远程调用到现金服务，扣除客户冻结的现金</li>
+</ol>
+
+<p>以上是正常完成的流程，若为异常流程，则需要发送远程调用请求到现金服务，撤销冻结的金额。</p>
+
+<p>以上流程比基于补偿实现的事务的流程要复杂，同时开发的工作量也更多：</p>
+
+<ul>
+  <li>订单服务编写创建订单的逻辑</li>
+  <li>现金服务编写冻结现金的逻辑</li>
+  <li>现金服务编写扣除现金的逻辑</li>
+  <li>现金服务编写解冻现金的逻辑</li>
+</ul>
+
+<p>TCC实际上是最为复杂的一种情况，其能处理所有的业务场景，但无论出于性能上的考虑，还是开发复杂度上的考虑，都应该尽量避免该类事务。</p>
+
+<h4 id="tcc-事务模型的要求">TCC 事务模型的要求</h4>
+
+<ol>
+  <li>可查询操作：服务操作具有<strong>全局唯一</strong>的标识，操作唯一的确定的时间。</li>
+  <li>幂等操作：重复调用多次产生的业务结果与调用一次产生的结果相同。
+    <ol>
+      <li>一是通过<strong>业务操作</strong>实现幂等性，</li>
+      <li>二是<strong>系统缓存</strong>所有请求与处理的结果，</li>
+      <li>最后是检测到重复请求之后，自动返回之前的处理结果。</li>
+    </ol>
+  </li>
+  <li>TCC操作：
+    <ol>
+      <li>Try阶段，尝试执行业务，完成所有业务的检查，实现一致性；预留必须的业务资源，实现准隔离性。</li>
+      <li>Confirm阶段：真正的去执行业务，不做任何检查，仅适用Try阶段预留的业务资源，Confirm操作还要满足幂等性。</li>
+      <li>Cancel阶段：取消执行业务，释放Try阶段预留的业务资源，Cancel操作要满足幂等性。</li>
+      <li>TCC与2PC(两阶段提交)协议的区别：
+        <ol>
+          <li>TCC位于业务服务层而不是资源层，TCC没有单独准备阶段，Try操作兼备资源操作与准备的能力，TCC中Try操作可以灵活的选择业务资源，锁定粒度。TCC的开发成本比2PC高。</li>
+          <li>实际上TCC也属于两阶段操作，但是TCC不等同于2PC操作。</li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+  <li>可补偿操作：
+    <ol>
+      <li>Do阶段：真正的执行业务处理，业务处理结果外部可见。</li>
+      <li>Compensate阶段：抵消或者部分撤销正向业务操作的业务结果，补偿操作满足幂等性。</li>
+      <li>约束：补偿操作在业务上可行，由于业务执行结果未隔离或者补偿不完整带来的风险与成本可控。</li>
+      <li>实际上，TCC的Confirm和Cancel操作可以看做是补偿操作。</li>
+    </ol>
+  </li>
+</ol>
+
+<h4 id="tcc-vs-dtp-事务模型">TCC VS DTP 事务模型</h4>
+
+<p>DTP模型，全称 <code class="highlighter-rouge">X/Open</code> <code class="highlighter-rouge">Distributed Transaction Processing</code> <code class="highlighter-rouge">Reference Model</code>，是一个由X/Open组织（现称为The Open Group）定义的分布式事务处理规范。</p>
+
+<ul>
+  <li>这个模型主要使用了两阶段提交（2PC - Two-Phase-Commit）来保证分布式事务的完整性。</li>
+  <li>DTP模型在分布式系统中非常重要，因为它允许<strong>跨越多个网络主机</strong>的事务处理。</li>
+</ul>
+
+<p>在DTP模型中，有三个核心角色：</p>
+
+<ol>
+  <li><strong>AP（Application Program）</strong>：应用程序，定义事务的边界，并在事务边界内对资源进行操作。</li>
+  <li><strong>TM（Transaction Manager）</strong>：事务管理器，负责分配事务唯一标识，监控事务的执行进度，并负责事务的提交、回滚等。</li>
+  <li><strong>RM（Resource Manager）</strong>：资源管理器，通常是指数据库管理系统，负责管理资源（如数据库记录）并提供访问资源的方式。</li>
+</ol>
+
+<p>DTP模型的执行流程大致如下：</p>
+
+<ol>
+  <li>AP通过TM向TM注册一个全局事务，并告知TM需要操作哪些资源。</li>
+  <li>TM通过XA接口通知每个管理对应资源域的RM开启一个子事务。</li>
+  <li>AP通过RM对资源进行操作，并根据执行结果通知TM提交或回滚全局事务。</li>
+  <li>如果所有子事务全部执行成功，则TM提交全局事务；否则，TM通知所有RM回滚子事务。</li>
+</ol>
+
+<p>DTP模型通过XA规范定义了TM和RM之间的接口，XA接口是双向的系统接口，在事务管理器和资源管理器之间形成通信桥梁。XA规范主要定义了全局事务管理器和局部资源管理器之间的接口，使得多个资源（如数据库、应用服务器、消息队列等）可以在一个事务中处理，同时跨应用满足ACID属性。</p>
+
+<p>DTP模型的优点在于它提供了一种标准化的方式来处理分布式事务，但同时也存在一些局限性，比如性能问题。由于DTP模型通常采用基于锁的并发控制来保证事务的隔离性，这意味着资源将被锁定直至事务结束，这可能会严重影响系统的并发性能。此外，DTP模型主要适用于单服务、跨资源场景，对于跨服务、跨资源的分布式事务处理可能不够有效。</p>
+
+<p>TCC事务模型（Try-Confirm-Cancel）是一种分布式事务解决方案，它通过将事务的执行过程分为三个阶段来实现分布式事务的原子性和一致性。这种模型不依赖于底层资源管理器（如数据库）对分布式事务的支持，而是通过对业务逻辑的分解来实现分布式事务。以下是TCC事务模型的三个核心阶段：</p>
+
+<ol>
+  <li><strong>Try阶段</strong>：这是事务的准备阶段，主要完成所有业务的检查和资源的预留。例如，在电商下单场景中，Try阶段会检查库存是否充足，并冻结相应的库存资源。</li>
+  <li><strong>Confirm阶段</strong>：如果Try阶段成功，那么在Confirm阶段会执行真正的业务操作，如真正地扣除库存、扣款等。这个阶段的操作必须满足幂等性，即无论执行多少次，结果都是一样的。</li>
+  <li><strong>Cancel阶段</strong>：如果Try阶段执行成功，但在后续过程中需要回滚事务（比如用户取消订单），则进入Cancel阶段，释放Try阶段预留的所有资源，如解冻库存等。Cancel操作也必须满足幂等性。</li>
+</ol>
+
+<p>TCC模型的优势在于它提供了一种灵活的事务管理方式，允许业务系统根据具体业务逻辑来实现Try、Confirm和Cancel三个阶段的操作。这使得TCC模型能够适应复杂的业务场景，并且可以通过减少资源锁定的时间来提高系统的并发性能。</p>
+
+<p>然而，TCC模型的缺点在于它对业务代码的侵入性较强，需要业务系统开发者实现Try、Confirm和Cancel三个接口，这增加了开发的复杂度和维护成本。此外，为了保证事务的最终一致性，开发者需要确保Confirm和Cancel操作的幂等性，这可能需要额外的设计和实现工作。</p>
+
+<p>在实际应用中，TCC模型适用于那些对性能要求较高、业务逻辑复杂且需要细粒度控制事务的场景。例如，在互联网金融、电子商务等领域，TCC模型可以帮助实现跨服务、跨数据库的事务一致性</p>
+
+<p>比较一下TCC事务模型和DTP事务模型，如下所示：</p>
+
+<p><img src="../assets/7515ca55ba8b43f096d16e5dcd05630b.png" alt="在这里插入图片描述" /></p>
+
+<p>这两张图看起来差别较大，实际上很多地方是类似的!</p>
+
+<p>1、TCC模型中的 主业务服务 相当于 DTP模型中的AP，TCC模型中的从业务服务 相当于 DTP模型中的RM</p>
+
+<ul>
+  <li>在DTP模型中，应用AP操作多个资源管理器RM上的资源；而在TCC模型中，是主业务服务操作多个从业务服务上的资源。例如航班预定案例中，美团App就是主业务服务，而川航和东航就是从业务服务，主业务服务需要使用从业务服务上的机票资源。不同的是DTP模型中的资源提供者是类似于Mysql这种关系型数据库，而TCC模型中资源的提供者是其他业务服务。</li>
+</ul>
+
+<p>2、TCC模型中，从业务服务提供的try、confirm、cancel接口 相当于 DTP模型中RM提供的prepare、commit、rollback接口</p>
+
+<ul>
+  <li>XA协议中规定了DTP模型中定RM需要提供prepare、commit、rollback接口给TM调用，以实现两阶段提交。</li>
+  <li>而在TCC模型中，从业务服务相当于RM，提供了类似的try、confirm、cancel接口。</li>
+</ul>
+
+<p>3、事务管理器</p>
+
+<ul>
+  <li>DTP模型和TCC模型中都有一个事务管理器。不同的是：</li>
+  <li>在DTP模型中，阶段1的(prepare)和阶段2的(commit、rollback)，都是由TM进行调用的。</li>
+  <li>在TCC模型中，阶段1的try接口是主业务服务调用(绿色箭头)，阶段2的(confirm、cancel接口)是事务管理器TM调用(红色箭头)。这就是 TCC 分布式事务模型的二阶段异步化功能，从业务服务的第一阶段执行成功，主业务服务就可以提交完成，然后再由事务管理器框架异步的执行各从业务服务的第二阶段。这里牺牲了一定的隔离性和一致性的，但是提高了长事务的可用性。</li>
+</ul>
+
+<h4 id="tcc与2pc对比">TCC与2PC对比</h4>
+
+<h5 id="二者本质差不多">二者本质差不多</h5>
+
+<ul>
+  <li>T就是Try，两个C分别是Confirm和Cancel。</li>
+  <li>Try就是尝试，请求链路中每个参与者依次执行Try逻辑，如果都成功，就再执行Confirm逻辑，如果有失败，就执行Cancel逻辑。</li>
+</ul>
+
+<p>TCC与XA两阶段提交有着异曲同工之妙：</p>
+
+<p><img src="../assets/6c9c3d703fb34b428a05fed189630212.png" alt="在这里插入图片描述" style="zoom: 50%;" /></p>
+
+<ol>
+  <li>在阶段1：
+    <ul>
+      <li>在XA中，各个RM准备提交各自的事务分支，事实上就是准备提交资源的更新操作(insert、delete、update等)；</li>
+      <li>而在TCC中，是主业务活动请求(try)各个从业务服务预留资源。</li>
+    </ul>
+  </li>
+  <li>在阶段2：
+    <ul>
+      <li>XA根据第一阶段每个RM是否都prepare成功，判断是要提交还是回滚。如果都prepare成功，那么就commit每个事务分支，反之则rollback每个事务分支。</li>
+      <li>TCC中，如果在第一阶段所有业务资源都预留成功，那么confirm各个从业务服务，否则取消(cancel)所有从业务服务的资源预留请求。</li>
+    </ul>
+  </li>
+</ol>
+
+<h5 id="不同的是">不同的是</h5>
+
+<ul>
+  <li>XA是资源层面的分布式事务，强一致性，在两阶段提交的整个过程中，一直会持有资源的锁。基于数据库锁实现，需要数据库支持XA协议，由于在执行事务的全程都需要对相关数据加锁，一般高并发性能会比较差</li>
+  <li>TCC是业务层面的分布式事务，最终一致性，不会一直持有资源的锁，性能较好。但是对微服务的侵入性强，微服务的每个事务都必须实现try、confirm、cancel等3个方法，开发成本高，今后维护改造的成本也高为了达到事务的一致性要求，try、confirm、cancel接口必须实现幂等性操作由于事务管理器要记录事务日志，必定会损耗一定的性能，并使得整个TCC事务时间拉长</li>
+</ul>
+
+<blockquote>
+  <p>TCC它会弱化每个步骤中对于资源的锁定，以达到一个能承受高并发的目的（基于最终一致性）。</p>
+</blockquote>
+
+<p>具体的说明如下：</p>
+
+<p>XA是资源层面的分布式事务，强一致性，在两阶段提交的整个过程中，一直会持有资源的锁。</p>
+
+<p>XA事务中的两阶段提交内部过程是对开发者屏蔽的，开发者从代码层面是感知不到这个过程的。而事务管理器在两阶段提交过程中，从prepare到commit/rollback过程中，资源实际上一直都是被加锁的。如果有其他人需要更新这两条记录，那么就必须等待锁释放。</p>
+
+<p>TCC是业务层面的分布式事务，最终一致性，不会一直持有资源的锁。</p>
+
+<p>TCC中的两阶段提交并没有对开发者完全屏蔽，也就是说从代码层面，开发者是可以感受到两阶段提交的存在。try、confirm/cancel在执行过程中，一般都会开启各自的本地事务，来保证方法内部业务逻辑的ACID特性。其中：</p>
+
+<p>1、try过程的本地事务，是保证资源预留的业务逻辑的正确性。</p>
+
+<p>2、confirm/cancel执行的本地事务逻辑确认/取消预留资源，以保证最终一致性，也就是所谓的补偿型事务(Compensation-Based Transactions)。由于是多个独立的本地事务，因此不会对资源一直加锁。</p>
+
+<p>另外，这里提到confirm/cancel执行的本地事务是 <strong>补偿性事务：</strong></p>
+
+<p>补偿是一个独立的支持ACID特性的本地事务，用于在逻辑上取消服务提供者上一个ACID事务造成的影响，对于一个长事务(long-running transaction)，与其实现一个巨大的分布式ACID事务，不如使用基于补偿性的方案，把每一次服务调用当做一个较短的本地ACID事务来处理，执行完就立即提交</p>
+
+<h4 id="使用场景">使用场景</h4>
+
+<p>TCC是可以解决部分场景下的分布式事务的，但是，它的一个问题在于，需要每个参与者都分别实现Try，Confirm和Cancel接口及逻辑，这对于业务的侵入性是巨大的。</p>
+
+<p>TCC 方案严重依赖回滚和补偿代码，最终的结果是：回滚代码逻辑复杂，业务代码很难维护。所以，TCC 方案的使用场景较少，但是也有使用的场景。</p>
+
+<p>比如说跟钱打交道的，支付、交易相关的场景，大家会用 TCC方案，严格保<strong>证分布式事务要么全部成功，要么全部自动回滚</strong>，严格保证资金的正确性，保证在资金上不会出现问题。</p>
+
+<p><img src="../assets/3679ae02f65f41a58f02ab2cbfb8b0fc.png" alt="在这里插入图片描述" style="zoom:67%;" /></p>
+
+<h3 id="saga-长事务模型">SAGA 长事务模型</h3>
+
+<p>SAGA可以看做一个异步的、利用队列实现的补偿事务。</p>
+
+<ul>
+  <li>设计目标是对业务无侵入，因此它是从业务无侵入的<strong>两阶段提交</strong>（全局事务）着手，在传统的两阶段上进行改进。</li>
+</ul>
+
+<ol>
+  <li>把一个分布式事务理解成一个包含了若干<strong>分支事务</strong>的全局事务。</li>
+  <li>而全局事务的职责是协调它管理的分支事务达成一致性，要么一起成功提交，要么一起失败回滚。也就是一荣俱荣一损俱损~</li>
+</ol>
+
+<h4 id="saga-模型">Saga 模型</h4>
+
+<p>Saga是一个长活事务可被分解成可以交错运行的子事务集合。</p>
+
+<ul>
+  <li>其中每个子事务都是一个保持数据库一致性的真实事务。</li>
+</ul>
+
+<p><strong>Saga</strong>模型是把一个分布式事务拆分为多个本地事务，每个本地事务都有相应的执行模块和补偿模块（对应TCC中的Confirm和Cancel），当Saga事务中任意一个本地事务出错时，可以通过调用相关的补偿方法恢复之前的事务，达到事务最终一致性。</p>
+
+<p>这样的SAGA事务模型，是牺牲了一定的隔离性和一致性的，但是提高了long-running事务的可用性。</p>
+
+<p>Saga 模型由三部分组成：</p>
+
+<ol>
+  <li><strong>LLT</strong>（Long Live Transaction）：由一个个本地事务组成的事务链。</li>
+  <li><strong>本地事务</strong>：事务链由一个个子事务（本地事务）组成，LLT = T1+T2+T3+…+Ti。</li>
+  <li><strong>补偿</strong>：每个本地事务 Ti 有对应的补偿 Ci。</li>
+</ol>
+
+<p>执行顺序有两种：</p>
+
+<ul>
+  <li>T1, T2, T3, …, Tn</li>
+  <li>T1, T2, …, Tj, Cj,…, C2, C1，其中0 &lt; j &lt; n</li>
+</ul>
+
+<p>Saga 两种恢复策略：</p>
+
+<ul>
+  <li><strong>向后恢复</strong>（Backward Recovery）：撤销掉之前所有成功子事务。如果任意本地子事务失败，则补偿已完成的事务。如异常情况的执行顺序T1,T2,T3,..Ti,Ci,…C3,C2,C1。</li>
+</ul>
+
+<p><img src="../assets/d20fde8602584c66acfcd9135dd9975e.png" alt="在这里插入图片描述" style="zoom:50%;" /></p>
+
+<ul>
+  <li><strong>向前恢复</strong>（Forward Recovery）：即重试失败的事务，适用于必须要成功的场景，该情况下不需要Ci。执行顺序：T1,T2,…,Tj（失败）,Tj（重试）,…,Ti。</li>
+</ul>
+
+<p>显然，向前恢复没有必要提供补偿事务，如果你的业务中，子事务（最终）总会成功，或补偿事务难以定义或不可能，向前恢复更符合你的需求。</p>
+
+<p>理论上补偿事务永不失败，然而，在分布式世界中，服务器可能会宕机，网络可能会失败，甚至数据中心也可能会停电。在这种情况下我们能做些什么？ 最后的手段是提供回退措施，比如人工干预。</p>
+
+<h4 id="使用条件">使用条件</h4>
+
+<p>Saga看起来很有希望满足我们的需求。所有长活事务都可以这样做吗？这里有一些限制：</p>
+
+<ol>
+  <li>Saga只允许<strong>两个层次的嵌套</strong>，顶级的Saga和简单子事务</li>
+  <li>在外层，全原子性不能得到满足。也就是说，sagas可能会看到其他sagas的部分结果</li>
+  <li>每个子事务应该是独立的原子行为</li>
+  <li>在我们的业务场景下，各个业务环境（如：航班预订、租车、酒店预订和付款）是自然独立的行为，而且每个事务都可以用对应服务的数据库保证原子操作。</li>
+</ol>
+
+<p>补偿也有需考虑的事项：</p>
+
+<ul>
+  <li>补偿事务从语义角度撤消了事务Ti的行为，但未必能将数据库返回到执行Ti时的状态。（例如，如果事务触发导弹发射， 则可能无法撤消此操作）</li>
+</ul>
+
+<p>但这对我们的业务来说不是问题。其实难以撤消的行为也有可能被补偿。例如，发送电邮的事务可以通过发送解释问题的另一封电邮来补偿。</p>
+
+<h4 id="对于acid的保证"><strong>对于ACID的保证：</strong></h4>
+
+<p>Saga对于ACID的保证和TCC一样：</p>
+
+<ol>
+  <li>原子性（Atomicity）：正常情况下保证。</li>
+  <li><strong>一致性</strong>（Consistency），在某个时间点，会出现A库和B库的数据违反一致性要求的情况，但是最终是一致的。</li>
+  <li>隔离性（Isolation），在某个时间点，A事务能够读到B事务部分提交的结果。</li>
+  <li><strong>持久性</strong>（Durability），和本地事务一样，只要commit则数据被持久。</li>
+</ol>
+
+<p>Saga不提供ACID保证，因为原子性和隔离性不能得到满足。</p>
+
+<ul>
+  <li>通过saga log，saga可以保证<strong>一致性和持久性</strong>。</li>
+</ul>
+
+<h4 id="saga模型的解决方案">SAGA模型的解决方案</h4>
+
+<p>SAGA模型的核心思想是，通过某种方案，将分布式事务转化为本地事务，从而降低问题的复杂性。</p>
+
+<p>比如以DB和MQ的场景为例，业务逻辑如下：</p>
+
+<ol>
+  <li>向DB中插入一条数据。</li>
+  <li>向MQ中发送一条消息。</li>
+</ol>
+
+<p>由于上述逻辑中，对应了两种存储端，即DB和MQ，所以，简单的通过本地事务是无法解决的。那么，依照SAGA模型，可以有两种解决方案。</p>
+
+<h5 id="方案一半消息模式">方案一：半消息模式</h5>
+
+<p>RocketMQ新版本中，就支持了这种模式。</p>
+
+<p>首先，我们理解什么是半消息。简单来说，就是在消息上加了一个状态。当发送者第一次将消息放入MQ后，该消息为待确认状态。该状态下，该消息是不能被消费者消费的。发送者必须二次和MQ进行交互，将消息从待确认状态变更为确认状态后，消息才能被消费者消费。待确认状态的消息，就称之为半消息。</p>
+
+<p>半消息的完整事务逻辑如下：</p>
+
+<ol>
+  <li>向MQ发送半消息。</li>
+  <li>向DB插入数据。</li>
+  <li>向MQ发送确认消息。</li>
+</ol>
+
+<p>我们发现，通过半消息的形式，将DB的操作夹在了两个MQ操作的中间。假设，第2步失败了，那么，MQ中的消息就会一直是半消息状态，也就不会被消费者消费。</p>
+
+<p>那么，半消息就一直存在于MQ中吗？或者是说如果第3步失败了呢？</p>
+
+<p>为了解决上面的问题，MQ引入了一个扫描的机制。即MQ会每隔一段时间，对所有的半消息进行扫描，并就扫描到的存在时间过长的半消息，向发送者进行询问，询问如果得到确认回复，则将消息改为确认状态，如得到失败回复，则将消息删除。</p>
+
+<p><img src="../assets/ef7455c6ece44d8aa39b33b8a1311e83.png" alt="" style="zoom:50%;" />
+半消息如上，半消息机制的一个问题是：要求业务方提供查询消息状态接口，对业务方依然有较大的侵入性。</p>
+
+<h5 id="方案二本地消息表">方案二：本地消息表</h5>
+
+<p>在DB中，新增一个消息表，用于存放消息。如下：</p>
+
+<ol>
+  <li>在DB业务表中插入数据。</li>
+  <li>在DB消息表中插入数据。</li>
+  <li>异步将消息表中的消息发送到MQ，收到ack后，删除消息表中的消息。
+ <img src="../assets/6241076994684a20a3afaf9cb91e1ac2.png" alt="在这里插入图片描述" style="zoom:50%;" /></li>
+</ol>
+
+<p>本地消息表如上，通过上述逻辑，将一个分布式的事务，拆分成两大步。第1和第2，构成了一个本地的事务，从而解决了分布式事务的问题。</p>
+
+<p>这种解决方案，不需要业务端提供消息查询接口，只需要稍微修改业务逻辑，侵入性是最小的。</p>
+
+<h4 id="saga的案例">SAGA的案例</h4>
+
+<p>SAGA适用于无需马上返回业务发起方最终状态的场景，例如：你的请求已提交，请稍后查询或留意通知 之类。</p>
+
+<p>将上述补偿事务的场景用SAGA改写，其流程如下：</p>
+
+<ol>
+  <li>订单服务创建最终状态未知的订单记录，并提交事务</li>
+  <li>现金服务扣除所需的金额，并提交事务</li>
+  <li>订单服务更新订单状态为成功，并提交事务</li>
+</ol>
+
+<p>以上为成功的流程，若现金服务扣除金额失败，那么，最后一步订单服务将会更新订单状态为失败。</p>
+
+<p>其业务编码工作量比补偿事务多一点，包括以下内容：</p>
+
+<ul>
+  <li>订单服务创建初始订单的逻辑</li>
+  <li>订单服务确认订单成功的逻辑</li>
+  <li>订单服务确认订单失败的逻辑</li>
+  <li>现金服务扣除现金的逻辑</li>
+  <li>现金服务补偿返回现金的逻辑</li>
+</ul>
+
+<p>但其相对于补偿事务形态有性能上的优势，所有的本地子事务执行过程中，都无需等待其调用的子事务执行，减少了加锁的时间，这在事务流程较多较长的业务中性能优势更为明显。同时，其利用队列进行进行通讯，具有削峰填谷的作用。</p>
+
+<p>因此该形式适用于不需要同步返回发起方执行最终结果、可以进行补偿、对性能要求较高、不介意额外编码的业务场景。</p>
+
+<p>但当然SAGA也可以进行稍微改造，变成与TCC类似、可以进行资源预留的形态</p>
+
+<h4 id="saga和tcc对比"><strong>Saga和TCC对比</strong></h4>
+
+<p>Saga相比TCC的缺点是缺少预留动作，导致补偿动作的实现比较麻烦：</p>
+
+<ul>
+  <li>Ti就是commit，比如一个业务是发送邮件，在TCC模式下，先保存草稿（Try）再发送（Confirm），撤销的话直接删除草稿（Cancel）就行了。</li>
+  <li>而Saga则就直接发送邮件了（Ti），如果要撤销则得再发送一份邮件说明撤销（Ci），实现起来有一些麻烦。</li>
+</ul>
+
+<p>如果把上面的发邮件的例子换成：A服务在完成Ti后立即发送Event到ESB（企业服务总线，可以认为是一个消息中间件），下游服务监听到这个Event做自己的一些工作然后再发送Event到ESB，如果A服务执行补偿动作Ci，那么整个补偿动作的层级就很深。</p>
+
+<p>不过没有预留动作也可以认为是优点：</p>
+
+<ul>
+  <li>有些业务很简单，套用TCC需要修改原来的业务逻辑，而Saga只需要添加一个补偿动作就行了。</li>
+  <li>TCC最少通信次数为2n，而Saga为n（n=sub-transaction的数量）。</li>
+  <li>有些第三方服务没有Try接口，TCC模式实现起来就比较tricky了，而Saga则很简单。</li>
+  <li>没有预留动作就意味着不必担心资源释放的问题，异常处理起来也更简单。</li>
+</ul>
+
+<h5 id="saga对比tcc">Saga对比TCC</h5>
+
+<p>Saga和TCC都是补偿型事务，他们的区别为：</p>
+
+<p>劣势：</p>
+
+<ul>
+  <li>无法保证隔离性；</li>
+</ul>
+
+<p>优势：</p>
+
+<ul>
+  <li>一阶段提交本地事务，无锁，高性能；</li>
+  <li>事件驱动模式，参与者可异步执行，高吞吐；</li>
+  <li>Saga 对业务侵入较小，只需要提供一个逆向操作的Cancel即可；而TCC需要对业务进行全局性的流程改造；</li>
+</ul>
+
+<h2 id="各模式方案对比">各模式方案对比</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>属性</th>
+      <th>2PC</th>
+      <th>TCC</th>
+      <th>Saga</th>
+      <th>异步确保型事务</th>
+      <th>尽最大努力通知</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>事务一致性</td>
+      <td>强</td>
+      <td>弱</td>
+      <td>弱</td>
+      <td>弱</td>
+      <td>弱</td>
+    </tr>
+    <tr>
+      <td>复杂性</td>
+      <td>中</td>
+      <td>高</td>
+      <td>中</td>
+      <td>低</td>
+      <td>低</td>
+    </tr>
+    <tr>
+      <td>业务侵入性</td>
+      <td>小</td>
+      <td>大</td>
+      <td>小</td>
+      <td>中</td>
+      <td>中</td>
+    </tr>
+    <tr>
+      <td>使用局限性</td>
+      <td>大</td>
+      <td>大</td>
+      <td>中</td>
+      <td>小</td>
+      <td>中</td>
+    </tr>
+    <tr>
+      <td>性能</td>
+      <td>低</td>
+      <td>中</td>
+      <td>高</td>
+      <td>高</td>
+      <td>高</td>
+    </tr>
+    <tr>
+      <td>维护成本</td>
+      <td>低</td>
+      <td>高</td>
+      <td>中</td>
+      <td>低</td>
+      <td>中</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="面试题标准答案">面试题标准答案</h2>
+
+<p>现在Java面试，分布式系统、分布式事务几乎是标配。而分布式系统、分布式事务本身比较复杂，大家学起来也非常头疼。</p>
+
+<blockquote>
+  <p>面试题：分布式事务了解吗？你们是如何解决分布式事务问题的？</p>
+</blockquote>
+
+<p>Seata AT/TCC 和 MQ异步确保型 事务 是在生产中最常用。</p>
+
+<ul>
+  <li>强一致性模型， <strong>Seata AT/TCC 强一致方案</strong> 模式用于强一致主要用于核心模块（例如交易/订单等）。</li>
+  <li>弱一致性模型。 <strong>MQ 异步确保型 事务 弱一致方案</strong>一般用于边缘模块（例如库存），通过 MQ 原子消息和发布订阅，保证最终一致性，也可以业务解耦。</li>
+</ul>
+
+<blockquote>
+  <p>面试中如果真的被问到，可以分场景回答：</p>
+</blockquote>
+
+<h4 id="1强一致性场景">（1）强一致性场景</h4>
+
+<p>对于那些特别严格的场景，用的是Seata AT模式来保证强一致性；</p>
+
+<p>准备好例子：找一个严格要求数据绝对不能错的场景（如电商交易交易中的<strong>库存和订单</strong>、优惠券），可以使用成熟的如中间件 <strong>Seata AT 模式</strong>。</p>
+
+<ul>
+  <li>阿里开源了分布式事务框架seata，经历过阿里生产环境大量考验的框架。支持Dubbo，Spring Cloud。</li>
+</ul>
+
+<p><img src="../assets/104e974d57074ac89f3b10b0c3374280.png" alt="在这里插入图片描述" style="zoom:67%;" /></p>
+
+<p>Seata AT/TCC模式，保障强一致性，支持<strong>跨多个库</strong>修改数据；</p>
+
+<ul>
+  <li>订单库：增加订单</li>
+  <li>商品库：扣减库存</li>
+  <li>优惠券库：预扣优惠券</li>
+</ul>
+
+<h4 id="2弱一致性场景">（2）弱一致性场景</h4>
+
+<p>基于可靠消息的最终一致性，各个子事务可以较长时间内异步，但数据绝对不能丢的场景。可以使用<strong>基于MQ的异步确保型事务</strong>。</p>
+
+<p>比如电商平台的<strong>通知支付结果</strong>：</p>
+
+<ul>
+  <li><strong>积分服务</strong>：增加积分</li>
+  <li>会计服务：生成会计记录</li>
+</ul>
+
+<p><img src="../assets/bf54a16d18484430937659666f6456ff.png" alt="在这里插入图片描述" style="zoom: 67%;" /></p>
+
+<h4 id="3强弱结合一致性场景">（3）强弱结合一致性场景</h4>
+
+<p>两阶段 提交，如 <strong>Seata AT/TCC模式</strong>，保障强一致性，支持跨多个库修改数据；</p>
+
+<ul>
+  <li>订单库：增加订单</li>
+  <li>商品库：扣减库存</li>
+  <li>优惠券库：预扣优惠券</li>
+</ul>
+
+<p>异步确保型事务，保障弱一致性，支持跨多个服务和系统修改数据，在下面的场景中相关的弱一致性操作为：</p>
+
+<ul>
+  <li>积分服务：增加积分</li>
+  <li>通知服务：发生通知</li>
+</ul>
+
+<p>弱一致性部分：如果不是严格对数据一致性要求、或者由不同系统执行子事务的场景，如电商发送成功支付成功消息，只需要保障弱一致性即可。</p>
+
+<p><img src="../assets/9f3278b002f54e3487c3fdb2e8175ea6.png" alt="在这里插入图片描述" style="zoom: 60%;" /></p>
+
+<p>Seata 新功能: 和Rocketmq 事务消息实现，实现 强弱结合型事务 , 具体参见下面的文章：</p>
+
+<p><a href="https://mp.weixin.qq.com/s/UVigpiFajKPoVx_gQXgD3w">最新 Seata 集成了RocketMQ事务消息，Seata 越来越 牛X 了！ yyds ！</a></p>
+
+<h2 id="电商交易场景">电商交易场景</h2>
+
+<p>以电商交易场景为例，<strong>用户支付订单</strong>这一核心操作的同时会涉及到下游物流发货、积分变更、购物车状态清空等多个子系统的变更。</p>
+
+<p><img src="../assets/2487169-20240328135421135-2094592544.png" alt="img" style="zoom: 80%;" /></p>
+
+<h4 id="1传统xa事务方案性能不足">1、传统XA事务方案：性能不足</h4>
+
+<p>为了保证上述四个分支的执行结果一致性，典型方案是基于 XA 协议的分布式事务系统来实现。将四个调用分支封装成包含四个独立事务分支的大事务。基于 XA 分布式事务的方案可以满足业务处理结果的正确性，但最大的缺点是多分支环境下资源锁定范围大，并发度低，随着下游分支的增加，系统性能会越来越差。</p>
+
+<h4 id="2基于普通消息方案一致性保障困难"><strong>2、基于普通消息方案：一致性保障困难</strong></h4>
+
+<p><img src="../assets/2487169-20240328135422714-1582300416.png" alt="img" style="zoom:80%;" /></p>
+
+<p>该方案中消息下游分支和订单系统变更的主分支很容易出现不一致的现象，例如：</p>
+
+<ul>
+  <li>消息发送成功，订单没有执行成功，需要回滚整个事务。</li>
+  <li>订单执行成功，消息没有发送成功，需要额外补偿才能发现不一致。</li>
+  <li>消息发送超时未知，此时无法判断需要回滚订单还是提交订单变更。</li>
+</ul>
+
+<h4 id="3基于-rocketmq-分布式事务消息支持最终一致性"><strong>3、基于 RocketMQ 分布式事务消息：支持最终一致性</strong></h4>
+
+<p>上述普通消息方案中，普通消息和订单事务无法保证一致的原因，本质上是由于普通消息无法像单机数据库事务一样，具备提交、回滚和统一协调的能力。</p>
+
+<p>而基于 RocketMQ 实现的分布式事务消息功能，在普通消息基础上，支持二阶段的提交能力。将二阶段提交和本地事务绑定，实现全局提交结果的一致性。</p>
+
+<p>RocketMQ 事务消息是支持在分布式场景下<strong>保障消息生产和本地事务的最终一致性</strong>。交互流程如下图所示：</p>
+
+<p><img src="../assets/2487169-20240328135420274-1404471145.png" alt="img" /></p>
+
+<p>1、生产者将消息发送至 Broker 。</p>
+
+<p>2、Broker 将消息持久化成功之后，向生产者返回 Ack 确认消息已经发送成功，此时消息被标记为”<strong>暂不能投递</strong>“，这种状态下的消息即为<strong>半事务消息</strong>。</p>
+
+<p>3、生产者开始<strong>执行本地事务逻辑</strong>。</p>
+
+<p>4、生产者根据本地事务执行结果向服务端<strong>提交二次确认结果</strong>（ Commit 或是 Rollback ），Broker 收到确认结果后处理逻辑如下：</p>
+
+<ul>
+  <li>二次确认结果为 Commit ：Broker 将半事务消息标记为可投递，并投递给消费者。</li>
+  <li>二次确认结果为 Rollback ：Broker 将回滚事务，不会将半事务消息投递给消费者。</li>
+</ul>
+
+<p>5、在断网或者是生产者应用重启的特殊情况下，若 Broker 未收到发送者提交的二次确认结果，或 Broker 收到的二次确认结果为 Unknown 未知状态，经过固定时间后，服务端将对消息生产者即生产者集群中任一生产者实例发起<strong>消息回查</strong>。</p>
+
+<ol>
+  <li>生产者收到消息回查后，需要检查对应消息的本地事务执行的最终结果。</li>
+  <li>生产者根据检查到的本地事务的最终状态<strong>再次提交二次确认</strong>，服务端仍按照步骤4对半事务消息进行处理。</li>
+</ol>

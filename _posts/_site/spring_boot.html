@@ -1,5 +1,5 @@
 <blockquote>
-  <p>摘要：Spring Boot 包括配置、自动装配、数据库等。Spring Boot 整合 Web、Hibernate、MyBatis、Redis、ELK、Swagger-UI、Security、Hutool 等。</p>
+  <p>摘要：Spring Boot 包括配置、自动装配、数据库等。另外，Spring Boot 整合 Web、Hibernate、MyBatis、Redis、ELK、Swagger-UI、Security、Hutool 等见其它文档。</p>
 </blockquote>
 
 <!-- more -->
@@ -117,10 +117,10 @@
   <li>
     <p><code class="highlighter-rouge">@Value("${url}")</code>：用在<strong>属性</strong>上，只读取配置文件中的某一个配置，与当前属性<strong>绑定</strong>；只支持基本数据类型 + String 类型，支持 SpEL 表达式。<strong>不推荐</strong>。与 <a href="#数据类型转换">Lombok 常用注解</a>重名；</p>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> import org.springframework.beans.factory.annotation.Value;
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Value</span><span class="o">;</span>
     
- @Value("${aliyun.oss.accessKeyId}")
- private String ALIYUN_OSS_ACCESSKEYID;
+ <span class="nd">@Value</span><span class="o">(</span><span class="s">"${aliyun.oss.accessKeyId}"</span><span class="o">)</span>
+ <span class="kd">private</span> <span class="n">String</span> <span class="n">ALIYUN_OSS_ACCESSKEYID</span><span class="o">;</span>
 </code></pre></div>    </div>
   </li>
   <li>
@@ -149,10 +149,10 @@
   <li>在 <code class="highlighter-rouge">application.properties</code> 文件中添加 <code class="highlighter-rouge">spring.profiles.active=dev</code>；</li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 命令行激活：将 Spring Boot 项目打包成 JAR 文件
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 命令行激活：将 Spring Boot 项目打包成 JAR 文件
 // 命令行窗口，跳转到 JAR 文件所在目录，执行以下命令，
 // 启动该项目，并激活开发环境的 Profile。
-java -jar helloworld-0.0.1-SNAPSHOT.jar  --spring.profiles.active=dev
+java <span class="nt">-jar</span> helloworld-0.0.1-SNAPSHOT.jar  <span class="nt">--spring</span>.profiles.active<span class="o">=</span>dev
 </code></pre></div></div>
 
 <h5 id="配置文件优先级加载顺序">配置文件优先级、加载顺序</h5>
@@ -955,9 +955,9 @@ java -jar helloworld-0.0.1-SNAPSHOT.jar  --spring.profiles.active=dev
 
 <h5 id="配置-thymeleaf">配置 thymeleaf</h5>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>spring:
-  thymeleaf:
-    prefix: classpath:/templates/
-    suffix: .html
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spring</span><span class="pi">:</span>
+  <span class="na">thymeleaf</span><span class="pi">:</span>
+    <span class="na">prefix</span><span class="pi">:</span> <span class="s">classpath:/templates/</span>
+    <span class="na">suffix</span><span class="pi">:</span> <span class="s">.html</span>
 </code></pre></div></div>
 

@@ -211,22 +211,24 @@
 
 <p>顺序消费的原理解析，在默认的情况下消息发送会采取Round Robin轮询方式把消息发送到不同的queue(分区队列)；而消费消息的时候从多个queue上拉取消息，这种情况发送和消费是不能保证顺序。但是如果控制发送的顺序消息只依次发送到同一个queue中，消费的时候只从这个queue上依次拉取，则就保证了顺序。当发送和消费参与的queue只有一个，则是全局有序；如果多个queue参与，则为分区有序，即相对每个queue，消息都是有序的。</p>
 
-<p>下面用订单进行分区有序的示例。一个订单的顺序流程是：创建、付款、推送、完成。订单号相同的消息会被先后发送到同一个队列中，消费时，同一个OrderId获取到的肯定是同一个队列。</p>
+<p>下面用订单进行<strong>分区有序</strong>的示例。</p>
+
+<ul>
+  <li>
+    <p>一个<strong>订单</strong>的顺序流程是：创建、付款、推送、完成。</p>
+  </li>
+  <li>
+    <p>订单号相同的消息会被先后发送到同一个队列中，消费时，同一个OrderId获取到的肯定是同一个队列。</p>
+  </li>
+</ul>
 
 <h3 id="21-顺序消息生产">2.1 顺序消息生产</h3>
 
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">org</span><span class="o">.</span><span class="na">apache</span><span class="o">.</span><span class="na">rocketmq</span><span class="o">.</span><span class="na">example</span><span class="o">.</span><span class="na">order2</span><span class="o">;</span>
-
-<span class="kn">import</span> <span class="nn">org.apache.rocketmq.client.producer.DefaultMQProducer</span><span class="o">;</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">org.apache.rocketmq.client.producer.DefaultMQProducer</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">org.apache.rocketmq.client.producer.MessageQueueSelector</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">org.apache.rocketmq.client.producer.SendResult</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">org.apache.rocketmq.common.message.Message</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">org.apache.rocketmq.common.message.MessageQueue</span><span class="o">;</span>
-
-<span class="kn">import</span> <span class="nn">java.text.SimpleDateFormat</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">java.util.ArrayList</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">java.util.Date</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
 
 <span class="cm">/**
 * Producer，发送顺序消息
@@ -366,9 +368,7 @@
 
 <h3 id="22-顺序消费消息">2.2 顺序消费消息</h3>
 
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">org</span><span class="o">.</span><span class="na">apache</span><span class="o">.</span><span class="na">rocketmq</span><span class="o">.</span><span class="na">example</span><span class="o">.</span><span class="na">order2</span><span class="o">;</span>
-
-<span class="kn">import</span> <span class="nn">org.apache.rocketmq.client.consumer.DefaultMQPushConsumer</span><span class="o">;</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">org.apache.rocketmq.client.consumer.DefaultMQPushConsumer</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">org.apache.rocketmq.client.consumer.listener.ConsumeOrderlyContext</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">org.apache.rocketmq.client.consumer.listener.ConsumeOrderlyStatus</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">org.apache.rocketmq.client.consumer.listener.MessageListenerOrderly</span><span class="o">;</span>
@@ -885,61 +885,61 @@ INFO 57133 <span class="nt">---</span> <span class="o">[</span>MessageThread_1] 
 
 <p>按下面样例使用log4j属性配置</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>log4j.appender.mq=org.apache.rocketmq.logappender.log4j.RocketmqLog4jAppender
-log4j.appender.mq.Tag=yourTag
-log4j.appender.mq.Topic=yourLogTopic
-log4j.appender.mq.ProducerGroup=yourLogGroup
-log4j.appender.mq.NameServerAddress=yourRocketmqNameserverAddress
-log4j.appender.mq.layout=org.apache.log4j.PatternLayout
-log4j.appender.mq.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss} %-4r [%t] (%F:%L) %-5p - %m%n
+<div class="language-ini highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">log4j.appender.mq</span><span class="p">=</span><span class="s">org.apache.rocketmq.logappender.log4j.RocketmqLog4jAppender</span>
+<span class="py">log4j.appender.mq.Tag</span><span class="p">=</span><span class="s">yourTag</span>
+<span class="py">log4j.appender.mq.Topic</span><span class="p">=</span><span class="s">yourLogTopic</span>
+<span class="py">log4j.appender.mq.ProducerGroup</span><span class="p">=</span><span class="s">yourLogGroup</span>
+<span class="py">log4j.appender.mq.NameServerAddress</span><span class="p">=</span><span class="s">yourRocketmqNameserverAddress</span>
+<span class="py">log4j.appender.mq.layout</span><span class="p">=</span><span class="s">org.apache.log4j.PatternLayout</span>
+<span class="py">log4j.appender.mq.layout.ConversionPattern</span><span class="p">=</span><span class="s">%d{yyyy-MM-dd HH:mm:ss} %-4r [%t] (%F:%L) %-5p - %m%n</span>
 </code></pre></div></div>
 
 <p>按下面样例使用log4j xml配置来使用异步添加日志</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;appender name="mqAppender1"class="org.apache.rocketmq.logappender.log4j.RocketmqLog4jAppender"&gt;
-  &lt;param name="Tag" value="yourTag" /&gt;
-  &lt;param name="Topic" value="yourLogTopic" /&gt;
-  &lt;param name="ProducerGroup" value="yourLogGroup" /&gt;
-  &lt;param name="NameServerAddress" value="yourRocketmqNameserverAddress"/&gt;
-  &lt;layout class="org.apache.log4j.PatternLayout"&gt;
-      &lt;param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss}-%p %t %c - %m%n" /&gt;
-  &lt;/layout&gt;
-&lt;/appender&gt;
-&lt;appender name="mqAsyncAppender1"class="org.apache.log4j.AsyncAppender"&gt;
-  &lt;param name="BufferSize" value="1024" /&gt;
-  &lt;param name="Blocking" value="false" /&gt;
-  &lt;appender-ref ref="mqAppender1"/&gt;
-&lt;/appender&gt;
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;appender</span> <span class="na">name=</span><span class="s">"mqAppender1"</span><span class="na">class=</span><span class="s">"org.apache.rocketmq.logappender.log4j.RocketmqLog4jAppender"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">"Tag"</span><span class="err"> </span><span class="na">value=</span><span class="s">"yourTag"</span><span class="err"> </span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">"Topic"</span><span class="err"> </span><span class="na">value=</span><span class="s">"yourLogTopic"</span><span class="err"> </span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">"ProducerGroup"</span><span class="err"> </span><span class="na">value=</span><span class="s">"yourLogGroup"</span><span class="err"> </span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">"NameServerAddress"</span><span class="err"> </span><span class="na">value=</span><span class="s">"yourRocketmqNameserverAddress"</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;layout</span> <span class="na">class=</span><span class="s">"org.apache.log4j.PatternLayout"</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">"ConversionPattern"</span><span class="err"> </span><span class="na">value=</span><span class="s">"%d{yyyy-MM-dd HH:mm:ss}-%p %t %c - %m%n"</span><span class="err"> </span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;/layout&gt;</span>
+<span class="nt">&lt;/appender&gt;</span>
+<span class="nt">&lt;appender</span> <span class="na">name=</span><span class="s">"mqAsyncAppender1"</span><span class="na">class=</span><span class="s">"org.apache.log4j.AsyncAppender"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">"BufferSize"</span><span class="err"> </span><span class="na">value=</span><span class="s">"1024"</span><span class="err"> </span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;param</span> <span class="na">name=</span><span class="s">"Blocking"</span><span class="err"> </span><span class="na">value=</span><span class="s">"false"</span><span class="err"> </span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;appender-ref</span> <span class="na">ref=</span><span class="s">"mqAppender1"</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/appender&gt;</span>
 </code></pre></div></div>
 
 <h3 id="72-log4j2样例">7.2 log4j2样例</h3>
 
 <p>用log4j2时，配置如下，如果想要非阻塞，只需要使用异步添加引用即可</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;RocketMQ name="rocketmqAppender" producerGroup="yourLogGroup" nameServerAddress="yourRocketmqNameserverAddress"
-   topic="yourLogTopic" tag="yourTag"&gt;
-  &lt;PatternLayout pattern="%d [%p] hahahah %c %m%n"/&gt;
-&lt;/RocketMQ&gt;
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;RocketMQ</span> <span class="na">name=</span><span class="s">"rocketmqAppender"</span><span class="err"> </span><span class="na">producerGroup=</span><span class="s">"yourLogGroup"</span><span class="err"> </span><span class="na">nameServerAddress=</span><span class="s">"yourRocketmqNameserverAddress"</span>
+<span class="err"> </span> <span class="err"> </span><span class="na">topic=</span><span class="s">"yourLogTopic"</span><span class="err"> </span><span class="na">tag=</span><span class="s">"yourTag"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;PatternLayout</span> <span class="na">pattern=</span><span class="s">"%d [%p] hahahah %c %m%n"</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/RocketMQ&gt;</span>
 </code></pre></div></div>
 
 <h3 id="73-logback样例">7.3 logback样例</h3>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;appender name="mqAppender1"class="org.apache.rocketmq.logappender.logback.RocketmqLogbackAppender"&gt;
-  &lt;tag&gt;yourTag&lt;/tag&gt;
-  &lt;topic&gt;yourLogTopic&lt;/topic&gt;
-  &lt;producerGroup&gt;yourLogGroup&lt;/producerGroup&gt;
-  &lt;nameServerAddress&gt;yourRocketmqNameserverAddress&lt;/nameServerAddress&gt;
-  &lt;layout&gt;
-      &lt;pattern&gt;%date %p %t - %m%n&lt;/pattern&gt;
-  &lt;/layout&gt;
-&lt;/appender&gt;
-&lt;appender name="mqAsyncAppender1"class="ch.qos.logback.classic.AsyncAppender"&gt;
-  &lt;queueSize&gt;1024&lt;/queueSize&gt;
-  &lt;discardingThreshold&gt;80&lt;/discardingThreshold&gt;
-  &lt;maxFlushTime&gt;2000&lt;/maxFlushTime&gt;
-  &lt;neverBlock&gt;true&lt;/neverBlock&gt;
-  &lt;appender-ref ref="mqAppender1"/&gt;
-&lt;/appender&gt;
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;appender</span> <span class="na">name=</span><span class="s">"mqAppender1"</span><span class="na">class=</span><span class="s">"org.apache.rocketmq.logappender.logback.RocketmqLogbackAppender"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;tag&gt;</span>yourTag<span class="nt">&lt;/tag&gt;</span>
+  <span class="nt">&lt;topic&gt;</span>yourLogTopic<span class="nt">&lt;/topic&gt;</span>
+  <span class="nt">&lt;producerGroup&gt;</span>yourLogGroup<span class="nt">&lt;/producerGroup&gt;</span>
+  <span class="nt">&lt;nameServerAddress&gt;</span>yourRocketmqNameserverAddress<span class="nt">&lt;/nameServerAddress&gt;</span>
+  <span class="nt">&lt;layout&gt;</span>
+      <span class="nt">&lt;pattern&gt;</span>%date %p %t - %m%n<span class="nt">&lt;/pattern&gt;</span>
+  <span class="nt">&lt;/layout&gt;</span>
+<span class="nt">&lt;/appender&gt;</span>
+<span class="nt">&lt;appender</span> <span class="na">name=</span><span class="s">"mqAsyncAppender1"</span><span class="na">class=</span><span class="s">"ch.qos.logback.classic.AsyncAppender"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;queueSize&gt;</span>1024<span class="nt">&lt;/queueSize&gt;</span>
+  <span class="nt">&lt;discardingThreshold&gt;</span>80<span class="nt">&lt;/discardingThreshold&gt;</span>
+  <span class="nt">&lt;maxFlushTime&gt;</span>2000<span class="nt">&lt;/maxFlushTime&gt;</span>
+  <span class="nt">&lt;neverBlock&gt;</span>true<span class="nt">&lt;/neverBlock&gt;</span>
+  <span class="nt">&lt;appender-ref</span> <span class="na">ref=</span><span class="s">"mqAppender1"</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/appender&gt;</span>
 </code></pre></div></div>
 
 <h2 id="8-openmessaging样例">8 OpenMessaging样例</h2>

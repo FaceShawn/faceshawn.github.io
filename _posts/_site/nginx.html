@@ -6,11 +6,11 @@
 
 <hr />
 
-<h2 id="目录">目录</h2>
+<h3 id="目录">目录</h3>
 
 <p>[TOC]</p>
 
-<h4 id="nginx-反向代理服务器">NginX 反向代理服务器</h4>
+<h3 id="nginx-反向代理服务器">NginX 反向代理服务器</h3>
 
 <p>Nginx 是一款轻量级的 Web 服务器、<strong>反向代理服务器</strong>、及电子邮件（IMAP/POP3）代理服务器。</p>
 
@@ -21,7 +21,7 @@
   <li>特点是占有内存少，<strong>并发</strong>能力强（能够经受高负载的考验，有报告表明能支持高达 50000 个并发连接数）。</li>
 </ul>
 
-<h5 id="正向代理反向代理">正向代理、反向代理</h5>
+<h3 id="正向代理反向代理">正向代理、反向代理</h3>
 
 <p>（正向）<strong>代理</strong>：即是<strong>客户端代理</strong>，代理客户端，服务端不知道实际发起请求的客户端。隐藏了真实的请求客户端。</p>
 
@@ -52,7 +52,7 @@
 
 <p><img src="../assets/1424359-20210315105323910-1721094187.png" alt="img" style="zoom: 80%;" /></p>
 
-<h5 id="常见命令配置文件">常见命令、配置文件</h5>
+<h3 id="常见命令配置文件">常见命令、配置文件</h3>
 
 <p>常用命令：</p>
 
@@ -77,7 +77,7 @@
 
 <p><img src="../assets/1424359-20210704222646234-259382019.png" alt="img" style="zoom: 80%;" /></p>
 
-<h5 id="http-反向代理配置">http 反向代理配置</h5>
+<h3 id="http-反向代理配置">http 反向代理配置</h3>
 
 <ol>
   <li><code class="highlighter-rouge">proxy_pass</code>：适用于配置反向代理，让Nginx将请求转发给后端服务器。最后请求的路径：proxy_pass指定的<strong>后端服务</strong>URL。</li>
@@ -85,9 +85,7 @@
   <li><code class="highlighter-rouge">alias</code>：则适用于将URL路径映射到文件系统路径，方便访问资源。最后请求的路径：alias指定的<strong>静态资源</strong>URL。</li>
 </ol>
 
-<ul>
-  <li>更改 host：在 <code class="highlighter-rouge">C:\Windows\System32\drivers\etc</code> 目录下的 host 文件中添加一条 DNS 记录：</li>
-</ul>
+<p>更改 host：在 <code class="highlighter-rouge">C:\Windows\System32\drivers\etc</code> 目录下的 host 文件中添加一条 DNS 记录：</p>
 
 <pre><code class="language-basic">127.0.0.1 www.helloworld.com
 </code></pre>
@@ -170,7 +168,7 @@
 <span class="p">}</span>
 </code></pre></div></div>
 
-<h6 id="proxy_pass-反向代理路径">proxy_pass 反向代理路径</h6>
+<h4 id="proxy_pass-反向代理路径">proxy_pass 反向代理路径</h4>
 
 <p>proxy_pass配置代理路径时，直接替换整个代理路径，包括ip地址的端口等：</p>
 
@@ -222,7 +220,7 @@
     <span class="p">}</span>
 </code></pre></div></div>
 
-<h6 id="root-和-alias-代理路径">root 和 alias 代理路径</h6>
+<h4 id="root-和-alias-代理路径">root 和 alias 代理路径</h4>
 
 <p>root与alias主要区别在于nginx如何解释location后面的uri，这会使两者分别以不同的方式将请求映射到服务器文件上。</p>
 
@@ -247,7 +245,7 @@
 <span class="p">}</span>
 </code></pre></div></div>
 
-<h6 id="https-反向代理配置">https 反向代理配置</h6>
+<h4 id="https-反向代理配置">https 反向代理配置</h4>
 
 <p>使用 nginx 配置 https 需要知道几点：</p>
 
@@ -283,7 +281,7 @@
 <span class="p">}</span>
 </code></pre></div></div>
 
-<h5 id="负载均衡配置">负载均衡配置</h5>
+<h3 id="负载均衡配置">负载均衡配置</h3>
 
 <p>Nginx 支持以下负载均衡算法：</p>
 
@@ -358,7 +356,7 @@
 <span class="p">}</span>
 </code></pre></div></div>
 
-<h6 id="解决跨域问题">解决跨域问题</h6>
+<h4 id="解决跨域问题">解决跨域问题</h4>
 
 <blockquote>
   <p>见计算机网络文档中。</p>
@@ -445,7 +443,7 @@
 <span class="p">}</span>
 </code></pre></div></div>
 
-<h5 id="动静分离">动静分离</h5>
+<h3 id="动静分离">动静分离</h3>
 
 <p>动静分离：简单来说就是把动态请求和静态请求分开、动态文件与静态文件的分离。</p>
 
@@ -456,7 +454,7 @@
 
 <p><img src="../assets/1424359-20210703164458075-1516620523.png" alt="img" style="zoom: 44%;" /></p>
 
-<h6 id="静态站点配置">静态站点配置</h6>
+<h4 id="静态站点配置">静态站点配置</h4>
 
 <p>举例来说：如果所有的静态资源都放在了 <code class="highlighter-rouge">/app/dist</code> 目录下，只需要指定首页以及这个站点的 host 即可。</p>
 
@@ -466,7 +464,7 @@
 
 <p>此时，在本地浏览器访问 static.zp.cn ，就可以访问静态站点了。</p>
 
-<h6 id="搭建文件服务器">搭建文件服务器</h6>
+<h4 id="搭建文件服务器">搭建文件服务器</h4>
 
 <div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">autoindex</span> <span class="no">on</span><span class="p">;</span> <span class="c1"># 开启可以显示目录，默认不开启
 </span><span class="k">autoindex_exact_size</span> <span class="no">on</span><span class="p">;</span><span class="c1"># 显示文件大小

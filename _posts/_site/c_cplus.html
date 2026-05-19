@@ -90,19 +90,19 @@
 
 <h5 id="int-数组">int 数组</h5>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>int a[10];		// 推荐 fill_n
-fill(a,a+10,20);//三个参数，前面两个是起始地址，最后一个是填充值
-fill_n(a,5,-3);	//三个参数，第一个是首地址，第二个是个数，最后一个是填充值
-memset(a, 0, sizeof(a)); 	//
-</code></pre></div></div>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="n">a</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span>		<span class="c1">// 推荐 fill_n
+</span><span class="n">fill</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">a</span><span class="o">+</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">);</span><span class="c1">//三个参数，前面两个是起始地址，最后一个是填充值
+</span><span class="n">fill_n</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="o">-</span><span class="mi">3</span><span class="p">);</span>	<span class="c1">//三个参数，第一个是首地址，第二个是个数，最后一个是填充值
+</span><span class="n">memset</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">a</span><span class="p">));</span> 	<span class="c1">//
+</span></code></pre></div></div>
 
 <h5 id="bool-数组">bool 数组</h5>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 1、初始化器
-bool boolArray[ARRAY_SIZE] = { 0 };		// 只可以初始化 0/-1
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 1、初始化器
+</span><span class="n">bool</span> <span class="n">boolArray</span><span class="p">[</span><span class="n">ARRAY_SIZE</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">0</span> <span class="p">};</span>		<span class="c1">// 只可以初始化 0/-1
 // 2、函数
-#include &lt;cstring&gt;
-memset(boolArray, 0, sizeof(Array)); 
+</span><span class="cp">#include &lt;cstring&gt;
+</span><span class="n">memset</span><span class="p">(</span><span class="n">boolArray</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">Array</span><span class="p">));</span> 
 </code></pre></div></div>
 
 <h4 id="一数学库函数"><strong>一、数学库函数</strong></h4>

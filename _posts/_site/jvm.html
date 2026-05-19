@@ -1,5 +1,5 @@
 <blockquote>
-  <p>摘要：Java高级之JVM虚拟机，包括类加载机制，创建对象，内存分配机制，GC 垃圾回收，JVM 调优等。</p>
+  <p>摘要：Java 高级之 JVM 虚拟机，包括字节码执行机制、类加载机制、创建对象、JVM 内存分配机制、GC 垃圾回收、性能监控与故障定位、JVM 调优等。</p>
 </blockquote>
 
 <!-- more -->
@@ -10,8 +10,8 @@
 
 <h3 id="main-方法的执行步骤">main() 方法的执行步骤</h3>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Student stu = new Student("Tom");
-stu.sayName();
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Student</span> <span class="n">stu</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Student</span><span class="o">(</span><span class="s">"Tom"</span><span class="o">);</span>
+<span class="n">stu</span><span class="o">.</span><span class="na">sayName</span><span class="o">();</span>
 </code></pre></div></div>
 
 <p><img src="../assets/stack_heap_method_area.jpg" alt="img" style="zoom:70%;" /></p>
@@ -37,119 +37,27 @@ stu.sayName();
 
 <p>4) 执行方法：根据 stu 引用找到 Student 对象，获取 <code class="highlighter-rouge">sayName()</code> 的字节码地址并执行。</p>
 
-<h3 id="new-对象的流程">new 对象的流程</h3>
-
-<p>new 一个对象的流程（详细版）：加载并初始化类、创建对象。</p>
-
-<ol>
-  <li><strong>类加载</strong>：检查当前类是否已被加载？
-    <ol>
-      <li>若已被加载、则直接返回<strong>类的符号引用</strong>；</li>
-      <li>否则尝试用 ClassLoader 加载 .class 字节码文件到内存；</li>
-      <li>初始化<strong>静态成员变量</strong>。</li>
-    </ol>
-  </li>
-  <li>执行 new，<strong>申请一片内存空间</strong>；（为新对象在堆中）<strong>分配内存</strong>，若内存不够则先执行<a href="#回收策略">GC</a>；
-    <ul>
-      <li>不包括任何静态变量；</li>
-    </ul>
-  </li>
-  <li><strong>初始化为零值（默认值）</strong>；
-    <ol>
-      <li>JVM 将分配到的内存空间都初始化为零值（不包括对象头），</li>
-      <li><del>保证了对象的实例字段在 Java 代码中可以不赋初始值就直接使用，程序能访问到这些字段的<strong>数据类型所对应的零值</strong>。</del></li>
-    </ol>
-  </li>
-  <li><strong>设置对象头</strong>：比如这个对象是<strong>哪个类的实例</strong>、如何才能找到类的元数据信息、对象的<strong>哈希码</strong>、对象的 GC <strong>分代年龄</strong>等信息。</li>
-  <li><strong>执行 init 方法</strong>：（按照程序员的意愿）<strong>初始化对象</strong>；
-    <ul>
-      <li>初始化顺序：是先初始化<strong>父类</strong>再初始化子类，先执行实例代码块、然后是构造方法（初始化成员变量？）；</li>
-    </ul>
-  </li>
-  <li>如果赋值给变量 <code class="highlighter-rouge">Student stu = new Student("Tom");</code>，则：
-    <ol>
-      <li>在（VM 栈中的）<strong>局部变量表</strong>创建变量 <code class="highlighter-rouge">stu</code>，字面量<code class="highlighter-rouge">"Tom"</code>放在<del>方法区</del>；</li>
-      <li>把堆内对象的首地址（引用）<strong>赋值</strong>给（vm 栈中的）变量 <code class="highlighter-rouge">stu</code>；</li>
-    </ol>
-  </li>
-</ol>
-
-<h5 id="执行顺序">执行顺序</h5>
-
-<blockquote>
-  <p>类的实例化/创建对象的顺序：</p>
-
-  <ul>
-    <li>先静态、先父后子；</li>
-    <li>按在代码中出现的顺序依次执行。</li>
-  </ul>
-</blockquote>
-
-<p>执行顺序：（优先级从高到低）静态代码块 &gt; 构造代码块 &gt; 构造方法 &gt; 普通方法。</p>
-
-<ul>
-  <li>其中静态代码块只执行一次。构造代码块在每次创建对象是都会执行。</li>
-</ul>
-
-<p>类加载时？执行静态代码块和静态初始化语句：</p>
-
-<ol>
-  <li>初始化父类静态成员变量、静态初始化块/静态代码块（只执行一次）：static 成员变量和 static 语句块的执行顺序同代码中的顺序一致；</li>
-  <li>子类静态成员、静态初始化块；</li>
-</ol>
-
-<p>创建对象执行顺序：</p>
-
-<ol>
-  <li>初始化对象父类的实例成员变量，执行实例初始化块；</li>
-  <li><strong>父类构造器</strong>、构造方法；</li>
-  <li>初始化子类实例成员变量，执行实例初始化块；</li>
-  <li><strong>子类构造器</strong>；</li>
-  <li>普通代码块；</li>
-</ol>
-
-<h5 id="对象在堆内存的存储布局">对象在堆内存的存储布局</h5>
-
-<ol>
-  <li><strong>对象头</strong>：
-    <ul>
-      <li>MarkWord：存储哈希码、分代年龄、（锁状态标志位、）线程持有的（轻/重量级）锁、偏向锁线程ID等信息。</li>
-      <li>存储类型指针：指向类的元数据指针，确定对象是属于哪个类的实例。数组长度。</li>
-    </ul>
-  </li>
-  <li>
-    <p>实例数据：存储代码中所定义的各种类型的字段信息。</p>
-  </li>
-  <li>对齐填充：起占位作用。HotSpot 要求对象的起始地址必须是8的整数倍。。</li>
-</ol>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>String str = new String("hello");
-// 变量str放在VM栈上的局部变量表中
-// 用new创建出来的String对象放在堆中
-// 而"hello"这个字面量放在方法区的运行时常量池
-</code></pre></div></div>
-
 <h3 id="字节码执行机制">字节码执行机制</h3>
 
 <p>字节码：JVM 可理解的代码（即扩展名为 <code class="highlighter-rouge">.class</code> 的文件）。</p>
 
-<h5 id="编译与解释共存">编译与解释共存</h5>
+<h4 id="编译与解释共存">编译与解释共存</h4>
 
 <ol>
   <li>既有编译型语言的特征，也有<strong>解释型语言</strong>的特征：先编译生成字节码文件，编译后不直接运行，而是通过<strong>解释</strong>运行。</li>
   <li><strong>JIT</strong>（just-in-time compilation）<strong>即时编译器</strong>：属于运行时编译。完成第一次编译后，将（热点代码的）字节码对应的机器码保存下来，下次可直接用。</li>
 </ol>
 
-<h5 id="jvm-vs-传统解释型语言">JVM VS 传统解释型语言</h5>
+<h4 id="jvm-vs-传统解释型语言">JVM VS 传统解释型语言</h4>
 
 <ol>
-  <li>保留优点：可移植；</li>
-  <li>一定程度上解决缺点：执行效率低。</li>
+  <li>保留（传统解释型语言的）优点：<strong>可移植</strong>；</li>
+  <li>一定程度上解决缺点：<strong>执行效率</strong>低。</li>
 </ol>
 
-<p><img src="../assets/class_file_compile_explain.png" alt="在这里插入图片描述" style="zoom: 45%;" /></p>
+<p><img src="../assets/class_file_compile_explain.png" alt="在这里插入图片描述" style="zoom: 50%;" /></p>
 
-<h5 id="java-程序运行过程">Java 程序运行过程</h5>
+<h4 id="java-程序运行过程">Java 程序运行过程</h4>
 
 <ol>
   <li>-&gt; 源文件(<code class="highlighter-rouge">.java</code>）</li>
@@ -163,7 +71,7 @@ stu.sayName();
   </li>
 </ol>
 
-<h5 id="class-字节码文件">.class 字节码文件</h5>
+<h4 id="class-字节码文件">.class 字节码文件</h4>
 
 <blockquote>
   <p>包含类的版本、字段、方法、接口等描述信息外，</p>
@@ -207,7 +115,7 @@ stu.sayName();
 
 <p>ClassLoader：用来加载 Class，负责将 Class 的字节码形式转换成<strong>内存形式</strong>的 Class 对象。</p>
 
-<h5 id="类加载步骤">类加载步骤</h5>
+<h4 id="类加载步骤">类加载步骤</h4>
 
 <p>根据（常量池中的）<strong>动态链接</strong>定位<strong>类的符号引用</strong>，检查当前类是否已被加载：</p>
 
@@ -237,9 +145,9 @@ stu.sayName();
   <li>
     <p>初始化：执行<strong>构造器</strong>，初始化实例成员变量和真正初始化 static 成员变量。</p>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> public static int i =3 ;
- // 第一次初始化后i的值为0，
- // 第二次初始化后值才为3.
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="kd">public</span> <span class="kd">static</span> <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span><span class="mi">3</span> <span class="o">;</span>
+ <span class="c1">// 第一次初始化后i的值为0，</span>
+ <span class="c1">// 第二次初始化后值才为3.</span>
 </code></pre></div>    </div>
   </li>
   <li>
@@ -248,7 +156,7 @@ stu.sayName();
   <li><strong>卸载</strong>：GC 将无用类从内存中卸载。</li>
 </ol>
 
-<h5 id="双亲委派机制">双亲委派机制</h5>
+<h4 id="双亲委派机制">双亲委派机制</h4>
 
 <blockquote>
   <p>用于加载类？</p>
@@ -297,9 +205,9 @@ stu.sayName();
 
 <p>详解：<a href="https://cloud.tencent.com/developer/article/1862861">Tomcat - 都说Tomcat违背了双亲委派机制，到底对不对？</a>、<del><a href="https://www.cnblogs.com/aspirant/p/8991830.html">图解Tomcat类加载机制(阿里面试题)</a></del></p>
 
-<h5 id="常用类加载器">常用类加载器</h5>
+<h4 id="常用类加载器">常用类加载器</h4>
 
-<p><strong>ClassLoader</strong>：用来动态加载（按需加载）<code class="highlighter-rouge">.class</code> 字节码文件到 JVM 内存（=&gt; 内存形式的 Class 对象）。</p>
+<p>ClassLoader：用来动态加载（按需加载）<code class="highlighter-rouge">.class</code> 字节码文件到 JVM 内存（=&gt; 内存形式的 Class 对象）。</p>
 
 <p>不同层次的<strong>类加载器</strong>检查顺序、<strong>优先级</strong>：</p>
 
@@ -317,7 +225,7 @@ stu.sayName();
   <li>=&gt; 保证核心 API 不被修改。</li>
 </ol>
 
-<p>(JVM 搜索类时)判断两个class是相同的，要同时满足：</p>
+<p>（JVM 搜索类时）判断两个class是相同的，要同时满足：</p>
 
 <ol>
   <li>两个类名相同（表示同一份class字节码）；</li>
@@ -327,6 +235,98 @@ stu.sayName();
 <blockquote>
   <p>对于<code class="highlighter-rouge">equals()、instanceof()</code>等方法来判断对象相等或所属关系都需基于<strong>同一个 ClassLoader</strong>。</p>
 </blockquote>
+
+<h3 id="new-对象的流程">new 对象的流程</h3>
+
+<p>new 一个对象的流程（详细版）：加载并初始化类、创建对象。</p>
+
+<ol>
+  <li><strong>类加载</strong>：检查当前类是否已被加载？
+    <ol>
+      <li>若已被加载、则直接返回<strong>类的符号引用</strong>；</li>
+      <li>否则尝试用 ClassLoader 加载 .class 字节码文件到内存；</li>
+      <li>初始化<strong>静态成员变量</strong>。</li>
+    </ol>
+  </li>
+  <li>执行 new，<strong>申请一片内存空间</strong>；（为新对象在堆中）<strong>分配内存</strong>，若内存不够则先执行<a href="#回收策略">GC</a>；
+    <ul>
+      <li>不包括任何静态变量；</li>
+    </ul>
+  </li>
+  <li><strong>初始化为零值（默认值）</strong>；
+    <ol>
+      <li>JVM 将分配到的内存空间都初始化为零值（不包括对象头），</li>
+      <li><del>保证了对象的实例字段在 Java 代码中可以不赋初始值就直接使用，程序能访问到这些字段的<strong>数据类型所对应的零值</strong>。</del></li>
+    </ol>
+  </li>
+  <li><strong>设置对象头</strong>：比如这个对象是<strong>哪个类的实例</strong>、如何才能找到类的元数据信息、对象的<strong>哈希码</strong>、对象的 GC <strong>分代年龄</strong>等信息。</li>
+  <li><strong>执行 init 方法</strong>：（按照程序员的意愿）<strong>初始化对象</strong>；
+    <ul>
+      <li>初始化顺序：是先初始化<strong>父类</strong>再初始化子类，先执行实例代码块、然后是构造方法（初始化成员变量？）；</li>
+    </ul>
+  </li>
+  <li>如果赋值给变量 <code class="highlighter-rouge">Student stu = new Student("Tom");</code>，则：
+    <ol>
+      <li>在（VM 栈中的）<strong>局部变量表</strong>创建变量 <code class="highlighter-rouge">stu</code>，字面量<code class="highlighter-rouge">"Tom"</code>放在<del>方法区</del>；</li>
+      <li>把堆内对象的首地址（引用）<strong>赋值</strong>给（vm 栈中的）变量 <code class="highlighter-rouge">stu</code>；</li>
+    </ol>
+  </li>
+</ol>
+
+<h4 id="执行顺序">执行顺序</h4>
+
+<blockquote>
+  <p>类的实例化/创建对象的顺序：</p>
+
+  <ul>
+    <li>先静态、先父后子；</li>
+    <li>按在代码中出现的顺序依次执行。</li>
+  </ul>
+</blockquote>
+
+<p>执行顺序：（优先级从高到低）静态代码块 &gt; 构造代码块 &gt; 构造方法 &gt; 普通方法。</p>
+
+<ul>
+  <li>其中静态代码块只执行一次。构造代码块在每次创建对象是都会执行。</li>
+</ul>
+
+<p>类加载时？执行静态代码块和静态初始化语句：</p>
+
+<ol>
+  <li>初始化父类静态成员变量、静态初始化块/静态代码块（只执行一次）：static 成员变量和 static 语句块的执行顺序同代码中的顺序一致；</li>
+  <li>子类静态成员、静态初始化块；</li>
+</ol>
+
+<p>创建对象执行顺序：</p>
+
+<ol>
+  <li>初始化对象父类的实例成员变量，执行实例初始化块；</li>
+  <li><strong>父类构造器</strong>、构造方法；</li>
+  <li>初始化子类实例成员变量，执行实例初始化块；</li>
+  <li><strong>子类构造器</strong>；</li>
+  <li>普通代码块；</li>
+</ol>
+
+<h4 id="对象在堆内存的存储布局">对象在堆内存的存储布局</h4>
+
+<ol>
+  <li><strong>对象头</strong>：
+    <ul>
+      <li>MarkWord：存储哈希码、分代年龄、（锁状态标志位、）线程持有的（轻/重量级）锁、偏向锁线程ID等信息。</li>
+      <li>存储类型指针：指向类的元数据指针，确定对象是属于哪个类的实例。数组长度。</li>
+    </ul>
+  </li>
+  <li>
+    <p>实例数据：存储代码中所定义的各种类型的字段信息。</p>
+  </li>
+  <li>对齐填充：起占位作用。HotSpot 要求对象的起始地址必须是8的整数倍。。</li>
+</ol>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">String</span> <span class="n">str</span> <span class="o">=</span> <span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="s">"hello"</span><span class="o">);</span>
+<span class="c1">// 变量str放在VM栈上的局部变量表中</span>
+<span class="c1">// 用new创建出来的String对象放在堆中</span>
+<span class="c1">// 而"hello"这个字面量放在方法区的运行时常量池</span>
+</code></pre></div></div>
 
 <h3 id="jvm-内存分配机制">JVM 内存分配机制</h3>
 
@@ -524,19 +524,19 @@ stu.sayName();
   </li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 强引用
-String str = new String("abc");
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 强引用</span>
+<span class="n">String</span> <span class="n">str</span> <span class="o">=</span> <span class="k">new</span> <span class="n">String</span><span class="o">(</span><span class="s">"abc"</span><span class="o">);</span>
 
-// 软引用
-SoftReference&lt;String&gt; softReference = new SoftReference&lt;String&gt;(str);
+<span class="c1">// 软引用</span>
+<span class="n">SoftReference</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">softReference</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SoftReference</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;(</span><span class="n">str</span><span class="o">);</span>
 
-// 弱引用转强引用
-WeakReference&lt;String&gt; weakReference = new WeakReference&lt;&gt;(str);
-String strongReference = weakReference.get();
+<span class="c1">// 弱引用转强引用</span>
+<span class="n">WeakReference</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">weakReference</span> <span class="o">=</span> <span class="k">new</span> <span class="n">WeakReference</span><span class="o">&lt;&gt;(</span><span class="n">str</span><span class="o">);</span>
+<span class="n">String</span> <span class="n">strongReference</span> <span class="o">=</span> <span class="n">weakReference</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
 
-// 创建虚引用，要求必须与一个引用队列关联
-ReferenceQueue queue = new ReferenceQueue();
-PhantomReference pr = new PhantomReference(str, queue);
+<span class="c1">// 创建虚引用，要求必须与一个引用队列关联</span>
+<span class="n">ReferenceQueue</span> <span class="n">queue</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ReferenceQueue</span><span class="o">();</span>
+<span class="n">PhantomReference</span> <span class="n">pr</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PhantomReference</span><span class="o">(</span><span class="n">str</span><span class="o">,</span> <span class="n">queue</span><span class="o">);</span>
 </code></pre></div></div>
 
 <h4 id="判断可被回收时机">判断可被回收时机</h4>
@@ -628,13 +628,15 @@ PhantomReference pr = new PhantomReference(str, queue);
   <li>分代回收算法</li>
 </ol>
 
-<h5 id="可作为-gc-roots-的对象">可作为 <code class="highlighter-rouge">GC Roots</code> 的对象：</h5>
+<h5 id="gc-roots">GC Roots</h5>
 
 <blockquote>
   <p>按 JVM 内存分配区域的顺序。</p>
 </blockquote>
 
-<p>GC root：指在GC启动的时候必然存活的一组对象。一般来说，GC root 包含：</p>
+<p>GC root：指在GC启动的时候必然存活的一组对象。</p>
+
+<p>一般来说，可作为 <code class="highlighter-rouge">GC Roots</code> 的对象包括：</p>
 
 <ol>
   <li><strong>虚拟机栈</strong>（局部变量表）中引用的对象，如方法参数、局部变量、临时变量等；</li>
@@ -648,7 +650,7 @@ PhantomReference pr = new PhantomReference(str, queue);
   <li><strong>JVM 内部</strong>的引用，如基本数据类型的 Class 对象、系统类加载器等。</li>
 </ol>
 
-<h5 id="如何解决循环引用问题">如何解决循环引用问题</h5>
+<h5 id="循环引用问题">循环引用问题</h5>
 
 <blockquote>
   <p>引用计数中的</p>
@@ -656,12 +658,12 @@ PhantomReference pr = new PhantomReference(str, queue);
 
 <p>循环引用：指多个对象之间互相引用，最终行成一个环，因此它们的计数永远都不会为0。</p>
 
-<p>一般是有三种策略：</p>
+<p>如何解决？一般是有三种策略：</p>
 
 <ol>
   <li>采用特殊引用。例如使用<strong>弱引用</strong>。这一类的做法是用户需要自己显式管理自己的引用，在出现循环引用的地方，将一部分引用修改为 weak reference，从而所谓的 strong reference 就不再组成环；</li>
-  <li>采用后备的追踪式收集器。一般来说，是把可能出现环的对象单独处理，用追踪式的收集器标记一遍，这些就是存活对象。（Python就是这种策略，不了解算法细节）</li>
-  <li>采用试探删除策略。类似于图里面去除环的算法，尝试把某些引用删掉。如果删掉之后别的对象的计数变为0，那么说明这些对象只有环内的引用，因此是可回收对象。</li>
+  <li>采用后备的<strong>追踪式收集器</strong>。一般来说，是把可能出现环的对象单独处理，用追踪式的收集器标记一遍，这些就是存活对象。（Python就是这种策略，不了解算法细节）</li>
+  <li>采用<strong>试探删除策略</strong>。类似于图里面去除环的算法，尝试把某些引用删掉。如果删掉之后别的对象的计数变为0，那么说明这些对象只有环内的引用，因此是可回收对象。</li>
 </ol>
 
 <h5 id="三色标记法">三色标记法</h5>
@@ -732,7 +734,7 @@ PhantomReference pr = new PhantomReference(str, queue);
 
 <ul>
   <li>分代是基于分代假说，即新对象很容易死，老对象不容易死。</li>
-  <li>因此如果我们采用分代，依据存活时间来将对象放到不同的内存区域，那么在回收的时候，就可以只回收年轻代，或者一起回收。这样一来，回收效率高：
+  <li>因此如果采用分代，依据存活时间来将对象放到不同的内存区域，那么在回收时，就可以只回收年轻代，或者一起回收。这样一来，回收效率高：
     <ol>
       <li>一方面是停顿时间短（也可以说是资源消耗低）</li>
       <li>一方面是能够回收更多的内存。</li>
@@ -812,7 +814,7 @@ PhantomReference pr = new PhantomReference(str, queue);
   <p>CMS 是 hotspot 虚拟机上的一个实现，并不是某种算法。使用的算法是标记-清扫。</p>
 </blockquote>
 
-<p>基本特征：CMS 是一个基于标记-清扫算法的并发垃圾回收器，主要用于老年代回收。</p>
+<p>基本特征：CMS 是一个基于<strong>标记-清扫算法</strong>的并发垃圾回收器，主要用于老年代回收。</p>
 
 <ul>
   <li>标记-清扫-压缩算法：但是它有一个特殊的模式，就是可以开启压缩，那么会在回收的时候清扫之后再压缩内存，减少内存碎片。</li>
@@ -822,7 +824,7 @@ PhantomReference pr = new PhantomReference(str, queue);
   <p>CMS 有几次停顿？是哪几次？</p>
 </blockquote>
 
-<p>基本流程、执行步骤：可以分成六个步骤：在一般意义上的四步基础上引入额外的两步，并发预清理和并发重置。</p>
+<p><strong>基本流程、执行步骤</strong>：可以分成六个步骤：在一般意义上的四步基础上引入额外的两步，并发预清理和并发重置。</p>
 
 <ol>
   <li>初始标记：主要是扫描 GC root ，这个过程是 STW 的；暂停其他线程，标记与 GC roots直接关联的对象；</li>
@@ -836,7 +838,9 @@ PhantomReference pr = new PhantomReference(str, queue);
 
 <h5 id="g1-回收器">G1 回收器</h5>
 
-<p>G1 的目标是控制住停顿时间。</p>
+<blockquote>
+  <p>G1 的目标是控制住停顿时间。</p>
+</blockquote>
 
 <p>相比于 CMS 的改进：</p>
 
@@ -845,7 +849,7 @@ PhantomReference pr = new PhantomReference(str, queue);
   <li>精确控制停顿时间，在不牺牲<strong>吞吐量</strong>前提下，实现<strong>低停顿</strong>垃圾回收。</li>
 </ul>
 
-<p>步骤：G1 具体来说，可以分成 Young GC, Mixed GC 两个部分。</p>
+<p><strong>步骤</strong>：G1 具体来说，可以分成 Young GC, Mixed GC 两个部分。</p>
 
 <ol>
   <li>初始标记：该步骤标记 GC root；</li>
@@ -872,72 +876,37 @@ PhantomReference pr = new PhantomReference(str, queue);
 
 <h6 id="理解算法思路"><del>理解算法思路</del></h6>
 
-<p>分析：CMS 和 G1 都可以被认为是近年面试考察的高频考点。G1 的复习也类似于 CMS 的复习，重点在于捋清楚其中的步骤。而后为了刷出亮点，可以尝试在部分细节上下功夫。</p>
+<blockquote>
+  <p>分析：CMS 和 G1 都可以被认为是近年面试考察的高频考点。G1 的复习也类似于 CMS 的复习，重点在于捋清楚其中的步骤。而后为了刷出亮点，可以尝试在部分细节上下功夫。</p>
+
+  <p>G1 的面试总体上来说不如 CMS 常见。原因很简单，对于大多数应用来说，4G 的堆就足够了。在这个规模上，G1 是并不比 CMS 优秀的。而且 CMS 因为应用得多，所以懂得原理调优的人比 G1 多。</p>
+</blockquote>
 
 <p>G1 的几个基本概念要捋清楚：</p>
 
 <ol>
-  <li>Region。这个可以说是和 CMS 根源上不同设计理念的体现。总体来说，虽然 CMS 曾经也是支持增量式回收的，但是做得不如 G1 彻底。G1是彻底的增量式回收，原因就在于，它不是每次都回收全部的内存，而是挑一部分 Region 出来。之所以只挑选一部分出来，核心也就是为了控制停顿时间。</li>
-  <li>Garbage First：也就是 G1 名字的由来。是指，每次回收的时候，回收器会从 Region 里面挑出一些比较脏的来回收。注意这里面有两个，<strong>挑出一些</strong> 和 <strong>比较脏</strong>。这揭示了两个问题：第一个，G1是增量式回收的；第二，G1 优先挑选垃圾最多的。</li>
+  <li>Region。这个可以说是和 CMS 根源上不同设计理念的体现。
+    <ul>
+      <li>总体来说，虽然 CMS 曾经也是支持增量式回收的，但是做得不如 G1 彻底。</li>
+      <li>G1是彻底的增量式回收，原因就在于，它不是每次都回收全部的内存，而是挑一部分 Region 出来。</li>
+      <li>之所以只挑选一部分出来，核心也就是为了控制停顿时间。</li>
+    </ul>
+  </li>
+  <li>Garbage First：也就是 G1 名字的由来。是指，每次回收的时候，回收器会从 Region 里面<strong>挑出一些比较脏</strong>的来回收。注意这里面有两个，<strong>挑出一些</strong> 和 <strong>比较脏</strong>。这揭示了两个问题：
+    <ol>
+      <li>第一，G1是增量式回收的；</li>
+      <li>第二，G1 优先挑选垃圾最多的。</li>
+    </ol>
+  </li>
 </ol>
 
 <p>这里给出一个理解 G1 算法的思路：</p>
 
-<p>G1 的目标是控制住停顿时间。那么我们怎么控制停顿时间？一种比较好的思路就是，我每次回收只回收一小部分内存。例如说我有一个 32G 的堆，我每次只回收 4 个G。那么如果原来你停顿时间是32秒，回收 4G 就只需要5秒。</p>
+<p>G1 的目标是控制住停顿时间。那么怎么控制停顿时间？一种比较好的思路就是，每次回收只回收一小部分内存。</p>
 
-<p>进一步你就会想，如果是我来设计这个 G1，我要想做到这一步，我该怎么搞？我能不能先把堆分成四部分，每次回收其中的一部分？</p>
-
-<p>答案是可以的。然后你就又会遇到问题，有些人可能想回收三分之一的堆，那你怎么办？加个参数控制？比如说启动的时候让用户指定把堆分成多少分？</p>
-
-<p>那么问题又来了，用户也不知道该分成多少份才能恰好满足自己希望的停顿时间。</p>
-
-<p>这个时候你就会考虑，能不能让用户把他希望的停顿时间告诉你，你自己来决定回收多大的一块。</p>
-
-<p>到了这一步，你又会发现一个问题，即便用户告诉你期望停顿时间要控制在一秒内，于是你提前把堆分成了三十二份，但是因为应用的负载不是静态的，导致你每次回收一份，也会经常超出期望。</p>
-
-<p>这个时候，你就会想，我这提前划分好感觉不太靠谱，能不能动态划分呢？</p>
-
-<p>所以问题的根源就是怎么做到动态划分，比如说一会分成三十二份，一会分成六十四份。这个问题难在哪里？难在怎么知道不回收的部分，有哪些引用指向了被回收部分。如果直接动态划分，就没法子维护整个信息。</p>
-
-<p>那么，你就会想到，我能不能先把堆划分得很细碎，比如说，我直接把堆分成1024份，每一份自己维护一下别人引用自己内部对象的信息？然后当回收的时候，我就从里面挑。比如说这次回收，预计一秒内只能回收128份，那我就挑128份出来回收掉；下一次能更惨，只能回收64份，所以我就挑64份来回收。</p>
-
-<p>这就是 G1 的基本思想。</p>
-
-<p>这就是抓住 G1 的核心。G1 的后面的一切，都是因为分成了那么多小份，然后每一次要挑出来一部分回收。</p>
-
-<p>然后我们从这一点出发，看一下 G1 的各种奇技淫巧。</p>
-
-<p>首先 Region 我们已经说过了，就是为了能够保证 GC 期间灵活选择而不得不划分的。</p>
-
-<p>那么 RSet（记忆集）又是拿来干啥？用来记录别的 Region 引用本 Region 内部对象的结构体。为什么要记录？不记录的话不知道这个 Region 内部的对象是不是活着。</p>
-
-<p>那么怎么理解 G1 的两种模式？</p>
-
-<p>我们再考虑一下，我想要挑出来一部分 Region 来回收，我是随机挑吗？当然不是，我希望尽可能回收脏的 Region。那么什么 Region 比较脏？</p>
-
-<p>显然是放着年轻代对象的 Region 比较脏。因为对象朝生夕死，所以想当然的我们会说我们优先挑年轻代的 Region 就可以了。</p>
-
-<p>那么问题来了，你不能一直挑年轻代，你总要挑老年代的，不然老年代岂不是永远不回收了？</p>
-
-<p>所以我们会想到，启动一个后台线程，扫描这些老年代的 Region，看看脏不脏。要是很多已经很脏了，我们就把这部分老年代的 Region 回收掉。</p>
-
-<p>这就是 G1 的 Young GC、Mixed GC 和全局并发标记循环的来源了。</p>
-
-<p>这里面还有几个细节，我们沿着思路继续思考下去。</p>
-
-<p>首先一个，并发标记循环，意味着应用也在运行，如果我在标记过程中，引用被修改了，怎么办？这就是引入了 SATB（ snapshot at the beginning）。这个名字就有点让人误解，会以为 G1 真的记了一个快照，其实不是的。简单来说，可以理解为这个机制记录了在并发期间引用发生过修改的对象。在最终标记阶段，会处理这些变更。</p>
-
-<p>其次，如果我要是 Mixed GC 太慢，还没来得及回收老年代也满了，怎么办？这个问题和 CMS 是一样。那么 CMS 是怎么解决的？退化为 Serial Old GC。很显然，G1 也是一样处理的。（从这个角度来说，可以理解 Serial Old 是一个后备回收器，只要你 CMS 或者 G1 崩了，那就是它顶上）</p>
-
-<p>前面我们还提到，就是要挑出脏的，那么什么才是脏的，那就是要算一下，里边活着的对象还有多少。要是一个活着的对象都没了，这个 Region 是不是可以直接回收了？都不用复制存活对象了。这就是并发循环标记最后一步，把发现的一个存活对象都没了的 Region，脏得彻底的 Region 直接收回。</p>
-
-<p>还有一个点，其实算是优化，而不算是本质。就是并发标记循环会复用 Young GC 的结果。在 Young GC 的初始标记完成后，一边是 Young GC 继续下去，一边是并发循环标记。</p>
-
-<p>接下来我们想，每次挑出来多少个才是合适呢？之前我们已经揭露了，静态划分是不行的，因为要根据程序动态运行来决定挑多大一块内存来回收。因此我们肯定不能用参数或者直接写死，而是要实时计算。</p>
-
-<p>那么怎么计算呢？这个细节，面试基本不会考。大概的原理是考察最近的几次 G1 GC 的情况，大概推断这一次 G1 至多回收多少块。有点像是根据最近几次 GC 的情况，来猜测这一次 GC 回收每一块 Region 需要多长时间，然后算出来。核心在于，根据最近几次情况来推断。</p>
-
-<p>G1 的面试总体上来说不如 CMS 常见。原因很简单，对于大多数应用来说，4G 的堆就足够了。在这个规模上，G1 是并不比 CMS 优秀的。而且 CMS 因为应用得多，所以懂得原理调优的人比 G1 多。</p>
+<ul>
+  <li>例如说我有一个 32G 的堆，我每次只回收 4 个G。那么如果原来你停顿时间是32秒，回收 4G 就只需要5秒。</li>
+</ul>
 
 <h6 id="什么是-region">什么是 Region？</h6>
 
@@ -1064,7 +1033,7 @@ PhantomReference pr = new PhantomReference(str, queue);
 
 <h3 id="jvm-调优">JVM 调优</h3>
 
-<h4 id="jvm调优的时机">JVM调优的时机</h4>
+<h4 id="时机">时机</h4>
 
 <ol>
   <li>系统<strong>吞吐量</strong>与响应性能不高或下降。</li>
@@ -1078,7 +1047,7 @@ PhantomReference pr = new PhantomReference(str, queue);
   </li>
 </ol>
 
-<h4 id="jvm调优的目标">JVM调优的目标</h4>
+<h4 id="目标">目标</h4>
 
 <p>吞吐量、延迟、内存占用三者类似CAP，构成了一个不可能三角，只能选择其中两个进行调优，不可三者兼得。</p>
 
@@ -1099,7 +1068,7 @@ PhantomReference pr = new PhantomReference(str, queue);
   <li>Full gc 次数0 或 平均停顿间隔 avg pause interval &gt;= 24小时。</li>
 </ol>
 
-<h4 id="jvm调优的步骤">JVM调优的步骤</h4>
+<h4 id="步骤">步骤</h4>
 
 <p>一般情况下，JVM调优可通过以下步骤进行：</p>
 
@@ -1145,12 +1114,12 @@ PhantomReference pr = new PhantomReference(str, queue);
 
 <p>命令行启动时按如下格式设置、构建应用时设置 VM 参数：</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>java -jar -Xms1G -Xmx1G -Xmn512M -Xss1M -XX:MetaspaceSize=128M -XX:MaxMetaspaceSize=128M app.jar
-</code></pre></div></div>
+<pre><code class="language-cmd">java -jar -Xms1G -Xmx1G -Xmn512M -Xss1M -XX:MetaspaceSize=128M -XX:MaxMetaspaceSize=128M app.jar
+</code></pre>
 
 <p>IDEA help 中 Global VM 参数设置：<code class="highlighter-rouge">idea.vmoptions</code></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-Xms128m
+<pre><code class="language-cmd">-Xms128m
 -Xmx1024m
 -XX:ReservedCodeCacheSize=512m		#
 -XX:+IgnoreUnrecognizedVMOptions
@@ -1172,7 +1141,7 @@ PhantomReference pr = new PhantomReference(str, queue);
 --add-opens=java.base/jdk.internal.org.objectweb.asm.tree=ALL-UNNAMED
 
 -javaagent:C:\win-idea-activation\ja-netfilter.jar=jetbrains
-</code></pre></div></div>
+</code></pre>
 
 <h4 id="性能调优工具">性能调优工具</h4>
 

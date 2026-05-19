@@ -802,7 +802,7 @@
 
 <p>推荐使用最新发布的JDK 1.8版本。通过设置<strong>相同的Xms和Xmx值</strong>来防止JVM调整堆大小以获得更好的性能。简单的JVM配置如下所示：</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-server -Xms8g -Xmx8g -Xmn4g
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">-server</span> <span class="nt">-Xms8g</span> <span class="nt">-Xmx8g</span> <span class="nt">-Xmn4g</span>
 </code></pre></div></div>
 
 <ul>
@@ -812,9 +812,9 @@
 
 <p>至于垃圾回收，建议使用带JDK 1.8的<strong>G1收集器</strong>。</p>
 
-<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-XX:+UseG1GC -XX:G1HeapRegionSize=16m   
--XX:G1ReservePercent=25 
--XX:InitiatingHeapOccupancyPercent=30
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">-XX</span>:+UseG1GC <span class="nt">-XX</span>:G1HeapRegionSize<span class="o">=</span>16m   
+<span class="nt">-XX</span>:G1ReservePercent<span class="o">=</span>25 
+<span class="nt">-XX</span>:InitiatingHeapOccupancyPercent<span class="o">=</span>30
 </code></pre></div></div>
 
 <p>这些GC选项看起来有点激进，但事实证明它在我们的生产环境中具有良好的性能。</p>
@@ -823,14 +823,14 @@
   <li>另外不要把<code class="highlighter-rouge">-XX:MaxGCPauseMillis</code>的值设置太小，否则JVM将使用一个小的年轻代来实现这个目标，这将导致非常频繁的minor GC，所以建议使用rolling GC日志文件：</li>
 </ul>
 
-<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-XX:+UseGCLogFileRotation   
--XX:NumberOfGCLogFiles=5 
--XX:GCLogFileSize=30m
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">-XX</span>:+UseGCLogFileRotation   
+<span class="nt">-XX</span>:NumberOfGCLogFiles<span class="o">=</span>5 
+<span class="nt">-XX</span>:GCLogFileSize<span class="o">=</span>30m
 </code></pre></div></div>
 
 <p>如果写入GC文件会增加代理的延迟，可以考虑将GC日志文件重定向到内存文件系统：</p>
 
-<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-Xloggc:/dev/shm/mq_gc_%p.log123   
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">-Xloggc</span>:/dev/shm/mq_gc_%p.log123   
 </code></pre></div></div>
 
 <h3 id="62-linux内核参数">6.2 Linux内核参数</h3>

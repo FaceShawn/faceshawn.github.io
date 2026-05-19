@@ -4,7 +4,7 @@
 
 <!-- more -->
 
-<h2 id="目录">目录</h2>
+<h1 id="目录">目录</h1>
 
 <p>[TOC]</p>
 
@@ -251,9 +251,8 @@
     
     <span class="kd">private</span> <span class="n">String</span> <span class="n">id</span><span class="o">;</span>
 
-    <span class="nd">@Valid</span> <span class="c1">//如果不在此属性上，添加 @Valid 注解，就会导致 User.nickname 属性，不会进行校验。</span>
+    <span class="nd">@Valid</span> <span class="c1">//如果不在此属性上添加 @Valid 注解，就会导致 User.nickname 属性不会进行校验。</span>
     <span class="kd">private</span> <span class="n">UserProfile</span> <span class="n">profile</span><span class="o">;</span>
-
 <span class="o">}</span>
 
 <span class="c1">// User.java</span>
@@ -261,7 +260,6 @@
 
     <span class="nd">@NotBlank</span>
     <span class="kd">private</span> <span class="n">String</span> <span class="n">nickname</span><span class="o">;</span>
-
 <span class="o">}</span>
 </code></pre></div></div>
 
@@ -753,7 +751,6 @@
     <span class="nd">@NotEmpty</span><span class="o">(</span><span class="n">message</span> <span class="o">=</span> <span class="s">"手机号不能为空"</span><span class="o">)</span>
     <span class="nd">@Mobile</span> <span class="c1">// &lt;=== here</span>
     <span class="kd">private</span> <span class="n">String</span> <span class="n">mobile</span><span class="o">;</span>
-
 <span class="o">}</span>
 </code></pre></div></div>
 
@@ -1253,7 +1250,7 @@
   <li>还是偏好基于约定，<strong>返回 <code class="highlighter-rouge">0</code> 时</strong>表示成功。</li>
 </ul>
 
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">cn</span><span class="o">.</span><span class="na">iocoder</span><span class="o">.</span><span class="na">yudao</span><span class="o">.</span><span class="na">framework</span><span class="o">.</span><span class="na">common</span><span class="o">.</span><span class="na">pojo</span><span class="o">;</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">cn</span><span class="o">..</span><span class="na">framework</span><span class="o">.</span><span class="na">common</span><span class="o">.</span><span class="na">pojo</span><span class="o">;</span>
 
 <span class="cm">/**
  * 通用返回
@@ -1560,12 +1557,12 @@
   <li>原因是，GlobalResponseBodyHandler 本质上是 AOP，它<strong>不应该改变</strong> Controller 返回的数据结构
     <ul>
       <li>目前，主要作用是，记录 Controller 的返回结果，</li>
-      <li>方便 {@link cn.iocoder.yudao.framework.apilog.core.filter.ApiAccessLogFilter} 记录访问日志</li>
+      <li>方便 {@link cn..framework.apilog.core.filter.ApiAccessLogFilter} 记录访问日志</li>
     </ul>
   </li>
 </ul>
 
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">cn</span><span class="o">.</span><span class="na">framework</span><span class="o">.</span><span class="na">web</span><span class="o">.</span><span class="na">core</span><span class="o">.</span><span class="na">handler</span><span class="o">;</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">cn</span><span class="o">..</span><span class="na">framework</span><span class="o">.</span><span class="na">web</span><span class="o">.</span><span class="na">core</span><span class="o">.</span><span class="na">handler</span><span class="o">;</span>
 
 <span class="cm">/**
  * 全局响应结果（ResponseBody）处理器
@@ -1658,8 +1655,7 @@
 
 <h5 id="defaultexceptionhandler">defaultExceptionHandler</h5>
 
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
-<span class="cm">/**
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
      * 处理系统异常，兜底处理所有的一切
      */</span>
 <span class="nd">@ExceptionHandler</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="n">Exception</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>

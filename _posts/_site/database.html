@@ -4,13 +4,11 @@
 
 <!-- more -->
 
-<h2 id="目录">目录</h2>
+<h3 id="目录">目录</h3>
 
 <p>[TOC]</p>
 
-<h2 id="数据库基础">数据库基础</h2>
-
-<h3 id="什么是数据库-数据库管理系统-数据库系统">什么是数据库, 数据库管理系统, 数据库系统?</h3>
+<h3 id="数据库数据库管理系统数据库系统">数据库、数据库管理系统、数据库系统</h3>
 
 <p><strong>数据库系统</strong>（Data Base System，简称 <strong>DBS</strong>）：通常由软件、数据库和数据管理员组成。</p>
 
@@ -30,7 +28,7 @@
 
 <h3 id="sql-关系型数据库">SQL 关系型数据库</h3>
 
-<h5 id="sqlnosql-的区别">SQL、NoSQL 的区别</h5>
+<h4 id="sqlnosql-的区别">SQL、NoSQL 的区别</h4>
 
 <ul>
   <li><strong>SQL 关系型数据库</strong>：建立在<strong>关系模型</strong>的基础上的数据库。
@@ -49,7 +47,7 @@
   </li>
 </ul>
 
-<h5 id="数据模型">数据模型</h5>
+<h4 id="数据模型">数据模型</h4>
 
 <p>数据库按照数据结构来组织、存储和管理数据，共有三种模型：</p>
 
@@ -59,7 +57,7 @@
   <li><strong>关系模型</strong>：表明数据库中存储数据间一对一、一对多、多对多的联系，如表格。</li>
 </ol>
 
-<h5 id="分类">分类</h5>
+<h4 id="分类">分类</h4>
 
 <ul>
   <li><strong>SQL 关系型数据库</strong>：
@@ -83,7 +81,7 @@
       <li><strong>MongoDB</strong>：Nodejs 在 Mongoose 包的帮助下 JSON 的数据格式直接插入；用户行为分析数据存储；</li>
       <li>Apache Cassandra（Facebook 使用、高度可扩展）、Dynamo；</li>
       <li>MemcacheDB 和 HBase 等。
-        <h3 id="元组-码-候选码-主码-外码-主属性-非主属性">元组, 码, 候选码, 主码, 外码, 主属性, 非主属性</h3>
+        <h3 id="主码-外码-主属性-非主属性">主码, 外码, 主属性, 非主属性</h3>
       </li>
     </ol>
   </li>
@@ -182,7 +180,7 @@
 
 <h3 id="数据库范式">数据库范式</h3>
 
-<h5 id="函数依赖">函数依赖</h5>
+<h4 id="函数依赖">函数依赖</h4>
 
 <ol>
   <li><strong>函数依赖</strong> ：若在一张表中，在属性（或属性组）X 的值确定的情况下，必定能确定属性 Y 的值，那么就可说 <code class="highlighter-rouge">Y</code> 函数<strong>依赖于</strong> <code class="highlighter-rouge">X</code>，写作 <code class="highlighter-rouge">X → Y</code>。</li>
@@ -205,7 +203,7 @@
   </li>
 </ol>
 
-<h5 id="范式">范式</h5>
+<h4 id="范式">范式</h4>
 
 <p>用于规范建表，划分字段。</p>
 
@@ -232,7 +230,7 @@
   <p>数据库设计就是建立数据存储模型。</p>
 </blockquote>
 
-<h5 id="设计步骤">设计步骤</h5>
+<h4 id="设计步骤">设计步骤</h4>
 
 <ol>
   <li><strong>需求分析</strong> : 包括数据、功能和性能需求。根据功能模块划分实体（往往指现实世界中一个完整单位），实体间的关系，各实体的属性、可选唯一标识属性（主键）、数据存储特点/生命周期（是否常用，分库分表，永久存储，定期归档，定期清空等）。</li>
@@ -243,7 +241,7 @@
   <li>数据库的<strong>运行和维护</strong> : log 日志，根据新需求进行建表、索引优化、大表拆分。</li>
 </ol>
 
-<h5 id="e-r-图">E-R 图</h5>
+<h4 id="e-r-图">E-R 图</h4>
 
 <p>E-R 图 / 实体-联系图：提供了表示<strong>实体类型、属性和联系</strong>的方法，用来描述现实世界的概念模型。 是描述现实世界<strong>关系概念模型</strong>的有效方法。</p>
 
@@ -267,7 +265,7 @@
 
 <p><img src="../assets/数据库实际的关系模型.png" alt="关系模型" style="zoom: 100%;" /></p>
 
-<h5 id="uml-类图">UML 类图</h5>
+<h4 id="uml-类图">UML 类图</h4>
 
 <blockquote>
   <p>见面向对象文档。</p>

@@ -1,5 +1,5 @@
 <blockquote>
-  <p>摘要：是一种<strong>关系型</strong>数据库，建立在<strong>关系模型</strong>的基础上，主要用于<strong>持久化存储</strong>系统中的数据。</p>
+  <p>摘要：是一种<strong>关系型</strong>数据库，建立在<strong>关系模型</strong>的基础上，主要用于<strong>持久化存储</strong>系统中的数据。包括SQL 使用相关：数据类型、SQL 语句、索引视图触发器、数据库性能优化；原理：MySQL 基础架构、存储引擎；事务、锁机制、MVCC。</p>
 </blockquote>
 
 <!-- more -->
@@ -8,25 +8,22 @@
 
 <p>[TOC]</p>
 
-<h2 id="mysql">MySQL</h2>
-
-<blockquote>
-  <p>关键字用大写，表名、字段名用小写。</p>
-</blockquote>
-
-<p>是一种<strong>关系型</strong>数据库，建立在<strong>关系模型</strong>的基础上，主要用于<strong>持久化存储</strong>系统中的数据。</p>
-
-<blockquote>
-  <p>MySQL 的默认端口号是 <strong>3306</strong>。版本号 5.7.21。</p>
-</blockquote>
-
-<p>主要分为三大类：423</p>
+<p>主要分为三大类：4、2、3</p>
 
 <ol>
   <li>SQL 使用相关：数据类型、SQL 语句、索引视图触发器、数据库性能优化；4</li>
   <li>原理：MySQL 基础架构、存储引擎；2</li>
   <li>事务、锁机制、MVCC。3</li>
 </ol>
+
+<h2 id="mysql">MySQL</h2>
+
+<p>是一种<strong>关系型</strong>数据库，建立在<strong>关系模型</strong>的基础上，主要用于<strong>持久化存储</strong>系统中的数据。</p>
+
+<ul>
+  <li>MySQL 的默认端口号是 <strong>3306</strong>。版本号 5.7.21。</li>
+  <li>关键字用大写，表名、字段名用小写。</li>
+</ul>
 
 <h2 id="简介">简介</h2>
 
@@ -73,50 +70,47 @@
   <li>第 3 个数字 <code class="highlighter-rouge">20</code> 是在此发行系列的版本号：随每次新发行的版本递增。表示做了<strong>向下兼容</strong>的<strong>问题修正</strong>。通常选择已发行的最新版本。</li>
 </ol>
 
-<h4 id="解压">解压</h4>
+<h5 id="解压">解压</h5>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>解压到目标安装目录（比如统一安装到同一文件夹下`\Java`）
-</code></pre></div></div>
+<p>解压到目标安装目录（比如统一安装到同一文件夹下<code class="highlighter-rouge">\Java</code>）</p>
 
-<h5 id="设置环境变量">设置环境变量</h5>
+<h4 id="设置环境变量">设置环境变量</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>在-&gt;系统变量-&gt;`PATH` ***追加***
-</code></pre></div></div>
+<pre><code class="language-cmd">#在-&gt;系统变量-&gt;`PATH`, 追加
+;安装目录\Java\mysql-5.7.21-winx64\bin;
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>;安装目录\Java\mysql-5.7.21-winx64\bin;
-
-比如：
+#比如：
 ;D:\Develop\Java\mysql-5.7.21-winx64\bin;
-</code></pre></div></div>
+</code></pre>
 
 <h4 id="配置文件">配置文件</h4>
 
 <p>在安装目录<code class="highlighter-rouge">\Java\mysql-5.7.21-winx64</code>新建<code class="highlighter-rouge">my.ini</code>配置文件，另存为为 ANSI 编码。如下：</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[mysql]
-# 设置mysql客户端默认字符集
-default-character-set=utf8
+<div class="language-ini highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">[mysql]</span>
+<span class="c"># 设置mysql客户端默认字符集
+</span><span class="py">default-character-set</span><span class="p">=</span><span class="s">utf8</span>
 
-[mysqld]
-# 设置3306端口
-port = 3306
-# 设置mysql的安装目录，比如：
-basedir=D:\Develop\Java\mysql-5.7.21-winx64
-# 设置mysql数据库的数据的存放目录 \data，比如：
-datadir=D:\Develop\Java\mysql-5.7.21-winx64\data
+<span class="nn">[mysqld]</span>
+<span class="c"># 设置3306端口
+</span><span class="py">port</span> <span class="p">=</span> <span class="s">3306</span>
+<span class="c"># 设置mysql的安装目录，比如：
+</span><span class="py">basedir</span><span class="p">=</span><span class="s">D:</span><span class="se">\D</span><span class="s">evelop</span><span class="se">\J</span><span class="s">ava</span><span class="se">\m</span><span class="s">ysql-5.7.21-winx64</span>
+<span class="c"># 设置mysql数据库的数据的存放目录 \data，比如：
+</span><span class="py">datadir</span><span class="p">=</span><span class="s">D:</span><span class="se">\D</span><span class="s">evelop</span><span class="se">\J</span><span class="s">ava</span><span class="se">\m</span><span class="s">ysql-5.7.21-winx64</span><span class="se">\d</span><span class="s">ata</span>
 
-# 允许最大连接数
-max_connections=120
-# 默认值是28800秒，也就是当连接空闲时长超过8小时就会自动断开
-wait_timeout = 600
+<span class="c"># 允许最大连接数
+</span><span class="py">max_connections</span><span class="p">=</span><span class="s">120</span>
+<span class="c"># 默认值是28800秒，也就是当连接空闲时长超过8小时就会自动断开
+</span><span class="py">wait_timeout</span> <span class="p">=</span> <span class="s">600</span>
 
-# 服务端使用的字符集默认为8比特编码的latin1字符集
-character-set-server=utf8
-# 创建新表时将使用的默认存储引擎
-default-storage-engine=INNODB
+<span class="c"># 服务端使用的字符集默认为8比特编码的latin1字符集
+</span><span class="py">character-set-server</span><span class="p">=</span><span class="s">utf8</span>
+<span class="c"># 创建新表时将使用的默认存储引擎
+</span><span class="py">default-storage-engine</span><span class="p">=</span><span class="s">INNODB</span>
 
-skip-grant-tables #无密码登录mysql，在最后一行添加
-</code></pre></div></div>
+<span class="err">skip-grant-tables</span> <span class="c">#无密码登录mysql，在最后一行添加
+</span></code></pre></div></div>
 
 <ul>
   <li>MySQL <code class="highlighter-rouge">ERROR:Access denied for user 'root'@'localhost' (using password:YES)</code>
@@ -133,10 +127,11 @@ skip-grant-tables #无密码登录mysql，在最后一行添加
 
 <h4 id="以管理员身份运行cmd">以管理员身份运行cmd</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- 进入`C:\Windows\System32`
-- 右键单击cmd.exe
-- 选择“以管理员身份运行”
-</code></pre></div></div>
+<ol>
+  <li>进入<code class="highlighter-rouge">C:\Windows\System32</code></li>
+  <li>右键单击cmd.exe</li>
+  <li>选择“以管理员身份运行”</li>
+</ol>
 
 <blockquote>
   <p>如果不用管理员身份运行，将会因为权限不够而出现错误：
@@ -145,29 +140,25 @@ skip-grant-tables #无密码登录mysql，在最后一行添加
 
 <h5 id="cd到安装目录bin下"><code class="highlighter-rouge">cd</code>到安装目录<code class="highlighter-rouge">\bin</code>下]</h5>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>d:
-cd 安装目录\Java\mysql-5.7.21-winx64\bin
-
-比如：
-d:
-cd D:\Develop\Java\mysql-5.7.21-winx64\bin
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>d:
+<span class="nb">cd </span>安装目录<span class="se">\J</span>ava<span class="se">\m</span>ysql-5.7.21-winx64<span class="se">\b</span><span class="k">in</span>
 </code></pre></div></div>
 
 <h5 id="安装-1">安装</h5>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mysqld -install
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mysqld <span class="nt">-install</span>
 </code></pre></div></div>
 
-<p>显示<code class="highlighter-rouge">Service successfully installed.</code>即为安装成功</p>
+<p>显示<code class="highlighter-rouge">Service successfully installed.</code>即为安装成功。</p>
 
 <h4 id="启动mysql">启动MySQL</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>net start mysql
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>net start mysql
 </code></pre></div></div>
 
-<h4 id="登陆">登陆</h4>
+<h5 id="登陆">登陆</h5>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mysql -u root -p
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mysql <span class="nt">-u</span> root <span class="nt">-p</span>
 Enter password:
 </code></pre></div></div>
 
@@ -177,11 +168,11 @@ Enter password:
 
 <h4 id="新建测试数据库">新建测试数据库</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mysql&gt;CREATE DATABASE CampusDate;   //创建一个数据库
+<pre><code class="language-cmd">mysql&gt;CREATE DATABASE CampusDate;   //创建一个数据库
 mysql&gt;use CampusDate;  //指定test为当前要操作的数据库
 mysql&gt;CREATE TABLE user (UseID VARCHAR(20),PassWord VARCHAR(20));   //创建一个表user，设置两个字段。
 mysql&gt;INSERT INTO user VALUES('daixiaoke','shishazi'); //插入一条数据到表中
-</code></pre></div></div>
+</code></pre>
 
 <h4 id="用-navicat-导出导入-mysql"><a href="https://blog.csdn.net/davidchengx/article/details/75912013">用 Navicat 导出导入 MySQL</a></h4>
 
@@ -192,9 +183,9 @@ mysql&gt;INSERT INTO user VALUES('daixiaoke','shishazi'); //插入一条数据�
   <li>MySQL Server 的可执行程序是 mysqld，本机默认IP地址为 <code class="highlighter-rouge">127.0.0.1:3306</code>，可用远程IP。</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 登录
-mysql -h 127.0.0.1:3306 -u root -p
-# 服务器
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 登录</span>
+mysql <span class="nt">-h</span> 127.0.0.1:3306 <span class="nt">-u</span> root <span class="nt">-p</span>
+<span class="c"># 服务器</span>
 mysqld start/stop/restatr/status
 </code></pre></div></div>
 
@@ -210,15 +201,15 @@ mysqld start/stop/restatr/status
   <li>修改 MySQL 配置文件（Windows下为 my.ini， Linux下为 my.cnf ）中的参数：</li>
 </ul>
 
-<pre><code class="language-cobol">max_connections= 1000 
-wait_timeout = 5
-</code></pre>
+<div class="language-ini highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">max_connections</span><span class="p">=</span> <span class="s">1000 </span>
+<span class="py">wait_timeout</span> <span class="p">=</span> <span class="s">5</span>
+</code></pre></div></div>
 
 <p>如果没有可以自行添加，修改后重启 MySQL ，如果经常性的报此错误，请您按照服务器环境搭建教程检查下你的服务器。</p>
 
 <h4 id="windows下重启mysql的方法"><a href="https://blog.csdn.net/chenlu5201314/article/details/80017115">windows下重启mysql的方法</a></h4>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd </span>D:<span class="se">\D</span>evelop<span class="se">\J</span>ava<span class="se">\m</span>ysql-5.7.21-winx64<span class="se">\b</span><span class="k">in
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd </span>D:<span class="se">\D</span>evelop<span class="se">\J</span>ava<span class="se">\m</span>ysql-5.7.21-winx64<span class="se">\b</span><span class="k">in
 </span>net stop mysql
 net start mysql
 </code></pre></div></div>
@@ -236,7 +227,7 @@ taskkill <span class="nt">-pid</span> 9396 <span class="nt">-f</span>   // <span
 
 <p>解决：删除data文件夹（或改my.ini中的路径），然后执行<code class="highlighter-rouge">mysqld - initialize</code>、<code class="highlighter-rouge">mysqld  --initialize-insecure</code> （不设置root密码，建议使用），再启动mysql。再登录</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mysql -u root -p
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mysql <span class="nt">-u</span> root <span class="nt">-p</span>
 net start mysql
 </code></pre></div></div>
 
@@ -431,7 +422,7 @@ net start mysql
   </tbody>
 </table>
 
-<p><img src="../assets/java_mysql_jdbc_datatype.png" alt="img" style="zoom: 67%;" /></p>
+<p><img src="../assets/java_mysql_jdbc_datatype.png" alt="img" style="zoom: 80%;" /></p>
 
 <h3 id="三大类数据类型">三大类数据类型</h3>
 
@@ -522,8 +513,8 @@ net start mysql
           <li>用 int 存储时间取值范围为 <code class="highlighter-rouge">1970-01-01 00:00:01 ~ 2038-01-19-03:14:07</code>，超出范围的用 <code class="highlighter-rouge">DATETIME</code>，还需转换为时间，若<strong>访存频繁</strong>则用 datetime。</li>
         </ul>
 
-        <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> # 用于需记录时区的 create_time
- INSERT INTO time_zone_test(date_time, time_stamp) VALUES(NOW(), NOW());
+        <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c1">-- 用于需记录时区的 create_time</span>
+ <span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">time_zone_test</span><span class="p">(</span><span class="n">date_time</span><span class="p">,</span> <span class="n">time_stamp</span><span class="p">)</span> <span class="k">VALUES</span><span class="p">(</span><span class="n">NOW</span><span class="p">(),</span> <span class="n">NOW</span><span class="p">());</span>
 </code></pre></div>        </div>
       </li>
     </ol>
@@ -538,8 +529,8 @@ net start mysql
       <li>
         <p><code class="highlighter-rouge">set(‘v1’, ...)</code>：最多 64 个成员；取多个值时用SET；</p>
 
-        <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> CREATE TABLE tab ( gender SET('man', 'woman', 'no') );
- INSERT INTO tab VALUES ('man', 'man');
+        <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">tab</span> <span class="p">(</span> <span class="n">gender</span> <span class="k">SET</span><span class="p">(</span><span class="s1">'man'</span><span class="p">,</span> <span class="s1">'woman'</span><span class="p">,</span> <span class="s1">'no'</span><span class="p">)</span> <span class="p">);</span>
+ <span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">tab</span> <span class="k">VALUES</span> <span class="p">(</span><span class="s1">'man'</span><span class="p">,</span> <span class="s1">'man'</span><span class="p">);</span>
 </code></pre></div>        </div>
       </li>
     </ol>
@@ -550,16 +541,14 @@ net start mysql
 
 <p>字符字段类型的选择原则：</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  1. 一般 `&lt;` 50个**字节**时用 `char` （除个别很少用到的字段，也可用 `varchar` 来节省空间）；
-     2. 对于 `MyISAM `存储引擎，最好用**固定长度**的数据列（CHAR ）。可使整个表**静态化**，从而使数据**检索更快**，用空间换时间；
-     3. 对于 **`InnoDB` 存储引擎**，最好用**可变长度**的数据列（VARCHAR）。`InnoDB `数据表的存储格式不分固定长度和可变长度，因此用 CHAR 不一定比用 VARCHAR 更好，但由于 VARCHAR 是按照**实际的长度**存储，更**节省空间**，对磁盘 I/O 和数据存储总量更好。
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. 一般 `&lt;` 50个**字节**时用 `char` （除个别很少用到的字段，也可用 `varchar` 来节省空间）；   2. 对于 `MyISAM `存储引擎，最好用**固定长度**的数据列（CHAR ）。可使整个表**静态化**，从而使数据**检索更快**，用空间换时间；   3. 对于 **`InnoDB` 存储引擎**，最好用**可变长度**的数据列（VARCHAR）。`InnoDB `数据表的存储格式不分固定长度和可变长度，因此用 CHAR 不一定比用 VARCHAR 更好，但由于 VARCHAR 是按照**实际的长度**存储，更**节省空间**，对磁盘 I/O 和数据存储总量更好。
 </code></pre></div></div>
 
 <h3 id="字符集和字符编码">字符集和字符编码</h3>
 
 <p>数据库和表的字符集统一用 UTF8，兼容性更好。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CHARACTER SET UTF8
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">CHARACTER</span> <span class="k">SET</span> <span class="n">UTF8</span>
 </code></pre></div></div>
 
 <p>乱码的本质： 编码和解码时用了不同或不兼容的字符集 。</p>
@@ -601,8 +590,8 @@ net start mysql
   <li><strong><code class="highlighter-rouge">utf8mb4</code></strong> ： UTF-8 的完整实现，可存储 <code class="highlighter-rouge">emoji</code> 符号、较复杂的文字、繁体字，占 <strong><code class="highlighter-rouge">4</code> 个字节</strong>。</li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT LENGTH("轻松工作");            -- 返回为 12 位
-SELECT CHARACTER_LENGTH("轻松工作");  -- 返回为 4 字节
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="k">LENGTH</span><span class="p">(</span><span class="nv">"轻松工作"</span><span class="p">);</span>            <span class="c1">-- 返回为 12 位</span>
+<span class="k">SELECT</span> <span class="k">CHARACTER_LENGTH</span><span class="p">(</span><span class="nv">"轻松工作"</span><span class="p">);</span>  <span class="c1">-- 返回为 4 字节</span>
 </code></pre></div></div>
 
 <h2 id="sql-语句">SQL 语句</h2>
@@ -626,9 +615,9 @@ SELECT CHARACTER_LENGTH("轻松工作");  -- 返回为 4 字节
   <li>SQL 支持三种注释：</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## 注释1
--- 注释2
-/* 注释3 */
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">##</span> <span class="err">注释</span><span class="mi">1</span>
+<span class="c1">-- 注释2</span>
+<span class="cm">/* 注释3 */</span>
 </code></pre></div></div>
 
 <h3 id="sql-语言分类">SQL 语言分类</h3>
@@ -654,12 +643,12 @@ SELECT CHARACTER_LENGTH("轻松工作");  -- 返回为 4 字节
   </li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-- 允许远程连接的 IP 地址，“%”表示不限制连接的 IP
--- 123456 为用户密码
-MySQL&gt; grant all PRIVILEGES on &lt;数据库名.表名&gt; to root@'127.0.0.1/%' identified by '123456' [WITH GRANT OPTION];
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">-- 允许远程连接的 IP 地址，“%”表示不限制连接的 IP</span>
+<span class="c1">-- 123456 为用户密码</span>
+<span class="n">MySQL</span><span class="o">&gt;</span> <span class="k">grant</span> <span class="k">all</span> <span class="k">PRIVILEGES</span> <span class="k">on</span> <span class="o">&lt;</span><span class="err">数据库名</span><span class="p">.</span><span class="err">表名</span><span class="o">&gt;</span> <span class="k">to</span> <span class="n">root</span><span class="o">@</span><span class="s1">'127.0.0.1/%'</span> <span class="n">identified</span> <span class="k">by</span> <span class="s1">'123456'</span> <span class="p">[</span><span class="k">WITH</span> <span class="k">GRANT</span> <span class="k">OPTION</span><span class="p">];</span>
 
--- 开启MySQL的远程帐号，立即生效
-FLUSH PRIVILEGES;
+<span class="c1">-- 开启MySQL的远程帐号，立即生效</span>
+<span class="n">FLUSH</span> <span class="k">PRIVILEGES</span><span class="p">;</span>
 </code></pre></div></div>
 
 <h3 id="ddl-数据库表结构定义">DDL 数据库/表结构定义</h3>
@@ -701,8 +690,8 @@ FLUSH PRIVILEGES;
   <li>
     <p>创建：<code class="highlighter-rouge">CREATE database [IF NOT EXISTS] &lt;数据库名&gt; / table &lt;表名&gt; </code></p>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> [[DEFAULT] CHARACTER SET &lt;字符集名&gt;] 
- [[DEFAULT] COLLATE &lt;校对规则名 utf8_chinese_ci&gt;];
+    <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="p">[[</span><span class="k">DEFAULT</span><span class="p">]</span> <span class="n">CHARACTER</span> <span class="k">SET</span> <span class="o">&lt;</span><span class="err">字符集名</span><span class="o">&gt;</span><span class="p">]</span> 
+ <span class="p">[[</span><span class="k">DEFAULT</span><span class="p">]</span> <span class="k">COLLATE</span> <span class="o">&lt;</span><span class="err">校对规则名</span> <span class="n">utf8_chinese_ci</span><span class="o">&gt;</span><span class="p">];</span>
 </code></pre></div>    </div>
   </li>
   <li>
@@ -839,11 +828,11 @@ FLUSH PRIVILEGES;
   <li><code class="highlighter-rouge">COMMENT</code>：注释；</li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-- 在定义完列后直接用关键字指定约束
-&lt;字段名&gt; &lt;数据类型&gt; 约束关键字/UNIQUE
-ALTER TABLE &lt;数据表名&gt; ADD CONSTRAINT &lt;约束名&gt; UNIQUE(&lt;列名&gt;);
-ALTER TABLE &lt;数据表名&gt; CHANGE COLUMN &lt;字段名&gt; &lt;数据类型&gt; NULL DEFAULT &lt;默认值&gt;;
-ALTER TABLE &lt;表名&gt; DROP INDEX &lt;约束名&gt;;
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">-- 在定义完列后直接用关键字指定约束</span>
+<span class="o">&lt;</span><span class="err">字段名</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="err">数据类型</span><span class="o">&gt;</span> <span class="err">约束关键字</span><span class="o">/</span><span class="k">UNIQUE</span>
+<span class="k">ALTER</span> <span class="k">TABLE</span> <span class="o">&lt;</span><span class="err">数据表名</span><span class="o">&gt;</span> <span class="k">ADD</span> <span class="k">CONSTRAINT</span> <span class="o">&lt;</span><span class="err">约束名</span><span class="o">&gt;</span> <span class="k">UNIQUE</span><span class="p">(</span><span class="o">&lt;</span><span class="err">列名</span><span class="o">&gt;</span><span class="p">);</span>
+<span class="k">ALTER</span> <span class="k">TABLE</span> <span class="o">&lt;</span><span class="err">数据表名</span><span class="o">&gt;</span> <span class="n">CHANGE</span> <span class="k">COLUMN</span> <span class="o">&lt;</span><span class="err">字段名</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="err">数据类型</span><span class="o">&gt;</span> <span class="k">NULL</span> <span class="k">DEFAULT</span> <span class="o">&lt;</span><span class="err">默认值</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="k">ALTER</span> <span class="k">TABLE</span> <span class="o">&lt;</span><span class="err">表名</span><span class="o">&gt;</span> <span class="k">DROP</span> <span class="k">INDEX</span> <span class="o">&lt;</span><span class="err">约束名</span><span class="o">&gt;</span><span class="p">;</span>
 </code></pre></div></div>
 
 <h4 id="创建数据库表定义表结构">创建数据库表、定义表结构</h4>
@@ -856,25 +845,25 @@ ALTER TABLE &lt;表名&gt; DROP INDEX &lt;约束名&gt;;
   <li><strong>自动增长</strong>：在<code class="highlighter-rouge">INT</code>和<code class="highlighter-rouge">BIGINT</code>之间，<strong>只有<code class="highlighter-rouge">BIGINT</code></strong>可以作为<strong>自动增长</strong>的字段类型。</li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-- 如果数据库中存在user_accounts表，就从数据库中删除
-DROP TABLE IF EXISTS `user_accounts`;
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">-- 如果数据库中存在user_accounts表，就从数据库中删除</span>
+<span class="k">DROP</span> <span class="k">TABLE</span> <span class="n">IF</span> <span class="k">EXISTS</span> <span class="nv">`user_accounts`</span><span class="p">;</span>
 
--- 创建数据库表
-CREATE TABLE `user_accounts` (
-  `id` 		  bigint(20)   			  NOT NULL AUTO_INCREMENT [primary key],
-  `password`  varchar(32)  DEFAULT '' NOT NULL COMMENT '用户密码',
-  `reset_pwd` tinyint(32)  DEFAULT 0  NOT NULL COMMENT '用户类型：0-不需重置密码；1-需重置',
-  `status` 	  int(1) 	   DEFAULT '1' 		   COMMENT '帐号启用状态：0-&gt;禁用；1-&gt;启用'
-  `mobile`    varchar(20)  DEFAULT '' NOT NULL COMMENT '手机',
-  `create_at` timestamp(6) DEFAULT CURRENT_TIMESTAMP(6) NOT NULL ,
-  `update_at` timestamp(6) DEFAULT CURRENT_TIMESTAMP(6) NOT NULL ON UPDATE CURRENT_TIMESTAMP(6), --
-  `login_time` datetime    DEFAULT   	  NULL COMMENT '最后登录时间',
-  PRIMARY KEY (`id`),
-  -- 创建唯一索引，不允许重复
-  UNIQUE INDEX idx_user_mobile(`mobile`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8 COMMENT='用户表信息';
+<span class="c1">-- 创建数据库表</span>
+<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="nv">`user_accounts`</span> <span class="p">(</span>
+  <span class="nv">`id`</span> 		  <span class="n">bigint</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>   			  <span class="k">NOT</span> <span class="k">NULL</span> <span class="n">AUTO_INCREMENT</span> <span class="p">[</span><span class="k">primary</span> <span class="k">key</span><span class="p">],</span>
+  <span class="nv">`password`</span>  <span class="n">varchar</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>  <span class="k">DEFAULT</span> <span class="s1">''</span> <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">COMMENT</span> <span class="s1">'用户密码'</span><span class="p">,</span>
+  <span class="nv">`reset_pwd`</span> <span class="n">tinyint</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>  <span class="k">DEFAULT</span> <span class="mi">0</span>  <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">COMMENT</span> <span class="s1">'用户类型：0-不需重置密码；1-需重置'</span><span class="p">,</span>
+  <span class="nv">`status`</span> 	  <span class="n">int</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> 	   <span class="k">DEFAULT</span> <span class="s1">'1'</span> 		   <span class="k">COMMENT</span> <span class="s1">'帐号启用状态：0-&gt;禁用；1-&gt;启用'</span>
+  <span class="nv">`mobile`</span>    <span class="n">varchar</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>  <span class="k">DEFAULT</span> <span class="s1">''</span> <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">COMMENT</span> <span class="s1">'手机'</span><span class="p">,</span>
+  <span class="nv">`create_at`</span> <span class="k">timestamp</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="k">CURRENT_TIMESTAMP</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span> <span class="p">,</span>
+  <span class="nv">`update_at`</span> <span class="k">timestamp</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="k">DEFAULT</span> <span class="k">CURRENT_TIMESTAMP</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">ON</span> <span class="k">UPDATE</span> <span class="k">CURRENT_TIMESTAMP</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="c1">--</span>
+  <span class="nv">`login_time`</span> <span class="n">datetime</span>    <span class="k">DEFAULT</span>   	  <span class="k">NULL</span> <span class="k">COMMENT</span> <span class="s1">'最后登录时间'</span><span class="p">,</span>
+  <span class="k">PRIMARY</span> <span class="k">KEY</span> <span class="p">(</span><span class="nv">`id`</span><span class="p">),</span>
+  <span class="c1">-- 创建唯一索引，不允许重复</span>
+  <span class="k">UNIQUE</span> <span class="k">INDEX</span> <span class="n">idx_user_mobile</span><span class="p">(</span><span class="nv">`mobile`</span><span class="p">)</span>
+<span class="p">)</span> <span class="n">ENGINE</span><span class="o">=</span><span class="n">InnoDB</span> <span class="n">AUTO_INCREMENT</span><span class="o">=</span><span class="mi">9</span> <span class="k">DEFAULT</span> <span class="n">CHARSET</span><span class="o">=</span><span class="n">utf8</span> <span class="k">COMMENT</span><span class="o">=</span><span class="s1">'用户表信息'</span><span class="p">;</span>
 
-INSERT INTO `ums_admin` VALUES ('1', 'test', 'pwd', 'timg.jpg', 'test@qq.com', '测试账号', null, '2018-09-29 13:55:30', '2018-09-29 13:55:39', '1');
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="nv">`ums_admin`</span> <span class="k">VALUES</span> <span class="p">(</span><span class="s1">'1'</span><span class="p">,</span> <span class="s1">'test'</span><span class="p">,</span> <span class="s1">'pwd'</span><span class="p">,</span> <span class="s1">'timg.jpg'</span><span class="p">,</span> <span class="s1">'test@qq.com'</span><span class="p">,</span> <span class="s1">'测试账号'</span><span class="p">,</span> <span class="k">null</span><span class="p">,</span> <span class="s1">'2018-09-29 13:55:30'</span><span class="p">,</span> <span class="s1">'2018-09-29 13:55:39'</span><span class="p">,</span> <span class="s1">'1'</span><span class="p">);</span>
 </code></pre></div></div>
 
 <h3 id="dql-select-查询语句">DQL SELECT 查询语句</h3>
@@ -889,10 +878,10 @@ INSERT INTO `ums_admin` VALUES ('1', 'test', 'pwd', 'timg.jpg', 'test@qq.com', '
 
 <p>IDEA 中使用的刷新功能（对应的查询语句）：</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT t.*
-FROM mall.ums_admin t
-ORDER BY id
-LIMIT 501
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="n">t</span><span class="p">.</span><span class="o">*</span>
+<span class="k">FROM</span> <span class="n">mall</span><span class="p">.</span><span class="n">ums_admin</span> <span class="n">t</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">id</span>
+<span class="k">LIMIT</span> <span class="mi">501</span>
 </code></pre></div></div>
 
 <h4 id="子句执行顺序">子句执行顺序</h4>
@@ -925,16 +914,16 @@ LIMIT 501
 
 <p>SQL 语法书写顺序：（写 SQL 语句的顺序）</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>select[distinct]
-from
-  join(如 left join)
-  on
-where
-group by
-  having
-union
-order by
-limit
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">select</span><span class="p">[</span><span class="k">distinct</span><span class="p">]</span>
+<span class="k">from</span>
+  <span class="k">join</span><span class="p">(</span><span class="err">如</span> <span class="k">left</span> <span class="k">join</span><span class="p">)</span>
+  <span class="k">on</span>
+<span class="k">where</span>
+<span class="k">group</span> <span class="k">by</span>
+  <span class="k">having</span>
+<span class="k">union</span>
+<span class="k">order</span> <span class="k">by</span>
+<span class="k">limit</span>
 </code></pre></div></div>
 
 <h4 id="from-子句">FROM 子句</h4>
@@ -949,10 +938,10 @@ limit
   <li>为子查询结果集指定别名</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-- 作为 where 条件
-select t1.name from table_1 as t1, table_2 as t2 where t1.id = t2.id;
--- 为子查询结果集指定别名
-SELECT tmp.id FROM (SELECT * FROM result) AS tmp;
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">-- 作为 where 条件</span>
+<span class="k">select</span> <span class="n">t1</span><span class="p">.</span><span class="n">name</span> <span class="k">from</span> <span class="n">table_1</span> <span class="k">as</span> <span class="n">t1</span><span class="p">,</span> <span class="n">table_2</span> <span class="k">as</span> <span class="n">t2</span> <span class="k">where</span> <span class="n">t1</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">t2</span><span class="p">.</span><span class="n">id</span><span class="p">;</span>
+<span class="c1">-- 为子查询结果集指定别名</span>
+<span class="k">SELECT</span> <span class="n">tmp</span><span class="p">.</span><span class="n">id</span> <span class="k">FROM</span> <span class="p">(</span><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="k">result</span><span class="p">)</span> <span class="k">AS</span> <span class="n">tmp</span><span class="p">;</span>
 </code></pre></div></div>
 
 <h5 id="多表查询笛卡尔查询">多表查询/笛卡尔查询</h5>
@@ -963,18 +952,18 @@ SELECT tmp.id FROM (SELECT * FROM result) AS tmp;
   <li>与 <code class="highlighter-rouge">cross join</code> 查询相同？</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT
-    s.id sid,
-    s.name,
-    s.score,
-    c.id cid,
-    c.name cname
-FROM students [AS] s, classes [AS] c
-WHERE s.gender = 'M' AND c.id = 1;
-[GROUP BY &lt;group&gt;
-[HAVING &lt;expression&gt; [{&lt;operator&gt; &lt;expression&gt;}…]]
-[ORDER BY &lt;order&gt;]
-[LIMIT[&lt;offset&gt;,] &lt;row count&gt;]
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span>
+    <span class="n">s</span><span class="p">.</span><span class="n">id</span> <span class="n">sid</span><span class="p">,</span>
+    <span class="n">s</span><span class="p">.</span><span class="n">name</span><span class="p">,</span>
+    <span class="n">s</span><span class="p">.</span><span class="n">score</span><span class="p">,</span>
+    <span class="k">c</span><span class="p">.</span><span class="n">id</span> <span class="n">cid</span><span class="p">,</span>
+    <span class="k">c</span><span class="p">.</span><span class="n">name</span> <span class="n">cname</span>
+<span class="k">FROM</span> <span class="n">students</span> <span class="p">[</span><span class="k">AS</span><span class="p">]</span> <span class="n">s</span><span class="p">,</span> <span class="n">classes</span> <span class="p">[</span><span class="k">AS</span><span class="p">]</span> <span class="k">c</span>
+<span class="k">WHERE</span> <span class="n">s</span><span class="p">.</span><span class="n">gender</span> <span class="o">=</span> <span class="s1">'M'</span> <span class="k">AND</span> <span class="k">c</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">[</span><span class="k">GROUP</span> <span class="k">BY</span> <span class="o">&lt;</span><span class="k">group</span><span class="o">&gt;</span>
+<span class="p">[</span><span class="k">HAVING</span> <span class="o">&lt;</span><span class="n">expression</span><span class="o">&gt;</span> <span class="p">[</span><span class="err">{</span><span class="o">&lt;</span><span class="k">operator</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">expression</span><span class="o">&gt;</span><span class="err">}…</span><span class="p">]]</span>
+<span class="p">[</span><span class="k">ORDER</span> <span class="k">BY</span> <span class="o">&lt;</span><span class="k">order</span><span class="o">&gt;</span><span class="p">]</span>
+<span class="p">[</span><span class="k">LIMIT</span><span class="p">[</span><span class="o">&lt;</span><span class="k">offset</span><span class="o">&gt;</span><span class="p">,]</span> <span class="o">&lt;</span><span class="k">row</span> <span class="k">count</span><span class="o">&gt;</span><span class="p">]</span>
 </code></pre></div></div>
 
 <h5 id="join-on-连接查询">JOIN ON 连接查询</h5>
@@ -1003,29 +992,33 @@ WHERE s.gender = 'M' AND c.id = 1;
   <li><code class="highlighter-rouge">SELF JOIN</code> <strong>自连接</strong>：将一个表连接到自身，就像该表是两个表一样。为了区分两个表，在 SQL 语句中需要至少重命名一个表。</li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-- 左连接
-SELECT * FROM TableA 
-LEFT OUTER JOIN TableB 
-ON TableA.name = TableB.name
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">-- 左连接</span>
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">TableA</span> 
+<span class="k">LEFT</span> <span class="k">OUTER</span> <span class="k">JOIN</span> <span class="n">TableB</span> 
+<span class="k">ON</span> <span class="n">TableA</span><span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">TableB</span><span class="p">.</span><span class="n">name</span>
 </code></pre></div></div>
+
+<h6 id="举例">举例</h6>
 
 <p><img src="../assets/70d2ad4c725fe0bae377a0dfdcad33fb.png" alt="img" style="zoom:90%;" /> <img src="../assets/6ffdc1c79ebc38c1b039e086a682b6f2.png" alt="img" style="zoom:90%;" /></p>
 
 <p><img src="../assets/701670942f0f45d3a3a2187cd04a12ad~tplv-k3u1fbpfcp-zoom-1.png" alt="img" style="zoom: 50%;" /></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>select tb1.id, tb1.name, tb2.sex ...
-from tb_user tb1
-join tb_sex tb2
-on tb1.id = tb2.id -- 连接条件，只有满足此条件的记录才会合并为一行。
-order by tb1.id;
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">select</span> <span class="n">tb1</span><span class="p">.</span><span class="n">id</span><span class="p">,</span> <span class="n">tb1</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="n">tb2</span><span class="p">.</span><span class="n">sex</span> <span class="p">...</span>
+<span class="k">from</span> <span class="n">tb_user</span> <span class="n">tb1</span>
+<span class="k">join</span> <span class="n">tb_sex</span> <span class="n">tb2</span>
+<span class="k">on</span> <span class="n">tb1</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">tb2</span><span class="p">.</span><span class="n">id</span> <span class="c1">-- 连接条件，只有满足此条件的记录才会合并为一行。</span>
+<span class="k">order</span> <span class="k">by</span> <span class="n">tb1</span><span class="p">.</span><span class="n">id</span><span class="p">;</span>
 
-# 如果两张表的关联字段名相同，也可以使用USING子句：join....using()
-select c.cust_name, o.order_num
-from Customers c
-inner join Orders o
-using(cust_id) 		--
-order by c.cust_name;
+<span class="o">#</span> <span class="err">如果两张表的关联字段名相同，也可以使用</span><span class="k">USING</span><span class="err">子句：</span><span class="k">join</span><span class="p">....</span><span class="k">using</span><span class="p">()</span>
+<span class="k">select</span> <span class="k">c</span><span class="p">.</span><span class="n">cust_name</span><span class="p">,</span> <span class="n">o</span><span class="p">.</span><span class="n">order_num</span>
+<span class="k">from</span> <span class="n">Customers</span> <span class="k">c</span>
+<span class="k">inner</span> <span class="k">join</span> <span class="n">Orders</span> <span class="n">o</span>
+<span class="k">using</span><span class="p">(</span><span class="n">cust_id</span><span class="p">)</span> 		<span class="c1">--</span>
+<span class="k">order</span> <span class="k">by</span> <span class="k">c</span><span class="p">.</span><span class="n">cust_name</span><span class="p">;</span>
 </code></pre></div></div>
+
+<h5 id="on-和-where-条件的区别"><code class="highlighter-rouge">on 和 where</code> 条件的区别</h5>
 
 <p><code class="highlighter-rouge">on 和 where</code> 条件的区别：<strong>on 是 join on 的条件</strong>，先运行生成<strong>临时表</strong>，再根据 where 筛选；</p>
 
@@ -1103,6 +1096,8 @@ order by c.cust_name;
   <li>当用于 <code class="highlighter-rouge">FROM</code> 子句时，一般返回<strong>多行多列</strong>数据，返回的结果相当于一张<strong>临时表</strong>，这样才符合 <code class="highlighter-rouge">FROM</code> 后面是表的规则。这种做法能够实现<strong>多表联合查询</strong>。需要使用 <strong>AS 关键字</strong>为该临时表起一个名字。</li>
 </ol>
 
+<h5 id="用于-where-子句">用于 <code class="highlighter-rouge">WHERE</code> 子句</h5>
+
 <p>用于 <code class="highlighter-rouge">WHERE</code> 子句的子查询的基本语法如下：</p>
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">select</span> <span class="k">column_name</span> <span class="p">[,</span> <span class="k">column_name</span> <span class="p">]</span>
@@ -1113,6 +1108,8 @@ order by c.cust_name;
     <span class="p">[</span><span class="k">where</span><span class="p">])</span>
 </code></pre></div></div>
 
+<h5 id="用于-from-子句">用于 <code class="highlighter-rouge">FROM</code> 子句</h5>
+
 <p>用于 <code class="highlighter-rouge">FROM</code> 子句的子查询的基本语法如下：</p>
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">select</span> <span class="k">column_name</span> <span class="p">[,</span> <span class="k">column_name</span> <span class="p">]</span>
@@ -1122,7 +1119,7 @@ order by c.cust_name;
 <span class="k">where</span>  <span class="n">condition</span>
 </code></pre></div></div>
 
-<p>子查询的子查询：</p>
+<h5 id="子查询的子查询">子查询的子查询</h5>
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="n">cust_name</span><span class="p">,</span> <span class="n">cust_contact</span>
 <span class="k">FROM</span> <span class="n">customers</span>
@@ -1159,23 +1156,25 @@ order by c.cust_name;
   <li><code class="highlighter-rouge">GROUP_CONCAT(DISTINCT name [order by 排序字段 asc/desc ] [separator '分隔符-'])</code>：拼接</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT cust_name, COUNT(cust_address) AS addr_num
-FROM Customers GROUP BY cust_name
-[ORDER BY cust_name DESC];
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="n">cust_name</span><span class="p">,</span> <span class="k">COUNT</span><span class="p">(</span><span class="n">cust_address</span><span class="p">)</span> <span class="k">AS</span> <span class="n">addr_num</span>
+<span class="k">FROM</span> <span class="n">Customers</span> <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">cust_name</span>
+<span class="p">[</span><span class="k">ORDER</span> <span class="k">BY</span> <span class="n">cust_name</span> <span class="k">DESC</span><span class="p">];</span>
 
-SELECT COUNT(*/id) 聚合列别名 FROM ...
--- 分组聚合子句，得到N行结果&lt;class_id, num&gt;
-    SELECT COUNT(*) num  FROM students GROUP BY class_id;
--- 只支持分组的列，按class_id, gender分组:
-    SELECT class_id,gender,COUNT(*) num  FROM students GROUP BY class_id, gender;
+<span class="k">SELECT</span> <span class="k">COUNT</span><span class="p">(</span><span class="o">*/</span><span class="n">id</span><span class="p">)</span> <span class="err">聚合列别名</span> <span class="k">FROM</span> <span class="p">...</span>
+<span class="c1">-- 分组聚合子句，得到N行结果&lt;class_id, num&gt;</span>
+    <span class="k">SELECT</span> <span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="n">num</span>  <span class="k">FROM</span> <span class="n">students</span> <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">class_id</span><span class="p">;</span>
+<span class="c1">-- 只支持分组的列，按class_id, gender分组:</span>
+    <span class="k">SELECT</span> <span class="n">class_id</span><span class="p">,</span><span class="n">gender</span><span class="p">,</span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="n">num</span>  <span class="k">FROM</span> <span class="n">students</span> <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">class_id</span><span class="p">,</span> <span class="n">gender</span><span class="p">;</span>
 
--- 将group by产生的同一个分组中的值连接起来，返回一个字符串结果。
--- group_concat 返回带有来自一个组的连接的非NULL值的字符串结果。组内字符串连接。
--- 按性别分组，结果拼接name，如&lt;female, Lily-Cat&gt;
-    SELECT `sex`, GROUP_CONCAT(DISTINCT name [order by 排序字段 asc/desc ] [separator '分隔符-'])  FROM tb_students_info GROUP BY sex;
+<span class="c1">-- 将group by产生的同一个分组中的值连接起来，返回一个字符串结果。</span>
+<span class="c1">-- group_concat 返回带有来自一个组的连接的非NULL值的字符串结果。组内字符串连接。</span>
+<span class="c1">-- 按性别分组，结果拼接name，如&lt;female, Lily-Cat&gt;</span>
+    <span class="k">SELECT</span> <span class="nv">`sex`</span><span class="p">,</span> <span class="n">GROUP_CONCAT</span><span class="p">(</span><span class="k">DISTINCT</span> <span class="n">name</span> <span class="p">[</span><span class="k">order</span> <span class="k">by</span> <span class="err">排序字段</span> <span class="k">asc</span><span class="o">/</span><span class="k">desc</span> <span class="p">]</span> <span class="p">[</span><span class="n">separator</span> <span class="s1">'分隔符-'</span><span class="p">])</span>  <span class="k">FROM</span> <span class="n">tb_students_info</span> <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">sex</span><span class="p">;</span>
 </code></pre></div></div>
 
-<p>COUNT <strong>聚合函数</strong>、聚合查询：</p>
+<h5 id="count-聚合函数">COUNT <strong>聚合函数</strong></h5>
+
+<p>聚合查询：</p>
 
 <ul>
   <li><code class="highlighter-rouge">sum </code>：求和，无结果或全为NULL时返回NULL，需注意 NPE 问题。下同</li>
@@ -1183,13 +1182,13 @@ SELECT COUNT(*/id) 聚合列别名 FROM ...
   <li><code class="highlighter-rouge">max/min</code>：求最大/小值，不限于数值类型</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-- count 计数、统计，返回不同的非NULL值数目：
-	count(*)：统计值不为 NULL 的行数；
-    count(列名)：统计此列不为 NULL 值的行数，无结果返回0；
-	count(distinct col)：计算该列除 NULL 外的不重复行数；
-    count(distinct col1 , col2)：统计两列均不为 NULL 的行数（乘积）；如果其中一列全为 NULL，即使另一列有不同的值，也返回为 0。
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">-- count 计数、统计，返回不同的非NULL值数目：</span>
+	<span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="err">：统计值不为</span> <span class="k">NULL</span> <span class="err">的行数；</span>
+    <span class="k">count</span><span class="p">(</span><span class="err">列名</span><span class="p">)</span><span class="err">：统计此列不为</span> <span class="k">NULL</span> <span class="err">值的行数，无结果返回</span><span class="mi">0</span><span class="err">；</span>
+	<span class="k">count</span><span class="p">(</span><span class="k">distinct</span> <span class="n">col</span><span class="p">)</span><span class="err">：计算该列除</span> <span class="k">NULL</span> <span class="err">外的不重复行数；</span>
+    <span class="k">count</span><span class="p">(</span><span class="k">distinct</span> <span class="n">col1</span> <span class="p">,</span> <span class="n">col2</span><span class="p">)</span><span class="err">：统计两列均不为</span> <span class="k">NULL</span> <span class="err">的行数（乘积）；如果其中一列全为</span> <span class="k">NULL</span><span class="err">，即使另一列有不同的值，也返回为</span> <span class="mi">0</span><span class="err">。</span>
     
-SELECT COUNT(DISTINCT name,age) FROM student;
+<span class="k">SELECT</span> <span class="k">COUNT</span><span class="p">(</span><span class="k">DISTINCT</span> <span class="n">name</span><span class="p">,</span><span class="n">age</span><span class="p">)</span> <span class="k">FROM</span> <span class="n">student</span><span class="p">;</span>
 </code></pre></div></div>
 
 <h4 id="having-分组条件子句">HAVING 分组条件子句</h4>
@@ -1201,19 +1200,19 @@ SELECT COUNT(DISTINCT name,age) FROM student;
   <li><code class="highlighter-rouge">where</code> 和 <code class="highlighter-rouge">having</code> 可以在相同的查询中。</li>
 </ul>
 
-<p><strong><code class="highlighter-rouge">having</code> vs <code class="highlighter-rouge">where</code></strong>：</p>
+<h5 id="having-vs-where"><code class="highlighter-rouge">having</code> vs <code class="highlighter-rouge">where</code></h5>
 
 <ul>
   <li><code class="highlighter-rouge">where</code>：<strong>过滤指定的行</strong>，后面<strong>不能加聚合函数</strong>（分组函数）。<code class="highlighter-rouge">where</code> 在<code class="highlighter-rouge">group by</code> 前。</li>
   <li><code class="highlighter-rouge">having</code>：<strong>过滤分组</strong>，一般都是和 <code class="highlighter-rouge">group by</code> 连用，不能单独使用。<code class="highlighter-rouge">having</code> 在 <code class="highlighter-rouge">group by</code> 之后。</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-- 使用 WHERE 和 HAVING 过滤数据
-SELECT cust_name, COUNT(*) AS NumberOfOrders
-FROM Customers
-WHERE cust_email IS NOT NULL
-GROUP BY cust_name
-HAVING COUNT(*) &gt; 1;
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">-- 使用 WHERE 和 HAVING 过滤数据</span>
+<span class="k">SELECT</span> <span class="n">cust_name</span><span class="p">,</span> <span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">AS</span> <span class="n">NumberOfOrders</span>
+<span class="k">FROM</span> <span class="n">Customers</span>
+<span class="k">WHERE</span> <span class="n">cust_email</span> <span class="k">IS</span> <span class="k">NOT</span> <span class="k">NULL</span>
+<span class="k">GROUP</span> <span class="k">BY</span> <span class="n">cust_name</span>
+<span class="k">HAVING</span> <span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">;</span>
 </code></pre></div></div>
 
 <h4 id="函数">函数</h4>
@@ -1257,11 +1256,11 @@ HAVING COUNT(*) &gt; 1;
   <li>表示对后面的所有参数的拼接取不重复的记录，即查出的参数拼接每行记录都是唯一的。</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT DISTINCT vend_id FROM products;
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="n">vend_id</span> <span class="k">FROM</span> <span class="n">products</span><span class="p">;</span>
 
--- DISTINCT, ALL 选项：去除重复记录
-SELECT DISTINCT name,age FROM student; -- 统计&lt;name, age&gt;二者都不相同的结果集
-SELECT COUNT(DISTINCT name,age) FROM student;
+<span class="c1">-- DISTINCT, ALL 选项：去除重复记录</span>
+<span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="n">name</span><span class="p">,</span><span class="n">age</span> <span class="k">FROM</span> <span class="n">student</span><span class="p">;</span> <span class="c1">-- 统计&lt;name, age&gt;二者都不相同的结果集</span>
+<span class="k">SELECT</span> <span class="k">COUNT</span><span class="p">(</span><span class="k">DISTINCT</span> <span class="n">name</span><span class="p">,</span><span class="n">age</span><span class="p">)</span> <span class="k">FROM</span> <span class="n">student</span><span class="p">;</span>
 </code></pre></div></div>
 
 <h5 id="union-合并结果">UNION 合并结果</h5>
@@ -1281,19 +1280,21 @@ SELECT COUNT(DISTINCT name,age) FROM student;
   <li>默认地，<code class="highlighter-rouge">UNION</code> 操作符选取不同的值。如果允许重复的值，请使用 <code class="highlighter-rouge">UNION ALL</code>。</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SELECT column_name(s) FROM table1
-UNION ALL
-SELECT column_name(s) FROM table2;
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="k">column_name</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">FROM</span> <span class="n">table1</span>
+<span class="k">UNION</span> <span class="k">ALL</span>
+<span class="k">SELECT</span> <span class="k">column_name</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">FROM</span> <span class="n">table2</span><span class="p">;</span>
 </code></pre></div></div>
 
-<p><code class="highlighter-rouge">union VS union all</code>：都用于<strong>合并</strong>两个或多个 SELECT 语句的结果集。</p>
+<h6 id="union-vs-union-all"><code class="highlighter-rouge">union VS union all</code></h6>
+
+<p>都用于<strong>合并</strong>两个或多个 SELECT 语句的结果集。</p>
 
 <ul>
   <li><code class="highlighter-rouge">union</code>：取唯一值，记录没有重复；进行<strong>表连接后</strong>会筛选掉重复的记录。</li>
   <li><code class="highlighter-rouge">union all</code>：直接连接，取到的是所有值，记录可能有重复；Union All 不去除重复记录。</li>
 </ul>
 
-<p><code class="highlighter-rouge">JOIN</code> vs <code class="highlighter-rouge">UNION</code>：</p>
+<h6 id="join-vs-union"><code class="highlighter-rouge">JOIN</code> vs <code class="highlighter-rouge">UNION</code></h6>
 
 <ul>
   <li><code class="highlighter-rouge">JOIN</code> 中连接表的列可能不同，但在 <code class="highlighter-rouge">UNION</code> 中，<strong>所有查询的列数和列顺序</strong>必须相同。</li>
@@ -1325,14 +1326,14 @@ SELECT column_name(s) FROM table2;
   <li><code class="highlighter-rouge">LIMIT &lt;记录数&gt; OFFSET &lt;初始位置&gt;</code></li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-- 返回前 5 行
-SELECT * FROM mytable LIMIT 5;
-SELECT * FROM mytable LIMIT 0, 5;
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">-- 返回前 5 行</span>
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">mytable</span> <span class="k">LIMIT</span> <span class="mi">5</span><span class="p">;</span>
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">mytable</span> <span class="k">LIMIT</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">;</span>
 
--- 返回第 3 ~ 5 行
-SELECT * FROM mytable LIMIT 2, 3;
--- 等价于
-SELECT * FROM mytable LIMIT 2 OFFSET 3;
+<span class="c1">-- 返回第 3 ~ 5 行</span>
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">mytable</span> <span class="k">LIMIT</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">;</span>
+<span class="c1">-- 等价于</span>
+<span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">mytable</span> <span class="k">LIMIT</span> <span class="mi">2</span> <span class="k">OFFSET</span> <span class="mi">3</span><span class="p">;</span>
 </code></pre></div></div>
 
 <h3 id="dml-数据操纵语句">DML 数据操纵语句</h3>
@@ -1358,30 +1359,30 @@ SELECT * FROM mytable LIMIT 2 OFFSET 3;
   <li>首先，在创建表时，将不需要重复的字段设置为unique，然后在插入时，使用insert ignore语句。</li>
 </ul>
 
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">--</span> <span class="err">指定名称插入、完整语句：（使用）</span><span class="n">id</span><span class="err">可不传值，使用了自增</span>
-<span class="n">insert</span> <span class="n">into</span> <span class="nf">emp</span><span class="o">(</span><span class="n">ename</span><span class="o">,</span> <span class="n">hiredate</span><span class="o">,</span> <span class="n">sal</span><span class="o">,</span> <span class="n">deptno</span><span class="o">)</span> <span class="n">values</span> <span class="o">(</span><span class="err">'</span><span class="n">zhangsan</span><span class="err">'</span><span class="o">,</span> <span class="err">'</span><span class="mi">2018</span><span class="o">-</span><span class="mo">01</span><span class="o">-</span><span class="mo">01</span><span class="err">'</span><span class="o">,</span> <span class="err">'</span><span class="mi">2000</span><span class="err">'</span><span class="o">,</span> <span class="mi">1</span><span class="o">);</span>
-<span class="n">INSERT</span> <span class="o">[</span><span class="n">INTO</span><span class="o">]</span> <span class="err">`</span><span class="n">user_info</span><span class="err">`</span> <span class="n">name</span><span class="o">=</span><span class="s">"Tom"</span><span class="o">,</span> <span class="n">age</span><span class="o">=</span><span class="mi">21</span><span class="o">;</span>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">-- 指定名称插入、完整语句：（使用）id可不传值，使用了自增</span>
+<span class="k">insert</span> <span class="k">into</span> <span class="n">emp</span><span class="p">(</span><span class="n">ename</span><span class="p">,</span> <span class="n">hiredate</span><span class="p">,</span> <span class="n">sal</span><span class="p">,</span> <span class="n">deptno</span><span class="p">)</span> <span class="k">values</span> <span class="p">(</span><span class="s1">'zhangsan'</span><span class="p">,</span> <span class="s1">'2018-01-01'</span><span class="p">,</span> <span class="s1">'2000'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="k">INSERT</span> <span class="p">[</span><span class="k">INTO</span><span class="p">]</span> <span class="nv">`user_info`</span> <span class="n">name</span><span class="o">=</span><span class="nv">"Tom"</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="mi">21</span><span class="p">;</span>
 
-<span class="o">--</span> <span class="err">不指定名称插入、省略名称：需要指定所有的值，包括必须指定</span><span class="n">id</span><span class="err">，无法使用自增</span>
-<span class="n">insert</span> <span class="n">into</span> <span class="n">emp</span> <span class="nf">values</span> <span class="o">(</span><span class="err">'</span><span class="n">lisi</span><span class="err">'</span><span class="o">,</span> <span class="err">'</span><span class="mi">2018</span><span class="o">-</span><span class="mo">01</span><span class="o">-</span><span class="mo">01</span><span class="err">'</span><span class="o">,</span> <span class="err">'</span><span class="mi">2000</span><span class="err">'</span><span class="o">,</span> <span class="mi">1</span><span class="o">);</span>
-<span class="n">INSERT</span> <span class="n">INTO</span> <span class="err">`</span><span class="n">ums_admin</span><span class="err">`</span> <span class="n">VALUES</span> <span class="o">(</span><span class="sc">'1'</span><span class="o">,</span> <span class="err">'</span><span class="n">test</span><span class="err">'</span><span class="o">,</span> <span class="err">'</span><span class="n">pwd</span><span class="err">'</span><span class="o">,</span> <span class="err">'</span><span class="n">timg</span><span class="o">.</span><span class="na">jpg</span><span class="err">'</span><span class="o">,</span> <span class="err">'</span><span class="n">test</span><span class="nd">@qq</span><span class="o">.</span><span class="na">com</span><span class="err">'</span><span class="o">,</span> <span class="err">'测试账号'</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="err">'</span><span class="mi">2018</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">29</span> <span class="mi">13</span><span class="o">:</span><span class="mi">55</span><span class="o">:</span><span class="mi">30</span><span class="err">'</span><span class="o">,</span> <span class="err">'</span><span class="mi">2018</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">29</span> <span class="mi">13</span><span class="o">:</span><span class="mi">55</span><span class="o">:</span><span class="mi">39</span><span class="err">'</span><span class="o">,</span> <span class="sc">'1'</span><span class="o">);</span>
+<span class="c1">-- 不指定名称插入、省略名称：需要指定所有的值，包括必须指定id，无法使用自增</span>
+<span class="k">insert</span> <span class="k">into</span> <span class="n">emp</span> <span class="k">values</span> <span class="p">(</span><span class="s1">'lisi'</span><span class="p">,</span> <span class="s1">'2018-01-01'</span><span class="p">,</span> <span class="s1">'2000'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="nv">`ums_admin`</span> <span class="k">VALUES</span> <span class="p">(</span><span class="s1">'1'</span><span class="p">,</span> <span class="s1">'test'</span><span class="p">,</span> <span class="s1">'pwd'</span><span class="p">,</span> <span class="s1">'timg.jpg'</span><span class="p">,</span> <span class="s1">'test@qq.com'</span><span class="p">,</span> <span class="s1">'测试账号'</span><span class="p">,</span> <span class="k">null</span><span class="p">,</span> <span class="s1">'2018-09-29 13:55:30'</span><span class="p">,</span> <span class="s1">'2018-09-29 13:55:39'</span><span class="p">,</span> <span class="s1">'1'</span><span class="p">);</span>
 
-<span class="o">--</span> <span class="err">批量插入数据：</span>
-<span class="n">insert</span> <span class="n">into</span> <span class="n">dept</span> <span class="nf">values</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span><span class="err">'</span><span class="n">dept1</span><span class="err">'</span><span class="o">),(</span><span class="mi">2</span><span class="o">,</span><span class="err">'</span><span class="n">dept2</span><span class="err">'</span><span class="o">);</span>
-<span class="n">INSERT</span> <span class="o">[</span><span class="n">INTO</span><span class="o">]</span> <span class="err">`</span><span class="n">user_info</span><span class="err">`</span> <span class="o">([</span><span class="n">name</span><span class="o">,</span> <span class="n">age</span><span class="o">])</span> <span class="n">VALUES</span> <span class="o">(</span><span class="s">"Tom"</span><span class="o">,</span> <span class="mi">21</span><span class="o">),</span> <span class="o">(</span><span class="s">"Jack"</span><span class="o">,</span> <span class="mi">13</span><span class="o">);</span>
+<span class="c1">-- 批量插入数据：</span>
+<span class="k">insert</span> <span class="k">into</span> <span class="n">dept</span> <span class="k">values</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="s1">'dept1'</span><span class="p">),(</span><span class="mi">2</span><span class="p">,</span><span class="s1">'dept2'</span><span class="p">);</span>
+<span class="k">INSERT</span> <span class="p">[</span><span class="k">INTO</span><span class="p">]</span> <span class="nv">`user_info`</span> <span class="p">([</span><span class="n">name</span><span class="p">,</span> <span class="n">age</span><span class="p">])</span> <span class="k">VALUES</span> <span class="p">(</span><span class="nv">"Tom"</span><span class="p">,</span> <span class="mi">21</span><span class="p">),</span> <span class="p">(</span><span class="nv">"Jack"</span><span class="p">,</span> <span class="mi">13</span><span class="p">);</span>
 
-<span class="o">--</span> <span class="err">插入，如果已存在则更新</span>
-<span class="n">INSERT</span> <span class="n">INTO</span> <span class="nf">students</span> <span class="o">(</span><span class="n">id</span><span class="o">,</span> <span class="n">name</span><span class="o">,</span> <span class="n">gender</span><span class="o">,</span> <span class="n">score</span><span class="o">)</span> <span class="n">VALUES</span> <span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="err">'小明'</span><span class="o">,</span> <span class="sc">'F'</span><span class="o">,</span> <span class="mi">99</span><span class="o">)</span> <span class="n">ON</span> <span class="n">DUPLICATE</span> <span class="n">KEY</span> <span class="n">UPDATE</span> <span class="n">name</span><span class="o">=</span><span class="err">'小明'</span><span class="o">,</span> <span class="n">gender</span><span class="o">=</span><span class="sc">'F'</span><span class="o">,</span> <span class="n">score</span><span class="o">=</span><span class="mi">99</span><span class="o">;</span>
+<span class="c1">-- 插入，如果已存在则更新</span>
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">students</span> <span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">gender</span><span class="p">,</span> <span class="n">score</span><span class="p">)</span> <span class="k">VALUES</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">'小明'</span><span class="p">,</span> <span class="s1">'F'</span><span class="p">,</span> <span class="mi">99</span><span class="p">)</span> <span class="k">ON</span> <span class="n">DUPLICATE</span> <span class="k">KEY</span> <span class="k">UPDATE</span> <span class="n">name</span><span class="o">=</span><span class="s1">'小明'</span><span class="p">,</span> <span class="n">gender</span><span class="o">=</span><span class="s1">'F'</span><span class="p">,</span> <span class="n">score</span><span class="o">=</span><span class="mi">99</span><span class="p">;</span>
 </code></pre></div></div>
 
 <h4 id="删除记录">删除记录</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>DELETE FROM user_info WHERE ename='zhangsan'
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">DELETE</span> <span class="k">FROM</span> <span class="n">user_info</span> <span class="k">WHERE</span> <span class="n">ename</span><span class="o">=</span><span class="s1">'zhangsan'</span>
 </code></pre></div></div>
 
 <h4 id="修改记录">修改记录</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>UPDATE user_info  SET age=22,sal='4000',score=score+10  WHERE name="Tom" and score&lt;80;
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">UPDATE</span> <span class="n">user_info</span>  <span class="k">SET</span> <span class="n">age</span><span class="o">=</span><span class="mi">22</span><span class="p">,</span><span class="n">sal</span><span class="o">=</span><span class="s1">'4000'</span><span class="p">,</span><span class="n">score</span><span class="o">=</span><span class="n">score</span><span class="o">+</span><span class="mi">10</span>  <span class="k">WHERE</span> <span class="n">name</span><span class="o">=</span><span class="nv">"Tom"</span> <span class="k">and</span> <span class="n">score</span><span class="o">&lt;</span><span class="mi">80</span><span class="p">;</span>
 </code></pre></div></div>
 
 <h4 id="dql-查询记录">DQL 查询记录</h4>
@@ -1390,32 +1391,64 @@ SELECT * FROM mytable LIMIT 2 OFFSET 3;
   <p>主要见 DQL 语句。</p>
 </blockquote>
 
-<ul>
-  <li>查询所有记录：<code class="highlighter-rouge">select * from emp</code></li>
-  <li>查询不重复的记录：<code class="highlighter-rouge">select distinct deptno from emp</code></li>
-  <li>条件查询：<code class="highlighter-rouge">select * from emp where deptno=1 and sal&lt;3000</code></li>
-  <li><strong>排序和限制</strong>：<code class="highlighter-rouge">select * from emp order by deptno desc limit 2</code></li>
-  <li><strong>聚合</strong>（查询部门人数大于1的部门编号）：<code class="highlighter-rouge">select deptno,count(1) from emp group by deptno having count(1) &gt; 1</code>？</li>
-  <li>连接查询：<code class="highlighter-rouge">select * from emp e left join dept d on e.deptno=d.deptno</code></li>
-  <li><strong>子查询</strong>：<code class="highlighter-rouge">select * from emp where deptno in (select deptno from dept)</code></li>
-  <li>记录联合：<code class="highlighter-rouge">select deptno from emp union select deptno from dept</code></li>
-</ul>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">-- 查询所有记录</span>
+<span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">emp</span>
+<span class="c1">-- 查询不重复的记录</span>
+<span class="k">select</span> <span class="k">distinct</span> <span class="n">deptno</span> <span class="k">from</span> <span class="n">emp</span>
+<span class="c1">-- 条件查询</span>
+<span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">emp</span> <span class="k">where</span> <span class="n">deptno</span><span class="o">=</span><span class="mi">1</span> <span class="k">and</span> <span class="n">sal</span><span class="o">&lt;</span><span class="mi">3000</span>
+
+<span class="c1">-- **排序和限制**</span>
+<span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">emp</span> <span class="k">order</span> <span class="k">by</span> <span class="n">deptno</span> <span class="k">desc</span> <span class="k">limit</span> <span class="mi">2</span>
+<span class="c1">-- **聚合**（查询部门人数大于1的部门编号）</span>
+<span class="k">select</span> <span class="n">deptno</span><span class="p">,</span><span class="k">count</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="k">from</span> <span class="n">emp</span> <span class="k">group</span> <span class="k">by</span> <span class="n">deptno</span> <span class="k">having</span> <span class="k">count</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="c1">--？</span>
+
+<span class="c1">-- 连接查询</span>
+<span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">emp</span> <span class="n">e</span> <span class="k">left</span> <span class="k">join</span> <span class="n">dept</span> <span class="n">d</span> <span class="k">on</span> <span class="n">e</span><span class="p">.</span><span class="n">deptno</span><span class="o">=</span><span class="n">d</span><span class="p">.</span><span class="n">deptno</span>
+<span class="c1">-- **子查询**</span>
+<span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">emp</span> <span class="k">where</span> <span class="n">deptno</span> <span class="k">in</span> <span class="p">(</span><span class="k">select</span> <span class="n">deptno</span> <span class="k">from</span> <span class="n">dept</span><span class="p">)</span>
+<span class="c1">-- 记录联合</span>
+<span class="k">select</span> <span class="n">deptno</span> <span class="k">from</span> <span class="n">emp</span> <span class="k">union</span> <span class="k">select</span> <span class="n">deptno</span> <span class="k">from</span> <span class="n">dept</span>
+</code></pre></div></div>
 
 <h3 id="dcl-数据控制语句">DCL 数据控制语句</h3>
 
+<h4 id="权限">权限</h4>
+
 <p>可利用 DCL 控制的权限有：<code class="highlighter-rouge">CONNECT</code>、<code class="highlighter-rouge">SELECT</code>、<code class="highlighter-rouge">INSERT</code>、<code class="highlighter-rouge">UPDATE</code>、<code class="highlighter-rouge">DELETE</code>、<code class="highlighter-rouge">EXECUTE</code>、<code class="highlighter-rouge">USAGE</code>、<code class="highlighter-rouge">REFERENCES</code>。</p>
 
-<ul>
-  <li>授予操作权限：<code class="highlighter-rouge">grant select,insert on test.* to 'test'@'localhost' identified by '123'</code></li>
-  <li>收回操作权限：<code class="highlighter-rouge">revoke insert on test.* from 'test'@'localhost'</code></li>
-</ul>
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">-- 授予操作权限</span>
+<span class="k">grant</span> <span class="k">select</span><span class="p">,</span><span class="k">insert</span> <span class="k">on</span> <span class="n">test</span><span class="p">.</span><span class="o">*</span> <span class="k">to</span> <span class="s1">'test'</span><span class="o">@</span><span class="s1">'localhost'</span> <span class="n">identified</span> <span class="k">by</span> <span class="s1">'123'</span>
+<span class="c1">-- 授予所有数据库的所有权限：</span>
+<span class="k">grant</span> <span class="k">all</span> <span class="k">privileges</span> <span class="k">on</span> <span class="o">*</span><span class="p">.</span><span class="o">*</span> <span class="k">to</span> <span class="n">z1</span><span class="o">@</span><span class="n">localhost</span> <span class="n">identified</span> <span class="k">by</span> <span class="s1">'123'</span>
+<span class="c1">-- 授予所有数据库的所有权限（包括grant）</span>
+<span class="k">grant</span> <span class="k">all</span> <span class="k">privileges</span> <span class="k">on</span> <span class="o">*</span><span class="p">.</span><span class="o">*</span> <span class="k">to</span> <span class="n">z1</span><span class="o">@</span><span class="n">localhost</span> <span class="k">with</span> <span class="k">grant</span> <span class="k">option</span>
+<span class="c1">-- 授予`SUPER PROCESS FILE`权限</span>
+<span class="k">grant</span> <span class="n">super</span><span class="p">,</span><span class="n">process</span><span class="p">,</span><span class="n">file</span> <span class="k">on</span> <span class="o">*</span><span class="p">.</span><span class="o">*</span> <span class="k">to</span> <span class="n">z3</span><span class="o">@</span><span class="n">localhost</span>
+<span class="c1">-- 只授予登录权限</span>
+<span class="k">grant</span> <span class="k">usage</span> <span class="k">on</span> <span class="o">*</span><span class="p">.</span><span class="o">*</span> <span class="k">to</span> <span class="n">z4</span><span class="o">@</span><span class="n">localhost</span>
 
-<h4 id="字符集相关">字符集相关</h4>
+<span class="c1">-- 收回操作权限</span>
+<span class="k">revoke</span> <span class="k">insert</span> <span class="k">on</span> <span class="n">test</span><span class="p">.</span><span class="o">*</span> <span class="k">from</span> <span class="s1">'test'</span><span class="o">@</span><span class="s1">'localhost'</span>
 
-<ul>
-  <li>查看字符集：<code class="highlighter-rouge">show variables like 'character%'</code></li>
-  <li>创建数据库时指定字符集：<code class="highlighter-rouge">create database mall character set utf8</code></li>
-</ul>
+<span class="c1">-- 查看账号权限</span>
+<span class="k">show</span> <span class="n">grants</span> <span class="k">for</span> <span class="n">z1</span><span class="o">@</span><span class="n">localhost</span>
+<span class="c1">-- 修改自己的密码</span>
+<span class="k">set</span> <span class="n">password</span> <span class="o">=</span> <span class="n">password</span><span class="p">(</span><span class="s1">'123'</span><span class="p">)</span>
+<span class="c1">-- 管理员修改他人密码</span>
+<span class="k">set</span> <span class="n">password</span> <span class="k">for</span> <span class="s1">'z1'</span><span class="o">@</span><span class="s1">'localhost'</span> <span class="o">=</span> <span class="n">password</span><span class="p">(</span><span class="s1">'123'</span><span class="p">)</span>
+<span class="c1">-- 删除账号</span>
+<span class="k">drop</span> <span class="k">user</span> <span class="n">z2</span><span class="o">@</span><span class="n">localhost</span>
+</code></pre></div></div>
+
+<h4 id="字符集">字符集</h4>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">-- 查看字符集</span>
+<span class="k">show</span> <span class="n">variables</span> <span class="k">like</span> <span class="s1">'character%'</span>
+
+<span class="c1">-- 创建数据库时指定字符集</span>
+<span class="k">create</span> <span class="k">database</span> <span class="n">mall</span> <span class="n">character</span> <span class="k">set</span> <span class="n">utf8</span>
+</code></pre></div></div>
 
 <h4 id="修改时区">修改时区</h4>
 
@@ -1424,27 +1457,6 @@ SELECT * FROM mytable LIMIT 2 OFFSET 3;
   <li>修改当前会话时区：<code class="highlighter-rouge">set time_zone = '+8:00'</code></li>
   <li>立即生效：<code class="highlighter-rouge">flush privileges</code></li>
 </ul>
-
-<h4 id="权限相关">权限相关</h4>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-- 授予所有数据库的所有权限：
-grant all privileges on *.* to z1@localhost identified by '123'
--- 授予所有数据库的所有权限（包括grant）
-grant all privileges on *.* to z1@localhost with grant option
--- 授予`SUPER PROCESS FILE`权限
-grant super,process,file on *.* to z3@localhost
--- 只授予登录权限
-grant usage on *.* to z4@localhost
-
--- 查看账号权限
-show grants for z1@localhost
--- 修改自己的密码
-set password = password('123')
--- 管理员修改他人密码
-set password for 'z1'@'localhost' = password('123')
--- 删除账号
-drop user z2@localhost
-</code></pre></div></div>
 
 <h3 id="tcl-事务控制语言">TCL 事务控制语言</h3>
 
@@ -1487,42 +1499,46 @@ drop user z2@localhost
 <ol>
   <li>使用<code class="highlighter-rouge">distinct</code>；</li>
   <li>使用<code class="highlighter-rouge">group by</code>；</li>
-  <li>使用<code class="highlighter-rouge">ROW_NUMBER() OVER</code> 或 <code class="highlighter-rouge">GROUP BY 和 COLLECT_SET/COLLECT_LIST</code>。<code class="highlighter-rouge">row_number() over (partition by &lt;用于分组的字段名&gt; order by &lt;用于组内排序的字段名&gt;)</code>。</li>
+  <li>使用<code class="highlighter-rouge">ROW_NUMBER() OVER</code> 或 <code class="highlighter-rouge">GROUP BY 和 COLLECT_SET/COLLECT_LIST</code>。
+    <ul>
+      <li><code class="highlighter-rouge">row_number() over (partition by &lt;用于分组的字段名&gt; order by &lt;用于组内排序的字段名&gt;)</code>。</li>
+    </ul>
+  </li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-- 1. 使用distinct查重
-select distinct id,password from ums_admin;
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">-- 1. 使用distinct查重</span>
+<span class="k">select</span> <span class="k">distinct</span> <span class="n">id</span><span class="p">,</span><span class="n">password</span> <span class="k">from</span> <span class="n">ums_admin</span><span class="p">;</span>
 
--- 2.1 查找表中所有的重复记录，重复记录是根据单个字段来判断
-select * from people 
-where peopleId in (select peopleId from people 
-                   group by peopleId 
-                   having count(peopleId) &gt; 1); --此时在in后，count(0) &gt; 1作用相同
+<span class="c1">-- 2.1 查找表中所有的重复记录，重复记录是根据单个字段来判断</span>
+<span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">people</span> 
+<span class="k">where</span> <span class="n">peopleId</span> <span class="k">in</span> <span class="p">(</span><span class="k">select</span> <span class="n">peopleId</span> <span class="k">from</span> <span class="n">people</span> 
+                   <span class="k">group</span> <span class="k">by</span> <span class="n">peopleId</span> 
+                   <span class="k">having</span> <span class="k">count</span><span class="p">(</span><span class="n">peopleId</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">--此时在in后，count(0) &gt; 1作用相同</span>
 
--- 2.2 查找表中多余的重复记录，不包含rowid最小的记录
-select * from people --其余同下
--- 2.3 删除表中多余的重复记录，根据单个字段来判断，只保留rowid最小的记录
-delete from people 
-where peopleId in (select peopleId from people 
-   			group by peopleId having count(peopleId) &gt; 1)
-and rowid not in (select min(rowid) from people 
-   			group by peopleId having count(peopleId) &gt; 1)
+<span class="c1">-- 2.2 查找表中多余的重复记录，不包含rowid最小的记录</span>
+<span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">people</span> <span class="c1">--其余同下</span>
+<span class="c1">-- 2.3 删除表中多余的重复记录，根据单个字段来判断，只保留rowid最小的记录</span>
+<span class="k">delete</span> <span class="k">from</span> <span class="n">people</span> 
+<span class="k">where</span> <span class="n">peopleId</span> <span class="k">in</span> <span class="p">(</span><span class="k">select</span> <span class="n">peopleId</span> <span class="k">from</span> <span class="n">people</span> 
+   			<span class="k">group</span> <span class="k">by</span> <span class="n">peopleId</span> <span class="k">having</span> <span class="k">count</span><span class="p">(</span><span class="n">peopleId</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
+<span class="k">and</span> <span class="n">rowid</span> <span class="k">not</span> <span class="k">in</span> <span class="p">(</span><span class="k">select</span> <span class="k">min</span><span class="p">(</span><span class="n">rowid</span><span class="p">)</span> <span class="k">from</span> <span class="n">people</span> 
+   			<span class="k">group</span> <span class="k">by</span> <span class="n">peopleId</span> <span class="k">having</span> <span class="k">count</span><span class="p">(</span><span class="n">peopleId</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
 
--- 2.4 查找表中所有的重复记录（多个字段）
-select * from vitae a 
-where (a.peopleId,a.seq) in (select peopleId,seq from vitae 
-					 group by peopleId,seq having count(*) &gt; 1); --此*指peopleId,seq
-SELECT user_id,count(1) [as num] FROM 表名
-WHERE 条件  GROUP BY user_id HAVING count(*)&gt;1;
+<span class="c1">-- 2.4 查找表中所有的重复记录（多个字段）</span>
+<span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">vitae</span> <span class="n">a</span> 
+<span class="k">where</span> <span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">peopleId</span><span class="p">,</span><span class="n">a</span><span class="p">.</span><span class="n">seq</span><span class="p">)</span> <span class="k">in</span> <span class="p">(</span><span class="k">select</span> <span class="n">peopleId</span><span class="p">,</span><span class="n">seq</span> <span class="k">from</span> <span class="n">vitae</span> 
+					 <span class="k">group</span> <span class="k">by</span> <span class="n">peopleId</span><span class="p">,</span><span class="n">seq</span> <span class="k">having</span> <span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">--此*指peopleId,seq</span>
+<span class="k">SELECT</span> <span class="n">user_id</span><span class="p">,</span><span class="k">count</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">[</span><span class="k">as</span> <span class="n">num</span><span class="p">]</span> <span class="k">FROM</span> <span class="err">表名</span>
+<span class="k">WHERE</span> <span class="err">条件</span>  <span class="k">GROUP</span> <span class="k">BY</span> <span class="n">user_id</span> <span class="k">HAVING</span> <span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">;</span>
 
--- 2.5 查找表中多余的重复记录（多个字段），不包含rowid最小的记录
-select * from vitae a --其余同下
--- 2.6 删除表中多余的重复记录（多个字段），只保留rowid最小的记录
-delete from vitae a
-where (a.peopleId,a.seq) in (select peopleId,seq from vitae 
-                             group by peopleId,seq having count(*) &gt; 1) 
-           and rowid not in (select min(rowid) from vitae 
-           					 group by peopleId,seq having count(*) &gt; 1)
+<span class="c1">-- 2.5 查找表中多余的重复记录（多个字段），不包含rowid最小的记录</span>
+<span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">vitae</span> <span class="n">a</span> <span class="c1">--其余同下</span>
+<span class="c1">-- 2.6 删除表中多余的重复记录（多个字段），只保留rowid最小的记录</span>
+<span class="k">delete</span> <span class="k">from</span> <span class="n">vitae</span> <span class="n">a</span>
+<span class="k">where</span> <span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">peopleId</span><span class="p">,</span><span class="n">a</span><span class="p">.</span><span class="n">seq</span><span class="p">)</span> <span class="k">in</span> <span class="p">(</span><span class="k">select</span> <span class="n">peopleId</span><span class="p">,</span><span class="n">seq</span> <span class="k">from</span> <span class="n">vitae</span> 
+                             <span class="k">group</span> <span class="k">by</span> <span class="n">peopleId</span><span class="p">,</span><span class="n">seq</span> <span class="k">having</span> <span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> 
+           <span class="k">and</span> <span class="n">rowid</span> <span class="k">not</span> <span class="k">in</span> <span class="p">(</span><span class="k">select</span> <span class="k">min</span><span class="p">(</span><span class="n">rowid</span><span class="p">)</span> <span class="k">from</span> <span class="n">vitae</span> 
+           					 <span class="k">group</span> <span class="k">by</span> <span class="n">peopleId</span><span class="p">,</span><span class="n">seq</span> <span class="k">having</span> <span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
 </code></pre></div></div>
 
 <h3 id="删除表前1w行数据">删除表前1W行数据</h3>
@@ -1786,21 +1802,24 @@ where (a.peopleId,a.seq) in (select peopleId,seq from vitae
   </ol>
 </blockquote>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. CREATE &lt;索引名&gt; ON &lt;表名&gt; (&lt;列名&gt; [&lt;长度&gt;] [ ASC | DESC]);
-2. CREATE TABLE(
-	...
-	KEY | INDEX | UNIQUE INDEX [&lt;索引名&gt;] [&lt;索引类型&gt;] (&lt;列名&gt;,…)
-);
-SHOW INDEX FROM &lt;表名&gt; [ FROM &lt;数据库名&gt;];
-DROP INDEX &lt;索引名&gt; ON &lt;表名&gt;;
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">-- 1. </span>
+<span class="k">CREATE</span> <span class="o">&lt;</span><span class="err">索引名</span><span class="o">&gt;</span> <span class="k">ON</span> <span class="o">&lt;</span><span class="err">表名</span><span class="o">&gt;</span> <span class="p">(</span><span class="o">&lt;</span><span class="err">列名</span><span class="o">&gt;</span> <span class="p">[</span><span class="o">&lt;</span><span class="err">长度</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">[</span> <span class="k">ASC</span> <span class="o">|</span> <span class="k">DESC</span><span class="p">]);</span>
 
--- 3.1. 添加 主键索引、唯一索引、全文索引
-ALTER TABLE `table_name` ADD PRIMARY KEY / UNIQUE / FULLTEXT ( `col` );
+<span class="c1">-- 2. </span>
+<span class="k">CREATE</span> <span class="k">TABLE</span><span class="p">(</span>
+	<span class="p">...</span>
+	<span class="k">KEY</span> <span class="o">|</span> <span class="k">INDEX</span> <span class="o">|</span> <span class="k">UNIQUE</span> <span class="k">INDEX</span> <span class="p">[</span><span class="o">&lt;</span><span class="err">索引名</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">[</span><span class="o">&lt;</span><span class="err">索引类型</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">(</span><span class="o">&lt;</span><span class="err">列名</span><span class="o">&gt;</span><span class="p">,</span><span class="err">…</span><span class="p">)</span>
+<span class="p">);</span>
+<span class="k">SHOW</span> <span class="k">INDEX</span> <span class="k">FROM</span> <span class="o">&lt;</span><span class="err">表名</span><span class="o">&gt;</span> <span class="p">[</span> <span class="k">FROM</span> <span class="o">&lt;</span><span class="err">数据库名</span><span class="o">&gt;</span><span class="p">];</span>
+<span class="k">DROP</span> <span class="k">INDEX</span> <span class="o">&lt;</span><span class="err">索引名</span><span class="o">&gt;</span> <span class="k">ON</span> <span class="o">&lt;</span><span class="err">表名</span><span class="o">&gt;</span><span class="p">;</span>
 
--- 3.2.添加 普通索引、多列索引
-ALTER TABLE `table_name` ADD INDEX index_name ( `col`[,`col2`] );
--- 也可只对某一列添加唯一约束而不创建唯一索引：
-ALTER TABLE students ADD CONSTRAINT uni_name UNIQUE (name);
+<span class="c1">-- 3.1. 添加 主键索引、唯一索引、全文索引</span>
+<span class="k">ALTER</span> <span class="k">TABLE</span> <span class="nv">`table_name`</span> <span class="k">ADD</span> <span class="k">PRIMARY</span> <span class="k">KEY</span> <span class="o">/</span> <span class="k">UNIQUE</span> <span class="o">/</span> <span class="n">FULLTEXT</span> <span class="p">(</span> <span class="nv">`col`</span> <span class="p">);</span>
+
+<span class="c1">-- 3.2.添加 普通索引、多列索引</span>
+<span class="k">ALTER</span> <span class="k">TABLE</span> <span class="nv">`table_name`</span> <span class="k">ADD</span> <span class="k">INDEX</span> <span class="n">index_name</span> <span class="p">(</span> <span class="nv">`col`</span><span class="p">[,</span><span class="nv">`col2`</span><span class="p">]</span> <span class="p">);</span>
+<span class="c1">-- 也可只对某一列添加唯一约束而不创建唯一索引：</span>
+<span class="k">ALTER</span> <span class="k">TABLE</span> <span class="n">students</span> <span class="k">ADD</span> <span class="k">CONSTRAINT</span> <span class="n">uni_name</span> <span class="k">UNIQUE</span> <span class="p">(</span><span class="n">name</span><span class="p">);</span>
 </code></pre></div></div>
 
 <h4 id="建立和使用索引的时机">建立和使用索引的时机</h4>
@@ -1839,21 +1858,21 @@ ALTER TABLE students ADD CONSTRAINT uni_name UNIQUE (name);
 
 <p><img src="../assets/ec4c975296ea4a7097879dac7c353878~tplv-k3u1fbpfcp-zoom-1.jpeg" alt="mysql视图" style="zoom:67%;" /></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CREATE VIEW &lt;视图名&gt; AS &lt;SELECT语句&gt;;
-CREATE VIEW v_stu_info (s_id, s_name, d_id, s_age) AS 
-SELECT id,name,dept_id,age FROM tb_stu_info WHERE id &lt; 10;
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">CREATE</span> <span class="k">VIEW</span> <span class="o">&lt;</span><span class="err">视图名</span><span class="o">&gt;</span> <span class="k">AS</span> <span class="o">&lt;</span><span class="k">SELECT</span><span class="err">语句</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="k">CREATE</span> <span class="k">VIEW</span> <span class="n">v_stu_info</span> <span class="p">(</span><span class="n">s_id</span><span class="p">,</span> <span class="n">s_name</span><span class="p">,</span> <span class="n">d_id</span><span class="p">,</span> <span class="n">s_age</span><span class="p">)</span> <span class="k">AS</span> 
+<span class="k">SELECT</span> <span class="n">id</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">dept_id</span><span class="p">,</span><span class="n">age</span> <span class="k">FROM</span> <span class="n">tb_stu_info</span> <span class="k">WHERE</span> <span class="n">id</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">;</span>
 
-DESCRIBE 视图名;
+<span class="k">DESCRIBE</span> <span class="err">视图名</span><span class="p">;</span>
 </code></pre></div></div>
 
 <h3 id="触发器">触发器</h3>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>create trigger &lt;触发器名称&gt;  
-{ before | after}         -- 之前或之后触发
-insert | update | delete  -- 指明激活触发程序的语句的类型  
-on &lt;表名&gt;                  -- 操作哪张表  
-for each row              -- 触发器的执行间隔，通知触发器每隔一行执行一次动作，而不是对整个表执行一次。  
-&lt;触发器SQL语句&gt;
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">create</span> <span class="k">trigger</span> <span class="o">&lt;</span><span class="err">触发器名称</span><span class="o">&gt;</span>  
+<span class="err">{</span> <span class="k">before</span> <span class="o">|</span> <span class="k">after</span><span class="err">}</span>         <span class="c1">-- 之前或之后触发</span>
+<span class="k">insert</span> <span class="o">|</span> <span class="k">update</span> <span class="o">|</span> <span class="k">delete</span>  <span class="c1">-- 指明激活触发程序的语句的类型  </span>
+<span class="k">on</span> <span class="o">&lt;</span><span class="err">表名</span><span class="o">&gt;</span>                 <span class="c1">-- 操作哪张表  </span>
+<span class="k">for</span> <span class="k">each</span> <span class="k">row</span>    <span class="c1">-- 触发器的执行间隔，通知触发器每隔一行执行一次动作，而不是对整个表执行一次</span>
+<span class="o">&lt;</span><span class="err">触发器</span><span class="k">SQL</span><span class="err">语句</span><span class="o">&gt;</span>
 </code></pre></div></div>
 
 <h3 id="存储过程">存储过程</h3>
@@ -1878,9 +1897,10 @@ for each row              -- 触发器的执行间隔，通知触发器每隔一
 
 <p>缺点：<strong>难以调试和扩展</strong>，没有<strong>移植性</strong>，消耗数据库资源。禁止使用。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CREATE PROCEDURE &lt;过程名&gt; ( [过程参数[,…] ] ) &lt;过程体&gt;
-[过程参数[,…] ] 格式
-[ IN | OUT | INOUT ] &lt;参数名&gt; &lt;类型&gt;
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">CREATE</span> <span class="k">PROCEDURE</span> <span class="o">&lt;</span><span class="err">过程名</span><span class="o">&gt;</span> <span class="p">(</span> <span class="p">[</span><span class="err">过程参数</span><span class="p">[,</span><span class="err">…</span><span class="p">]</span> <span class="p">]</span> <span class="p">)</span> <span class="o">&lt;</span><span class="err">过程体</span><span class="o">&gt;</span>
+
+<span class="p">[</span><span class="err">过程参数</span><span class="p">[,</span><span class="err">…</span><span class="p">]</span> <span class="p">]</span> <span class="err">格式</span>
+<span class="p">[</span> <span class="k">IN</span> <span class="o">|</span> <span class="k">OUT</span> <span class="o">|</span> <span class="k">INOUT</span> <span class="p">]</span> <span class="o">&lt;</span><span class="err">参数名</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="err">类型</span><span class="o">&gt;</span>
 </code></pre></div></div>
 
 <h2 id="数据库性能优化">数据库性能优化</h2>
@@ -1902,7 +1922,11 @@ for each row              -- 触发器的执行间隔，通知触发器每隔一
   </li>
 </ol>
 
-<h3 id="为什么数据库性能会慢优化的整体思路">为什么数据库性能会慢？优化的整体思路</h3>
+<h3 id="优化的整体思路">优化的整体思路</h3>
+
+<blockquote>
+  <p>为什么数据库性能会慢？</p>
+</blockquote>
 
 <p>应该站在哪个层面思考优化？</p>
 
@@ -2177,7 +2201,7 @@ for each row              -- 触发器的执行间隔，通知触发器每隔一
           <li>当某个节点<strong>故障</strong>时，负载均衡器会将用户请求转发到另外的节点上，从而保证所有服务<strong>持续可用</strong>。</li>
         </ul>
       </li>
-      <li><del>消息队列。</del></li>
+      <li><del>消息队列</del></li>
       <li><strong>读写分离</strong>：主要是为了将数据库的读和写操作<strong>分散到</strong>不同的数据库节点上。
         <ol>
           <li>部署多台数据库，主服务器负责写，从服务器负责读，通常<strong>一主多从</strong>。</li>
@@ -2201,8 +2225,8 @@ for each row              -- 触发器的执行间隔，通知触发器每隔一
           <li>同城<strong>灾备</strong>、异地灾备，同城多活、异地多活。</li>
         </ol>
       </li>
-      <li><strong>限流、降级、熔断</strong>。</li>
-      <li><strong>超时和重试机制</strong>。</li>
+      <li>限流、降级、熔断。</li>
+      <li>超时和重试机制。</li>
     </ol>
   </li>
 </ol>
@@ -2509,7 +2533,11 @@ for each row              -- 触发器的执行间隔，通知触发器每隔一
   </li>
 </ul>
 
-<h2 id="事务">事务</h2>
+<h2 id="mysql-事务">MySQL 事务</h2>
+
+<blockquote>
+  <p>见分布式事务文档。</p>
+</blockquote>
 
 <blockquote>
   <p>Transaction。事务的概念起源于数据库，目前，已经成为一个比较广泛的概念。</p>
@@ -2526,17 +2554,17 @@ for each row              -- 触发器的执行间隔，通知触发器每隔一
 
 <p>例如，经典的 AB 间转钱。A 转出钱与 B 收到钱，这两个操作必须都成功、或者都失败。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 开始事务，显式事务
-BEGIN; 或 START TRANSACTION;
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">#</span> <span class="err">开始事务，显式事务</span>
+<span class="k">BEGIN</span><span class="p">;</span> <span class="err">或</span> <span class="k">START</span> <span class="n">TRANSACTION</span><span class="p">;</span>
 
-# 多条 SQL 语句
-UPDATE accounts SET balance = balance - 100 WHERE id = 1;
-UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+<span class="o">#</span> <span class="err">多条</span> <span class="k">SQL</span> <span class="err">语句</span>
+<span class="k">UPDATE</span> <span class="n">accounts</span> <span class="k">SET</span> <span class="n">balance</span> <span class="o">=</span> <span class="n">balance</span> <span class="o">-</span> <span class="mi">100</span> <span class="k">WHERE</span> <span class="n">id</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="k">UPDATE</span> <span class="n">accounts</span> <span class="k">SET</span> <span class="n">balance</span> <span class="o">=</span> <span class="n">balance</span> <span class="o">+</span> <span class="mi">100</span> <span class="k">WHERE</span> <span class="n">id</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
 
-COMMIT;
+<span class="k">COMMIT</span><span class="p">;</span>
 
-# 有一条SQL执行失败、则回滚事务
-ROLLBACK;
+<span class="o">#</span> <span class="err">有一条</span><span class="k">SQL</span><span class="err">执行失败、则回滚事务</span>
+<span class="k">ROLLBACK</span><span class="p">;</span>
 </code></pre></div></div>
 
 <p><img src="../assets/数据库事务示意图.png" style="zoom: 80%;" /></p>
@@ -2629,39 +2657,48 @@ ROLLBACK;
   <li>脏读、不可重复读、幻读，其实都是<strong>数据库的一致性问题</strong>，必须由一定的事务隔离机制来解决。</li>
 </ul>
 
+<p>在 Spring <code class="highlighter-rouge">enum Isolation</code> 中，枚举值有：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">DEFAULT</span><span class="o">(-</span><span class="mi">1</span><span class="o">),</span> <span class="c1">// 采用数据库默认隔离级别。MYSQL 默认为 `REPEATABLE_READ`，SQLSERVER、Oracle 默认为 `READ_COMMITTED`。</span>
+<span class="n">READ_UNCOMMITTED</span><span class="o">(</span><span class="mi">1</span><span class="o">),</span>
+<span class="n">READ_COMMITTED</span><span class="o">(</span><span class="mi">2</span><span class="o">),</span>
+<span class="n">REPEATABLE_READ</span><span class="o">(</span><span class="mi">4</span><span class="o">),</span> <span class="c1">//</span>
+<span class="n">SERIALIZABLE</span><span class="o">(</span><span class="mi">8</span><span class="o">);</span>
+</code></pre></div></div>
+
 <p><img src="../assets/MySQL并发事务的问题及隔离级别.png" style="zoom:40%;" /></p>
 
 <p>数据库的事务隔离<strong>越严格</strong>，并发副作用越小，但付出的代价也就越大。</p>
 
 <ol>
-  <li><code class="highlighter-rouge">READ_UNCOMMITTED</code>（未提交读）： 最低，事务可以读取另一个事务<strong>未提交</strong>的数据。
+  <li><code class="highlighter-rouge">READ_UNCOMMITTED</code>（读未提交）： 最低级别，允许另外一个事务可看到当前事务<strong>未提交的数据</strong>；
     <ul>
       <li>解决了<strong>丢失更新</strong>，问题有：脏读、不可重复读、幻读。</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">READ_COMMITTED</code>（已提交读）： 事务只能读取到另一个<strong>已经提交的</strong>数据。
+  <li><code class="highlighter-rouge">READ_COMMITTED</code>（读已提交）： <del>事务只能读取到另一个<strong>已经提交的</strong>数据。</del>保证一个事务修改的数据<strong>提交后</strong>才能被另一事务读取，而且能看到该事务<strong>对已有记录的更新</strong>；
     <ul>
-      <li>解决了丢失更新、<strong>脏读</strong>，问题有：不可重复读、幻读。</li>
+      <li>解决了丢失更新、（新解决了）<strong>脏读</strong>，问题有：不可重复读、幻读。</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">REPEATABLE_READ</code>（可重复读）：事务执行过程中，（对同一字段的<strong>多次读取</strong>）查询结果都是一致的。（除非数据是被事务本身所修改）。
+  <li><code class="highlighter-rouge">REPEATABLE_READ</code>（可重复读）：事务执行过程中，（对同一字段的<strong>多次读取</strong>）查询结果都是一致的。（除非数据是被事务本身所修改）。<del>保证一个事务修改的数据<strong>提交后</strong>才能被另一事务读取，但不能看到该事务<strong>对已有记录的更新</strong>；</del>
     <ul>
       <li>
         <p>MySQL InnoDB 存储引擎<strong>默认</strong>支持的隔离级别。可以通过<code class="highlighter-rouge">SELECT @@tx_isolation;</code>命令来查看，MySQL 8.0 该命令改为<code class="highlighter-rouge">SELECT @@transaction_isolation;</code></p>
       </li>
       <li>
-        <p>解决了丢失更新、脏读、<strong>不可重复读</strong>，问题有：幻读。</p>
+        <p>解决了丢失更新、脏读、（新解决了）<strong>不可重复读</strong>，问题有：幻读。</p>
       </li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">SERIALIZABLE</code>（可序列化）： 最高，完全服从 <strong><code class="highlighter-rouge">ACID</code> 四大特性</strong>。串行执行，事务<strong>依次逐个执</strong>行，事务间完全不可能产生干扰。读写都会相互阻塞，<strong>效率</strong>会大大下降。
+  <li><code class="highlighter-rouge">SERIALIZABLE</code>（可序列化）： 最高级别，完全服从 <strong><code class="highlighter-rouge">ACID</code> 四大特性</strong>。串行执行，事务<strong>依次逐个执</strong>行，事务间完全不可能产生干扰。读写都会相互阻塞，<strong>效率</strong>会大大下降。<del>一个事务在执行的过程中<strong>完全看不到</strong>其他事务对数据库所做的更新。</del>
     <ul>
-      <li>解决了丢失更新、脏读、不可重复读、<strong>幻读</strong>全部一致性问题。</li>
+      <li>解决了丢失更新、脏读、不可重复读、（新解决了）<strong>幻读</strong>全部一致性问题。</li>
     </ul>
   </li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SET</span> <span class="n">TRANSACTION</span> <span class="k">ISOLATION</span> <span class="k">LEVEL</span> <span class="k">READ</span> <span class="k">UNCOMMITTED</span><span class="p">;</span>
 </code></pre></div></div>
 
 <h4 id="mysql-的隔离级别是基于锁实现的吗">MySQL 的隔离级别是基于锁实现的吗？</h4>
@@ -2686,9 +2723,7 @@ ROLLBACK;
 
 <ul>
   <li>官方文档中表述 InnoDB 用临键锁 (next-key lock) 解决了幻读的问题，临键锁工作在 RR 隔离级别下，设置隔离级别为 RC 会导致 GAP 锁失效，继而导致没有临键锁。这是 InnoDB 自我定义其 RC 存在幻读，而 RR 可以避免幻读的描述。</li>
-  <li>
-    <p>InnoDB 作为一个优等生，在隔离级别定义要求 RR 不需要避免幻读的情况下，宣称自己实现了这个功能。但实际上受到了限制：</p>
-
+  <li>InnoDB 作为一个优等生，在隔离级别定义要求 RR 不需要避免幻读的情况下，宣称自己实现了这个功能。但实际上受到了限制：
     <ul>
       <li>对于仅包含连续相同快照读语句的事务，MVCC 避免了幻读，但是这种场景临键锁没有用武之地，而官方文档重点强调是临键锁的实际避免了幻读，所以 InnoDB 肯定觉得自己做到了更多。</li>
       <li>对于仅包含连续相同当前读语句的事务，第一个当前读会加临键锁，会阻塞别的事物的修改，也避免了幻读。</li>
@@ -2697,7 +2732,7 @@ ROLLBACK;
   </li>
 </ul>
 
-<h3 id="事务传播行为">事务传播行为</h3>
+<h3 id="事务传播行为"><del>事务传播行为</del></h3>
 
 <blockquote>
   <p>见 SSM 框架中 Spring 事务管理。</p>
@@ -2736,7 +2771,7 @@ ROLLBACK;
 <h3 id="悲观锁乐观锁">悲观锁、乐观锁</h3>
 
 <blockquote>
-  <p>详细见 Java 多线程文档中的线程安全部分。</p>
+  <p>详细见 Java 多线程文档中的 #线程安全部分。</p>
 </blockquote>
 
 <p><strong>悲观锁</strong>：每次获取数据时，<strong>都担心数据被修改</strong>，因此加<strong>独占锁</strong>，确保自己使用的过程中数据不会被别人修改，使用完成后解锁。期间对该数据读写的其他线程都会<strong>等待/阻塞</strong>。</p>
@@ -2781,10 +2816,10 @@ ROLLBACK;
   </li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-- 锁定
-LOCK TABLES tbl_name [AS alias]
--- 解锁
-UNLOCK TABLES
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">-- 锁定</span>
+<span class="k">LOCK</span> <span class="n">TABLES</span> <span class="n">tbl_name</span> <span class="p">[</span><span class="k">AS</span> <span class="k">alias</span><span class="p">]</span>
+<span class="c1">-- 解锁</span>
+<span class="n">UNLOCK</span> <span class="n">TABLES</span>
 </code></pre></div></div>
 
 <h3 id="共享锁和排他锁">共享锁和排他锁</h3>
@@ -2873,7 +2908,11 @@ UNLOCK TABLES
   <li><code class="highlighter-rouge">读-写</code>：有<strong>线程安全</strong>问题，可能会造成事务隔离性问题，可能遇到<strong>脏读、幻读、不可重复读</strong>；</li>
 </ol>
 
-<h3 id="mvcc解决并发哪些问题优点">MVCC解决并发哪些问题？优点</h3>
+<h3 id="优点">优点</h3>
+
+<blockquote>
+  <p>MVCC解决并发哪些问题？</p>
+</blockquote>
 
 <p>MVCC机制具有以下优点：</p>
 

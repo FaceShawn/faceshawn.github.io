@@ -246,13 +246,7 @@
 
 <p>① 创建 <code class="highlighter-rouge">@DigestDesensitize</code> 注解，使用 <code class="highlighter-rouge">@DesensitizeBy</code> 标记它使用的处理器。代码如下：</p>
 
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">cn.iocoder.yudao.framework.desensitize.core.base.annotation.DesensitizeBy</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">cn.iocoder.yudao.framework.desensitize.core.handler.DigestHandler</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">com.fasterxml.jackson.annotation.JacksonAnnotationsInside</span><span class="o">;</span>
-
-<span class="kn">import</span> <span class="nn">java.lang.annotation.*</span><span class="o">;</span>
-
-<span class="nd">@Documented</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Documented</span>
 <span class="nd">@Target</span><span class="o">({</span><span class="n">ElementType</span><span class="o">.</span><span class="na">FIELD</span><span class="o">})</span>
 <span class="nd">@Retention</span><span class="o">(</span><span class="n">RetentionPolicy</span><span class="o">.</span><span class="na">RUNTIME</span><span class="o">)</span>
 <span class="nd">@JacksonAnnotationsInside</span>
@@ -269,11 +263,7 @@
 
 <p>② 创建 DigestHandler 类，实现 DesensitizationHandler 接口，将编号使用 MD5 或 SHA256 处理。代码如下：</p>
 
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">cn.hutool.crypto.digest.DigestUtil</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">cn.iocoder.yudao.framework.desensitize.core.annotation.DigestDesensitize</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">cn.iocoder.yudao.framework.desensitize.core.base.handler.DesensitizationHandler</span><span class="o">;</span>
-
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">DigestHandler</span> <span class="kd">implements</span> <span class="n">DesensitizationHandler</span><span class="o">&lt;</span><span class="n">DigestDesensitize</span><span class="o">&gt;</span> <span class="o">{</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">DigestHandler</span> <span class="kd">implements</span> <span class="n">DesensitizationHandler</span><span class="o">&lt;</span><span class="n">DigestDesensitize</span><span class="o">&gt;</span> <span class="o">{</span>
 
     <span class="nd">@Override</span>
     <span class="kd">public</span> <span class="n">String</span> <span class="nf">desensitize</span><span class="o">(</span><span class="n">String</span> <span class="n">origin</span><span class="o">,</span> <span class="n">DigestDesensitize</span> <span class="n">annotation</span><span class="o">)</span> <span class="o">{</span>
@@ -455,4 +445,3 @@
 <span class="o">}</span>
 </code></pre></div></div>
 
-<p>##</p>

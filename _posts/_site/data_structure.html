@@ -6,11 +6,11 @@
 
 <hr />
 
-<h2 id="目录">目录</h2>
+<h3 id="目录">目录</h3>
 
 <p>[TOC]</p>
 
-<h2 id="数据结构">数据结构</h2>
+<h3 id="数据结构">数据结构</h3>
 
 <blockquote>
   <p>线性数据结构：数组（字符串）、链表、栈和队列、哈希表；</p>
@@ -56,7 +56,7 @@ public static void swap(T[] arr, int i, int j) {
 }
 </code></pre></div></div>
 
-<h5 id="nsum">nSum</h5>
+<h4 id="nsum">nSum</h4>
 
 <p>nSum：取出数组中 n 个数， 相加之和为 target。</p>
 
@@ -76,7 +76,7 @@ public static void swap(T[] arr, int i, int j) {
   <li><a href="https://leetcode.cn/problems/3sum/">15.三数之和</a>：<strong>nSum框架 = 递归 + 2Sum</strong>，<code class="highlighter-rouge">List&lt;List&lt;Integer&gt; &gt; nSubSum = nSum(nums, n-1, i+1, target-nums[i]);</code> 表示从 <code class="highlighter-rouge">i+1</code> 位置开始求 <code class="highlighter-rouge">(n-1)Sum</code>，加上 <code class="highlighter-rouge">nums[i]</code> 即为 <code class="highlighter-rouge">nSum</code> 的结果。</li>
 </ul>
 
-<h5 id="前缀和">前缀和</h5>
+<h4 id="前缀和">前缀和</h4>
 
 <p>前缀和技巧：<code class="highlighter-rouge">preSum[i] = sum(nums[0, ..., i-1])</code>，表示前 <code class="highlighter-rouge">i-1</code> 项的累加和。</p>
 
@@ -84,15 +84,15 @@ public static void swap(T[] arr, int i, int j) {
 
 <p>主要适用场景是：不修改原始数组的情况下，<strong>频繁查询</strong>某区间的累加和。时间复杂度降为 <code class="highlighter-rouge">O(1)</code>。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>private int[] preSums;
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">private</span> <span class="kt">int</span><span class="o">[]</span> <span class="n">preSums</span><span class="o">;</span>
 
-preSums = new int[n + 1];
-this.preSums[0] = 0; // 默认为0，可不显式设置
-// 构造前缀和
-for (int i = 1; i &lt;= n; i++) { // i = 1
-	// 表示[0, i-1]位置的累加和
-	preSums[i] = preSums[i-1] + nums[i-1]; //注意 i-1
-}
+<span class="n">preSums</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="o">[</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="o">];</span>
+<span class="k">this</span><span class="o">.</span><span class="na">preSums</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="c1">// 默认为0，可不显式设置</span>
+<span class="c1">// 构造前缀和</span>
+<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">n</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span> <span class="c1">// i = 1</span>
+	<span class="c1">// 表示[0, i-1]位置的累加和</span>
+	<span class="n">preSums</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="n">preSums</span><span class="o">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="o">]</span> <span class="o">+</span> <span class="n">nums</span><span class="o">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="o">];</span> <span class="c1">//注意 i-1</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <ul>
@@ -111,7 +111,7 @@ for (int i = 1; i &lt;= n; i++) { // i = 1
   <li><a href="#5.1计数排序">5.1 计数排序</a></li>
 </ul>
 
-<h5 id="差分数组">差分数组</h5>
+<h4 id="差分数组">差分数组</h4>
 
 <p><a href="https://labuladong.online/algo/data-structure/diff-array/">差分数组</a>主要适用场景是：频繁对原始数组某区间的元素值进行增减。类似环比。</p>
 
@@ -126,13 +126,13 @@ for (int i = 1; i &lt;= n; i++) { // i = 1
 
 <p><img src="../assets/diff_array.jpg" alt="img" style="zoom: 25%;" /></p>
 
-<h5 id="有序数组">有序数组</h5>
+<h4 id="有序数组">有序数组</h4>
 
 <blockquote>
   <p>见<a href="#二分查找">二分查找</a></p>
 </blockquote>
 
-<h5 id="二维数组的花式遍历">二维数组的花式遍历</h5>
+<h4 id="二维数组的花式遍历">二维数组的花式遍历</h4>
 
 <ul>
   <li><a href="https://leetcode.cn/problems/er-wei-shu-zu-zhong-de-cha-zhao-lcof/">剑指 Offer 04.二维递增数组中二分查找</a>：从左下角开始遍历，比 <code class="highlighter-rouge">target</code> 大则向上 <code class="highlighter-rouge">row--</code>，小则向右 <code class="highlighter-rouge">col++</code>；用二分查找效率低。类似二叉查找树。</li>
@@ -223,9 +223,7 @@ for (int i = 1; i &lt;= n; i++) { // i = 1
   <li><a href="https://leetcode.cn/problems/intersection-of-two-arrays/">349.两个数组的交集</a>：<code class="highlighter-rouge">insert</code> set 容器 <code class="highlighter-rouge">record</code> 存储 <code class="highlighter-rouge">a1</code> 的元素，遍历 <code class="highlighter-rouge">a2</code> <code class="highlighter-rouge">find</code> 查找是否有相同的元素，如果有，用 set 容器 <code class="highlighter-rouge">resultSet</code> 进行存储，用 <code class="highlighter-rouge">iterator</code> 将 resultSet 转换为 vector 类型。【】</li>
 </ul>
 
-<p><img src="../assets/xfx1k.gif" alt="img" style="zoom:43%;" /></p>
-
-<p><img src="../assets/xfx1k.gif" alt="" /></p>
+<p><img src="../assets/xfx1k.gif" alt="img" style="zoom: 50%;" /></p>
 
 <h3 id="字符串">字符串</h3>
 
@@ -233,7 +231,7 @@ for (int i = 1; i &lt;= n; i++) { // i = 1
   <p>Java 对字符串的处理较麻烦，见常见类 String 类的常用方法。</p>
 </blockquote>
 
-<h5 id="回文串">回文串</h5>
+<h4 id="回文串">回文串</h4>
 
 <p>方法一、用数组等能找到<strong>前驱</strong>的数据结构来实现：</p>
 
@@ -260,19 +258,19 @@ for (int i = 1; i &lt;= n; i++) { // i = 1
   </li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  // 1. 判断
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="c1">// 1. 判断</span>
   
-  // 2. 获取以 s[lo, hi] 为中心的最长回文串，也可用于判断
-  String palindrome(String s, int lo, int hi) {
-      // 防止索引越界
-      while (lo &gt;= 0 &amp;&amp; hi &lt; s.length() &amp;&amp; s.charAt(lo) == s.charAt(hi)) {
-          lo--; // 背向双指针，由中心向两端扩散
-          hi++;
-      }
-      // 返回以 s[初始lo，初始hi] 为中心的、最长回文串[lo+1, hi)
-      // lo == hi 时，回文串长度为奇数
-      return s.substring(lo + 1, hi);
-  }
+  <span class="c1">// 2. 获取以 s[lo, hi] 为中心的最长回文串，也可用于判断</span>
+  <span class="n">String</span> <span class="nf">palindrome</span><span class="o">(</span><span class="n">String</span> <span class="n">s</span><span class="o">,</span> <span class="kt">int</span> <span class="n">lo</span><span class="o">,</span> <span class="kt">int</span> <span class="n">hi</span><span class="o">)</span> <span class="o">{</span>
+      <span class="c1">// 防止索引越界</span>
+      <span class="k">while</span> <span class="o">(</span><span class="n">lo</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">hi</span> <span class="o">&lt;</span> <span class="n">s</span><span class="o">.</span><span class="na">length</span><span class="o">()</span> <span class="o">&amp;&amp;</span> <span class="n">s</span><span class="o">.</span><span class="na">charAt</span><span class="o">(</span><span class="n">lo</span><span class="o">)</span> <span class="o">==</span> <span class="n">s</span><span class="o">.</span><span class="na">charAt</span><span class="o">(</span><span class="n">hi</span><span class="o">))</span> <span class="o">{</span>
+          <span class="n">lo</span><span class="o">--;</span> <span class="c1">// 背向双指针，由中心向两端扩散</span>
+          <span class="n">hi</span><span class="o">++;</span>
+      <span class="o">}</span>
+      <span class="c1">// 返回以 s[初始lo，初始hi] 为中心的、最长回文串[lo+1, hi)</span>
+      <span class="c1">// lo == hi 时，回文串长度为奇数</span>
+      <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="n">lo</span> <span class="o">+</span> <span class="mi">1</span><span class="o">,</span> <span class="n">hi</span><span class="o">);</span>
+  <span class="o">}</span>
 </code></pre></div></div>
 
 <p>方法二、用链表来实现：</p>
@@ -291,7 +289,7 @@ for (int i = 1; i &lt;= n; i++) { // i = 1
   </li>
 </ul>
 
-<h5 id="滑动窗口">滑动窗口</h5>
+<h4 id="滑动窗口">滑动窗口</h4>
 
 <p>左右指针技巧中，把索引<strong>左闭右开</strong>的区间 <code class="highlighter-rouge">[left, right)</code> 称为一个「窗口」，长度为 <code class="highlighter-rouge">right - left</code>。方便边界处理， <code class="highlighter-rouge">[0, 0)</code>中没有元素，<code class="highlighter-rouge">[0, 1)</code>中有一个元素 0。</p>
 
@@ -325,11 +323,19 @@ for (int i = 1; i &lt;= n; i++) { // i = 1
         <p><strong>步骤</strong>：十分<strong>经典</strong>的 <code class="highlighter-rouge">HashMap</code> 代码</p>
 
         <ol>
-          <li><code class="highlighter-rouge">need</code> 和 <code class="highlighter-rouge">window</code> 相当于计数器，分别记录 T 中（需凑齐的）字符数量和窗口中对应字符的出现次数；</li>
           <li>
-            <p>寻找可行解：先不断增加 <code class="highlighter-rouge">right</code> 指针扩大窗口 <code class="highlighter-rouge">[left, right)</code>，直到窗口中的字符串符合要求（包含了 <code class="highlighter-rouge">T</code> 中所有字符）；<img src="../assets/min_cover_substr1.png" alt="img" style="zoom:25%;" /><img src="../assets/min_cover_substr2.png" alt="img" style="zoom:25%;" /></p>
+            <p><code class="highlighter-rouge">need</code> 和 <code class="highlighter-rouge">window</code> 相当于计数器，分别记录 T 中（需凑齐的）字符数量和窗口中对应字符的出现次数；</p>
           </li>
-          <li>优化可行解：再不断右移 <code class="highlighter-rouge">left</code> 指针缩小窗口，更新窗口的起始索引及长度，直到窗口不再符合要求（不包含 <code class="highlighter-rouge">T</code> 中所有字符）。<img src="../assets/min_cover_substr3.png" alt="img" style="zoom:25%;" /><img src="../assets/min_cover_substr4.png" alt="img" style="zoom:25%;" /></li>
+          <li>
+            <p>寻找可行解：先不断增加 <code class="highlighter-rouge">right</code> 指针扩大窗口 <code class="highlighter-rouge">[left, right)</code>，直到窗口中的字符串符合要求（包含了 <code class="highlighter-rouge">T</code> 中所有字符）；</p>
+
+            <p><img src="../assets/min_cover_substr1.png" alt="img" style="zoom:25%;" /><img src="../assets/min_cover_substr2.png" alt="img" style="zoom:25%;" /></p>
+          </li>
+          <li>
+            <p>优化可行解：再不断右移 <code class="highlighter-rouge">left</code> 指针缩小窗口，更新窗口的起始索引及长度，直到窗口不再符合要求（不包含 <code class="highlighter-rouge">T</code> 中所有字符）。</p>
+
+            <p><img src="../assets/min_cover_substr3.png" alt="img" style="zoom:25%;" /><img src="../assets/min_cover_substr4.png" alt="img" style="zoom:25%;" /></p>
+          </li>
         </ol>
       </li>
       <li>
@@ -354,43 +360,43 @@ for (int i = 1; i &lt;= n; i++) { // i = 1
 
 <p><img src="../assets/gjz5m.gif" alt="img" style="zoom:35%;" /><img src="../assets/20whr.gif" alt="img" style="zoom:33%;" /></p>
 
-<p><strong>滑动窗口框架</strong>：</p>
+<h5 id="滑动窗口框架">滑动窗口框架</h5>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/* 滑动窗口算法框架 */
-void slidingWindow(string s, string t) {
-    // 字符最后一次出现的位置，用map记下每个字符的索引，直接进行跳转
-    Map&lt;Character, Integer&gt; window = new HashMap&lt;&gt;();
-    // needs 和 window 相当于计数器，分别记录 T 中字符出现次数和窗口中对应字符的出现次数。
-    Map&lt;Character, Integer&gt; need = new HashMap&lt;&gt;();
-    for (char key : t.toCharArray) { // need.keySet()) {
-    	// 不存在则初始化为0，存在则+1
-  		need.put(key, map.getOrDefault(key, 0) + 1);
-    }
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/* 滑动窗口算法框架 */</span>
+<span class="kt">void</span> <span class="nf">slidingWindow</span><span class="o">(</span><span class="n">string</span> <span class="n">s</span><span class="o">,</span> <span class="n">string</span> <span class="n">t</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// 字符最后一次出现的位置，用map记下每个字符的索引，直接进行跳转</span>
+    <span class="n">Map</span><span class="o">&lt;</span><span class="n">Character</span><span class="o">,</span> <span class="n">Integer</span><span class="o">&gt;</span> <span class="n">window</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;();</span>
+    <span class="c1">// needs 和 window 相当于计数器，分别记录 T 中字符出现次数和窗口中对应字符的出现次数。</span>
+    <span class="n">Map</span><span class="o">&lt;</span><span class="n">Character</span><span class="o">,</span> <span class="n">Integer</span><span class="o">&gt;</span> <span class="n">need</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;();</span>
+    <span class="k">for</span> <span class="o">(</span><span class="kt">char</span> <span class="n">key</span> <span class="o">:</span> <span class="n">t</span><span class="o">.</span><span class="na">toCharArray</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// need.keySet()) {</span>
+    	<span class="c1">// 不存在则初始化为0，存在则+1</span>
+  		<span class="n">need</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">map</span><span class="o">.</span><span class="na">getOrDefault</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="mi">0</span><span class="o">)</span> <span class="o">+</span> <span class="mi">1</span><span class="o">);</span>
+    <span class="o">}</span>
     
-    // 表示窗口中满足need条件（包含的T中字符）的个数，valid == need.size 说明窗口已完全覆盖了 T
-    int valid = 0;
-    for (int left = 0, right = 0; right &lt; n; right++) { // 大多数解法用while，不理解
-        // 准备移入窗口的字符
-        char inCh = s.charAt(right);
-        // 扩大窗口的更新操作
-        ...
-        // debug 输出窗口的区间位置
-        // System.out.printf("[" + left + ", " + right + ")");
+    <span class="c1">// 表示窗口中满足need条件（包含的T中字符）的个数，valid == need.size 说明窗口已完全覆盖了 T</span>
+    <span class="kt">int</span> <span class="n">valid</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">left</span> <span class="o">=</span> <span class="mi">0</span><span class="o">,</span> <span class="n">right</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">right</span> <span class="o">&lt;</span> <span class="n">n</span><span class="o">;</span> <span class="n">right</span><span class="o">++)</span> <span class="o">{</span> <span class="c1">// 大多数解法用while，不理解</span>
+        <span class="c1">// 准备移入窗口的字符</span>
+        <span class="kt">char</span> <span class="n">inCh</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="na">charAt</span><span class="o">(</span><span class="n">right</span><span class="o">);</span>
+        <span class="c1">// 扩大窗口的更新操作</span>
+        <span class="o">...</span>
+        <span class="c1">// debug 输出窗口的区间位置</span>
+        <span class="c1">// System.out.printf("[" + left + ", " + right + ")");</span>
         
-        // 判断左侧窗口是否要收缩
-        while (window 仍满足条件) {
-            // 判断是否完全覆盖子串
-            // 准备移出窗口的字符
-            char outCh = s.charAt(left);
-            // 缩小窗口，并更新操作，与扩大对称
-            left++;
-            ...
-        }
-    }
-}
+        <span class="c1">// 判断左侧窗口是否要收缩</span>
+        <span class="k">while</span> <span class="o">(</span><span class="n">window</span> <span class="err">仍满足条件</span><span class="o">)</span> <span class="o">{</span>
+            <span class="c1">// 判断是否完全覆盖子串</span>
+            <span class="c1">// 准备移出窗口的字符</span>
+            <span class="kt">char</span> <span class="n">outCh</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="na">charAt</span><span class="o">(</span><span class="n">left</span><span class="o">);</span>
+            <span class="c1">// 缩小窗口，并更新操作，与扩大对称</span>
+            <span class="n">left</span><span class="o">++;</span>
+            <span class="o">...</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
-<h5 id="经典例题-1">经典例题</h5>
+<h4 id="经典例题-1">经典例题</h4>
 
 <ul>
   <li>
@@ -411,14 +417,14 @@ void slidingWindow(string s, string t) {
   <li>
     <p><a href="https://leetcode.cn/problems/ti-huan-kong-ge-lcof/">剑指 Offer 05.替换空格</a>：常规方法为遍历 <code class="highlighter-rouge">charAt(i)</code>；</p>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  StringBuffer res = new StringBuffer();
-  return res.toString();
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="n">StringBuffer</span> <span class="n">res</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringBuffer</span><span class="o">();</span>
+  <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
 
-  // 将char转为String，并比较
-  String.valueOf(ch).equals(” “)
+  <span class="c1">// 将char转为String，并比较</span>
+  <span class="n">String</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="n">ch</span><span class="o">).</span><span class="na">equals</span><span class="o">(</span><span class="err">”</span> <span class="err">“</span><span class="o">)</span>
 
-  str.replaceAll(”\\s“, ”%20“); // 模式匹配
-  str.replace(” “， ”%20“);
+  <span class="n">str</span><span class="o">.</span><span class="na">replaceAll</span><span class="o">(</span><span class="err">”\\</span><span class="n">s</span><span class="err">“</span><span class="o">,</span> <span class="err">”</span><span class="o">%</span><span class="mi">20</span><span class="err">“</span><span class="o">);</span> <span class="c1">// 模式匹配</span>
+  <span class="n">str</span><span class="o">.</span><span class="na">replace</span><span class="o">(</span><span class="err">”</span> <span class="err">“，</span> <span class="err">”</span><span class="o">%</span><span class="mi">20</span><span class="err">“</span><span class="o">);</span>
 </code></pre></div>    </div>
   </li>
   <li>
@@ -434,12 +440,12 @@ void slidingWindow(string s, string t) {
       <li>
         <p><a href="https://leetcode.cn/problems/ba-zi-fu-chuan-zhuan-huan-cheng-zheng-shu-lcof/">剑指 Offer 67.把字符串转换成整数</a>【】</p>
 
-        <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>StringBuffer ans = new StringBuffer();
-while (i &gt;= 0 || j &gt;= 0 || add != 0) {
-      int x = (i &gt;= 0) ? num1.charAt(i) - ’0‘ : 0;
-}
-// 答案需翻转
-ans.reverse();
+        <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">StringBuffer</span> <span class="n">ans</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringBuffer</span><span class="o">();</span>
+<span class="k">while</span> <span class="o">(</span><span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">j</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">add</span> <span class="o">!=</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+      <span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="o">(</span><span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="o">)</span> <span class="o">?</span> <span class="n">num1</span><span class="o">.</span><span class="na">charAt</span><span class="o">(</span><span class="n">i</span><span class="o">)</span> <span class="o">-</span> <span class="err">’</span><span class="mi">0</span><span class="err">‘</span> <span class="o">:</span> <span class="mi">0</span><span class="o">;</span>
+<span class="o">}</span>
+<span class="c1">// 答案需翻转</span>
+<span class="n">ans</span><span class="o">.</span><span class="na">reverse</span><span class="o">();</span>
 </code></pre></div>        </div>
       </li>
     </ul>
@@ -461,7 +467,7 @@ ans.reverse();
   </li>
 </ul>
 
-<h5 id="kmp-字符串模式匹配算法">KMP 字符串<del>模式</del>匹配算法</h5>
+<h4 id="kmp-字符串模式匹配算法">KMP 字符串<del>模式</del>匹配算法</h4>
 
 <p>“暴力搜索”会反复回溯主串，导致效率低下，而 KMP 算法可利用已遍历部分匹配这个有效信息（部分匹配表），保持主串上的指针不回溯；通过修改子串的指针，让模式串尽量移动到有效的位置。</p>
 
@@ -530,12 +536,12 @@ ans.reverse();
   <li>第1个节点位置的插入、删除与其他位置的操作保持一致。</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> // 通常在链表头部加入哨兵(作为头结点)，使删除的代码保持一致，不用额外考虑删除第一个节点的情况
- // 虚拟头结点技巧，插入 dummy 哑节点，用dummy.next表示真正的头节点，可避免处理头节点为null的边界问题
- ListNode dummy = new ListNode(-1);
- dummy.next = head;
- ....
- return dummy.next;
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c1">// 通常在链表头部加入哨兵(作为头结点)，使删除的代码保持一致，不用额外考虑删除第一个节点的情况</span>
+ <span class="c1">// 虚拟头结点技巧，插入 dummy 哑节点，用dummy.next表示真正的头节点，可避免处理头节点为null的边界问题</span>
+ <span class="n">ListNode</span> <span class="n">dummy</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ListNode</span><span class="o">(-</span><span class="mi">1</span><span class="o">);</span>
+ <span class="n">dummy</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="n">head</span><span class="o">;</span>
+ <span class="o">....</span>
+ <span class="k">return</span> <span class="n">dummy</span><span class="o">.</span><span class="na">next</span><span class="o">;</span>
 </code></pre></div></div>
 
 <p>判断<strong>边界</strong> / 特殊情况:</p>
@@ -550,8 +556,8 @@ ans.reverse();
 
 <p>单链表大部分都适用<a href="#快慢双指针">数组快慢双指针</a>技巧。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 快慢指针初始化指向 head
-ListNode slow = head, fast = head;
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 快慢指针初始化指向 head</span>
+<span class="n">ListNode</span> <span class="n">slow</span> <span class="o">=</span> <span class="n">head</span><span class="o">,</span> <span class="n">fast</span> <span class="o">=</span> <span class="n">head</span><span class="o">;</span>
 </code></pre></div></div>
 
 <ol>
@@ -573,22 +579,25 @@ ListNode slow = head, fast = head;
 
     <p><img src="../assets/remove_kth_node_from_end.gif" alt="remove_kth_node_from_end" style="zoom:33%;" /></p>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   // 删除倒数第 k 个，要先找倒数第 k + 1 个节点
-   ListNode pre = findKthFromEnd(dummy, k + 1);
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 删除倒数第 k 个，要先找倒数第 k + 1 个节点</span>
+<span class="n">ListNode</span> <span class="n">pre</span> <span class="o">=</span> <span class="n">findKthFromEnd</span><span class="o">(</span><span class="n">dummy</span><span class="o">,</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="o">);</span>
 </code></pre></div>    </div>
   </li>
   <li>
     <p><strong>判断回文链表</strong>：见字符串中的<a href="#回文串">回文串</a>；</p>
   </li>
-  <li><a href="https://leetcode.cn/problems/linked-list-cycle/">141.检测链表中是否有环</a>：<code class="highlighter-rouge">slow</code> 和 <code class="highlighter-rouge">fast</code> 指针相遇即有环；【】
-    <ul>
-      <li>
-        <p><a href="https://leetcode.cn/problems/linked-list-cycle-ii/">142.环形链表 II 找环起点</a>： 遍历 <code class="highlighter-rouge">fast</code> 直到链表尾部，<code class="highlighter-rouge">fast</code> 为 <code class="highlighter-rouge">slow</code> 的两倍速迟早会追上，<code class="highlighter-rouge">fast、slow</code> 相遇（位置一定在环内）即跳出循环；无环则 <code class="highlighter-rouge">fast、slow</code> 将相继到达链表尾部，相遇时均为 <code class="highlighter-rouge">null</code>；有环则 <code class="highlighter-rouge">fast</code> 指针在环内， <code class="highlighter-rouge">slow</code> 以 <code class="highlighter-rouge">head</code> 为起点重新开始，<code class="highlighter-rouge">fast、slow</code> 第二次相遇即为环起点；环起点不一定在 <code class="highlighter-rouge">head</code>；</p>
+  <li><a href="https://leetcode.cn/problems/linked-list-cycle/">141.检测链表中是否有环</a>：<code class="highlighter-rouge">slow</code> 和 <code class="highlighter-rouge">fast</code> 指针相遇即有环；【】</li>
+</ol>
 
-        <p><img src="../assets/find_loop.jpeg" alt="img" style="zoom:25%;" /></p>
-      </li>
-    </ul>
+<ul>
+  <li>
+    <p><a href="https://leetcode.cn/problems/linked-list-cycle-ii/">142.环形链表 II 找环起点</a>： 遍历 <code class="highlighter-rouge">fast</code> 直到链表尾部，<code class="highlighter-rouge">fast</code> 为 <code class="highlighter-rouge">slow</code> 的两倍速迟早会追上，<code class="highlighter-rouge">fast、slow</code> 相遇（位置一定在环内）即跳出循环；无环则 <code class="highlighter-rouge">fast、slow</code> 将相继到达链表尾部，相遇时均为 <code class="highlighter-rouge">null</code>；有环则 <code class="highlighter-rouge">fast</code> 指针在环内， <code class="highlighter-rouge">slow</code> 以 <code class="highlighter-rouge">head</code> 为起点重新开始，<code class="highlighter-rouge">fast、slow</code> 第二次相遇即为环起点；环起点不一定在 <code class="highlighter-rouge">head</code>；</p>
+
+    <p><img src="../assets/find_loop.jpeg" alt="img" style="zoom:25%;" /></p>
   </li>
+</ul>
+
+<ol>
   <li>
     <p><a href="https://leetcode.cn/problems/intersection-of-two-linked-lists/">160.相交链表</a>：判断两单链表是否相交；【】</p>
 
@@ -607,7 +616,9 @@ ListNode slow = head, fast = head;
       </li>
     </ul>
   </li>
-  <li>循环左移</li>
+  <li>
+    <p>循环左移</p>
+  </li>
 </ol>
 
 <h4 id="链表双指针">链表双指针</h4>
@@ -620,10 +631,10 @@ ListNode slow = head, fast = head;
       <li>23.合并K个升序链表：<a href="#第K个元素">第K个元素</a></li>
     </ul>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> // 虚拟头结点
- ListNode dummy = new ListNode(-1);
- // 合并后l1、l2最多只有一个非空，直接将链表末尾指向未合并完的链表
- p.next = (l1 == null) ? l2 : l1;
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c1">// 虚拟头结点</span>
+ <span class="n">ListNode</span> <span class="n">dummy</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ListNode</span><span class="o">(-</span><span class="mi">1</span><span class="o">);</span>
+ <span class="c1">// 合并后l1、l2最多只有一个非空，直接将链表末尾指向未合并完的链表</span>
+ <span class="n">p</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="o">(</span><span class="n">l1</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">?</span> <span class="n">l2</span> <span class="o">:</span> <span class="n">l1</span><span class="o">;</span>
 </code></pre></div>    </div>
   </li>
   <li>
@@ -652,12 +663,12 @@ ListNode slow = head, fast = head;
 
 <p><img src="../assets/rain_water.jpg" alt="img" style="zoom:25%;" /></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>water[i] = min(
-           # 左边最高的柱子
-           max(height[0...i]),
-           # 右边最高的柱子
-           max(height[i...end])
-        ) - height[i]
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">water</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="n">min</span><span class="o">(</span>
+           <span class="err">#</span> <span class="err">左边最高的柱子</span>
+           <span class="n">max</span><span class="o">(</span><span class="n">height</span><span class="o">[</span><span class="mi">0</span><span class="o">...</span><span class="na">i</span><span class="o">]),</span>
+           <span class="err">#</span> <span class="err">右边最高的柱子</span>
+           <span class="n">max</span><span class="o">(</span><span class="n">height</span><span class="o">[</span><span class="n">i</span><span class="o">...</span><span class="na">end</span><span class="o">])</span>
+        <span class="o">)</span> <span class="o">-</span> <span class="n">height</span><span class="o">[</span><span class="n">i</span><span class="o">]</span>
 </code></pre></div></div>
 
 <h4 id="经典例题-2">经典例题</h4>
@@ -719,21 +730,21 @@ ListNode slow = head, fast = head;
   <li>双向循环链表</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/* 迭代遍历单链表 */
-for (ListNode p = head; p != null; p = p.next) {
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/* 迭代遍历单链表 */</span>
+<span class="k">for</span> <span class="o">(</span><span class="n">ListNode</span> <span class="n">p</span> <span class="o">=</span> <span class="n">head</span><span class="o">;</span> <span class="n">p</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">next</span><span class="o">)</span> <span class="o">{</span>
+<span class="o">}</span>
 
-/* 递归遍历单链表 */
-void traverse(ListNode head) {
-    if (head == null) {
-        return;
-    }
-    // 前序位置
-    traverse(head.next);
-    // 后序位置
-    /* 倒序打印链表元素 */
-    print(head.val);
-}
+<span class="cm">/* 递归遍历单链表 */</span>
+<span class="kt">void</span> <span class="nf">traverse</span><span class="o">(</span><span class="n">ListNode</span> <span class="n">head</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">head</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="c1">// 前序位置</span>
+    <span class="n">traverse</span><span class="o">(</span><span class="n">head</span><span class="o">.</span><span class="na">next</span><span class="o">);</span>
+    <span class="c1">// 后序位置</span>
+    <span class="cm">/* 倒序打印链表元素 */</span>
+    <span class="n">print</span><span class="o">(</span><span class="n">head</span><span class="o">.</span><span class="na">val</span><span class="o">);</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h4 id="跳表">跳表</h4>
@@ -757,11 +768,11 @@ void traverse(ListNode head) {
   <li>用链表实现的栈叫作 <strong>链式栈</strong> 。</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Deque&lt;Integer&gt; stack = new LinkedList&lt;&gt;();
-stack.push(1);
-Integer x = stack.pop();
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Deque</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">stack</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LinkedList</span><span class="o">&lt;&gt;();</span>
+<span class="n">stack</span><span class="o">.</span><span class="na">push</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
+<span class="n">Integer</span> <span class="n">x</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="na">pop</span><span class="o">();</span>
 
-Stack&lt;Character&gt; stack = new Stack&lt;&gt;();
+<span class="n">Stack</span><span class="o">&lt;</span><span class="n">Character</span><span class="o">&gt;</span> <span class="n">stack</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Stack</span><span class="o">&lt;&gt;();</span>
 </code></pre></div></div>
 
 <h5 id="队列">队列</h5>
@@ -1061,7 +1072,7 @@ Stack&lt;Character&gt; stack = new Stack&lt;&gt;();
       <li>摩尔投票法：计数器，计数器为 0 时，假设 nums[i] 就是众数；遇到相同元素则 <code class="highlighter-rouge">++</code>，遇到不同元素则 <code class="highlighter-rouge">--</code>，空间<code class="highlighter-rouge">O(1)</code>【】</li>
     </ol>
 
-    <p><img src="../assets/8wyb2.gif" alt="img" style="zoom:43%;" /></p>
+    <p><img src="../assets/8wyb2.gif" alt="img" style="zoom: 50%;" /></p>
   </li>
 </ul>
 
@@ -1098,9 +1109,9 @@ Stack&lt;Character&gt; stack = new Stack&lt;&gt;();
 
 <p>用<a href="#二叉树的存储">数组存储二叉树</a>既节省空间，又方便索引。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PriorityQueue&lt;Integer&gt; pq = new PriorityQueue&lt;&gt;();
-pq.offer(e); // 插入堆
-int e = pq.poll(); // 删除/弹出堆顶元素
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">PriorityQueue</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">pq</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PriorityQueue</span><span class="o">&lt;&gt;();</span>
+<span class="n">pq</span><span class="o">.</span><span class="na">offer</span><span class="o">(</span><span class="n">e</span><span class="o">);</span> <span class="c1">// 插入堆</span>
+<span class="kt">int</span> <span class="n">e</span> <span class="o">=</span> <span class="n">pq</span><span class="o">.</span><span class="na">poll</span><span class="o">();</span> <span class="c1">// 删除/弹出堆顶元素</span>
 </code></pre></div></div>
 
 <h5 id="插入元素">插入元素</h5>
@@ -1216,26 +1227,26 @@ int e = pq.poll(); // 删除/弹出堆顶元素
 
 <p><img src="../assets/二叉树-2.png" alt="二叉树" style="zoom: 50%;" /></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/* 基本的 N 叉树节点 */
-class TreeNode {
-    int val;
-    TreeNode[] children;
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/* 基本的 N 叉树节点 */</span>
+<span class="kd">class</span> <span class="nc">TreeNode</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">val</span><span class="o">;</span>
+    <span class="n">TreeNode</span><span class="o">[]</span> <span class="n">children</span><span class="o">;</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h4 id="树图的遍历">树、图的遍历</h4>
 
 <p>树的 <code class="highlighter-rouge">DFS/BFS</code> 遍历算法</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 多叉树遍历框架
-void traverse(TreeNode root) {
-	if (root == null) return;
-    for (TreeNode child : root.childern) {
-        // 前序位置，在进入节点前执行的操作
-        traverse(child);
-        // 后序遍历的操作
-    }
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 多叉树遍历框架</span>
+<span class="kt">void</span> <span class="nf">traverse</span><span class="o">(</span><span class="n">TreeNode</span> <span class="n">root</span><span class="o">)</span> <span class="o">{</span>
+	<span class="k">if</span> <span class="o">(</span><span class="n">root</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="k">return</span><span class="o">;</span>
+    <span class="k">for</span> <span class="o">(</span><span class="n">TreeNode</span> <span class="n">child</span> <span class="o">:</span> <span class="n">root</span><span class="o">.</span><span class="na">childern</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// 前序位置，在进入节点前执行的操作</span>
+        <span class="n">traverse</span><span class="o">(</span><span class="n">child</span><span class="o">);</span>
+        <span class="c1">// 后序遍历的操作</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h4 id="经典题目">经典题目</h4>
@@ -1302,7 +1313,7 @@ void traverse(TreeNode root) {
 
 <p>缺点：斜树，瘸子；因此发展出变体满二叉树、完全二叉树。</p>
 
-<h5 id="二叉树核心解题思路">二叉树核心解题思路</h5>
+<h4 id="二叉树核心解题思路">二叉树核心解题思路</h4>
 
 <p>二叉树的习题分为三大部分：</p>
 
@@ -1410,12 +1421,12 @@ void traverse(TreeNode root) {
 
 <h4 id="二叉树的存储">二叉树的存储</h4>
 
-<ul>
+<p>分为：</p>
+
+<ol>
   <li>链式存储</li>
   <li>
     <p>顺序存储：用于<a href="#堆的存储">堆的存储</a>；</p>
-
-    <p><img src="../assets/y1l6o3nhel.png" alt="img" style="zoom: 80%;" /></p>
 
     <ul>
       <li>根结点的序号为 0，则下标为 <code class="highlighter-rouge">i</code> 的节点对应的：
@@ -1435,25 +1446,29 @@ void traverse(TreeNode root) {
       </li>
     </ul>
   </li>
-</ul>
+</ol>
+
+<p>根结点的序号为 0 时：</p>
+
+<p><img src="../assets/y1l6o3nhel.png" alt="img" /></p>
 
 <h5 id="代码实现">代码实现</h5>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/**
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
  * Definition for a binary tree node.
- * public class TreeNode {
- *     int val;
- *     TreeNode left;
- *     TreeNode right;
- *     TreeNode() {}
- *     TreeNode(int val) { this.val = val; }
- *     TreeNode(int val, TreeNode left, TreeNode right) {
- *         this.val = val;
- *         this.left = left;
- *         this.right = right;
- *     }
- * }
- */
+ */</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">TreeNode</span> <span class="o">{</span>
+     <span class="kt">int</span> <span class="n">val</span><span class="o">;</span>
+     <span class="n">TreeNode</span> <span class="n">left</span><span class="o">;</span>
+     <span class="n">TreeNode</span> <span class="n">right</span><span class="o">;</span>
+     <span class="n">TreeNode</span><span class="o">()</span> <span class="o">{}</span>
+     <span class="n">TreeNode</span><span class="o">(</span><span class="kt">int</span> <span class="n">val</span><span class="o">)</span> <span class="o">{</span> <span class="k">this</span><span class="o">.</span><span class="na">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">;</span> <span class="o">}</span>
+     <span class="n">TreeNode</span><span class="o">(</span><span class="kt">int</span> <span class="n">val</span><span class="o">,</span> <span class="n">TreeNode</span> <span class="n">left</span><span class="o">,</span> <span class="n">TreeNode</span> <span class="n">right</span><span class="o">)</span> <span class="o">{</span>
+         <span class="k">this</span><span class="o">.</span><span class="na">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">;</span>
+         <span class="k">this</span><span class="o">.</span><span class="na">left</span> <span class="o">=</span> <span class="n">left</span><span class="o">;</span>
+         <span class="k">this</span><span class="o">.</span><span class="na">right</span> <span class="o">=</span> <span class="n">right</span><span class="o">;</span>
+     <span class="o">}</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h4 id="二叉树遍历">二叉树遍历</h4>
@@ -1481,114 +1496,122 @@ void traverse(TreeNode root) {
   </li>
 </ul>
 
-<p><strong>层序遍历框架</strong>：</p>
+<h5 id="层序遍历框架">层序遍历框架</h5>
 
 <p><img src="../assets/binary_bfs.jpeg" alt="img" style="zoom: 28%;" /></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 层序遍历：1. 非递归用栈实现
-public List&lt;List&lt;Integer&gt; &gt; levelOrderTraverse(TreeNode root) {
-    // 一维结果
-    // List&lt;Integer&gt; res = new LinkedList&lt;&gt;();
-    // 二维结果
-    List&lt;List&lt;Integer&gt; &gt; res = new LinkedList&lt;&gt;();
-    if (root == null) return res;
-    Deque&lt;TreeNode&gt; q = new LinkedList&lt;&gt;();
-    q.offer(root);
+<h6 id="非递归用栈实现">非递归用栈实现</h6>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 层序遍历：1. 非递归用栈实现</span>
+<span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">levelOrderTraverse</span><span class="o">(</span><span class="n">TreeNode</span> <span class="n">root</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// 一维结果</span>
+    <span class="c1">// List&lt;Integer&gt; res = new LinkedList&lt;&gt;();</span>
+    <span class="c1">// 二维结果</span>
+    <span class="n">List</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">res</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LinkedList</span><span class="o">&lt;&gt;();</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">root</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="k">return</span> <span class="n">res</span><span class="o">;</span>
+    <span class="n">Deque</span><span class="o">&lt;</span><span class="n">TreeNode</span><span class="o">&gt;</span> <span class="n">q</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LinkedList</span><span class="o">&lt;&gt;();</span>
+    <span class="n">q</span><span class="o">.</span><span class="na">offer</span><span class="o">(</span><span class="n">root</span><span class="o">);</span>
     
-    // 从上到下遍历二叉树的每一层
-    while (!q.isEmpty()) {
-    	// depth++; // 深度，初始化为0
-        int sz = q.size();
-        List&lt;Integer&gt; re = new LinkedList&lt;&gt;(); // not List new，level，长度可变
-        // 右视图从右往左遍历，且保存队头（队列中第0个元素）
-        // TreeNode last = q.peek();
-        // 从左到右遍历本层的每个节点
-        for (int i = 0; i &lt; sz; i++) {
-            TreeNode cur = q.poll(); //	
-            re.add(cur.val); // not offer() push()
-            if (0 == res.size()%2) { // 奇数层
-            }
-            // 二叉树的最小深度
-            if (node.left == null &amp;&amp; node.right == null) {
-                return depth;
-            }
-            // 将下一层节点放入队列
-            if (cur.left != null) {
-                q.offer(cur.left);
-            }
-            // 从右往左遍历时，right先入队，用于右视图等
-            if (cur.right != null) {
-                q.offer(cur.right);
-            }
-        }
-        res.add(re);
-        // 前插每层的遍历结果，就是自底向上的层序遍历
-        //res.addFirst(level);
-        // 用于右视图
-        //res.add(last.val);
-    }
-    return res;
-}
+    <span class="c1">// 从上到下遍历二叉树的每一层</span>
+    <span class="k">while</span> <span class="o">(!</span><span class="n">q</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+    	<span class="c1">// depth++; // 深度，初始化为0</span>
+        <span class="kt">int</span> <span class="n">sz</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="na">size</span><span class="o">();</span>
+        <span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">re</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LinkedList</span><span class="o">&lt;&gt;();</span> <span class="c1">// not List new，level，长度可变</span>
+        <span class="c1">// 右视图从右往左遍历，且保存队头（队列中第0个元素）</span>
+        <span class="c1">// TreeNode last = q.peek();</span>
+        <span class="c1">// 从左到右遍历本层的每个节点</span>
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">sz</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+            <span class="n">TreeNode</span> <span class="n">cur</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="na">poll</span><span class="o">();</span> <span class="c1">//	</span>
+            <span class="n">re</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">cur</span><span class="o">.</span><span class="na">val</span><span class="o">);</span> <span class="c1">// not offer() push()</span>
+            <span class="k">if</span> <span class="o">(</span><span class="mi">0</span> <span class="o">==</span> <span class="n">res</span><span class="o">.</span><span class="na">size</span><span class="o">()%</span><span class="mi">2</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// 奇数层</span>
+            <span class="o">}</span>
+            <span class="c1">// 二叉树的最小深度</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">node</span><span class="o">.</span><span class="na">left</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">node</span><span class="o">.</span><span class="na">right</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">return</span> <span class="n">depth</span><span class="o">;</span>
+            <span class="o">}</span>
+            <span class="c1">// 将下一层节点放入队列</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">cur</span><span class="o">.</span><span class="na">left</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">q</span><span class="o">.</span><span class="na">offer</span><span class="o">(</span><span class="n">cur</span><span class="o">.</span><span class="na">left</span><span class="o">);</span>
+            <span class="o">}</span>
+            <span class="c1">// 从右往左遍历时，right先入队，用于右视图等</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">cur</span><span class="o">.</span><span class="na">right</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">q</span><span class="o">.</span><span class="na">offer</span><span class="o">(</span><span class="n">cur</span><span class="o">.</span><span class="na">right</span><span class="o">);</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="n">res</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">re</span><span class="o">);</span>
+        <span class="c1">// 前插每层的遍历结果，就是自底向上的层序遍历</span>
+        <span class="c1">//res.addFirst(level);</span>
+        <span class="c1">// 用于右视图</span>
+        <span class="c1">//res.add(last.val);</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="n">res</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></div></div>
 
-// 层序遍历：2. 递归实现
-List&lt;List&lt;Integer&gt; &gt; res = new ArrayList&lt;&gt;(); // 需用到get()，not LinkedList
-List&lt;List&lt;Integer&gt; &gt; levelOrderTraverse(TreeNode root) {
-    if (root == null) {
-        return res;
-    }
-    // root 深度为 0，视为第 0 层
-    traverse(root, 0);
-    return res;
-}
+<h6 id="递归实现">递归实现</h6>
 
-void traverse(TreeNode root, int depth) {
-    if (root == null) {
-        return;
-    }
-    // 前序位置，判断是否已存储 depth 层的节点
-    if (res.size() &lt;= depth) {
-        // 第一次进入 depth 层
-        res.add(new LinkedList&lt;&gt;());
-    }
-    // 前序位置，在 depth 层添加 root 节点的值
-    res.get(depth).add(root.val);
-    traverse(root.left, depth + 1);
-    traverse(root.right, depth + 1);
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 层序遍历：2. 递归实现</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">res</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span> <span class="c1">// 需用到get()，not LinkedList</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">levelOrderTraverse</span><span class="o">(</span><span class="n">TreeNode</span> <span class="n">root</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">root</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">res</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="c1">// root 深度为 0，视为第 0 层</span>
+    <span class="n">traverse</span><span class="o">(</span><span class="n">root</span><span class="o">,</span> <span class="mi">0</span><span class="o">);</span>
+    <span class="k">return</span> <span class="n">res</span><span class="o">;</span>
+<span class="o">}</span>
 
-//层序遍历：3. 使用自定义 State 类维护每个节点的信息，复杂一些但最灵活，会在图算法或复杂 BFS 算法中见到
-class State {
-    TreeNode node;
-    int depth;
+<span class="kt">void</span> <span class="nf">traverse</span><span class="o">(</span><span class="n">TreeNode</span> <span class="n">root</span><span class="o">,</span> <span class="kt">int</span> <span class="n">depth</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">root</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="c1">// 前序位置，判断是否已存储 depth 层的节点</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">res</span><span class="o">.</span><span class="na">size</span><span class="o">()</span> <span class="o">&lt;=</span> <span class="n">depth</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// 第一次进入 depth 层</span>
+        <span class="n">res</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">LinkedList</span><span class="o">&lt;&gt;());</span>
+    <span class="o">}</span>
+    <span class="c1">// 前序位置，在 depth 层添加 root 节点的值</span>
+    <span class="n">res</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">depth</span><span class="o">).</span><span class="na">add</span><span class="o">(</span><span class="n">root</span><span class="o">.</span><span class="na">val</span><span class="o">);</span>
+    <span class="n">traverse</span><span class="o">(</span><span class="n">root</span><span class="o">.</span><span class="na">left</span><span class="o">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="o">);</span>
+    <span class="n">traverse</span><span class="o">(</span><span class="n">root</span><span class="o">.</span><span class="na">right</span><span class="o">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
 
-    State(TreeNode node, int depth) {
-        this.node = node;
-        this.depth = depth;
-    }
-}
+<h6 id="使用自定义-state-类">使用自定义 State 类</h6>
 
-void levelOrderTraverse(TreeNode root) {
-    if (root == null) {
-        return;
-    }
-    Queue&lt;State&gt; q = new LinkedList&lt;&gt;();
-    // 根节点的路径权重和是 1
-    q.offer(new State(root, 1));
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//层序遍历：3. 使用自定义 State 类维护每个节点的信息，复杂一些但最灵活，会在图算法或复杂 BFS 算法中见到</span>
+<span class="kd">class</span> <span class="nc">State</span> <span class="o">{</span>
+    <span class="n">TreeNode</span> <span class="n">node</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">depth</span><span class="o">;</span>
 
-    while (!q.isEmpty()) {
-        State cur = q.poll();
-        // 访问 cur 节点，同时知道它的路径权重和
-        System.out.println("depth = " + cur.depth + ", val = " + cur.node.val);
+    <span class="n">State</span><span class="o">(</span><span class="n">TreeNode</span> <span class="n">node</span><span class="o">,</span> <span class="kt">int</span> <span class="n">depth</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">node</span> <span class="o">=</span> <span class="n">node</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">depth</span> <span class="o">=</span> <span class="n">depth</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 
-        // 把 cur 的左右子节点加入队列
-        if (cur.node.left != null) {
-            q.offer(new State(cur.node.left, cur.depth + 1));
-        }
-        if (cur.node.right != null) {
-            q.offer(new State(cur.node.right, cur.depth + 1));
-        }
-    }
-}
+<span class="kt">void</span> <span class="nf">levelOrderTraverse</span><span class="o">(</span><span class="n">TreeNode</span> <span class="n">root</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">root</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="n">Queue</span><span class="o">&lt;</span><span class="n">State</span><span class="o">&gt;</span> <span class="n">q</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LinkedList</span><span class="o">&lt;&gt;();</span>
+    <span class="c1">// 根节点的路径权重和是 1</span>
+    <span class="n">q</span><span class="o">.</span><span class="na">offer</span><span class="o">(</span><span class="k">new</span> <span class="n">State</span><span class="o">(</span><span class="n">root</span><span class="o">,</span> <span class="mi">1</span><span class="o">));</span>
+
+    <span class="k">while</span> <span class="o">(!</span><span class="n">q</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+        <span class="n">State</span> <span class="n">cur</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="na">poll</span><span class="o">();</span>
+        <span class="c1">// 访问 cur 节点，同时知道它的路径权重和</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"depth = "</span> <span class="o">+</span> <span class="n">cur</span><span class="o">.</span><span class="na">depth</span> <span class="o">+</span> <span class="s">", val = "</span> <span class="o">+</span> <span class="n">cur</span><span class="o">.</span><span class="na">node</span><span class="o">.</span><span class="na">val</span><span class="o">);</span>
+
+        <span class="c1">// 把 cur 的左右子节点加入队列</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">cur</span><span class="o">.</span><span class="na">node</span><span class="o">.</span><span class="na">left</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">q</span><span class="o">.</span><span class="na">offer</span><span class="o">(</span><span class="k">new</span> <span class="n">State</span><span class="o">(</span><span class="n">cur</span><span class="o">.</span><span class="na">node</span><span class="o">.</span><span class="na">left</span><span class="o">,</span> <span class="n">cur</span><span class="o">.</span><span class="na">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="o">));</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">cur</span><span class="o">.</span><span class="na">node</span><span class="o">.</span><span class="na">right</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">q</span><span class="o">.</span><span class="na">offer</span><span class="o">(</span><span class="k">new</span> <span class="n">State</span><span class="o">(</span><span class="n">cur</span><span class="o">.</span><span class="na">node</span><span class="o">.</span><span class="na">right</span><span class="o">,</span> <span class="n">cur</span><span class="o">.</span><span class="na">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="o">));</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h5 id="前序中序后序遍历">前序/中序/后序遍历</h5>
@@ -1618,26 +1641,26 @@ void levelOrderTraverse(TreeNode root) {
   </li>
 </ol>
 
-<p><strong>递归框架</strong>：</p>
+<h6 id="递归框架">递归框架</h6>
 
 <p>在递归函数中，将当前节点<strong>分解</strong>为子问题（子树），通过子树的结果推导出当前节点的结果：对应<a href="#动态规划算法框架">动态规划核心框架</a>；</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public List&lt;Integer&gt; preorderTraverse(TreeNode root) {
-    List&lt;Integer&gt; res = new LinkedList&lt;&gt;();
-    if (root == null) return res;
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="nf">preorderTraverse</span><span class="o">(</span><span class="n">TreeNode</span> <span class="n">root</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">res</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LinkedList</span><span class="o">&lt;&gt;();</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">root</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="k">return</span> <span class="n">res</span><span class="o">;</span>
     
-    // 前序位置：自顶向下、自左向右遍历node、执行代码；
-    // 从根节点遍历过来的过程能顺带记录前序位置的信息，如节点的深度；
-    // 快速排序，对前中后序位置不敏感的代码；
-    res.add(root.val);
-    res.addAll(preorderTraverse(root.left));
-    // 中序位置：主要用在 BST 二叉查找树场景
-    res.addAll(preorderTraverse(root.right));
-    // 后序位置：自底向上遍历node、执行代码；
-    // 只有后序位置才能通过返回值获取子树的信息，如树的深度/高度、二叉树的最大深度（即根节点到「最远」叶子节点的最长路径上的节点数）、节点的高度；
-    // 归并排序、大多数和子树有关的、倒序打印单链表、二叉树的最长直径（即任意两个结点间的路径长度，不一定要穿过根结点=左右子树的最大深度之和+1）
-    return res;
-}
+    <span class="c1">// 前序位置：自顶向下、自左向右遍历node、执行代码；</span>
+    <span class="c1">// 从根节点遍历过来的过程能顺带记录前序位置的信息，如节点的深度；</span>
+    <span class="c1">// 快速排序，对前中后序位置不敏感的代码；</span>
+    <span class="n">res</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">root</span><span class="o">.</span><span class="na">val</span><span class="o">);</span>
+    <span class="n">res</span><span class="o">.</span><span class="na">addAll</span><span class="o">(</span><span class="n">preorderTraverse</span><span class="o">(</span><span class="n">root</span><span class="o">.</span><span class="na">left</span><span class="o">));</span>
+    <span class="c1">// 中序位置：主要用在 BST 二叉查找树场景</span>
+    <span class="n">res</span><span class="o">.</span><span class="na">addAll</span><span class="o">(</span><span class="n">preorderTraverse</span><span class="o">(</span><span class="n">root</span><span class="o">.</span><span class="na">right</span><span class="o">));</span>
+    <span class="c1">// 后序位置：自底向上遍历node、执行代码；</span>
+    <span class="c1">// 只有后序位置才能通过返回值获取子树的信息，如树的深度/高度、二叉树的最大深度（即根节点到「最远」叶子节点的最长路径上的节点数）、节点的高度；</span>
+    <span class="c1">// 归并排序、大多数和子树有关的、倒序打印单链表、二叉树的最长直径（即任意两个结点间的路径长度，不一定要穿过根结点=左右子树的最大深度之和+1）</span>
+    <span class="k">return</span> <span class="n">res</span><span class="o">;</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h5 id="非递归不用栈的中序遍历">（非递归不用栈的）中序遍历</h5>
@@ -1658,41 +1681,41 @@ void levelOrderTraverse(TreeNode root) {
 
 <p>难理解，直接背。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public List&lt;Integer&gt; inorderTraversal(TreeNode root) {
-    // 中序遍历非栈非递归，中序线索
-    List&lt;Integer&gt; res = new LinkedList&lt;&gt;();
-    TreeNode current = root;
-    while(current != null) {
-        if(current.left == null) {
-            // 当前节点没有左孩子，所以是应该访问的结点
-            res.add(current.val);
-            // 找右孩子、或者在前面建立的右孩子链接
-            current = current.right;
-        } else {
-            TreeNode past = current.left;
-            // past一直到最右下
-            while(past.right != null &amp;&amp; past.right != current) {
-                past = past.right;
-            }
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="nf">inorderTraversal</span><span class="o">(</span><span class="n">TreeNode</span> <span class="n">root</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// 中序遍历非栈非递归，中序线索</span>
+    <span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">res</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LinkedList</span><span class="o">&lt;&gt;();</span>
+    <span class="n">TreeNode</span> <span class="n">current</span> <span class="o">=</span> <span class="n">root</span><span class="o">;</span>
+    <span class="k">while</span><span class="o">(</span><span class="n">current</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span><span class="o">(</span><span class="n">current</span><span class="o">.</span><span class="na">left</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="c1">// 当前节点没有左孩子，所以是应该访问的结点</span>
+            <span class="n">res</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">current</span><span class="o">.</span><span class="na">val</span><span class="o">);</span>
+            <span class="c1">// 找右孩子、或者在前面建立的右孩子链接</span>
+            <span class="n">current</span> <span class="o">=</span> <span class="n">current</span><span class="o">.</span><span class="na">right</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="n">TreeNode</span> <span class="n">past</span> <span class="o">=</span> <span class="n">current</span><span class="o">.</span><span class="na">left</span><span class="o">;</span>
+            <span class="c1">// past一直到最右下</span>
+            <span class="k">while</span><span class="o">(</span><span class="n">past</span><span class="o">.</span><span class="na">right</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">past</span><span class="o">.</span><span class="na">right</span> <span class="o">!=</span> <span class="n">current</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">past</span> <span class="o">=</span> <span class="n">past</span><span class="o">.</span><span class="na">right</span><span class="o">;</span>
+            <span class="o">}</span>
 
-            if(past.right == null) {
-                // 此时current是past的后继结点，建立链接方便下次找到后继节点
-                past.right = current;
-                current = current.left;
-            } else {
-                /*
+            <span class="k">if</span><span class="o">(</span><span class="n">past</span><span class="o">.</span><span class="na">right</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="c1">// 此时current是past的后继结点，建立链接方便下次找到后继节点</span>
+                <span class="n">past</span><span class="o">.</span><span class="na">right</span> <span class="o">=</span> <span class="n">current</span><span class="o">;</span>
+                <span class="n">current</span> <span class="o">=</span> <span class="n">current</span><span class="o">.</span><span class="na">left</span><span class="o">;</span>
+            <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                <span class="cm">/*
                 此时past的右孩子指向后继节点，所以是第二次访问；
                 代表当前结点的左子树已经访问完毕，所以访问当前结点；
                 然后把指针移到后继或者右子树，并消除多余链接；
-                */
-                res.add(current.val);
-                past.right = null;
-                current = current.right;
-            }
-        }
-    }
-    return res;
-}
+                */</span>
+                <span class="n">res</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">current</span><span class="o">.</span><span class="na">val</span><span class="o">);</span>
+                <span class="n">past</span><span class="o">.</span><span class="na">right</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+                <span class="n">current</span> <span class="o">=</span> <span class="n">current</span><span class="o">.</span><span class="na">right</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="n">res</span><span class="o">;</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h4 id="经典题目-1">经典题目</h4>
@@ -1708,7 +1731,7 @@ void levelOrderTraverse(TreeNode root) {
 
 </blockquote>
 
-<h5 id="基本概念-1">基本概念</h5>
+<h4 id="基本概念-1">基本概念</h4>
 
 <p>图（G）由顶点的有穷非空集合（V）和顶点间的边（E）组成，通常表示为：<strong>G(V,E)</strong>。如社交软件上好友关系。</p>
 
@@ -1734,7 +1757,7 @@ void levelOrderTraverse(TreeNode root) {
   <li>哈希环：用于负载均衡算法中的一致性哈希法。</li>
 </ul>
 
-<h5 id="图的存储">图的存储</h5>
+<h4 id="图的存储">图的存储</h4>
 
 <blockquote>
   <p>表示方法、具体实现、物理结构</p>
@@ -1757,16 +1780,16 @@ void levelOrderTraverse(TreeNode root) {
 
 <p><img src="../assets/有向图的邻接矩阵存储.46663a1b.png" alt="有向图的邻接矩阵存储" style="zoom: 48%;" /> <img src="../assets/有向图的邻接表存储.362b00d5.png" alt="有向图的邻接表存储" style="zoom:48%;" /></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 邻接矩阵
-// graph[x][y] 记录 x 是否有一条指向 y 的边、或边的权重
-boolean/int[][] graph;
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 邻接矩阵</span>
+<span class="c1">// graph[x][y] 记录 x 是否有一条指向 y 的边、或边的权重</span>
+<span class="kt">boolean</span><span class="o">/</span><span class="kt">int</span><span class="o">[][]</span> <span class="n">graph</span><span class="o">;</span>
 
-// 邻接表
-// graph[x] = List&lt;Integer&gt; ？存储 x 的所有相邻节点
-List&lt;Integer&gt;[] graph;
+<span class="c1">// 邻接表</span>
+<span class="c1">// graph[x] = List&lt;Integer&gt; ？存储 x 的所有相邻节点</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;[]</span> <span class="n">graph</span><span class="o">;</span>
 </code></pre></div></div>
 
-<h5 id="图的搜索遍历">图的搜索、遍历</h5>
+<h4 id="图的搜索遍历">图的搜索、遍历</h4>
 
 <p>各种搜索问题其实都是树的遍历问题：</p>
 
@@ -1786,23 +1809,23 @@ List&lt;Integer&gt;[] graph;
 
 <p><img src="../assets/tree_select.jpg" alt="img" style="zoom: 40%;" /></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 记录被遍历过的节点
-boolean[] visited;
-// 记录从起点到当前节点的路径，用于判断是否成环
-boolean[] onPath;
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 记录被遍历过的节点</span>
+<span class="kt">boolean</span><span class="o">[]</span> <span class="n">visited</span><span class="o">;</span>
+<span class="c1">// 记录从起点到当前节点的路径，用于判断是否成环</span>
+<span class="kt">boolean</span><span class="o">[]</span> <span class="n">onPath</span><span class="o">;</span>
 
-// 图的遍历框架：递归实现
-void traverse(Graph graph, int s) { // 节点 s
-    if (visited[s]) return;
-    visited[s] = true;
-    // 做选择：标记节点 s 在路径上
-    onPath[s] = true;
-    for (int neighbor : graph.neighbors(s)) {
-        traverse(graph, neighbor);
-    }
-    // 撤销选择：节点 s 离开路径
-    onPath[s] = false;
-}
+<span class="c1">// 图的遍历框架：递归实现</span>
+<span class="kt">void</span> <span class="nf">traverse</span><span class="o">(</span><span class="n">Graph</span> <span class="n">graph</span><span class="o">,</span> <span class="kt">int</span> <span class="n">s</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// 节点 s</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">visited</span><span class="o">[</span><span class="n">s</span><span class="o">])</span> <span class="k">return</span><span class="o">;</span>
+    <span class="n">visited</span><span class="o">[</span><span class="n">s</span><span class="o">]</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+    <span class="c1">// 做选择：标记节点 s 在路径上</span>
+    <span class="n">onPath</span><span class="o">[</span><span class="n">s</span><span class="o">]</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">neighbor</span> <span class="o">:</span> <span class="n">graph</span><span class="o">.</span><span class="na">neighbors</span><span class="o">(</span><span class="n">s</span><span class="o">))</span> <span class="o">{</span>
+        <span class="n">traverse</span><span class="o">(</span><span class="n">graph</span><span class="o">,</span> <span class="n">neighbor</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="c1">// 撤销选择：节点 s 离开路径</span>
+    <span class="n">onPath</span><span class="o">[</span><span class="n">s</span><span class="o">]</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <ul>
@@ -1813,40 +1836,40 @@ void traverse(Graph graph, int s) { // 节点 s
   </li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 记录所有路径
-List&lt;List&lt;Integer&gt; &gt; res = new LinkedList&lt;&gt;();
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 记录所有路径</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">res</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LinkedList</span><span class="o">&lt;&gt;();</span>
 
-public List&lt;List&lt;Integer&gt; &gt; allPathsSourceTarget(int[][] graph) {
-    // 维护递归过程中经过的路径
-    LinkedList&lt;Integer&gt; path = new LinkedList&lt;&gt;();
-    traverse(graph, 0, path);
-    return res;
-}
+<span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">allPathsSourceTarget</span><span class="o">(</span><span class="kt">int</span><span class="o">[][]</span> <span class="n">graph</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// 维护递归过程中经过的路径</span>
+    <span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">path</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LinkedList</span><span class="o">&lt;&gt;();</span>
+    <span class="n">traverse</span><span class="o">(</span><span class="n">graph</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">path</span><span class="o">);</span>
+    <span class="k">return</span> <span class="n">res</span><span class="o">;</span>
+<span class="o">}</span>
 
-// 图的遍历框架：非递归实现
-void traverse(int[][] graph, int s, LinkedList&lt;Integer&gt; path) {
-    // 添加节点 s 到路径
-    path.addLast(s);
+<span class="c1">// 图的遍历框架：非递归实现</span>
+<span class="kt">void</span> <span class="nf">traverse</span><span class="o">(</span><span class="kt">int</span><span class="o">[][]</span> <span class="n">graph</span><span class="o">,</span> <span class="kt">int</span> <span class="n">s</span><span class="o">,</span> <span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">path</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// 添加节点 s 到路径</span>
+    <span class="n">path</span><span class="o">.</span><span class="na">addLast</span><span class="o">(</span><span class="n">s</span><span class="o">);</span>
 
-    int n = graph.length;
-    if (s == n - 1) {
-        // 到达终点
-        res.add(new LinkedList&lt;&gt;(path));
-        // 可在这直接 return，但要 removeLast 正确维护 path
-        path.removeLast();
-        return;
-        // 不 return 也可，因为图中不含环，不会出现无限递归
-    }
-    // 递归每个相邻节点
-    for (int v : graph[s]) {
-        traverse(graph, v, path);
-    }
-    // 从路径移出节点 s
-    path.removeLast();
-}
+    <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">s</span> <span class="o">==</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// 到达终点</span>
+        <span class="n">res</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">LinkedList</span><span class="o">&lt;&gt;(</span><span class="n">path</span><span class="o">));</span>
+        <span class="c1">// 可在这直接 return，但要 removeLast 正确维护 path</span>
+        <span class="n">path</span><span class="o">.</span><span class="na">removeLast</span><span class="o">();</span>
+        <span class="k">return</span><span class="o">;</span>
+        <span class="c1">// 不 return 也可，因为图中不含环，不会出现无限递归</span>
+    <span class="o">}</span>
+    <span class="c1">// 递归每个相邻节点</span>
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">v</span> <span class="o">:</span> <span class="n">graph</span><span class="o">[</span><span class="n">s</span><span class="o">])</span> <span class="o">{</span>
+        <span class="n">traverse</span><span class="o">(</span><span class="n">graph</span><span class="o">,</span> <span class="n">v</span><span class="o">,</span> <span class="n">path</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="c1">// 从路径移出节点 s</span>
+    <span class="n">path</span><span class="o">.</span><span class="na">removeLast</span><span class="o">();</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
-<h5 id="kruskal-最小生成树算法">Kruskal 最小生成树算法</h5>
+<h4 id="kruskal-最小生成树算法">Kruskal 最小生成树算法</h4>
 
 <blockquote>
   <p>经典算法，学有余力可以掌握一下</p>
@@ -1867,10 +1890,10 @@ void traverse(int[][] graph, int s, LinkedList&lt;Integer&gt; path) {
   <li><code class="highlighter-rouge">Prim</code> 普瑞姆算法：核心是切分定理（将图分为两个不重叠且非空的节点集合），每次都把权重最小的「横切边」拿出来，直到把构成最小生成树的所有边都切出来为止。用 BFS 算法思想 和 <code class="highlighter-rouge">visited</code> 布尔数组避免成环。</li>
 </ol>
 
-<h5 id="dijkstra-最短路径算法">Dijkstra 最短路径算法</h5>
+<h4 id="dijkstra-最短路径算法">Dijkstra 最短路径算法</h4>
 
 <blockquote>
-  <p>，经典算法，学有余力可以掌握一下。</p>
+  <p>经典算法，学有余力可以掌握一下。</p>
 </blockquote>
 
 <p>简单图（有向无向皆可）的最短路径 <code class="highlighter-rouge">Dijkstra</code> 迪杰斯特拉（戴克斯特拉）算法：注意是长度而不是具体的路径。是 BFS 算法的加强版，都是从二叉树的层序遍历衍生出来。</p>
@@ -1879,7 +1902,7 @@ void traverse(int[][] graph, int s, LinkedList&lt;Integer&gt; path) {
   <li>用于计算 OSPF 动态<strong>路由选择</strong>协议。</li>
 </ul>
 
-<h5 id="经典题目-2">经典题目</h5>
+<h4 id="经典题目-2">经典题目</h4>
 
 <ul>
   <li>看到依赖问题 ==&gt; 首先想到的就是把问题转化成「有向图」</li>

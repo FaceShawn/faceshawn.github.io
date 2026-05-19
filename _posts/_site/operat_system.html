@@ -537,30 +537,30 @@
   <li>两个线程<strong>相互等待</strong>对方释放资源形成死锁。</li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public class Main {
-	public static void main(String[] args) {
-		new Thread(()-&gt;{ //
-			A.a();
-		}).start();
-		new Thread(()-&gt;{
-			B.b();
-		}).start();
-	}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Main</span> <span class="o">{</span>
+	<span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+		<span class="k">new</span> <span class="nf">Thread</span><span class="o">(()-&gt;{</span> <span class="c1">//</span>
+			<span class="n">A</span><span class="o">.</span><span class="na">a</span><span class="o">();</span>
+		<span class="o">}).</span><span class="na">start</span><span class="o">();</span>
+		<span class="k">new</span> <span class="nf">Thread</span><span class="o">(()-&gt;{</span>
+			<span class="n">B</span><span class="o">.</span><span class="na">b</span><span class="o">();</span>
+		<span class="o">}).</span><span class="na">start</span><span class="o">();</span>
+	<span class="o">}</span>
 
-	// 静态内部类
-    static class A {
-        public static synchronized void a() {
-            try {
-                Thread.sleep(3000);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            System.out.println("get A.");
-            B.b();
-        }
-    }
-    // B 类相似
-}
+	<span class="c1">// 静态内部类</span>
+    <span class="kd">static</span> <span class="kd">class</span> <span class="nc">A</span> <span class="o">{</span>
+        <span class="kd">public</span> <span class="kd">static</span> <span class="kd">synchronized</span> <span class="kt">void</span> <span class="nf">a</span><span class="o">()</span> <span class="o">{</span>
+            <span class="k">try</span> <span class="o">{</span>
+                <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="mi">3000</span><span class="o">);</span>
+            <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+            <span class="o">}</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"get A."</span><span class="o">);</span>
+            <span class="n">B</span><span class="o">.</span><span class="na">b</span><span class="o">();</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="c1">// B 类相似</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h2 id="内存管理">内存管理</h2>

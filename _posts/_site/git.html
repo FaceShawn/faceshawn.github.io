@@ -112,16 +112,16 @@
 
 <p><strong>分离 HEAD</strong> 就是让其指向某个具体的提交记录而不是分支名。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#在命令执行前的状态如下所示：HEAD -&gt; main -&gt; C1
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#在命令执行前的状态如下所示：HEAD -&gt; main -&gt; C1</span>
 git checkout C1
-#变成了：HEAD -&gt; C1
+<span class="c">#变成了：HEAD -&gt; C1</span>
 </code></pre></div></div>
 
 <p><strong>相对引用</strong>：用 <code class="highlighter-rouge">^</code>、<code class="highlighter-rouge">~&lt;n&gt;</code> 将HEAD向上移动 1 个、n个提交记录，可代替<commit>。</commit></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git checkout &lt;commit id&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git checkout &lt;commit id&gt;
 git checkout main^
-git checkout HEAD~1 #HEAD~1：历史版本库最新提交的第一父提交
+git checkout HEAD~1 <span class="c">#HEAD~1：历史版本库最新提交的第一父提交</span>
 </code></pre></div></div>
 
 <h4 id="repository-仓库">Repository 仓库</h4>
@@ -143,7 +143,7 @@ git checkout HEAD~1 #HEAD~1：历史版本库最新提交的第一父提交
       <li>
         <p><code class="highlighter-rouge">--progress</code>：</p>
 
-        <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  pull —progress origin: Fast-forward
+        <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  pull —progress origin: Fast-forward
 </code></pre></div>        </div>
       </li>
     </ul>
@@ -168,9 +168,9 @@ git checkout HEAD~1 #HEAD~1：历史版本库最新提交的第一父提交
   </li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 丢弃在本地的所有改动与提交：从服务器获取最新的版本历史，并将本地主分支指向它
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 丢弃在本地的所有改动与提交：从服务器获取最新的版本历史，并将本地主分支指向它</span>
 git fetch origin
-git reset --hard origin/master
+git reset <span class="nt">--hard</span> origin/master
 </code></pre></div></div>
 
 <h4 id="work-on-the-current-change">work on the current change</h4>
@@ -430,11 +430,11 @@ git reset --hard origin/master
       <li><code class="highlighter-rouge">--hard</code>： 作用于索引和工作目录。</li>
     </ul>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  #查找commit id
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="c">#查找commit id</span>
   git reflog
     
-  #恢复到因reset回退的commit
-  git reset --hard &lt;commit id&gt;
+  <span class="c">#恢复到因reset回退的commit</span>
+  git reset <span class="nt">--hard</span> &lt;commit id&gt;
 </code></pre></div>    </div>
   </li>
 </ul>
@@ -467,11 +467,11 @@ git reset --hard origin/master
       <li><code class="highlighter-rouge">-d</code>：删除标签</li>
     </ul>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  #一次性推送全部尚未推送到远程的本地标签
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="c">#一次性推送全部尚未推送到远程的本地标签</span>
   git push origin —tags
     
-  #标签已经推送到远程，要删除远程标签就麻烦一点，先从本地删除，然后从远程删除
-  git tag -d v0.9
+  <span class="c">#标签已经推送到远程，要删除远程标签就麻烦一点，先从本地删除，然后从远程删除</span>
+  git tag <span class="nt">-d</span> v0.9
   git push origin :refs/tags/v0.9
 </code></pre></div>    </div>
   </li>
@@ -526,17 +526,17 @@ git reset --hard origin/master
               <li>不删除：开发周期长，与develop分支处于并行关系，自身有特定功能的feature分支。</li>
             </ul>
 
-            <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  &gt;&gt;&gt; git checkout develop
-  # 回到develop分支
+            <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="o">&gt;&gt;&gt;</span> git checkout develop
+  <span class="c"># 回到develop分支</span>
             
-  &gt;&gt;&gt; git merge --no-ff feature-discuss
-  # 把做好的功能合并到develop中
+  <span class="o">&gt;&gt;&gt;</span> git merge <span class="nt">--no-ff</span> feature-discuss
+  <span class="c"># 把做好的功能合并到develop中</span>
             
-  &gt;&gt;&gt; git branch -d feature-discuss
-  # 删除功能性分支
+  <span class="o">&gt;&gt;&gt;</span> git branch <span class="nt">-d</span> feature-discuss
+  <span class="c"># 删除功能性分支</span>
             
-  &gt;&gt;&gt; git push origin develop
-  # 把develop提交到自己的远程仓库中
+  <span class="o">&gt;&gt;&gt;</span> git push origin develop
+  <span class="c"># 把develop提交到自己的远程仓库中</span>
 </code></pre></div>            </div>
           </li>
           <li>
@@ -597,9 +597,9 @@ git reset --hard origin/master
 
 <p>一般安装包会默认勾选<code class="highlighter-rouge">Add to PATH</code>选项，可以不再单独配置系统环境变量。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 在 cmd 控制台查看环境变量配置是否成功
-node -v
-npm -v
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 在 cmd 控制台查看环境变量配置是否成功</span>
+node <span class="nt">-v</span>
+npm <span class="nt">-v</span>
 </code></pre></div></div>
 
 <h5 id="安装-git">安装 Git</h5>
@@ -610,8 +610,8 @@ npm -v
 
 <p>直接安装，可以右键 -&gt; Git Bash Here 查看 Git 命令行</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 在 cmd 控制台查看环境变量配置是否成功
-git --version
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 在 cmd 控制台查看环境变量配置是否成功</span>
+git <span class="nt">--version</span>
 </code></pre></div></div>
 
 <h5 id="设置-ssh-连接到-github">设置 SSH 连接到 GitHub</h5>
@@ -624,26 +624,26 @@ git --version
   <li>设置用户名、邮箱：注意用户名不是昵称。</li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git config --global user.name "your_name"
-git config --global user.email "your_email@example.com"
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git config <span class="nt">--global</span> user.name <span class="s2">"your_name"</span>
+git config <span class="nt">--global</span> user.email <span class="s2">"your_email@example.com"</span>
 </code></pre></div></div>
 
 <ol>
   <li>生成 SSH 秘钥</li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 创建秘钥
-ssh-keygen -t rsa -C "your_email@example.com"
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 创建秘钥</span>
+ssh-keygen <span class="nt">-t</span> rsa <span class="nt">-C</span> <span class="s2">"your_email@example.com"</span>
 
-# 三次回车
+<span class="c"># 三次回车</span>
 Generating public/private rsa key pair.
-Enter file in which to save the key (/c/Users/you/.ssh/id_rsa): [Press enter]
-Enter passphrase (empty for no passphrase): [Type a passphrase]
-Enter same passphrase again: [Type passphrase again]
+Enter file <span class="k">in </span>which to save the key <span class="o">(</span>/c/Users/you/.ssh/id_rsa<span class="o">)</span>: <span class="o">[</span>Press enter]
+Enter passphrase <span class="o">(</span>empty <span class="k">for </span>no passphrase<span class="o">)</span>: <span class="o">[</span>Type a passphrase]
+Enter same passphrase again: <span class="o">[</span>Type passphrase again]
 
-# 创建成功
-Your identification has been saved in /c/Users/you/.ssh/id_rsa.
-Your public key has been saved in /c/Users/you/.ssh/id_rsa.pub.
+<span class="c"># 创建成功</span>
+Your identification has been saved <span class="k">in</span> /c/Users/you/.ssh/id_rsa.
+Your public key has been saved <span class="k">in</span> /c/Users/you/.ssh/id_rsa.pub.
 The key fingerprint is:
 01:0f:f4:3b:ca:85:d6:17:a1:7d:f0:68:9d:f0:a2:db your_email@example.com
 </code></pre></div></div>
@@ -661,55 +661,55 @@ C:\Users\Cooper\.ssh\id_rsa.pub
   <li>测试</li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># 在 Git Bash 中测试
-ssh -T git@github.com
-# 表示链接成功
-Hi your_name! You've successfully authenticated, but GitHub does not provide shell access.
-</code></pre></div></div>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 在 Git Bash 中测试</span>
+ssh <span class="nt">-T</span> git@github.com
+<span class="c"># 表示链接成功</span>
+Hi your_name! You<span class="s1">'ve successfully authenticated, but GitHub does not provide shell access.
+</span></code></pre></div></div>
 
 <h4 id="github-desktop-报错-443-timed-out">Github Desktop 报错 443: Timed out</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># Github Desktop 报错
-# github desktop fatal: unable to access Failed to connect to github.com port 443: Timed out
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Github Desktop 报错</span>
+<span class="c"># github desktop fatal: unable to access Failed to connect to github.com port 443: Timed out</span>
 
-# 设置 ssh 连接 github
-# C:\Users\Cooper\.ssh\config 中添加：
+<span class="c"># 设置 ssh 连接 github</span>
+<span class="c"># C:\Users\Cooper\.ssh\config 中添加：</span>
 Host github.com
  Hostname ssh.github.com
  Port 443
  User git
 
-# C:\Users\Cooper\.ssh\.gitconfig
-[user]
-	name = {name}
-	email = {username@mail.com}
-[color]
-	ui = true
-[core]
-	autocrlf = false
-[filter "lfs"]
-	clean = git-lfs clean -- %f
-	smudge = git-lfs smudge -- %f
-	process = git-lfs filter-process
-	required = true
-[http]
-	sslverify = true
-	sslBackend = openssl
-[credential]
-	helper = wincred
-[https]
-	sslverify = true
-[commit]
-	gpgsign = false
+<span class="c"># C:\Users\Cooper\.ssh\.gitconfig</span>
+<span class="o">[</span>user]
+	name <span class="o">=</span> <span class="o">{</span>name<span class="o">}</span>
+	email <span class="o">=</span> <span class="o">{</span>username@mail.com<span class="o">}</span>
+<span class="o">[</span>color]
+	ui <span class="o">=</span> <span class="nb">true</span>
+<span class="o">[</span>core]
+	autocrlf <span class="o">=</span> <span class="nb">false</span>
+<span class="o">[</span>filter <span class="s2">"lfs"</span><span class="o">]</span>
+	clean <span class="o">=</span> git-lfs clean <span class="nt">--</span> %f
+	smudge <span class="o">=</span> git-lfs smudge <span class="nt">--</span> %f
+	process <span class="o">=</span> git-lfs filter-process
+	required <span class="o">=</span> <span class="nb">true</span>
+<span class="o">[</span>http]
+	sslverify <span class="o">=</span> <span class="nb">true
+	</span>sslBackend <span class="o">=</span> openssl
+<span class="o">[</span>credential]
+	helper <span class="o">=</span> wincred
+<span class="o">[</span>https]
+	sslverify <span class="o">=</span> <span class="nb">true</span>
+<span class="o">[</span>commit]
+	gpgsign <span class="o">=</span> <span class="nb">false</span>
 
-#  C:\Users\Cooper\.ssh\known_hosts，github 2023年重新设置了秘钥，
-github.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+VTTvDP6mHBL9j1aNUkY4Ue1gvwnGLVlOhGeYrnZaMgRK6+PKCUXaDbC7qtbW8gIkhL7aGCsOr/C56SJMy/BCZfxd1nWzAOxSDPgVsmerOBYfNqltV9/hWCqBywINIR+5dIg6JTJ72pcEpEjcYgXkE2YEFXV1JHnsKgbLWNlhScqb2UmyRkQyytRLtL+38TGxkxCflmO+5Z8CSSNY7GidjMIZ7Q4zMjA2n1nGrlTDkzwDCsw+wqFPGQA179cnfGWOWRVruj16z6XyvxvjJwbz0wQZ75XK5tKSb7FNyeIEs4TT4jk+S4dhPeAUC5y+bDYirYgM4GC7uEnztnZyaVWQ7B381AK4Qdrwt51ZqExKbQpTUNn+EjqoTwvqNj4kqx5QUCI0ThS/YkOxJCXmPUWZbhjpCg56i+2aB6CmK2JGhn57K5mj0MNdBXA4/WnwH6XoPWJzK5Nyu2zB3nAZp+S5hpQs+p1vN1/wsjk=
+<span class="c">#  C:\Users\Cooper\.ssh\known_hosts，github 2023年重新设置了秘钥，</span>
+github.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+VTTvDP6mHBL9j1aNUkY4Ue1gvwnGLVlOhGeYrnZaMgRK6+PKCUXaDbC7qtbW8gIkhL7aGCsOr/C56SJMy/BCZfxd1nWzAOxSDPgVsmerOBYfNqltV9/hWCqBywINIR+5dIg6JTJ72pcEpEjcYgXkE2YEFXV1JHnsKgbLWNlhScqb2UmyRkQyytRLtL+38TGxkxCflmO+5Z8CSSNY7GidjMIZ7Q4zMjA2n1nGrlTDkzwDCsw+wqFPGQA179cnfGWOWRVruj16z6XyvxvjJwbz0wQZ75XK5tKSb7FNyeIEs4TT4jk+S4dhPeAUC5y+bDYirYgM4GC7uEnztnZyaVWQ7B381AK4Qdrwt51ZqExKbQpTUNn+EjqoTwvqNj4kqx5QUCI0ThS/YkOxJCXmPUWZbhjpCg56i+2aB6CmK2JGhn57K5mj0MNdBXA4/WnwH6XoPWJzK5Nyu2zB3nAZp+S5hpQs+p1vN1/wsjk<span class="o">=</span>
 
-# 重新生成 SSH 秘钥，并添加到 github
+<span class="c"># 重新生成 SSH 秘钥，并添加到 github</span>
 
-# 生成 GPG
+<span class="c"># 生成 GPG</span>
 
-# 改用 ssh 连接 github
+<span class="c"># 改用 ssh 连接 github</span>
 git remote set-url origin git@github.com:FaceShawn/Job2021.git
 </code></pre></div></div>
 
@@ -799,23 +799,23 @@ git remote set-url origin git@github.com:FaceShawn/Job2021.git
   <li>
     <p>代理错误：<a href="https://blog.csdn.net/qq_27093465/article/details/71210203">Git push时报错：Failed connect to github.com:443; No error和The remote end hung up unexpectedly</a></p>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  git config --global http.proxy "localhost:1080"
-  git config --global https.proxy "localhost:1080"
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  git config <span class="nt">--global</span> http.proxy <span class="s2">"localhost:1080"</span>
+  git config <span class="nt">--global</span> https.proxy <span class="s2">"localhost:1080"</span>
     
-  git config --global https.proxy 127.0.0.1:1080
-  git config --global http.proxy ""
-  git config --global http.proxy 127.0.0.1:8087
+  git config <span class="nt">--global</span> https.proxy 127.0.0.1:1080
+  git config <span class="nt">--global</span> http.proxy <span class="s2">""</span>
+  git config <span class="nt">--global</span> http.proxy 127.0.0.1:8087
     
-  git config --list --show-origin
+  git config <span class="nt">--list</span> <span class="nt">--show-origin</span>
     
-  git config --global --unset http.proxy
-  git config --global --unset https.proxy
+  git config <span class="nt">--global</span> <span class="nt">--unset</span> http.proxy
+  git config <span class="nt">--global</span> <span class="nt">--unset</span> https.proxy
     
-  git config --add remote.origin.proxy "http://[yourproxy]:[yourport]"
-  git config http.sslverify false
-  git config --global http.sslverify false
+  git config <span class="nt">--add</span> remote.origin.proxy <span class="s2">"http://[yourproxy]:[yourport]"</span>
+  git config http.sslverify <span class="nb">false
+  </span>git config <span class="nt">--global</span> http.sslverify <span class="nb">false
     
-  ssh -T git@github.com
+  </span>ssh <span class="nt">-T</span> git@github.com
     
 </code></pre></div>    </div>
   </li>

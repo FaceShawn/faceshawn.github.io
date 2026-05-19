@@ -20,13 +20,13 @@
 
 <p>抽象：指将一类对象的共同特征提取出来构造类，<strong>类是对象（实例）的抽象</strong>。一切皆对象。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Student stu1 = new Student("小刘", 22); // 显式创建对象
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Student</span> <span class="n">stu1</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Student</span><span class="o">(</span><span class="s">"小刘"</span><span class="o">,</span> <span class="mi">22</span><span class="o">);</span> <span class="c1">// 显式创建对象</span>
 
-String str1 = "Hello"; // 隐式创建对象
-String str2 = str1 + "Java";
+<span class="n">String</span> <span class="n">str1</span> <span class="o">=</span> <span class="s">"Hello"</span><span class="o">;</span> <span class="c1">// 隐式创建对象</span>
+<span class="n">String</span> <span class="n">str2</span> <span class="o">=</span> <span class="n">str1</span> <span class="o">+</span> <span class="s">"Java"</span><span class="o">;</span>
 
-// 匿名对象，对象只用一次，大多用作参数，需区别于单例模式
-new Person("张三", 30).tell();
+<span class="c1">// 匿名对象，对象只用一次，大多用作参数，需区别于单例模式</span>
+<span class="k">new</span> <span class="nf">Person</span><span class="o">(</span><span class="s">"张三"</span><span class="o">,</span> <span class="mi">30</span><span class="o">).</span><span class="na">tell</span><span class="o">();</span>
 </code></pre></div></div>
 
 <p>面向对象和面向过程的主要区别在于：解决问题的方式不同；</p>

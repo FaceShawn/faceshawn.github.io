@@ -21,7 +21,7 @@
 
 <p>在云原生时代，Dubbo 相继衍生出了 Dubbo3、Proxyless Mesh 等架构与解决方案，在易用性、超大规模微服务实践、云原生基础设施适配、安全性等几大方向上进行了全面升级。</p>
 
-<h5 id="dubbo-的开源故事">Dubbo 的开源故事</h5>
+<h4 id="dubbo-的开源故事">Dubbo 的开源故事</h4>
 
 <ul>
   <li>
@@ -32,7 +32,7 @@
   <li>截止 2022 年双十一结束，Dubbo3 已经在阿里巴巴内部广泛落地，实现了老版本 HSF2 框架升级，包括<strong>电商核心、阿里云</strong>等核心系统已经全面运行在 Dubbo3 之上。</li>
 </ul>
 
-<h4 id="为什么需要-dubbo它能做什么">为什么需要 Dubbo，它能做什么？</h4>
+<h3 id="为什么需要-dubbo它能做什么">为什么需要 Dubbo，它能做什么？</h3>
 
 <p>按照微服务架构的定义，采用它的组织能够很好的提高业务迭代效率与系统稳定性，但前提是要先能保证微服务按照期望的方式运行，要做到这一点需要解决服务拆分与定义、数据通信、地址发现、流量管理、数据一致性、系统容错能力等一系列问题。</p>
 
@@ -59,7 +59,7 @@
   </li>
 </ul>
 
-<h5 id="dubbo-不是什么">Dubbo 不是什么？</h5>
+<h4 id="dubbo-不是什么">Dubbo 不是什么？</h4>
 
 <ul>
   <li>
@@ -76,7 +76,7 @@
   </li>
 </ul>
 
-<h4 id="核心概念和架构">核心概念和架构</h4>
+<h3 id="核心概念和架构">核心概念和架构</h3>
 
 <p><img src="../assets/architecture-2.png" alt="architecture" style="zoom: 25%;" /></p>
 
@@ -92,7 +92,7 @@
   </li>
 </ul>
 
-<h5 id="dubbo-数据面">Dubbo 数据面</h5>
+<h4 id="dubbo-数据面">Dubbo 数据面</h4>
 
 <p>从数据面视角，Dubbo 帮助解决了微服务实践中的以下问题：</p>
 
@@ -103,7 +103,7 @@
 
 <p><img src="../assets/framework1.png" alt="framework" /></p>
 
-<h6 id="服务开发框架">服务开发框架</h6>
+<h5 id="服务开发框架">服务开发框架</h5>
 
 <p>微服务的目标是构建足够小的、自包含的、独立演进的、可以随时部署运行的分布式应用程序，几乎每个语言都有类似的应用开发框架来帮助开发者快速构建此类微服务应用。</p>
 
@@ -131,7 +131,7 @@
 
 <p>想了解如何使用 Dubbo 微服务框架进行业务编码？从以下 SDK 开始微服务项目开发之旅吧。</p>
 
-<h6 id="通信协议">通信协议</h6>
+<h5 id="通信协议">通信协议</h5>
 
 <p>Dubbo 从设计上不绑定任何一款特定通信协议，HTTP/2、<strong>REST</strong>、<strong>gRPC</strong>、JsonRPC、Thrift、Hessian2 等几乎所有主流的通信协议，Dubbo 框架都可以提供支持。</p>
 
@@ -168,13 +168,13 @@
   <li>支持一个应用内多个服务使用不同通信协议</li>
 </ul>
 
-<h5 id="dubbo-服务治理">Dubbo 服务治理</h5>
+<h4 id="dubbo-服务治理">Dubbo 服务治理</h4>
 
 <p>服务开发框架（数据面）解决了开发与通信的问题，但在微服务集群环境下，仍需要解决无状态服务节点动态变化、外部化配置、日志跟踪、可观测性、流量管理、高可用性、数据一致性等一系列问题，我们将这些问题统称为<strong>服务治理</strong>。</p>
 
 <p>Dubbo 抽象了一套微服务治理模式并发布了对应的官方实现，服务治理可帮助简化微服务开发与运维，让开发者更专注在微服务业务本身。</p>
 
-<h6 id="服务治理抽象">服务治理抽象</h6>
+<h5 id="服务治理抽象">服务治理抽象</h5>
 
 <p>以下展示了 Dubbo 核心的服务治理功能定义</p>
 
@@ -197,7 +197,7 @@
   <li>Dubbo 服务治理生态还提供了对 <strong>API 网关</strong>、<strong>限流降级</strong>、<strong>数据一致性</strong>、<strong>认证鉴权</strong>等场景的适配支持。</li>
 </ul>
 
-<h6 id="dubbo-admin">Dubbo Admin</h6>
+<h5 id="dubbo-admin">Dubbo Admin</h5>
 
 <p>Admin 控制台提供了 Dubbo 集群的可视化视图，通过 Admin 可以完成集群的几乎所有管控工作。</p>
 
@@ -210,13 +210,13 @@
 
 <p><img src="../assets/admin.png" alt="Admin" style="zoom:25%;" /></p>
 
-<h6 id="服务网格">服务网格</h6>
+<h5 id="服务网格">服务网格</h5>
 
 <p>将 Dubbo 接入 Istio 等服务网格治理体系。</p>
 
 <p><img src="../assets/mix-mesh.png" alt="Dubbo-Mesh" style="zoom: 25%;" /></p>
 
-<h4 id="dubbogrpcspring-cloud-对比">Dubbo、gRPC、Spring Cloud 对比</h4>
+<h3 id="dubbogrpcspring-cloud-对比">Dubbo、gRPC、Spring Cloud 对比</h3>
 
 <p><del>提到Dubbo，想顺便提下ESB，目前央视新华社也在用ESB来做任务编排，这里先比较下Dubbo和ESB：</del></p>
 
@@ -240,11 +240,11 @@
   </li>
 </ul>
 
-<h4 id="与-grpcspring-cloudistio-的关系">与 gRPC、Spring Cloud、Istio 的关系</h4>
+<h3 id="与-grpcspring-cloudistio-的关系">与 gRPC、Spring Cloud、Istio 的关系</h3>
 
 <p>总的来说，它们之间有些能力是重合的，但在一些场景可以把它们放在一起使用。</p>
 
-<h5 id="dubbo-与-spring-cloud">Dubbo 与 Spring Cloud</h5>
+<h4 id="dubbo-与-spring-cloud">Dubbo 与 Spring Cloud</h4>
 
 <p><img src="../assets/dubbo-springcloud.png" alt="dubbo-springcloud" style="zoom:33%;" /></p>
 
@@ -294,7 +294,7 @@
   <p>Dubbo 在入门资料上的欠缺是对比 Spring Cloud 的一个劣势，这体现在依赖配置管理、文档、demo 示例完善度上，当前整个社区在重点投入这一部分的建设，期望能降低用户在第一天体验和学习 Dubbo 时的门槛，不让开发者因为缺乏文档而错失 Dubbo 这样一款优秀的产品。</p>
 </blockquote>
 
-<h5 id="dubbo-与-grpc">Dubbo 与 gRPC</h5>
+<h4 id="dubbo-与-grpc">Dubbo 与 gRPC</h4>
 
 <p>Dubbo 与 gRPC 最大的差异在于两者的定位上：</p>
 
@@ -323,7 +323,7 @@
 
 <p>如果我们忽略 gRPC 在应用开发框架侧的空白，只考虑如何给 gRPC 带来服务治理能力，则另一种可以采用的模式就是在 Service Mesh 架构下使用 gRPC，这就引出了我们下一小节要讨论的内容：Dubbo 与 Service Mesh 架构的关系。</p>
 
-<h5 id="dubbo-与-istio"><del>Dubbo 与 Istio</del></h5>
+<h4 id="dubbo-与-istio"><del>Dubbo 与 Istio</del></h4>
 
 <p><strong>Service Mesh</strong> 是近年来在云原生背景下诞生的一种微服务架构，在 Kubernetes 体系下，让微服务开发中的更多能力如流量拦截、服务治理等下沉并成为基础设施，让微服务开发、升级更轻量。Istio 是 Service Mesh 的开源代表实现，它从部署架构上分为数据面与控制面，从这一点上与 <a href="https://cn.dubbo.apache.org/zh-cn/overview/what/overview">Dubbo 总体架构</a> 是基本一致的，Istio 带来的主要变化在于：</p>
 

@@ -192,7 +192,7 @@
 
 <p><a href="http://www.imooc.com/wiki/springbootlesson/jpa.html">Spring Boot 使用 JPA</a> 测试类</p>
 
-<h4 id="entity-层">Entity 层</h4>
+<h4 id="entity-层注解">Entity 层注解</h4>
 
 <p><a href="http://conkeyn.iteye.com/blog/602463">JPA 注解（一） id table entity</a></p>
 
@@ -206,7 +206,7 @@
   </li>
   <li><code class="highlighter-rouge">@NamedQuery</code>：标注在接口的<strong>自定义查询方法</strong>上，指定要执行的查询语句；</li>
   <li><code class="highlighter-rouge">@NamedQueries</code>：定义多个；</li>
-  <li><code class="highlighter-rouge">serialVersionUID</code>：适用于JAVA序列化机制。简单来说，通过判断类的<code class="highlighter-rouge">serialVersionUID</code>来验证版本一致。
+  <li><code class="highlighter-rouge">serialVersionUID</code>：适用于JAVA<strong>序列化机制</strong>。简单来说，通过判断类的<code class="highlighter-rouge">serialVersionUID</code>来验证版本一致。
     <ul>
       <li>在进行反序列化时，JVM会把传来的字节流中的<code class="highlighter-rouge">serialVersionUID</code>与本地相应实体类的<code class="highlighter-rouge">serialVersionUID</code>进行比较。</li>
       <li>如果相同说明是一致的，可以进行反序列化，否则会出现反序列化版本一致的异常，即是<code class="highlighter-rouge">InvalidCastException</code>。</li>
@@ -233,14 +233,14 @@
   <li><code class="highlighter-rouge">@Modifying</code>：支持更新类的 Query 语句，配合 <code class="highlighter-rouge">@Transactional</code> <a href="#Spring 事务">Spring 事务</a> 使用；</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// like后的参数需在前、后加“%”
-// nativeQuery=true表示指定本地查询
-@Query(value="select * from tbl_user where name like %?1", nativeQuery=true)
-public List&lt;UserModel&gt; findByUidOrAge(String name);
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// like后的参数需在前、后加“%”</span>
+<span class="c1">// nativeQuery=true表示指定本地查询</span>
+<span class="nd">@Query</span><span class="o">(</span><span class="n">value</span><span class="o">=</span><span class="s">"select * from tbl_user where name like %?1"</span><span class="o">,</span> <span class="n">nativeQuery</span><span class="o">=</span><span class="kc">true</span><span class="o">)</span>
+<span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">UserModel</span><span class="o">&gt;</span> <span class="nf">findByUidOrAge</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">);</span>
 
-@Modifying
-@Query(value = "update UserModel o set o.name=:newName where o.name like %:nn")
-public int findByUidOrAge(@Param("nn") String name, @Param("newName") String newName);
+<span class="nd">@Modifying</span>
+<span class="nd">@Query</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">"update UserModel o set o.name=:newName where o.name like %:nn"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kt">int</span> <span class="nf">findByUidOrAge</span><span class="o">(</span><span class="nd">@Param</span><span class="o">(</span><span class="s">"nn"</span><span class="o">)</span> <span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="nd">@Param</span><span class="o">(</span><span class="s">"newName"</span><span class="o">)</span> <span class="n">String</span> <span class="n">newName</span><span class="o">);</span>
 </code></pre></div></div>
 
 <ul>
@@ -253,13 +253,13 @@ public int findByUidOrAge(@Param("nn") String name, @Param("newName") String new
   </li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Entity
-@Table(name = "tb_contact", schema = "test", uniqueConstraints = {   
-        @UniqueConstraint(columnNames = {"name", "email" }),  
-        @UniqueConstraint(columnNames = {"col1", "col2" })  
-}) 
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Entity</span>
+<span class="nd">@Table</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"tb_contact"</span><span class="o">,</span> <span class="n">schema</span> <span class="o">=</span> <span class="s">"test"</span><span class="o">,</span> <span class="n">uniqueConstraints</span> <span class="o">=</span> <span class="o">{</span>   
+        <span class="nd">@UniqueConstraint</span><span class="o">(</span><span class="n">columnNames</span> <span class="o">=</span> <span class="o">{</span><span class="s">"name"</span><span class="o">,</span> <span class="s">"email"</span> <span class="o">}),</span>  
+        <span class="nd">@UniqueConstraint</span><span class="o">(</span><span class="n">columnNames</span> <span class="o">=</span> <span class="o">{</span><span class="s">"col1"</span><span class="o">,</span> <span class="s">"col2"</span> <span class="o">})</span>  
+<span class="o">})</span> 
 
-public class ContactEO implements Serializable {}
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ContactEO</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{}</span>
 </code></pre></div></div>
 
 <ul>
@@ -278,9 +278,9 @@ public class ContactEO implements Serializable {}
   </li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Temporal(TemporalType.TIMESTAMP)
-@Column(name = "create_time", unique = false)
-private Date createTime;
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Temporal</span><span class="o">(</span><span class="n">TemporalType</span><span class="o">.</span><span class="na">TIMESTAMP</span><span class="o">)</span>
+<span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"create_time"</span><span class="o">,</span> <span class="n">unique</span> <span class="o">=</span> <span class="kc">false</span><span class="o">)</span>
+<span class="kd">private</span> <span class="n">Date</span> <span class="n">createTime</span><span class="o">;</span>
 </code></pre></div></div>
 
 <ul>
@@ -314,9 +314,9 @@ private Date createTime;
   <li><code class="highlighter-rouge">@SequenceGenerator</code></li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Id
-@GeneratedValue(strategy=GenerationType.AUTO)
-private String id;
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Id</span>
+<span class="nd">@GeneratedValue</span><span class="o">(</span><span class="n">strategy</span><span class="o">=</span><span class="n">GenerationType</span><span class="o">.</span><span class="na">AUTO</span><span class="o">)</span>
+<span class="kd">private</span> <span class="n">String</span> <span class="n">id</span><span class="o">;</span>
 </code></pre></div></div>
 
 <ul>
@@ -390,7 +390,7 @@ private String id;
   <li>嵌入式（embeddable）类</li>
 </ol>
 
-<h2 id="数据持久层演化">数据持久层演化</h2>
+<h2 id="数据持久层演化"><del>数据持久层演化</del></h2>
 
 <ol>
   <li>MVC：
@@ -752,11 +752,11 @@ private String id;
 <span class="n">List</span><span class="o">&lt;</span><span class="n">BatchResult</span><span class="o">&gt;</span> <span class="nf">flushStatements</span><span class="o">()</span>
 
 <span class="c1">// 本地缓存</span>
-<span class="err">每当创建一个新</span> <span class="n">session</span><span class="err">，</span><span class="n">MyBatis</span> <span class="err">就会创建与之相关联的本地缓存，保存任何在</span> <span class="n">session</span> <span class="err">执行过的查询结果；</span>
-<span class="err">当再次执行参数相同的查询时，不需再实际查询数据库。</span>
-<span class="err">在做出修改、事务提交或回滚，及关闭</span> <span class="n">session</span> <span class="err">时清空。</span>
-<span class="err">默认情况下，本地缓存数据的生命周期等同于整个</span> <span class="n">session</span> <span class="err">的周期。</span>
-<span class="err">由于缓存会被用来解决循环引用问题和加快重复嵌套查询的速度，所以无法将其完全禁用。</span>
+<span class="c1">// 每当创建一个新 session，MyBatis 就会创建与之相关联的本地缓存，保存任何在 session 执行过的查询结果；</span>
+<span class="c1">// 当再次执行参数相同的查询时，不需再实际查询数据库。</span>
+<span class="c1">// 在做出修改、事务提交或回滚，及关闭 session 时清空。</span>
+<span class="c1">// 默认情况下，本地缓存数据的生命周期等同于整个 session 的周期。</span>
+<span class="c1">// 由于缓存会被用来解决循环引用问题和加快重复嵌套查询的速度，所以无法将其完全禁用。</span>
 <span class="kt">void</span> <span class="nf">clearCache</span><span class="o">()</span>
 
 <span class="c1">// 2. 事务控制方法，用由 Connection 实例控制的 JDBC 事务管理器时起作用</span>
@@ -766,16 +766,16 @@ private String id;
 <span class="kt">void</span> <span class="nf">rollback</span><span class="o">([</span><span class="kt">boolean</span> <span class="n">force</span><span class="o">])</span>
 
 <span class="c1">// 3. 使用映射器</span>
-<span class="err">上述的各个</span> <span class="n">insert</span><span class="err">、</span><span class="n">update</span><span class="err">、</span><span class="n">delete</span> <span class="err">和</span> <span class="n">select</span> <span class="err">方法都很强大，</span>
-<span class="err">但也有些繁琐，并不符合类型安全，对</span> <span class="n">IDE</span> <span class="err">和单元测试也不友好。</span>
-<span class="err">因此，用映射器类来执行映射语句更常见。</span>
+<span class="c1">// 上述的各个 insert、update、delete 和 select 方法都很强大，</span>
+<span class="c1">// 但也有些繁琐，并不符合类型安全，对 IDE 和单元测试也不友好。</span>
+<span class="c1">// 因此，用映射器类来执行映射语句更常见。</span>
 <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">T</span> <span class="nf">getMapper</span><span class="o">(</span><span class="n">Class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">type</span><span class="o">)</span>
 
 <span class="c1">// 确保 SqlSession 被关闭</span>
 <span class="kt">void</span> <span class="nf">close</span><span class="o">()</span>
 </code></pre></div></div>
 
-<h3 id="创建映射器类接口">创建映射器类/接口</h3>
+<h3 id="映射器接口">映射器接口</h3>
 
 <p>映射器类/接口（DAO 层）：<code class="highlighter-rouge">XxxDao.java / XxxMapper.java</code>，实现 Mapper 接口或由 <code class="highlighter-rouge">@Mapper </code> 修饰的类；映射器类/接口就是一个仅需声明与 <code class="highlighter-rouge">SqlSession</code> 方法（映射器方法）相匹配的接口。</p>
 
@@ -797,6 +797,67 @@ private String id;
     </ul>
   </li>
 </ol>
+
+<h4 id="dao-接口">Dao 接口</h4>
+
+<p>Mybatis 的 Dao 接口里的方法，参数不同时，方法可<strong>重载</strong>。</p>
+
+<p>但是多个接口<strong>对应的映射</strong>必须只有一个，否则启动会报错。同一 xml <code class="highlighter-rouge">namspace </code>下的 id 不允许重复。</p>
+
+<p>重载需满足以下条件：</p>
+
+<ol>
+  <li>仅有一个无参方法和一个有参方法；</li>
+  <li>多个有参方法时，参数数量必须一致，且使用相同的 <code class="highlighter-rouge">@Param</code> ，或使用 <code class="highlighter-rouge">param1</code> 这种。
+    <ul>
+      <li>id 相同，对应同一段 <code class="highlighter-rouge">MappedStatement</code> 标签，用<strong>动态 SQL</strong> 的<code class="highlighter-rouge">&lt;if test="id != null"&gt;</code> <strong>标签</strong>处理不同的参数列表来实现重载。</li>
+    </ul>
+  </li>
+</ol>
+
+<h5 id="dao-接口的工作原理">Dao 接口的<strong>工作原理</strong></h5>
+
+<p>MyBatis 运行时会用 <strong>JDK 动态代理</strong>为 Dao 接口生成 <code class="highlighter-rouge">proxy</code> 代理对象，用于拦截接口方法，转而执行 <code class="highlighter-rouge">MappedStatement</code> 所代表的 SQL，返回 SQL 执行结果。</p>
+
+<ul>
+  <li>最佳实践中，通常一个 xml 映射文件，都会写一个 Dao 接口与之对应。</li>
+  <li>在 MyBatis 中，每一个 <code class="highlighter-rouge">&lt;select&gt;</code> 、 <code class="highlighter-rouge">&lt;insert&gt;</code> 、 <code class="highlighter-rouge">&lt;update&gt;</code> 、 <code class="highlighter-rouge">&lt;delete&gt;</code> 标签，都会被解析为一个 <strong><code class="highlighter-rouge">MappedStatement</code> 对象</strong>。</li>
+  <li>Dao 接口就是常说的 <code class="highlighter-rouge">Mapper</code> 接口，
+    <ol>
+      <li>接口的<strong>全限名，</strong>就是映射文件中的 namespace 的值，</li>
+      <li>接口的<strong>方法名</strong>，就是映射文件中 <code class="highlighter-rouge">MappedStatement</code> 的 id 值，对应<code class="highlighter-rouge">&lt;select&gt;</code> 等元素的<code class="highlighter-rouge">id</code>属性，是在命名空间中<strong>唯一的标识符</strong>，用来引用此语句；</li>
+      <li>接口方法的<strong>参数</strong>，就是传递给 SQL 的参数。</li>
+    </ol>
+  </li>
+  <li><code class="highlighter-rouge">Mapper</code> 接口是没有实现类的，当调用接口方法时，接口全限名+方法名拼接字符串作为 key 值，可唯一定位一个 <code class="highlighter-rouge">MappedStatement</code> 。</li>
+  <li>举例： <code class="highlighter-rouge">com.mybatis3.mappers.StudentDao.findStudentById</code> ，可以唯一找到 namespace 为 <code class="highlighter-rouge">com.mybatis3.mappers.StudentDao</code> 下面 <code class="highlighter-rouge">id = findStudentById</code> 的 <code class="highlighter-rouge">MappedStatement</code> 。</li>
+</ul>
+
+<p>Mybatis 版本 3.3.0：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+ * Mapper接口里面方法重载
+ */</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">StuMapper</span> <span class="o">{</span>
+
+	<span class="n">List</span><span class="o">&lt;</span><span class="n">Student</span><span class="o">&gt;</span> <span class="nf">getAllStu</span><span class="o">();</span>
+	<span class="n">List</span><span class="o">&lt;</span><span class="n">Student</span><span class="o">&gt;</span> <span class="nf">getAllStu</span><span class="o">(</span><span class="nd">@Param</span><span class="o">(</span><span class="s">"id"</span><span class="o">)</span> <span class="n">Integer</span> <span class="n">id</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>然后在 <code class="highlighter-rouge">StuMapper.xml</code> 中利用 Mybatis 的<strong>动态 sql</strong> 就可以实现。</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	<span class="o">&lt;</span><span class="k">select</span> <span class="n">id</span><span class="o">=</span><span class="nv">"getAllStu"</span> <span class="n">resultType</span><span class="o">=</span><span class="nv">"com.pojo.Student"</span><span class="o">&gt;</span>
+ 		<span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="n">student</span>
+		<span class="o">&lt;</span><span class="k">where</span><span class="o">&gt;</span> <span class="o">##</span>
+			<span class="o">&lt;</span><span class="n">if</span> <span class="n">test</span><span class="o">=</span><span class="nv">"id != null"</span><span class="o">&gt;</span> <span class="o">##</span>
+				<span class="n">id</span> <span class="o">=</span> <span class="o">#</span><span class="err">{</span><span class="n">id</span><span class="err">}</span>
+			<span class="o">&lt;/</span><span class="n">if</span><span class="o">&gt;</span>
+		<span class="o">&lt;/</span><span class="k">where</span><span class="o">&gt;</span>
+ 	<span class="o">&lt;/</span><span class="k">select</span><span class="o">&gt;</span>
+</code></pre></div></div>
+
+<p>能正常运行，并能得到相应的结果，这样就实现了在 Dao 接口中写重载方法。</p>
 
 <h3 id="映射器接口实现绑定">映射器接口实现/绑定</h3>
 
@@ -1025,10 +1086,9 @@ private String id;
   <li><code class="highlighter-rouge">&lt;resultMap&gt; </code>：描述如何从数据库结果集中<strong>加载对象</strong>。逐一定义<strong>数据库表的列名<code class="highlighter-rouge">column</code> **和 **<code class="highlighter-rouge">model</code> 对象的属性名</strong>间的映射关系。</li>
   <li><del><code class="highlighter-rouge">&lt;parameterMap&gt;</code> – 老式风格的参数映射。已废弃，现用行内参数映射 parameterType属性。</del></li>
   <li><code class="highlighter-rouge">&lt;sql id="Base_Column_List"&gt;</code>：可被其他语句引用的<strong>可重用语句块</strong>。比如基本字段列表部分。（在加载阶段）参数可静态地确定下来。
-    <ol>
+    <ul>
       <li><code class="highlighter-rouge">trim|where|set|foreach|if|choose|when|otherwise|bind</code> 等；</li>
-      <li></li>
-    </ol>
+    </ul>
   </li>
   <li><code class="highlighter-rouge">&lt;include&gt;</code>：用于引入sql片段；
     <ol>
@@ -1118,7 +1178,6 @@ private String id;
                 #{id}
             <span class="nt">&lt;/foreach&gt;</span>
     <span class="nt">&lt;/select&gt;</span>
-
 <span class="nt">&lt;/mapper&gt;</span>
 </code></pre></div></div>
 
@@ -1126,7 +1185,11 @@ private String id;
 
 <ul>
   <li>第一种是使用 <code class="highlighter-rouge">&lt;resultMap&gt;</code> 标签，逐一定义列名和对象属性名之间的映射关系。</li>
-  <li>第二种是使用 sql 列的别名功能，将列别名书写为对象属性名，比如 T_NAME AS NAME，对象属性名一般是小写 name，但是列名不区分大小写，MyBatis 会忽略列名大小写，智能找到与之对应对象属性名。</li>
+  <li>第二种是使用 sql 列的<strong>别名</strong>功能，将列别名书写为对象属性名。
+    <ul>
+      <li>比如 T_NAME AS NAME，对象属性名一般是小写 name，但是列名不区分大小写，MyBatis 会忽略列名大小写，智能找到与之对应对象属性名。</li>
+    </ul>
+  </li>
 </ul>
 
 <p>有了列名与属性名的映射关系后，MyBatis 通过<strong>反射</strong>创建对象，同时使用反射给对象的属性逐一赋值并返回。那些找不到映射关系的属性，是无法完成赋值的。</p>
@@ -1169,12 +1232,16 @@ private String id;
   <li><code class="highlighter-rouge">&lt;discriminator&gt;</code> – 歧视者，用结果值来决定使用哪个 <code class="highlighter-rouge">resultMap</code>；</li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;resultMap id="orderDetailResultMap" type="com.macro.mall.dto.OmsOrderDetail" extends="com.macro.mall.mapper.OmsOrderMapper.BaseResultMap"&gt;
-    &lt;collection property="orderItemList" resultMap="com.macro.mall.mapper.OmsOrderItemMapper.BaseResultMap" columnPrefix="item_"/&gt;
-&lt;/resultMap&gt;
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;resultMap</span> <span class="na">id=</span><span class="s">"orderDetailResultMap"</span> <span class="na">type=</span><span class="s">"com.macro.mall.dto.OmsOrderDetail"</span> <span class="na">extends=</span><span class="s">"com.macro.mall.mapper.OmsOrderMapper.BaseResultMap"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;collection</span> <span class="na">property=</span><span class="s">"orderItemList"</span> <span class="na">resultMap=</span><span class="s">"com.macro.mall.mapper.OmsOrderItemMapper.BaseResultMap"</span> <span class="na">columnPrefix=</span><span class="s">"item_"</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/resultMap&gt;</span>
 </code></pre></div></div>
 
-<h5 id="typehandlers-类型处理器映射-enum-枚举类"><code class="highlighter-rouge">typeHandlers</code> 类型处理器映射 Enum 枚举类？</h5>
+<h6 id="typehandlers-类型处理器"><code class="highlighter-rouge">typeHandlers</code> 类型处理器</h6>
+
+<blockquote>
+  <p><code class="highlighter-rouge">typeHandlers</code> 类型处理器映射 Enum 枚举类？</p>
+</blockquote>
 
 <p>MyBatis 可以映射枚举类，不单可以映射枚举类，MyBatis 可以映射任何对象到表的一列上。</p>
 
@@ -1185,7 +1252,7 @@ private String id;
   <li>二是完成 jdbcType 至 javaType 的转换，体现为 <code class="highlighter-rouge">setParameter()</code> 和 <code class="highlighter-rouge">getResult()</code> 两个方法，分别代表设置 sql 问号占位符参数和获取列查询结果。</li>
 </ul>
 
-<h5 id="实体类中的属性名和表中的字段名不一致时的解决方案">实体类中的属性名和表中的字段名不一致时的解决方案</h5>
+<h6 id="实体类属性名和表字段名不一致">实体类属性名和表字段名不一致</h6>
 
 <p>实体类中的属性名和表中的字段名不一致时的解决方案：</p>
 
@@ -1198,9 +1265,11 @@ private String id;
   </li>
 </ol>
 
-<h5 id="mybatis-能执行一对多的关联查询吗">MyBatis 能执行一对多的关联查询吗？</h5>
+<h6 id="一对多的关联查询">一对多的关联查询</h6>
 
 <blockquote>
+  <p>MyBatis 能执行一对多的关联查询吗？</p>
+
   <p>都有哪些实现方式，以及它们之间的区别。</p>
 </blockquote>
 
@@ -1222,11 +1291,11 @@ private String id;
   </li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;resultMap id="BaseResultMap" type="com.macro.mall.model.OmsOrder"&gt;
-    &lt;id column="id" jdbcType="BIGINT" property="id" /&gt;
-    &lt;result column="member_id" jdbcType="BIGINT" property="memberId" /&gt;
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;resultMap</span> <span class="na">id=</span><span class="s">"BaseResultMap"</span> <span class="na">type=</span><span class="s">"com.macro.mall.model.OmsOrder"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;id</span> <span class="na">column=</span><span class="s">"id"</span> <span class="na">jdbcType=</span><span class="s">"BIGINT"</span> <span class="na">property=</span><span class="s">"id"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;result</span> <span class="na">column=</span><span class="s">"member_id"</span> <span class="na">jdbcType=</span><span class="s">"BIGINT"</span> <span class="na">property=</span><span class="s">"memberId"</span> <span class="nt">/&gt;</span>
 	...
-&lt;resultMap /&gt;
+<span class="nt">&lt;resultMap</span> <span class="nt">/&gt;</span>
 </code></pre></div></div>
 
 <p>那么问题来了，join 查询出来 100 条记录，如何确定主对象是 5 个，而不是 100 个？</p>
@@ -1269,7 +1338,11 @@ private String id;
   </tbody>
 </table>
 
-<h5 id="是否支持延迟加载及实现原理">是否支持延迟加载及实现原理？</h5>
+<h5 id="延迟加载">延迟加载</h5>
+
+<blockquote>
+  <p>是否支持延迟加载及实现原理？</p>
+</blockquote>
 
 <p>MyBatis 仅支持 <strong>association 关联对象</strong>和 collection 关联集合对象的<strong>延迟加载</strong>。</p>
 
@@ -1279,6 +1352,8 @@ private String id;
 </ul>
 
 <p>在 MyBatis 配置文件中，可以配置是否启用延迟加载 <code class="highlighter-rouge">lazyLoadingEnabled=true|false。</code></p>
+
+<h6 id="实现原理">实现原理</h6>
 
 <p>原理是：使用 <code class="highlighter-rouge">CGLIB</code> 创建目标对象的代理对象，当调用目标方法时，进入拦截器方法，</p>
 
@@ -1351,7 +1426,11 @@ private String id;
 <span class="nt">&lt;/select&gt;</span>
 </code></pre></div></div>
 
-<h5 id="不同的-xml-映射文件id-是否可以重复">不同的 xml 映射文件，id 是否可以重复？</h5>
+<h6 id="id-属性">id 属性</h6>
+
+<blockquote>
+  <p>不同的 xml 映射文件，id 是否可以重复？</p>
+</blockquote>
 
 <p>下面那些顶级元素的 id 属性是否可重复：</p>
 
@@ -1364,65 +1443,6 @@ private String id;
 
 <p><strong>原因</strong>：就是 <code class="highlighter-rouge">namespace+id</code> 是作为 <code class="highlighter-rouge">Map&lt;String, MappedStatement&gt;</code> 的 key 使用的，如果没有 namespace，就剩下 id，那么 id 重复会导致<strong>数据互相覆盖</strong>。有了 namespace，自然 id 就可以重复。</p>
 
-<h5 id="dao-接口的工作原理方法可重载">Dao 接口的工作原理、方法可重载</h5>
-
-<p>Mybatis 的 Dao 接口里的方法，参数不同时，方法可<strong>重载</strong>。</p>
-
-<p>但是多个接口<strong>对应的映射</strong>必须只有一个，否则启动会报错。同一 xml <code class="highlighter-rouge">namspace </code>下的 id 不允许重复。</p>
-
-<p>重载需满足以下条件：</p>
-
-<ol>
-  <li>仅有一个无参方法和一个有参方法；</li>
-  <li>多个有参方法时，参数数量必须一致，且使用相同的 <code class="highlighter-rouge">@Param</code> ，或使用 <code class="highlighter-rouge">param1</code> 这种。
-    <ul>
-      <li>id 相同，对应同一段 <code class="highlighter-rouge">MappedStatement</code> 标签，用<strong>动态 SQL</strong> 的<code class="highlighter-rouge">&lt;if test="id != null"&gt;</code> <strong>标签</strong>处理不同的参数列表来实现重载。</li>
-    </ul>
-  </li>
-</ol>
-
-<p>Dao 接口的<strong>工作原理</strong>：MyBatis 运行时会用 <strong>JDK 动态代理</strong>为 Dao 接口生成 <code class="highlighter-rouge">proxy</code> 代理对象，用于拦截接口方法，转而执行 <code class="highlighter-rouge">MappedStatement</code> 所代表的 SQL，返回 SQL 执行结果。</p>
-
-<ul>
-  <li>最佳实践中，通常一个 xml 映射文件，都会写一个 Dao 接口与之对应。</li>
-  <li>在 MyBatis 中，每一个 <code class="highlighter-rouge">&lt;select&gt;</code> 、 <code class="highlighter-rouge">&lt;insert&gt;</code> 、 <code class="highlighter-rouge">&lt;update&gt;</code> 、 <code class="highlighter-rouge">&lt;delete&gt;</code> 标签，都会被解析为一个 <strong><code class="highlighter-rouge">MappedStatement</code> 对象</strong>。</li>
-  <li>Dao 接口就是常说的 <code class="highlighter-rouge">Mapper</code> 接口，
-    <ol>
-      <li>接口的<strong>全限名，</strong>就是映射文件中的 namespace 的值，</li>
-      <li>接口的<strong>方法名</strong>，就是映射文件中 <code class="highlighter-rouge">MappedStatement</code> 的 id 值，对应<code class="highlighter-rouge">&lt;select&gt;</code> 等元素的<code class="highlighter-rouge">id</code>属性，是在命名空间中<strong>唯一的标识符</strong>，用来引用此语句；</li>
-      <li>接口方法的<strong>参数</strong>，就是传递给 SQL 的参数。</li>
-    </ol>
-  </li>
-  <li><code class="highlighter-rouge">Mapper</code> 接口是没有实现类的，当调用接口方法时，接口全限名+方法名拼接字符串作为 key 值，可唯一定位一个 <code class="highlighter-rouge">MappedStatement</code> 。</li>
-  <li>举例： <code class="highlighter-rouge">com.mybatis3.mappers.StudentDao.findStudentById</code> ，可以唯一找到 namespace 为 <code class="highlighter-rouge">com.mybatis3.mappers.StudentDao</code> 下面 <code class="highlighter-rouge">id = findStudentById</code> 的 <code class="highlighter-rouge">MappedStatement</code> 。</li>
-</ul>
-
-<p>Mybatis 版本 3.3.0：</p>
-
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
- * Mapper接口里面方法重载
- */</span>
-<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">StuMapper</span> <span class="o">{</span>
-
-	<span class="n">List</span><span class="o">&lt;</span><span class="n">Student</span><span class="o">&gt;</span> <span class="nf">getAllStu</span><span class="o">();</span>
-	<span class="n">List</span><span class="o">&lt;</span><span class="n">Student</span><span class="o">&gt;</span> <span class="nf">getAllStu</span><span class="o">(</span><span class="nd">@Param</span><span class="o">(</span><span class="s">"id"</span><span class="o">)</span> <span class="n">Integer</span> <span class="n">id</span><span class="o">);</span>
-<span class="o">}</span>
-</code></pre></div></div>
-
-<p>然后在 <code class="highlighter-rouge">StuMapper.xml</code> 中利用 Mybatis 的<strong>动态 sql</strong> 就可以实现。</p>
-
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	<span class="o">&lt;</span><span class="n">select</span> <span class="n">id</span><span class="o">=</span><span class="s">"getAllStu"</span> <span class="n">resultType</span><span class="o">=</span><span class="s">"com.pojo.Student"</span><span class="o">&gt;</span>
- 		<span class="n">select</span> <span class="o">*</span> <span class="n">from</span> <span class="n">student</span>
-		<span class="o">&lt;</span><span class="n">where</span><span class="o">&gt;</span> <span class="err">##</span>
-			<span class="o">&lt;</span><span class="k">if</span> <span class="n">test</span><span class="o">=</span><span class="s">"id != null"</span><span class="o">&gt;</span> <span class="err">##</span>
-				<span class="n">id</span> <span class="o">=</span> <span class="err">#</span><span class="o">{</span><span class="n">id</span><span class="o">}</span>
-			<span class="o">&lt;/</span><span class="k">if</span><span class="o">&gt;</span>
-		<span class="o">&lt;/</span><span class="n">where</span><span class="o">&gt;</span>
- 	<span class="o">&lt;/</span><span class="n">select</span><span class="o">&gt;</span>
-</code></pre></div></div>
-
-<p>能正常运行，并能得到相应的结果，这样就实现了在 Dao 接口中写重载方法。</p>
-
 <h5 id="insert-update-元素"><code class="highlighter-rouge">&lt;insert&gt;</code> <code class="highlighter-rouge">&lt;update&gt;</code> 元素</h5>
 
 <p>仅对 <code class="highlighter-rouge">insert </code>和 <code class="highlighter-rouge">update </code> 有用的属性：</p>
@@ -1433,7 +1453,7 @@ private String id;
   <li><del><code class="highlighter-rouge">keyColumn</code></del>：通过生成的键值设置表中的列名，仅在某些数据库（如 PostgreSQL）是必须的，当主键不是表的第一列时需设置。</li>
 </ol>
 
-<h5 id="insert-语句的-selectkey"><code class="highlighter-rouge">&lt;insert&gt;</code> 语句的 <code class="highlighter-rouge">&lt;selectKey&gt;</code></h5>
+<h6 id="selectkey"><code class="highlighter-rouge">&lt;selectKey&gt;</code></h6>
 
 <p>在 MySQL 中用函数来自动生成插入表的主键，而且需方法返回这个生成主键，如用 MyBatis 的 <code class="highlighter-rouge">&lt;selectKey&gt; </code>标签。</p>
 
@@ -1473,7 +1493,7 @@ private String id;
   <p>见 SSM 分层目录中的 <a href="#分层目录"><code class="highlighter-rouge">mall-mbg/src/main/</code></a>。</p>
 </blockquote>
 
-<h4 id="依赖项">依赖项</h4>
+<h4 id="依赖">依赖</h4>
 
 <p><code class="highlighter-rouge">pom.xml</code></p>
 
@@ -1660,13 +1680,13 @@ private String id;
       <li>
         <p><code class="highlighter-rouge">suffixOverrides</code> 语句后面部分要去掉的的内容。</p>
 
-        <div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code> 	insert into pms_member_price
-     <span class="nt">&lt;trim</span> <span class="na">prefix=</span><span class="s">"("</span> <span class="na">suffix=</span><span class="s">")"</span> <span class="na">suffixOverrides=</span><span class="s">","</span><span class="nt">&gt;</span>
-       <span class="nt">&lt;if</span> <span class="na">test=</span><span class="s">"productId != null"</span><span class="nt">&gt;</span>
+        <div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code> insert into pms_member_price
+ <span class="nt">&lt;trim</span> <span class="na">prefix=</span><span class="s">"("</span> <span class="na">suffix=</span><span class="s">")"</span> <span class="na">suffixOverrides=</span><span class="s">","</span><span class="nt">&gt;</span>
+     <span class="nt">&lt;if</span> <span class="na">test=</span><span class="s">"productId != null"</span><span class="nt">&gt;</span>
          product_id, #{productId,jdbcType=BIGINT},
-       <span class="nt">&lt;/if&gt;</span>
-     <span class="nt">&lt;/trim&gt;</span>
-   <span class="nt">&lt;/insert&gt;</span>
+     <span class="nt">&lt;/if&gt;</span>
+ <span class="nt">&lt;/trim&gt;</span>
+ <span class="nt">&lt;/insert&gt;</span>
 </code></pre></div>        </div>
       </li>
     </ol>

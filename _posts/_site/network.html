@@ -178,10 +178,10 @@
 
 <p>实质上就是连接服务器指定的端口，建立 TCP 连接，并同步客户端和服务端的序列号和确认号，交换 TCP 窗口大小信息。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  		报文标志位    确认号      序列号
-B-to-S:	SYN		  (			   seq = x )
-S-to-B:	SYN + ACK ( ACK = x+1, seq = y )
-B-to-S:	ACK		  ( ACK = y+1, [seq = x+1] )
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  		报文标志位    确认号      序列号
+B-to-S:	SYN		  <span class="o">(</span>			   seq <span class="o">=</span> x <span class="o">)</span>
+S-to-B:	SYN + ACK <span class="o">(</span> ACK <span class="o">=</span> x+1, seq <span class="o">=</span> y <span class="o">)</span>
+B-to-S:	ACK		  <span class="o">(</span> ACK <span class="o">=</span> y+1, <span class="o">[</span>seq <span class="o">=</span> x+1] <span class="o">)</span>
 </code></pre></div></div>
 
 <p>刚开始客户端处于 <code class="highlighter-rouge">Closed</code> 的状态，服务端处于 <code class="highlighter-rouge">Listen</code> 状态。Socket 编程中，客户端执行 <code class="highlighter-rouge">connect()</code> 时，将<strong>触发三次握手</strong>。</p>
@@ -228,18 +228,18 @@ B-to-S:	ACK		  ( ACK = y+1, [seq = x+1] )
 
 <h4 id="数据传输">数据传输</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  		标志位 确认号  	序列号
-B-to-S:	ACK ( ACK = y+1, seq = x+1 )
-S-to-B:	ACK ( ACK = x+2 		   )
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  		标志位 确认号  	序列号
+B-to-S:	ACK <span class="o">(</span> ACK <span class="o">=</span> y+1, seq <span class="o">=</span> x+1 <span class="o">)</span>
+S-to-B:	ACK <span class="o">(</span> ACK <span class="o">=</span> x+2 		   <span class="o">)</span>
 </code></pre></div></div>
 
 <h4 id="tcp-四次挥手">TCP 四次挥手</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  	报文标志位 确认号	   序列号
-B-to-S:	FIN ( 			 seq = x )
-S-to-B:	ACK	( ACK = x+1 		 )
-S-to-B:	FIN ( 			 seq = y )
-B-to-S:	ACK ( ACK = y+1			 )
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  	报文标志位 确认号	   序列号
+B-to-S:	FIN <span class="o">(</span> 			 seq <span class="o">=</span> x <span class="o">)</span>
+S-to-B:	ACK	<span class="o">(</span> ACK <span class="o">=</span> x+1 		 <span class="o">)</span>
+S-to-B:	FIN <span class="o">(</span> 			 seq <span class="o">=</span> y <span class="o">)</span>
+B-to-S:	ACK <span class="o">(</span> ACK <span class="o">=</span> y+1			 <span class="o">)</span>
 </code></pre></div></div>
 
 <p>当 TCP 连接超过一定时间或不再使用时（数据传送完毕、传输完一个网页的全部资源、收到全部内容后），<strong>触发四次挥手</strong>。</p>
@@ -387,8 +387,8 @@ B-to-S:	ACK ( ACK = y+1			 )
   <li>
     <p>请求行（request line）：</p>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>GET	 /search?lan=zh-CN&amp;name=tom  HTTP/1.1
-</code></pre></div>    </div>
+    <div class="language-http highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">GET	 /search?lan=zh-CN&amp;name=tom  HTTP/1.1
+</span></code></pre></div>    </div>
 
     <ol>
       <li>8种请求方法：
@@ -781,7 +781,7 @@ B-to-S:	ACK ( ACK = y+1			 )
 <h4 id="加密和解密算法">加密和解密算法</h4>
 
 <blockquote>
-  <p>见 SSM 文档中 Spring Security 的加密机制部分。</p>
+  <p>见 Spring Security 文档的 #加密机制部分。</p>
 </blockquote>
 
 <h5 id="对称加密">对称加密</h5>
@@ -817,13 +817,13 @@ B-to-S:	ACK ( ACK = y+1			 )
 
 <p>CA 认证：</p>
 
-<h4 id="session-和-cookie">Session 和 Cookie</h4>
+<h4 id="cookie-和-session">Cookie 和 Session</h4>
 
 <blockquote>
-  <p>见 Spring Security 文档。</p>
+  <p>见 Cookie、Session、Token、JWT 文档。</p>
 </blockquote>
 
-<h3 id="uri-和-url-的区别是什么">URI 和 URL 的区别是什么?</h3>
+<h3 id="uri-和-url-的区别">URI 和 URL 的区别</h3>
 
 <ul>
   <li>URI（Uniform Resource Identifier）：统一资源标志符，可以唯一标识一个资源。比如像<strong>身份证号</strong>。</li>
@@ -854,9 +854,9 @@ B-to-S:	ACK ( ACK = y+1			 )
 
 <p><code class="highlighter-rouge">Q1</code>：URL 统一资源定位符：用于定位互联网上资源，俗称网址。提取<strong>域名</strong>。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;协议&gt;://&lt;域主机&gt;.&lt;Web 服务器域名&gt;:&lt;端口&gt;/&lt;资源路径地址&gt;/&lt;文件名&gt;?
+<div class="language-http highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">&lt;协议&gt;://&lt;域主机&gt;.&lt;Web 服务器域名&gt;:&lt;端口&gt;/&lt;资源路径地址&gt;/&lt;文件名&gt;?
 scheme://host.domain:port/path/filename?&lt;参数&gt;
-</code></pre></div></div>
+</span></code></pre></div></div>
 
 <ol>
   <li><code class="highlighter-rouge">scheme</code>：因特网服务的类型。常见的协议有 http、https、ftp、file。</li>
@@ -904,7 +904,7 @@ scheme://host.domain:port/path/filename?&lt;参数&gt;
   <li>迭代查询</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>域名 		  服务器外网IP地址  端口
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>域名 		  服务器外网IP地址  端口
 baidu.com	220.114.23.56 	80
 </code></pre></div></div>
 
@@ -1029,12 +1029,18 @@ baidu.com	220.114.23.56 	80
   <li>负载均衡服务器根据设定的分配算法和规则（如根据每台机器的负载量，离用户地理位置的距离等），选择一台后端的（真实） Web 服务器 IP 地址并返回；</li>
 </ol>
 
+<p>功能：</p>
+
 <ul>
   <li><strong>路由转发</strong>：根据配置规则（如 <code class="highlighter-rouge">location</code> 指令），<code class="highlighter-rouge">Nginx</code> 将请求转发到后端网关或服务。</li>
   <li><strong>负载均衡</strong>：如果后端有多个服务实例，<code class="highlighter-rouge">Nginx</code> 还可以根据负载均衡策略（如轮询、最小连接数等），将请求分发到不同的服务实例上。</li>
 </ul>
 
 <h4 id="api-网关">API 网关</h4>
+
+<blockquote>
+  <p>Gateway</p>
+</blockquote>
 
 <h4 id="三次握手建立-tcp-连接">三次握手建立 TCP 连接</h4>
 
@@ -1152,15 +1158,15 @@ baidu.com	220.114.23.56 	80
       <li>
         <p>原理：因为跨域是浏览器限制的，服务器<strong>请求服务器</strong>不受浏览器同源策略限制。</p>
 
-        <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  location / {
-     add_header Access-Control-Allow-Origin *;
-     add_header Access-Control-Allow-Headers X-Requested-With;
-     add_header Access-Control-Allow-Methods GET,POST,PUT,DELETE,OPTIONS;
-        
-     if ($request_method = 'OPTIONS') {
-       return 204;
-     }
-  }
+        <div class="language-ini highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="err">location</span> <span class="err">/</span> <span class="err">{</span>
+     <span class="err">add_header</span> <span class="err">Access-Control-Allow-Origin</span> <span class="err">*</span><span class="c">;
+</span>     <span class="err">add_header</span> <span class="err">Access-Control-Allow-Headers</span> <span class="err">X-Requested-With</span><span class="c">;
+</span>     <span class="err">add_header</span> <span class="err">Access-Control-Allow-Methods</span> <span class="err">GET,POST,PUT,DELETE,OPTIONS</span><span class="c">;
+</span>        
+     <span class="err">if</span> <span class="err">($</span><span class="py">request_method</span> <span class="p">=</span> <span class="s">'OPTIONS') {</span>
+       <span class="err">return</span> <span class="err">204</span><span class="c">;
+</span>     <span class="err">}</span>
+  <span class="err">}</span>
 </code></pre></div>        </div>
       </li>
     </ul>

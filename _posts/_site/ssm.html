@@ -1,5 +1,5 @@
 <blockquote>
-  <p>摘要：Spring + Spring MVC + Mybatis。Spring MVC，包括 MVC、Java Web。</p>
+  <p>摘要：Spring + Spring MVC + Mybatis。Java Web，Spring MVC，包括 MVC 设计模式、工作原理、前后端分离、接收请求参数（REST 常用注解）、参数校验、统一响应和异常，Hutool、Guava 工具类。</p>
 </blockquote>
 
 <!-- more -->
@@ -11,15 +11,88 @@
 <h2 id="ssm-框架">SSM 框架</h2>
 
 <blockquote>
-  <p>至少在项目里做过。介绍项目时，用一个业务流程说说 spring mvc 如何做的。</p>
+  <p>介绍项目时，用一个<a href="#业务流程">业务流程</a>说说 spring mvc 如何做的。</p>
 </blockquote>
 
-<p>SSM 框架集是 <code class="highlighter-rouge">Spring + Spring MVC + Mybatis </code> 框架的整合，<code class="highlighter-rouge">Spring</code> 实现业务对象管理，<code class="highlighter-rouge">Spring MVC</code> 负责请求转发和视图管理，<code class="highlighter-rouge">Mybatis</code> 作为数据对象的持久化引擎。</p>
+<p>SSM 框架集是 <code class="highlighter-rouge">Spring + Spring MVC + Mybatis </code> 框架的整合：<code class="highlighter-rouge">Spring</code> 实现<strong>业务对象</strong>管理，<code class="highlighter-rouge">Spring MVC</code> 负责请求转发和视图管理，<code class="highlighter-rouge">Mybatis</code> 作为数据对象的持久化引擎。</p>
 
 <ul>
   <li>是标准的 MVC 模式，将整个系统划分为 <code class="highlighter-rouge">model/DAO</code> 层、<code class="highlighter-rouge">View</code> 层、<code class="highlighter-rouge">Controller</code> 层、<code class="highlighter-rouge">Service</code> 层.</li>
   <li>是目前比较主流的 Java EE 企业级框架，适用于搭建各种大型的企业级应用系统。</li>
 </ul>
+
+<h3 id="模块框架演化">模块框架演化</h3>
+
+<ol>
+  <li>MVC 模式：应用分层开发 ——&gt; Spring MVC
+    <ol>
+      <li>Model：<strong>@Entity + @NamedQuery 写 SQL</strong> ——&gt; JPA 数据接口层（extends JpaRepository + @Repository 注解）</li>
+      <li>View：</li>
+      <li>Controller：</li>
+    </ol>
+  </li>
+  <li>SSM：
+    <ol>
+      <li>Spring（实现**业务对象 **Bean 管理）——&gt; Spring Boot</li>
+      <li>Spring MVC：负责请求转发和视图管理。
+        <ul>
+          <li>Controller：
+            <ul>
+              <li>——&gt; Service 层 + ServiceImpl：（剥离重复的业务逻辑，@Autowired 注入 Bean）</li>
+              <li>RESTful + @RestController ——&gt; CommonResult + ErrorCode + Exception + Hibernate Validator 参数校验</li>
+            </ul>
+          </li>
+          <li>View ——&gt; 对 View 细化，前后端分离（后端<strong>关注数据和逻辑</strong>，前端关注界面与交互）</li>
+          <li>Model：DAO 数据持久层 ——&gt; DAL 数据访问层：
+            <ul>
+              <li>Mapper 接口</li>
+              <li>POJO：DO + VO + DTO，Lombok（实体类 Getter/Settor 注解）</li>
+              <li><strong>Redis</strong></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>MyBatis（作为数据对象的持久化引擎） ——&gt; MyBatis Plus ——&gt; MapStruct + Convert
+        <ul>
+          <li><strong>ORM</strong>：对象–关系映射，用于建立 Java Object <strong>实体类</strong>和数据库表之间的映射，从而达到<strong>操作</strong>实体类就相当于操作数据库表的目的。</li>
+          <li>MyBatis 实现 Mapper 接口
+            <ol>
+              <li>全注解实现 Mapper（SQL <strong>不够灵活</strong>，每次都要修改 SQL）</li>
+              <li>XML 实现 Mapper。工作量大。（MyBatis Generator 生成）</li>
+              <li>MyBatis Plus 增强（BaseMapper + LambdaQueryWrapper 条件构造器） ——&gt; MapStruct  + <strong>Convert</strong>（ DO 转 VO） + Easy Trans 翻译枚举属性</li>
+            </ol>
+          </li>
+        </ul>
+      </li>
+    </ol>
+  </li>
+  <li>Spring Boot 整合框架 ——&gt; Spring Cloud ——&gt; Spring Cloud Alibaba
+    <ul>
+      <li>整合 Spring Security ——&gt; Cookie、Session、Token、JWT——&gt; OAuth2 + RBAC 授权</li>
+      <li>整合 Swagger2 ——&gt; Swagger3 ——&gt; Knife4j</li>
+      <li>整合 ELK</li>
+      <li>——&gt; <del>WebSocket</del></li>
+    </ul>
+  </li>
+  <li>单体应用 ——&gt; <strong>多模块</strong> ——&gt; 分布式架构 ——&gt; SOA ——&gt; 微服务架构：
+    <ul>
+      <li>API：Feign
+        <ul>
+          <li>Gateway、Nacos、Config</li>
+          <li>分布式链路追踪</li>
+        </ul>
+      </li>
+      <li>高并发、高性能、高可用集群：
+        <ul>
+          <li>负载均衡：Nginx、CDN、Feign 客户端负载均衡</li>
+          <li><strong>消息队列</strong></li>
+          <li>限流降级熔断</li>
+        </ul>
+      </li>
+      <li>数据库： 读写分离、分库分表</li>
+    </ul>
+  </li>
+</ol>
 
 <h3 id="简化的开发步骤">简化的开发步骤</h3>
 
@@ -27,7 +100,11 @@
   <li>需求分析：功能需求和非功能需求（稳定性、性能）；</li>
   <li>系统设计：系统<strong>架构</strong>示意图：普通用户、管理员，前端（输入输出），后台，MyBatis 数据持久化，微服务，配置等；
     <ol>
-      <li>系统概要设计：系统功能模块（划分）图：系统-子系统-功能模块，各自的描述、输入输出接口设计（格式、入参和出参/返回值）。接口文档现在都是 <a href="#接口文档">Swagger-UI</a>，注解标注在 Controller；</li>
+      <li>系统概要设计：系统功能模块（划分）图：系统-子系统-功能模块，各自的描述、输入输出接口设计（格式、入参和出参/返回值）。
+        <ul>
+          <li>接口文档现在都是 <a href="#接口文档">Swagger-UI</a>，注解标注在 Controller；</li>
+        </ul>
+      </li>
       <li>数据库表结构设计：
         <ol>
           <li><strong>逻辑设计/详细设计</strong> : 通过将 E-R 图转换成表，实现从 E-R 模型到关系模型的转换（转为 POJOs 及 DAO 接口），并应用三大范式优化；</li>
@@ -43,7 +120,7 @@
   <li>单元测试，回归测试，覆盖率测试。</li>
 </ol>
 
-<h5 id="系统业务架构示意图">系统业务架构示意图</h5>
+<h4 id="系统业务架构示意图">系统业务架构示意图</h4>
 
 <p>项目技术架构图：</p>
 
@@ -53,15 +130,17 @@
 
 <p><img src="../assets/mall系统架构示意图.jpg" alt="系统架构图" style="zoom: 37%;" /></p>
 
-<h5 id="系统功能模块图">系统功能模块图</h5>
+<h4 id="系统功能模块图"><del>系统功能模块图</del></h4>
 
-<h5 id="e-r-模型图">E-R 模型图</h5>
+<h4 id="e-r-模型图">E-R 模型图</h4>
 
-<p><img src="../assets/image-20220925110316119.png" alt="image-20220925110316119" style="zoom:100%;" /><img src="../assets/image-20220925111724175.png" alt="image-20220925111724175" style="zoom:100%;" /></p>
+<p><img src="../assets/image-20220925110316119.png" alt="image-20220925110316119" style="zoom:100%;" /></p>
+
+<p><img src="../assets/image-20220925111724175.png" alt="image-20220925111724175" style="zoom:100%;" /></p>
 
 <h3 id="项目架构">项目架构</h3>
 
-<p><img src="../assets/arch_screen_02.png" alt="img" style="zoom:70%;" /><img src="../assets/image-20250805140940884.png" alt="img" style="zoom:60%;" /></p>
+<p><img src="../assets/image-20250805140940884.png" alt="img" style="zoom:60%;" /></p>
 
 <p>在<a href="https://github.com/alibaba/p3c/blob/master/阿里巴巴Java开发手册（华山版）.pdf">《阿里巴巴 Java 开发手册》</a>中，推荐分层如下图：</p>
 
@@ -71,7 +150,7 @@
 
 <p>项目的目录结构展示了Maven所约定了源代码的位置，只需配置很少的信息就可以自动完成编译，测试和打包等工作。</p>
 
-<p><img src="../assets/250px-Maven_CoC.svg.png" alt="img" style="zoom:80%;" /></p>
+<p><img src="../assets/arch_screen_02.png" alt="img" style="zoom:70%;" /><img src="../assets/250px-Maven_CoC.svg.png" alt="img" style="zoom:100%;" /></p>
 
 <p>Java Web 项目中的 SSM 目录结构，同时也遵循 maven 的目录规范：</p>
 
@@ -281,8 +360,8 @@
 </blockquote>
 
 <ul>
-  <li><strong>Spring Boot 配置类</strong>配置 MyBatis，用来指定 mapper 映射器接口的 xml 实现所在的<strong>项目目录</strong>。</li>
-  <li><strong>MyBatis 配置类</strong>中通过<code class="highlighter-rouge">@MapperScan</code>，用来指定 mapper 映射器接口的 xml 实现所在的<strong>包路径</strong>。</li>
+  <li>Spring Boot 配置类配置 MyBatis，用来指定 mapper 映射器接口的 xml 实现所在的<strong>项目目录</strong>。</li>
+  <li>MyBatis 配置类中通过<code class="highlighter-rouge">@MapperScan</code>，用来指定 mapper 映射器接口的 xml 实现所在的<strong>包路径</strong>。</li>
 </ul>
 
 <h5 id="mybatis-generator-简介">Mybatis Generator 简介</h5>
@@ -519,11 +598,10 @@
      */</span>
     <span class="nd">@NotEmpty</span><span class="o">(</span><span class="n">message</span> <span class="o">=</span> <span class="s">"响应的加密密钥不能为空"</span><span class="o">)</span>
     <span class="kd">private</span> <span class="n">String</span> <span class="n">responseKey</span><span class="o">;</span>
-
 <span class="o">}</span>
 </code></pre></div></div>
 
-<h3 id="api-日志">API 日志</h3>
+<h3 id="api-日志"><del>API 日志</del></h3>
 
 <h3 id="swagger">Swagger</h3>
 
@@ -1226,13 +1304,13 @@
   <li>参数转化的配置必须统一，否则无法接收数据，比如 json、request 混用等。</li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@ApiOperation(value = "登录以后返回token")
-@RequestMapping(value = "/login", method = RequestMethod.POST)
-@ResponseBody
-public CommonResult login(@Validated @RequestBody UmsAdminLoginParam umsAdminLoginParam) {
-	String token = adminService.login(umsAdminLoginParam.getUsername(), umsAdminLoginParam.getPassword());
-	...
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@ApiOperation</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">"登录以后返回token"</span><span class="o">)</span>
+<span class="nd">@RequestMapping</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">"/login"</span><span class="o">,</span> <span class="n">method</span> <span class="o">=</span> <span class="n">RequestMethod</span><span class="o">.</span><span class="na">POST</span><span class="o">)</span>
+<span class="nd">@ResponseBody</span>
+<span class="kd">public</span> <span class="n">CommonResult</span> <span class="nf">login</span><span class="o">(</span><span class="nd">@Validated</span> <span class="nd">@RequestBody</span> <span class="n">UmsAdminLoginParam</span> <span class="n">umsAdminLoginParam</span><span class="o">)</span> <span class="o">{</span>
+	<span class="n">String</span> <span class="n">token</span> <span class="o">=</span> <span class="n">adminService</span><span class="o">.</span><span class="na">login</span><span class="o">(</span><span class="n">umsAdminLoginParam</span><span class="o">.</span><span class="na">getUsername</span><span class="o">(),</span> <span class="n">umsAdminLoginParam</span><span class="o">.</span><span class="na">getPassword</span><span class="o">());</span>
+	<span class="o">...</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h5 id="requestparam-vs-requestbody">@RequestParam VS @RequestBody</h5>
@@ -1312,38 +1390,44 @@ public CommonResult login(@Validated @RequestBody UmsAdminLoginParam umsAdminLog
   <li><code class="highlighter-rouge">PATCH</code>：更新服务器上的资源（可看作是<strong>部分更新</strong>），较少用。</li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@GetMapping("/users")
-//&lt;==&gt;@RequestMapping(value = "/users", method = RequestMethod.GET)
-public ResponseEntity&lt;List&lt;User&gt; &gt; getAllUsers() {
-	return userRepository.findAll();
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@GetMapping</span><span class="o">(</span><span class="s">"/users"</span><span class="o">)</span>
+<span class="c1">//&lt;==&gt;@RequestMapping(value = "/users", method = RequestMethod.GET)</span>
+<span class="kd">public</span> <span class="n">ResponseEntity</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">getAllUsers</span><span class="o">()</span> <span class="o">{</span>
+	<span class="k">return</span> <span class="n">userRepository</span><span class="o">.</span><span class="na">findAll</span><span class="o">();</span>
+<span class="o">}</span>
 
-@PostMapping("/users")
-public ResponseEntity&lt;User&gt; createUser(@Valid @RequestBody UserCreateRequest userCreateRequest) {
-	return userRespository.save(userCreateRequest);
-}
+<span class="nd">@PostMapping</span><span class="o">(</span><span class="s">"/users"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="n">ResponseEntity</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span> <span class="nf">createUser</span><span class="o">(</span><span class="nd">@Valid</span> <span class="nd">@RequestBody</span> <span class="n">UserCreateRequest</span> <span class="n">userCreateRequest</span><span class="o">)</span> <span class="o">{</span>
+	<span class="k">return</span> <span class="n">userRespository</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="n">userCreateRequest</span><span class="o">);</span>
+<span class="o">}</span>
 
-@PutMapping("/users/{userId}")
-public ResponseEntity&lt;User&gt; updateUser(@PathVariable(value = "userId") Long userId, @Valid @RequestBody UserUpdateRequest userUpdateRequest) {
-  ......
-}
+<span class="nd">@PutMapping</span><span class="o">(</span><span class="s">"/users/{userId}"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="n">ResponseEntity</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span> <span class="nf">updateUser</span><span class="o">(</span><span class="nd">@PathVariable</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">"userId"</span><span class="o">)</span> <span class="n">Long</span> <span class="n">userId</span><span class="o">,</span> <span class="nd">@Valid</span> <span class="nd">@RequestBody</span> <span class="n">UserUpdateRequest</span> <span class="n">userUpdateRequest</span><span class="o">)</span> <span class="o">{</span>
+  <span class="o">......</span>
+<span class="o">}</span>
 
-@DeleteMapping("/users/{userId}")
-public ResponseEntity deleteUser(@PathVariable(value = "userId") Long userId){
-  ......
-}
+<span class="nd">@DeleteMapping</span><span class="o">(</span><span class="s">"/users/{userId}"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="n">ResponseEntity</span> <span class="nf">deleteUser</span><span class="o">(</span><span class="nd">@PathVariable</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">"userId"</span><span class="o">)</span> <span class="n">Long</span> <span class="n">userId</span><span class="o">){</span>
+  <span class="o">......</span>
+<span class="o">}</span>
 
-@PatchMapping("/profile")
-public ResponseEntity updateStudent(@RequestBody StudentUpdateRequest stuUpdateRequest) {
-	stuRepository.updateDetail(stuUpdateRequest);
-	return ResponseEntity.ok().build();
-}
+<span class="nd">@PatchMapping</span><span class="o">(</span><span class="s">"/profile"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="n">ResponseEntity</span> <span class="nf">updateStudent</span><span class="o">(</span><span class="nd">@RequestBody</span> <span class="n">StudentUpdateRequest</span> <span class="n">stuUpdateRequest</span><span class="o">)</span> <span class="o">{</span>
+	<span class="n">stuRepository</span><span class="o">.</span><span class="na">updateDetail</span><span class="o">(</span><span class="n">stuUpdateRequest</span><span class="o">);</span>
+	<span class="k">return</span> <span class="n">ResponseEntity</span><span class="o">.</span><span class="na">ok</span><span class="o">().</span><span class="na">build</span><span class="o">();</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h3 id="参数校验统一响应和异常">参数校验、统一响应和异常</h3>
 
 <blockquote>
   <p>参考参数校验、统一响应和异常处理文档</p>
+</blockquote>
+
+<h3 id="业务流程举例">业务流程举例</h3>
+
+<blockquote>
+  <p>介绍项目时，用一个业务流程说说 spring mvc 如何做的。</p>
 </blockquote>
 
 <h3 id="测试接口">测试接口</h3>

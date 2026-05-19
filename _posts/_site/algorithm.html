@@ -139,15 +139,15 @@
   </li>
 </ul>
 
-<p><img src="../assets/sort_time_complex.png" alt="img" style="zoom: 64%;" /><img src="../assets/sort_classify.png" alt="排序算法分类" style="zoom:20%;" /></p>
+<p><img src="../assets/sort_time_complex.png" alt="img" style="zoom: 72%;" /><img src="../assets/sort_classify.png" alt="排序算法分类" style="zoom:25%;" /></p>
 
 <h4 id="0-内置排序函数">0. 内置排序函数</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>int[] nums = new int[]{1, 3, 4, 7};
-Arrays.sort(nums);
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span><span class="o">[]</span> <span class="n">nums</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="o">[]{</span><span class="mi">1</span><span class="o">,</span> <span class="mi">3</span><span class="o">,</span> <span class="mi">4</span><span class="o">,</span> <span class="mi">7</span><span class="o">};</span>
+<span class="n">Arrays</span><span class="o">.</span><span class="na">sort</span><span class="o">(</span><span class="n">nums</span><span class="o">);</span>
 
-List&lt;User&gt; list = new ArrayList&lt;User&gt;();
-Collections.sort(list);
+<span class="n">List</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;();</span>
+<span class="n">Collections</span><span class="o">.</span><span class="na">sort</span><span class="o">(</span><span class="n">list</span><span class="o">);</span>
 </code></pre></div></div>
 
 <h4 id="1-插入排序">1. 插入排序</h4>
@@ -173,47 +173,47 @@ Collections.sort(list);
 
 <p><img src="../assets/insertion-sort-1-animate-example.svg" alt="insertion sort animate example" style="zoom: 50%;" /></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public static void directInsertSort(int[] arr) {
-    for (int i = 1; i &lt; arr.length; i++) { // 第0个不用排序
-        int target = arr[i];
-        int j = i - 1;
-        for (; j &gt;= 0 &amp;&amp; arr[j] &gt; target; j--){ // 防止下界溢出
-            arr[j + 1] = arr[j]; // 逐个后移
-        }
-        // if (j &gt;= 0) {
-            arr[j + 1] = target; // j最小为-1，此时待插入元素最小，插入0位置
-        //}
-    }
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">directInsertSort</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">arr</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">arr</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span> <span class="c1">// 第0个不用排序</span>
+        <span class="kt">int</span> <span class="n">target</span> <span class="o">=</span> <span class="n">arr</span><span class="o">[</span><span class="n">i</span><span class="o">];</span>
+        <span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="o">;</span>
+        <span class="k">for</span> <span class="o">(;</span> <span class="n">j</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">arr</span><span class="o">[</span><span class="n">j</span><span class="o">]</span> <span class="o">&gt;</span> <span class="n">target</span><span class="o">;</span> <span class="n">j</span><span class="o">--){</span> <span class="c1">// 防止下界溢出</span>
+            <span class="n">arr</span><span class="o">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="o">]</span> <span class="o">=</span> <span class="n">arr</span><span class="o">[</span><span class="n">j</span><span class="o">];</span> <span class="c1">// 逐个后移</span>
+        <span class="o">}</span>
+        <span class="c1">// if (j &gt;= 0) {</span>
+            <span class="n">arr</span><span class="o">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="o">]</span> <span class="o">=</span> <span class="n">target</span><span class="o">;</span> <span class="c1">// j最小为-1，此时待插入元素最小，插入0位置</span>
+        <span class="c1">//}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 
-public static void binaryInsertSort(int[] arr) {
-    for (int i = 1; i &lt; n; i++) {
-        int target = arr[i];
-        // 在已排序序列中二分查找插入位置，相当于在区间[0, i-1]中查找右边界
-        int pos = binaryRightBound(arr, 0, i-1, target);
-        // 将pos后、[pos, i - 1]内的元素由后往前、统一逐位后移
-        for (int j = i - 1; j &gt;= 0 &amp;&amp; j &gt;= pos; j--) { // not while, pos = -1
-            nums[j + 1] = nums[j];
-        }
-        // target插入pos位置
-        arr[pos] = target; // pos == j + 1 &gt;= 0 
-    }
-}
+<span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">binaryInsertSort</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">arr</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+        <span class="kt">int</span> <span class="n">target</span> <span class="o">=</span> <span class="n">arr</span><span class="o">[</span><span class="n">i</span><span class="o">];</span>
+        <span class="c1">// 在已排序序列中二分查找插入位置，相当于在区间[0, i-1]中查找右边界</span>
+        <span class="kt">int</span> <span class="n">pos</span> <span class="o">=</span> <span class="n">binaryRightBound</span><span class="o">(</span><span class="n">arr</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="o">,</span> <span class="n">target</span><span class="o">);</span>
+        <span class="c1">// 将pos后、[pos, i - 1]内的元素由后往前、统一逐位后移</span>
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="o">;</span> <span class="n">j</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">j</span> <span class="o">&gt;=</span> <span class="n">pos</span><span class="o">;</span> <span class="n">j</span><span class="o">--)</span> <span class="o">{</span> <span class="c1">// not while, pos = -1</span>
+            <span class="n">nums</span><span class="o">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="o">]</span> <span class="o">=</span> <span class="n">nums</span><span class="o">[</span><span class="n">j</span><span class="o">];</span>
+        <span class="o">}</span>
+        <span class="c1">// target插入pos位置</span>
+        <span class="n">arr</span><span class="o">[</span><span class="n">pos</span><span class="o">]</span> <span class="o">=</span> <span class="n">target</span><span class="o">;</span> <span class="c1">// pos == j + 1 &gt;= 0 </span>
+    <span class="o">}</span>
+<span class="o">}</span>
 
-// right bound not found, then return min value's index witch greater than target
-public static int binaryRightBound(int[] arr, int lo, int hi, int target) {
-    while (lo &lt;= hi) { // 同二分查找算法框架
-        // 防止数组下标溢出，2^31 - 1
-		int mid = lo + (hi-lo)/2;
-		// 2.找右边界时，收缩左侧边界
-		if (nums[mid] &lt;= target) {
-			lo = mid + 1;
-		} else if (nums[mid] &gt; target) {
-			hi = mid - 1;
-		}
-	}
-    return lo; // [0, -1] return lo=0
-}
+<span class="c1">// right bound not found, then return min value's index witch greater than target</span>
+<span class="kd">public</span> <span class="kd">static</span> <span class="kt">int</span> <span class="nf">binaryRightBound</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">arr</span><span class="o">,</span> <span class="kt">int</span> <span class="n">lo</span><span class="o">,</span> <span class="kt">int</span> <span class="n">hi</span><span class="o">,</span> <span class="kt">int</span> <span class="n">target</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">while</span> <span class="o">(</span><span class="n">lo</span> <span class="o">&lt;=</span> <span class="n">hi</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// 同二分查找算法框架</span>
+        <span class="c1">// 防止数组下标溢出，2^31 - 1</span>
+		<span class="kt">int</span> <span class="n">mid</span> <span class="o">=</span> <span class="n">lo</span> <span class="o">+</span> <span class="o">(</span><span class="n">hi</span><span class="o">-</span><span class="n">lo</span><span class="o">)/</span><span class="mi">2</span><span class="o">;</span>
+		<span class="c1">// 2.找右边界时，收缩左侧边界</span>
+		<span class="k">if</span> <span class="o">(</span><span class="n">nums</span><span class="o">[</span><span class="n">mid</span><span class="o">]</span> <span class="o">&lt;=</span> <span class="n">target</span><span class="o">)</span> <span class="o">{</span>
+			<span class="n">lo</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">+</span> <span class="mi">1</span><span class="o">;</span>
+		<span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">nums</span><span class="o">[</span><span class="n">mid</span><span class="o">]</span> <span class="o">&gt;</span> <span class="n">target</span><span class="o">)</span> <span class="o">{</span>
+			<span class="n">hi</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">-</span> <span class="mi">1</span><span class="o">;</span>
+		<span class="o">}</span>
+	<span class="o">}</span>
+    <span class="k">return</span> <span class="n">lo</span><span class="o">;</span> <span class="c1">// [0, -1] return lo=0</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h5 id="12-希尔排序">1.2 希尔排序</h5>
@@ -234,26 +234,26 @@ public static int binaryRightBound(int[] arr, int lo, int hi, int target) {
 
 <p><img src="../assets/shell_sort.png" alt="shell_sort" style="zoom: 33%;" /></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public static void shellSort(int[] nums) {
-	...
-	for (int gap = n/2; gap &gt; 0; gap /= 2) { // 步长减半
-		// 分组内进行直接插入排序，逐个分组排序
-		for (int i = gap * 1; i &lt; n; i++) {
-		    // gap, gap+1, …, gap*2, gap*2+1, …, n
-			// 取出各组内第2个元素（总第gap个元素）作为待插入元素；
-			// 取出各组内第3个元素（总第gap*2个元素）
-            int target = nums[i];
-			int pre = i - gap; // 同组的前一个元素的索引
-			// 同组内i（当前元素）前的元素直接插入排序
-			while (pre &gt;= 0 &amp;&amp; nums[pre] &gt; target) { // &amp;&amp;，相当于插入排序中的for逐个后移
-				// 比当前元素大的在组内向后移，如第1个覆盖第2个
-				nums[pre + gap] = nums[pre];
-				pre -= gap;	// 向前迈一个步长
-			}
-			nums[pre + gap] = target; // 插入待排序元素
-		}
-	}
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">shellSort</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">nums</span><span class="o">)</span> <span class="o">{</span>
+	<span class="o">...</span>
+	<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">gap</span> <span class="o">=</span> <span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="o">;</span> <span class="n">gap</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">;</span> <span class="n">gap</span> <span class="o">/=</span> <span class="mi">2</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// 步长减半</span>
+		<span class="c1">// 分组内进行直接插入排序，逐个分组排序</span>
+		<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">gap</span> <span class="o">*</span> <span class="mi">1</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+		    <span class="c1">// gap, gap+1, …, gap*2, gap*2+1, …, n</span>
+			<span class="c1">// 取出各组内第2个元素（总第gap个元素）作为待插入元素；</span>
+			<span class="c1">// 取出各组内第3个元素（总第gap*2个元素）</span>
+            <span class="kt">int</span> <span class="n">target</span> <span class="o">=</span> <span class="n">nums</span><span class="o">[</span><span class="n">i</span><span class="o">];</span>
+			<span class="kt">int</span> <span class="n">pre</span> <span class="o">=</span> <span class="n">i</span> <span class="o">-</span> <span class="n">gap</span><span class="o">;</span> <span class="c1">// 同组的前一个元素的索引</span>
+			<span class="c1">// 同组内i（当前元素）前的元素直接插入排序</span>
+			<span class="k">while</span> <span class="o">(</span><span class="n">pre</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">nums</span><span class="o">[</span><span class="n">pre</span><span class="o">]</span> <span class="o">&gt;</span> <span class="n">target</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// &amp;&amp;，相当于插入排序中的for逐个后移</span>
+				<span class="c1">// 比当前元素大的在组内向后移，如第1个覆盖第2个</span>
+				<span class="n">nums</span><span class="o">[</span><span class="n">pre</span> <span class="o">+</span> <span class="n">gap</span><span class="o">]</span> <span class="o">=</span> <span class="n">nums</span><span class="o">[</span><span class="n">pre</span><span class="o">];</span>
+				<span class="n">pre</span> <span class="o">-=</span> <span class="n">gap</span><span class="o">;</span>	<span class="c1">// 向前迈一个步长</span>
+			<span class="o">}</span>
+			<span class="n">nums</span><span class="o">[</span><span class="n">pre</span> <span class="o">+</span> <span class="n">gap</span><span class="o">]</span> <span class="o">=</span> <span class="n">target</span><span class="o">;</span> <span class="c1">// 插入待排序元素</span>
+		<span class="o">}</span>
+	<span class="o">}</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h4 id="2-交换排序">2. 交换排序</h4>
@@ -268,22 +268,22 @@ public static int binaryRightBound(int[] arr, int lo, int hi, int target) {
 
 <p><img src="../assets/bubble_sort.gif" alt="冒泡排序" style="zoom:50%;" /></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public static void bubbleSort(int[] nums) {
-	int n = nums.length;
-	for (int i = 0; i &lt; n; i++) { // [0, n)表示n次排序
-		boolean runSort = false; // flag 作为一趟冒泡是否发生交换的标志
-		for (int j = 1; j &lt; n - i; j++) { // 在[0，n-i)范围内冒泡一次，注意j=1
-			if (nums[j-1] &gt; nums[j]) { // 逆序（前面的大于后面的）
-				swap(nums, j-1, j); // 则交换
-				runSort = true; // not i = n, then break from 2-for
-			}
-		}
-		// 若一次交换也没有发生，则跳出循环
-		if (!runSort) {
-			break;
-		}
-	}
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">bubbleSort</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">nums</span><span class="o">)</span> <span class="o">{</span>
+	<span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">nums</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
+	<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span> <span class="c1">// [0, n)表示n次排序</span>
+		<span class="kt">boolean</span> <span class="n">runSort</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span> <span class="c1">// flag 作为一趟冒泡是否发生交换的标志</span>
+		<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">n</span> <span class="o">-</span> <span class="n">i</span><span class="o">;</span> <span class="n">j</span><span class="o">++)</span> <span class="o">{</span> <span class="c1">// 在[0，n-i)范围内冒泡一次，注意j=1</span>
+			<span class="k">if</span> <span class="o">(</span><span class="n">nums</span><span class="o">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="o">]</span> <span class="o">&gt;</span> <span class="n">nums</span><span class="o">[</span><span class="n">j</span><span class="o">])</span> <span class="o">{</span> <span class="c1">// 逆序（前面的大于后面的）</span>
+				<span class="n">swap</span><span class="o">(</span><span class="n">nums</span><span class="o">,</span> <span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="o">,</span> <span class="n">j</span><span class="o">);</span> <span class="c1">// 则交换</span>
+				<span class="n">runSort</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span> <span class="c1">// not i = n, then break from 2-for</span>
+			<span class="o">}</span>
+		<span class="o">}</span>
+		<span class="c1">// 若一次交换也没有发生，则跳出循环</span>
+		<span class="k">if</span> <span class="o">(!</span><span class="n">runSort</span><span class="o">)</span> <span class="o">{</span>
+			<span class="k">break</span><span class="o">;</span>
+		<span class="o">}</span>
+	<span class="o">}</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h5 id="22-快速排序">2.2 快速排序</h5>
@@ -314,33 +314,33 @@ public static int binaryRightBound(int[] arr, int lo, int hi, int target) {
 
 <p><img src="../assets/quick_sort2.gif" alt="图片" style="zoom: 44%;" /></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public static int partation(int[] nums, int lo, int hi) {
-	int pivot = nums[lo]; // 取最左一位作为基准，not povit
-	while (lo &lt; hi) {
-		while (lo &lt; hi &amp;&amp; nums[hi] &gt;= pivot) { // &gt;=, not nums[pivot]
-			hi--;
-		}
-		if (lo &lt; hi) {
-			nums[lo++] = nums[hi]; // 最左已被作为基准，覆盖最左
-		}
-		while (lo &lt; hi &amp;&amp; nums[lo] &lt; pivot) { // not &gt; or &lt;=
-			lo++;
-		}
-		if (lo &lt; hi) {
-			nums[hi--] = nums[lo]; //
-		}
-	}
-	nums[lo] = pivot; // lo即为pivot最终放的index
-	return lo;
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kt">int</span> <span class="nf">partation</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">nums</span><span class="o">,</span> <span class="kt">int</span> <span class="n">lo</span><span class="o">,</span> <span class="kt">int</span> <span class="n">hi</span><span class="o">)</span> <span class="o">{</span>
+	<span class="kt">int</span> <span class="n">pivot</span> <span class="o">=</span> <span class="n">nums</span><span class="o">[</span><span class="n">lo</span><span class="o">];</span> <span class="c1">// 取最左一位作为基准，not povit</span>
+	<span class="k">while</span> <span class="o">(</span><span class="n">lo</span> <span class="o">&lt;</span> <span class="n">hi</span><span class="o">)</span> <span class="o">{</span>
+		<span class="k">while</span> <span class="o">(</span><span class="n">lo</span> <span class="o">&lt;</span> <span class="n">hi</span> <span class="o">&amp;&amp;</span> <span class="n">nums</span><span class="o">[</span><span class="n">hi</span><span class="o">]</span> <span class="o">&gt;=</span> <span class="n">pivot</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// &gt;=, not nums[pivot]</span>
+			<span class="n">hi</span><span class="o">--;</span>
+		<span class="o">}</span>
+		<span class="k">if</span> <span class="o">(</span><span class="n">lo</span> <span class="o">&lt;</span> <span class="n">hi</span><span class="o">)</span> <span class="o">{</span>
+			<span class="n">nums</span><span class="o">[</span><span class="n">lo</span><span class="o">++]</span> <span class="o">=</span> <span class="n">nums</span><span class="o">[</span><span class="n">hi</span><span class="o">];</span> <span class="c1">// 最左已被作为基准，覆盖最左</span>
+		<span class="o">}</span>
+		<span class="k">while</span> <span class="o">(</span><span class="n">lo</span> <span class="o">&lt;</span> <span class="n">hi</span> <span class="o">&amp;&amp;</span> <span class="n">nums</span><span class="o">[</span><span class="n">lo</span><span class="o">]</span> <span class="o">&lt;</span> <span class="n">pivot</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// not &gt; or &lt;=</span>
+			<span class="n">lo</span><span class="o">++;</span>
+		<span class="o">}</span>
+		<span class="k">if</span> <span class="o">(</span><span class="n">lo</span> <span class="o">&lt;</span> <span class="n">hi</span><span class="o">)</span> <span class="o">{</span>
+			<span class="n">nums</span><span class="o">[</span><span class="n">hi</span><span class="o">--]</span> <span class="o">=</span> <span class="n">nums</span><span class="o">[</span><span class="n">lo</span><span class="o">];</span> <span class="c1">//</span>
+		<span class="o">}</span>
+	<span class="o">}</span>
+	<span class="n">nums</span><span class="o">[</span><span class="n">lo</span><span class="o">]</span> <span class="o">=</span> <span class="n">pivot</span><span class="o">;</span> <span class="c1">// lo即为pivot最终放的index</span>
+	<span class="k">return</span> <span class="n">lo</span><span class="o">;</span>
+<span class="o">}</span>
 
-public static void quickSort(int[] nums, int lo, int hi) {
-	if (lo &lt; hi) { // 快排和归并都用此方法控制递归深度
-        int pos = partation(nums, lo, hi); // partation
-        quickSort(nums, lo, pos-1);	// -1
-        quickSort(nums, pos+1, hi);
-     }
-}
+<span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">quickSort</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">nums</span><span class="o">,</span> <span class="kt">int</span> <span class="n">lo</span><span class="o">,</span> <span class="kt">int</span> <span class="n">hi</span><span class="o">)</span> <span class="o">{</span>
+	<span class="k">if</span> <span class="o">(</span><span class="n">lo</span> <span class="o">&lt;</span> <span class="n">hi</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// 快排和归并都用此方法控制递归深度</span>
+        <span class="kt">int</span> <span class="n">pos</span> <span class="o">=</span> <span class="n">partation</span><span class="o">(</span><span class="n">nums</span><span class="o">,</span> <span class="n">lo</span><span class="o">,</span> <span class="n">hi</span><span class="o">);</span> <span class="c1">// partation</span>
+        <span class="n">quickSort</span><span class="o">(</span><span class="n">nums</span><span class="o">,</span> <span class="n">lo</span><span class="o">,</span> <span class="n">pos</span><span class="o">-</span><span class="mi">1</span><span class="o">);</span>	<span class="c1">// -1</span>
+        <span class="n">quickSort</span><span class="o">(</span><span class="n">nums</span><span class="o">,</span> <span class="n">pos</span><span class="o">+</span><span class="mi">1</span><span class="o">,</span> <span class="n">hi</span><span class="o">);</span>
+     <span class="o">}</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h4 id="3-选择排序">3. 选择排序</h4>
@@ -354,22 +354,22 @@ public static void quickSort(int[] nums, int lo, int hi) {
   <li><strong>不稳定</strong>：<code class="highlighter-rouge">[2, 2, 1, 3]</code>，选择最小的 <code class="highlighter-rouge">1</code>，与第一个<code class="highlighter-rouge">2</code>交换后，两个<code class="highlighter-rouge">2</code>的相对顺序改变了。</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public static void selectSort(int[] nums) {
-    int n = nums.length;
-    for (int i = 0; i &lt; n - 1; i++) { // n-2 趟,第n趟无意义
-        int mini = i;
-        // 从下一个位置开始查找，在[i+1, n)内查找
-        for (int j = i + 1; j &lt; n; j++) {
-            if (nums[j] &lt; nums[mini]) {
-                mini = j; // 记录最小值的index
-            }
-        }
-        // 最小值为未排序序列第一个（当前）元素时不移动；提高的效率并不高，可省略
-        if (mini != i) {
-            swap(nums, mini, i);
-        }
-    }
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">selectSort</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">nums</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">nums</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span> <span class="c1">// n-2 趟,第n趟无意义</span>
+        <span class="kt">int</span> <span class="n">mini</span> <span class="o">=</span> <span class="n">i</span><span class="o">;</span>
+        <span class="c1">// 从下一个位置开始查找，在[i+1, n)内查找</span>
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="o">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">n</span><span class="o">;</span> <span class="n">j</span><span class="o">++)</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">nums</span><span class="o">[</span><span class="n">j</span><span class="o">]</span> <span class="o">&lt;</span> <span class="n">nums</span><span class="o">[</span><span class="n">mini</span><span class="o">])</span> <span class="o">{</span>
+                <span class="n">mini</span> <span class="o">=</span> <span class="n">j</span><span class="o">;</span> <span class="c1">// 记录最小值的index</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="c1">// 最小值为未排序序列第一个（当前）元素时不移动；提高的效率并不高，可省略</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">mini</span> <span class="o">!=</span> <span class="n">i</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">swap</span><span class="o">(</span><span class="n">nums</span><span class="o">,</span> <span class="n">mini</span><span class="o">,</span> <span class="n">i</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h5 id="32-堆排序">3.2 堆排序</h5>
@@ -418,60 +418,60 @@ public static void quickSort(int[] nums, int lo, int hi) {
 
 <p><img src="../assets/heap_sort.gif" alt="图片" style="zoom:50%;" /></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public static void heapSort(int[] nums) {
-	// buildMaxHeap(nums)
-	for (int i = (n-1)/2; i &gt;= 0; i--) { // not n/2 - 1
-		adjustDownHeap(heap, i, n); // 自下而上构建大顶堆[i, n)
-	}
-	for (int i = n-1; i &gt; 0; i--) { // not n/2-1, not &gt;=
-		swap(heap, 0, i); // 交换堆顶和堆底
-		adjustDownHeap(heap, 0, i); // 维持剩余堆的性质，将[0,i)调整为大顶堆, not i-1
-	}
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">heapSort</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">nums</span><span class="o">)</span> <span class="o">{</span>
+	<span class="c1">// buildMaxHeap(nums)</span>
+	<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="o">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="o">)/</span><span class="mi">2</span><span class="o">;</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span><span class="o">--)</span> <span class="o">{</span> <span class="c1">// not n/2 - 1</span>
+		<span class="n">adjustDownHeap</span><span class="o">(</span><span class="n">heap</span><span class="o">,</span> <span class="n">i</span><span class="o">,</span> <span class="n">n</span><span class="o">);</span> <span class="c1">// 自下而上构建大顶堆[i, n)</span>
+	<span class="o">}</span>
+	<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="o">;</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span><span class="o">--)</span> <span class="o">{</span> <span class="c1">// not n/2-1, not &gt;=</span>
+		<span class="n">swap</span><span class="o">(</span><span class="n">heap</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">i</span><span class="o">);</span> <span class="c1">// 交换堆顶和堆底</span>
+		<span class="n">adjustDownHeap</span><span class="o">(</span><span class="n">heap</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">i</span><span class="o">);</span> <span class="c1">// 维持剩余堆的性质，将[0,i)调整为大顶堆, not i-1</span>
+	<span class="o">}</span>
+<span class="o">}</span>
 
-// 自上而下调整大顶堆[root, n)（非递归）while
-public static void adjustDownHeap(int[] nums, int root, int n) {
-	// while 版
-	int child = root*2+1; // 沿root节点较大的子节点向下调整
-	while (child &lt; n) {
-		// 如果左子结点小于右子结点
-		if (child + 1 &lt; n &amp;&amp; nums[child] &lt; nums[child+1]) { // 注意边界child+1
-			child ++; // 则取右子结点
-		}
-		if (nums[root] &gt;= nums[child]) { // not &gt;, 如果堆顶结点最大
-			break; // 则调整结束
-		} else {
-			swap(nums, root, child); // 将大者与父结点交换
-			root = child; // 将大者作为root，继续向下(递归)调整
-			child = root*2 + 1;
-		}
-	}
+<span class="c1">// 自上而下调整大顶堆[root, n)（非递归）while</span>
+<span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">adjustDownHeap</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">nums</span><span class="o">,</span> <span class="kt">int</span> <span class="n">root</span><span class="o">,</span> <span class="kt">int</span> <span class="n">n</span><span class="o">)</span> <span class="o">{</span>
+	<span class="c1">// while 版</span>
+	<span class="kt">int</span> <span class="n">child</span> <span class="o">=</span> <span class="n">root</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span><span class="o">;</span> <span class="c1">// 沿root节点较大的子节点向下调整</span>
+	<span class="k">while</span> <span class="o">(</span><span class="n">child</span> <span class="o">&lt;</span> <span class="n">n</span><span class="o">)</span> <span class="o">{</span>
+		<span class="c1">// 如果左子结点小于右子结点</span>
+		<span class="k">if</span> <span class="o">(</span><span class="n">child</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="n">n</span> <span class="o">&amp;&amp;</span> <span class="n">nums</span><span class="o">[</span><span class="n">child</span><span class="o">]</span> <span class="o">&lt;</span> <span class="n">nums</span><span class="o">[</span><span class="n">child</span><span class="o">+</span><span class="mi">1</span><span class="o">])</span> <span class="o">{</span> <span class="c1">// 注意边界child+1</span>
+			<span class="n">child</span> <span class="o">++;</span> <span class="c1">// 则取右子结点</span>
+		<span class="o">}</span>
+		<span class="k">if</span> <span class="o">(</span><span class="n">nums</span><span class="o">[</span><span class="n">root</span><span class="o">]</span> <span class="o">&gt;=</span> <span class="n">nums</span><span class="o">[</span><span class="n">child</span><span class="o">])</span> <span class="o">{</span> <span class="c1">// not &gt;, 如果堆顶结点最大</span>
+			<span class="k">break</span><span class="o">;</span> <span class="c1">// 则调整结束</span>
+		<span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+			<span class="n">swap</span><span class="o">(</span><span class="n">nums</span><span class="o">,</span> <span class="n">root</span><span class="o">,</span> <span class="n">child</span><span class="o">);</span> <span class="c1">// 将大者与父结点交换</span>
+			<span class="n">root</span> <span class="o">=</span> <span class="n">child</span><span class="o">;</span> <span class="c1">// 将大者作为root，继续向下(递归)调整</span>
+			<span class="n">child</span> <span class="o">=</span> <span class="n">root</span><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="o">;</span>
+		<span class="o">}</span>
+	<span class="o">}</span>
 	
-	// for not swap版，教科书写法
-	int x = nums[root];
-	for (int child = 2*root + 1; child &lt; n; child = child*2 + 1) {
-		....
-		} else {
-			nums[root] = nums[child]; // 将大者赋给父结点
-			root = child;
-		}
-	}
-	nums[root] = x;	// 将堆顶节点放到最终位置
-}
+	<span class="c1">// for not swap版，教科书写法</span>
+	<span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="n">nums</span><span class="o">[</span><span class="n">root</span><span class="o">];</span>
+	<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">child</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">root</span> <span class="o">+</span> <span class="mi">1</span><span class="o">;</span> <span class="n">child</span> <span class="o">&lt;</span> <span class="n">n</span><span class="o">;</span> <span class="n">child</span> <span class="o">=</span> <span class="n">child</span><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
+		<span class="o">....</span>
+		<span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+			<span class="n">nums</span><span class="o">[</span><span class="n">root</span><span class="o">]</span> <span class="o">=</span> <span class="n">nums</span><span class="o">[</span><span class="n">child</span><span class="o">];</span> <span class="c1">// 将大者赋给父结点</span>
+			<span class="n">root</span> <span class="o">=</span> <span class="n">child</span><span class="o">;</span>
+		<span class="o">}</span>
+	<span class="o">}</span>
+	<span class="n">nums</span><span class="o">[</span><span class="n">root</span><span class="o">]</span> <span class="o">=</span> <span class="n">x</span><span class="o">;</span>	<span class="c1">// 将堆顶节点放到最终位置</span>
+<span class="o">}</span>
 
-// 自上而下调整大顶堆（递归）
-public static void adjustDownHeap(int[] nums, int root, int n) {
-	int left = i*2 + 1;
-	int right = i*2 + 2;
-	if (left &lt; n &amp;&amp; nums[i] &lt; nums[left]) {
-		swap(nums, i, left);
-		adjustHeap(nums, left, n);
-	}
-	if (right &lt; n &amp;&amp; nums[i] &lt; nums[right]) {
-		swap(nums, i, right);
-		adjustHeap(nums, right, n);
-	}
-}
+<span class="c1">// 自上而下调整大顶堆（递归）</span>
+<span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">adjustDownHeap</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">nums</span><span class="o">,</span> <span class="kt">int</span> <span class="n">root</span><span class="o">,</span> <span class="kt">int</span> <span class="n">n</span><span class="o">)</span> <span class="o">{</span>
+	<span class="kt">int</span> <span class="n">left</span> <span class="o">=</span> <span class="n">i</span><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="o">;</span>
+	<span class="kt">int</span> <span class="n">right</span> <span class="o">=</span> <span class="n">i</span><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span><span class="o">;</span>
+	<span class="k">if</span> <span class="o">(</span><span class="n">left</span> <span class="o">&lt;</span> <span class="n">n</span> <span class="o">&amp;&amp;</span> <span class="n">nums</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">&lt;</span> <span class="n">nums</span><span class="o">[</span><span class="n">left</span><span class="o">])</span> <span class="o">{</span>
+		<span class="n">swap</span><span class="o">(</span><span class="n">nums</span><span class="o">,</span> <span class="n">i</span><span class="o">,</span> <span class="n">left</span><span class="o">);</span>
+		<span class="n">adjustHeap</span><span class="o">(</span><span class="n">nums</span><span class="o">,</span> <span class="n">left</span><span class="o">,</span> <span class="n">n</span><span class="o">);</span>
+	<span class="o">}</span>
+	<span class="k">if</span> <span class="o">(</span><span class="n">right</span> <span class="o">&lt;</span> <span class="n">n</span> <span class="o">&amp;&amp;</span> <span class="n">nums</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">&lt;</span> <span class="n">nums</span><span class="o">[</span><span class="n">right</span><span class="o">])</span> <span class="o">{</span>
+		<span class="n">swap</span><span class="o">(</span><span class="n">nums</span><span class="o">,</span> <span class="n">i</span><span class="o">,</span> <span class="n">right</span><span class="o">);</span>
+		<span class="n">adjustHeap</span><span class="o">(</span><span class="n">nums</span><span class="o">,</span> <span class="n">right</span><span class="o">,</span> <span class="n">n</span><span class="o">);</span>
+	<span class="o">}</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h4 id="4-2-路归并排序">4. （2-路）归并排序</h4>
@@ -506,47 +506,47 @@ public static void adjustDownHeap(int[] nums, int root, int n) {
 
 <p><img src="../assets/merge_sort.gif" alt="img" style="zoom:50%;" /></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public static void merge(int[] a, int low, int mid, int high) {
-    // int firstStart, int firstEnd, int secondStart, int secondEnd
-    //int[] firstCopy = new int(secondEnd - firstStart + 1);
-    //for (int i = s1; i &lt; e2; i++) {
-        //c[i] = a[i];
-    //}
-	// 改进：先将原数组a复制出来，结果可直接放进a
-	int[] temp = Arrays.copyOfRange(a, low, high + 1); // [lo, hi+1)
-	int i = low; // 第一个数组（左半部分）的指针
-	int j = mid + 1; // 第二个数组的指针
-	int k = low; // 注意下标不从0开始
-	// 已排序数组[low, mid] 和 [mid + 1, high]
-	while (i &lt;= mid &amp;&amp; j &lt;= high) { // &amp;&amp;
-		if (temp[i] &lt; temp[j]) {
-			a[k++] = temp[i++];
-		} else {
-			a[k++] = temp[j++];
-		}
-	}
-	// 把第一个数组剩余的数移入原数组
-    while (i &lt;= mid) { // [lo, mid], not high
-    	a[k++] = temp[i++];
-    }
-	while (j &lt;= high) { // [mid+1, hi]
-    	a[k++] = temp[j++];
-    }
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">merge</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">a</span><span class="o">,</span> <span class="kt">int</span> <span class="n">low</span><span class="o">,</span> <span class="kt">int</span> <span class="n">mid</span><span class="o">,</span> <span class="kt">int</span> <span class="n">high</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// int firstStart, int firstEnd, int secondStart, int secondEnd</span>
+    <span class="c1">//int[] firstCopy = new int(secondEnd - firstStart + 1);</span>
+    <span class="c1">//for (int i = s1; i &lt; e2; i++) {</span>
+        <span class="c1">//c[i] = a[i];</span>
+    <span class="c1">//}</span>
+	<span class="c1">// 改进：先将原数组a复制出来，结果可直接放进a</span>
+	<span class="kt">int</span><span class="o">[]</span> <span class="n">temp</span> <span class="o">=</span> <span class="n">Arrays</span><span class="o">.</span><span class="na">copyOfRange</span><span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">low</span><span class="o">,</span> <span class="n">high</span> <span class="o">+</span> <span class="mi">1</span><span class="o">);</span> <span class="c1">// [lo, hi+1)</span>
+	<span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">low</span><span class="o">;</span> <span class="c1">// 第一个数组（左半部分）的指针</span>
+	<span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">+</span> <span class="mi">1</span><span class="o">;</span> <span class="c1">// 第二个数组的指针</span>
+	<span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="n">low</span><span class="o">;</span> <span class="c1">// 注意下标不从0开始</span>
+	<span class="c1">// 已排序数组[low, mid] 和 [mid + 1, high]</span>
+	<span class="k">while</span> <span class="o">(</span><span class="n">i</span> <span class="o">&lt;=</span> <span class="n">mid</span> <span class="o">&amp;&amp;</span> <span class="n">j</span> <span class="o">&lt;=</span> <span class="n">high</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// &amp;&amp;</span>
+		<span class="k">if</span> <span class="o">(</span><span class="n">temp</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">&lt;</span> <span class="n">temp</span><span class="o">[</span><span class="n">j</span><span class="o">])</span> <span class="o">{</span>
+			<span class="n">a</span><span class="o">[</span><span class="n">k</span><span class="o">++]</span> <span class="o">=</span> <span class="n">temp</span><span class="o">[</span><span class="n">i</span><span class="o">++];</span>
+		<span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+			<span class="n">a</span><span class="o">[</span><span class="n">k</span><span class="o">++]</span> <span class="o">=</span> <span class="n">temp</span><span class="o">[</span><span class="n">j</span><span class="o">++];</span>
+		<span class="o">}</span>
+	<span class="o">}</span>
+	<span class="c1">// 把第一个数组剩余的数移入原数组</span>
+    <span class="k">while</span> <span class="o">(</span><span class="n">i</span> <span class="o">&lt;=</span> <span class="n">mid</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// [lo, mid], not high</span>
+    	<span class="n">a</span><span class="o">[</span><span class="n">k</span><span class="o">++]</span> <span class="o">=</span> <span class="n">temp</span><span class="o">[</span><span class="n">i</span><span class="o">++];</span>
+    <span class="o">}</span>
+	<span class="k">while</span> <span class="o">(</span><span class="n">j</span> <span class="o">&lt;=</span> <span class="n">high</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// [mid+1, hi]</span>
+    	<span class="n">a</span><span class="o">[</span><span class="n">k</span><span class="o">++]</span> <span class="o">=</span> <span class="n">temp</span><span class="o">[</span><span class="n">j</span><span class="o">++];</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 
-// 在[lo, hi]排序，初始值为[0, n-1]
-public static void mergeSort(int[] a, int low, int high) {
-	// low == high 时只有一个元素
-	if (low &lt; high) { // not n == 1
-		int mid = low + (high - low) / 2;
-		// 左边
-		mergeSort(a, low, mid); // not mid-1, n/2-1);
-		mergeSort(a, mid + 1, high); // not mid
-		// 左右归并
-		merge(a, low, mid, high);
-		// System.out.println(Arrays.toString(a));
-	}
-}
+<span class="c1">// 在[lo, hi]排序，初始值为[0, n-1]</span>
+<span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">mergeSort</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">a</span><span class="o">,</span> <span class="kt">int</span> <span class="n">low</span><span class="o">,</span> <span class="kt">int</span> <span class="n">high</span><span class="o">)</span> <span class="o">{</span>
+	<span class="c1">// low == high 时只有一个元素</span>
+	<span class="k">if</span> <span class="o">(</span><span class="n">low</span> <span class="o">&lt;</span> <span class="n">high</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// not n == 1</span>
+		<span class="kt">int</span> <span class="n">mid</span> <span class="o">=</span> <span class="n">low</span> <span class="o">+</span> <span class="o">(</span><span class="n">high</span> <span class="o">-</span> <span class="n">low</span><span class="o">)</span> <span class="o">/</span> <span class="mi">2</span><span class="o">;</span>
+		<span class="c1">// 左边</span>
+		<span class="n">mergeSort</span><span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">low</span><span class="o">,</span> <span class="n">mid</span><span class="o">);</span> <span class="c1">// not mid-1, n/2-1);</span>
+		<span class="n">mergeSort</span><span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">mid</span> <span class="o">+</span> <span class="mi">1</span><span class="o">,</span> <span class="n">high</span><span class="o">);</span> <span class="c1">// not mid</span>
+		<span class="c1">// 左右归并</span>
+		<span class="n">merge</span><span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">low</span><span class="o">,</span> <span class="n">mid</span><span class="o">,</span> <span class="n">high</span><span class="o">);</span>
+		<span class="c1">// System.out.println(Arrays.toString(a));</span>
+	<span class="o">}</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h4 id="5-非比较类的排序">5. 非比较类的排序</h4>
@@ -581,60 +581,60 @@ public static void mergeSort(int[] a, int low, int high) {
   </li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public static int[] countingSort(int[] nums) {
-	if (n &lt; 2) return nums;
-	// Arrays.sort(nums);
-	int[] extremum = getMinAndMax(nums);
-	int min = extremum[0];
-	int max = extremum[1];
-	// int min = Collections.min(Arrays.asList(nums));
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kt">int</span><span class="o">[]</span> <span class="nf">countingSort</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">nums</span><span class="o">)</span> <span class="o">{</span>
+	<span class="k">if</span> <span class="o">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="o">)</span> <span class="k">return</span> <span class="n">nums</span><span class="o">;</span>
+	<span class="c1">// Arrays.sort(nums);</span>
+	<span class="kt">int</span><span class="o">[]</span> <span class="n">extremum</span> <span class="o">=</span> <span class="n">getMinAndMax</span><span class="o">(</span><span class="n">nums</span><span class="o">);</span>
+	<span class="kt">int</span> <span class="n">min</span> <span class="o">=</span> <span class="n">extremum</span><span class="o">[</span><span class="mi">0</span><span class="o">];</span>
+	<span class="kt">int</span> <span class="n">max</span> <span class="o">=</span> <span class="n">extremum</span><span class="o">[</span><span class="mi">1</span><span class="o">];</span>
+	<span class="c1">// int min = Collections.min(Arrays.asList(nums));</span>
 	
-	int len = max - min + 1; // 元素大小的极值差，用于减小数组count的大小
-	// int count[len+1] = 0;
-	int[] count = new int[len+1];
-	int[] re = new int[n];
+	<span class="kt">int</span> <span class="n">len</span> <span class="o">=</span> <span class="n">max</span> <span class="o">-</span> <span class="n">min</span> <span class="o">+</span> <span class="mi">1</span><span class="o">;</span> <span class="c1">// 元素大小的极值差，用于减小数组count的大小</span>
+	<span class="c1">// int count[len+1] = 0;</span>
+	<span class="kt">int</span><span class="o">[]</span> <span class="n">count</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="o">[</span><span class="n">len</span><span class="o">+</span><span class="mi">1</span><span class="o">];</span>
+	<span class="kt">int</span><span class="o">[]</span> <span class="n">re</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="o">[</span><span class="n">n</span><span class="o">];</span>
 
-	for (int num : nums) {
-		int j = num - min; // 减去极差
-		count[j] += 1; // 初始化数组，（1表示值为j的元素有1个），统计值为j的元素个数
-	}
-	for (int j = 1; j &lt;= len; j++) { // len = count.length - 1
-		count[j] += count[j-1]; // 原数组求前缀和，count[j-1]表示偏移量
-	}
-	// 关键
-	for (int i = n - 1; i &gt;= 0; i--) {
-		int j = count[i] + min - 1;	// -1，前缀和是为了求元素在最终结果re的索引j
-		re[j] = count[i];
-		count[i+1] -= 1; // i+1处元素数量-1
-	}
-	return re;
-}
-// 方法一，不好
-public static int[] getMinAndMax(int[] arr) {
-    int maxValue = arr[0];
-    int minValue = arr[0];
-    for (int i = 0; i &lt; arr.length; i++) {
-        if (arr[i] &gt; maxValue) {
-            maxValue = arr[i];
-        } else if (arr[i] &lt; minValue) {
-            minValue = arr[i];
-        }
-    }
-    return new int[] { minValue, maxValue };
-}
-// 方法二
-public static int[] getMinAndMax(List&lt;Integer&gt; arr) {
-    int maxValue = arr.get(0);
-    int minValue = arr.get(0);
-    for (int i : arr) {
-        if (i &gt; maxValue) {
-            maxValue = i;
-        } else if (i &lt; minValue) {
-            minValue = i;
-        }
-    }
-    return new int[] { minValue, maxValue };
-}
+	<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">num</span> <span class="o">:</span> <span class="n">nums</span><span class="o">)</span> <span class="o">{</span>
+		<span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">num</span> <span class="o">-</span> <span class="n">min</span><span class="o">;</span> <span class="c1">// 减去极差</span>
+		<span class="n">count</span><span class="o">[</span><span class="n">j</span><span class="o">]</span> <span class="o">+=</span> <span class="mi">1</span><span class="o">;</span> <span class="c1">// 初始化数组，（1表示值为j的元素有1个），统计值为j的元素个数</span>
+	<span class="o">}</span>
+	<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span> <span class="n">j</span> <span class="o">&lt;=</span> <span class="n">len</span><span class="o">;</span> <span class="n">j</span><span class="o">++)</span> <span class="o">{</span> <span class="c1">// len = count.length - 1</span>
+		<span class="n">count</span><span class="o">[</span><span class="n">j</span><span class="o">]</span> <span class="o">+=</span> <span class="n">count</span><span class="o">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="o">];</span> <span class="c1">// 原数组求前缀和，count[j-1]表示偏移量</span>
+	<span class="o">}</span>
+	<span class="c1">// 关键</span>
+	<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="o">;</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span><span class="o">--)</span> <span class="o">{</span>
+		<span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">count</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">+</span> <span class="n">min</span> <span class="o">-</span> <span class="mi">1</span><span class="o">;</span>	<span class="c1">// -1，前缀和是为了求元素在最终结果re的索引j</span>
+		<span class="n">re</span><span class="o">[</span><span class="n">j</span><span class="o">]</span> <span class="o">=</span> <span class="n">count</span><span class="o">[</span><span class="n">i</span><span class="o">];</span>
+		<span class="n">count</span><span class="o">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="o">]</span> <span class="o">-=</span> <span class="mi">1</span><span class="o">;</span> <span class="c1">// i+1处元素数量-1</span>
+	<span class="o">}</span>
+	<span class="k">return</span> <span class="n">re</span><span class="o">;</span>
+<span class="o">}</span>
+<span class="c1">// 方法一，不好</span>
+<span class="kd">public</span> <span class="kd">static</span> <span class="kt">int</span><span class="o">[]</span> <span class="nf">getMinAndMax</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">arr</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">maxValue</span> <span class="o">=</span> <span class="n">arr</span><span class="o">[</span><span class="mi">0</span><span class="o">];</span>
+    <span class="kt">int</span> <span class="n">minValue</span> <span class="o">=</span> <span class="n">arr</span><span class="o">[</span><span class="mi">0</span><span class="o">];</span>
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">arr</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">arr</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">&gt;</span> <span class="n">maxValue</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">maxValue</span> <span class="o">=</span> <span class="n">arr</span><span class="o">[</span><span class="n">i</span><span class="o">];</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">arr</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">&lt;</span> <span class="n">minValue</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">minValue</span> <span class="o">=</span> <span class="n">arr</span><span class="o">[</span><span class="n">i</span><span class="o">];</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="kt">int</span><span class="o">[]</span> <span class="o">{</span> <span class="n">minValue</span><span class="o">,</span> <span class="n">maxValue</span> <span class="o">};</span>
+<span class="o">}</span>
+<span class="c1">// 方法二</span>
+<span class="kd">public</span> <span class="kd">static</span> <span class="kt">int</span><span class="o">[]</span> <span class="nf">getMinAndMax</span><span class="o">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">arr</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">maxValue</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+    <span class="kt">int</span> <span class="n">minValue</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">:</span> <span class="n">arr</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">i</span> <span class="o">&gt;</span> <span class="n">maxValue</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">maxValue</span> <span class="o">=</span> <span class="n">i</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">minValue</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">minValue</span> <span class="o">=</span> <span class="n">i</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="kt">int</span><span class="o">[]</span> <span class="o">{</span> <span class="n">minValue</span><span class="o">,</span> <span class="n">maxValue</span> <span class="o">};</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h5 id="52-基数排序">5.2 基数排序</h5>
@@ -658,47 +658,47 @@ public static int[] getMinAndMax(List&lt;Integer&gt; arr) {
 
 <p><img src="../assets/radix_sort2.gif" alt="图片" style="zoom:50%;" /></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public static int[] radixSort(int[] arr) {
-    if (arr.length &lt; 2) {
-        return arr;
-    }
-    int maxValue = arr[0];
-    for (int element : arr) {
-        if (element &gt; maxValue) {
-            maxValue = element;
-        }
-    }
-    int N = (int)(Math.log10(maxValue) + 1);
-    /*
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kt">int</span><span class="o">[]</span> <span class="nf">radixSort</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">arr</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">arr</span><span class="o">.</span><span class="na">length</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">arr</span><span class="o">;</span>
+    <span class="o">}</span>
+    <span class="kt">int</span> <span class="n">maxValue</span> <span class="o">=</span> <span class="n">arr</span><span class="o">[</span><span class="mi">0</span><span class="o">];</span>
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">element</span> <span class="o">:</span> <span class="n">arr</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">element</span> <span class="o">&gt;</span> <span class="n">maxValue</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">maxValue</span> <span class="o">=</span> <span class="n">element</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="kt">int</span> <span class="n">N</span> <span class="o">=</span> <span class="o">(</span><span class="kt">int</span><span class="o">)(</span><span class="n">Math</span><span class="o">.</span><span class="na">log10</span><span class="o">(</span><span class="n">maxValue</span><span class="o">)</span> <span class="o">+</span> <span class="mi">1</span><span class="o">);</span>
+    <span class="cm">/*
     int N = 0;
     while (maxValue != 0) {
         maxValue /= 10;
         N += 1;
     }
-    */
+    */</span>
     
-    for (int i = 0; i &lt; N; i++) {
-        // 第i位初始化
-        List&lt;List&lt;Integer&gt; &gt; radix = new ArrayList&lt;&gt;();
-        // 第i位有10种取值
-        for (int k = 0; k &lt; 10; k++) {
-            radix.add(new ArrayList&lt;Integer&gt;());
-        }
-        // 收集
-        for (int element : arr) {
-        	// 取第i位的数字
-            int idx = (element / (int)Math.pow(10, i) ) % 10;
-            radix.get(idx).add(element);
-        }
-        // 赋给原数组
-        int idx = 0;
-        for (List&lt;Integer&gt; list : radix) {
-            for (int x : list) {
-                arr[idx++] = x;
-            }
-        }
-    }
-}
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">N</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+        <span class="c1">// 第i位初始化</span>
+        <span class="n">List</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">radix</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
+        <span class="c1">// 第i位有10种取值</span>
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="o">;</span> <span class="n">k</span><span class="o">++)</span> <span class="o">{</span>
+            <span class="n">radix</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;());</span>
+        <span class="o">}</span>
+        <span class="c1">// 收集</span>
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">element</span> <span class="o">:</span> <span class="n">arr</span><span class="o">)</span> <span class="o">{</span>
+        	<span class="c1">// 取第i位的数字</span>
+            <span class="kt">int</span> <span class="n">idx</span> <span class="o">=</span> <span class="o">(</span><span class="n">element</span> <span class="o">/</span> <span class="o">(</span><span class="kt">int</span><span class="o">)</span><span class="n">Math</span><span class="o">.</span><span class="na">pow</span><span class="o">(</span><span class="mi">10</span><span class="o">,</span> <span class="n">i</span><span class="o">)</span> <span class="o">)</span> <span class="o">%</span> <span class="mi">10</span><span class="o">;</span>
+            <span class="n">radix</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">idx</span><span class="o">).</span><span class="na">add</span><span class="o">(</span><span class="n">element</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="c1">// 赋给原数组</span>
+        <span class="kt">int</span> <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+        <span class="k">for</span> <span class="o">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">:</span> <span class="n">radix</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">x</span> <span class="o">:</span> <span class="n">list</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">arr</span><span class="o">[</span><span class="n">idx</span><span class="o">++]</span> <span class="o">=</span> <span class="n">x</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h5 id="53-桶排序">5.3 桶排序</h5>
@@ -730,38 +730,38 @@ public static int[] getMinAndMax(List&lt;Integer&gt; arr) {
 
 <p><img src="../assets/bucket_sort1.png" alt="img" style="zoom:35%;" /><img src="../assets/bucket_sort.gif" alt="图片" style="zoom:40%;" /></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public static List&lt;Integer&gt; bucketSort(List&lt;Integer&gt; arr, int buketSize) {
-	int n = arr.length;
-	if (n &lt; 2 || buketSize == 0) return arr;
-	int[] extremum = getMinAndMax(arr);
-	int min = extremum[0];
-	int max = extremum[1];
-	// 桶个数，向下取整
-	int bucketCnt = (int)Math.floor((max-min) / buketSize) + 1;
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="nf">bucketSort</span><span class="o">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">arr</span><span class="o">,</span> <span class="kt">int</span> <span class="n">buketSize</span><span class="o">)</span> <span class="o">{</span>
+	<span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
+	<span class="k">if</span> <span class="o">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="o">||</span> <span class="n">buketSize</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="k">return</span> <span class="n">arr</span><span class="o">;</span>
+	<span class="kt">int</span><span class="o">[]</span> <span class="n">extremum</span> <span class="o">=</span> <span class="n">getMinAndMax</span><span class="o">(</span><span class="n">arr</span><span class="o">);</span>
+	<span class="kt">int</span> <span class="n">min</span> <span class="o">=</span> <span class="n">extremum</span><span class="o">[</span><span class="mi">0</span><span class="o">];</span>
+	<span class="kt">int</span> <span class="n">max</span> <span class="o">=</span> <span class="n">extremum</span><span class="o">[</span><span class="mi">1</span><span class="o">];</span>
+	<span class="c1">// 桶个数，向下取整</span>
+	<span class="kt">int</span> <span class="n">bucketCnt</span> <span class="o">=</span> <span class="o">(</span><span class="kt">int</span><span class="o">)</span><span class="n">Math</span><span class="o">.</span><span class="na">floor</span><span class="o">((</span><span class="n">max</span><span class="o">-</span><span class="n">min</span><span class="o">)</span> <span class="o">/</span> <span class="n">buketSize</span><span class="o">)</span> <span class="o">+</span> <span class="mi">1</span><span class="o">;</span>
 	
-	List&lt;List&lt;Integer&gt; &gt; buckets = new ArrayList&lt;&gt;();
-	for (int i = 0; i &lt; bucketCnt; i++) {
-		buckets.add(new ArrayList&lt;Integer&gt;()); // 创建桶
-	}
-	for (Integer el : arr) {
-		int j = (el - min)/bucketSize; // idx
-		buckets.get(j).add(el);	// 放进桶里
-	}
+	<span class="n">List</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">buckets</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
+	<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">bucketCnt</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+		<span class="n">buckets</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;());</span> <span class="c1">// 创建桶</span>
+	<span class="o">}</span>
+	<span class="k">for</span> <span class="o">(</span><span class="n">Integer</span> <span class="n">el</span> <span class="o">:</span> <span class="n">arr</span><span class="o">)</span> <span class="o">{</span>
+		<span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="o">(</span><span class="n">el</span> <span class="o">-</span> <span class="n">min</span><span class="o">)/</span><span class="n">bucketSize</span><span class="o">;</span> <span class="c1">// idx</span>
+		<span class="n">buckets</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">j</span><span class="o">).</span><span class="na">add</span><span class="o">(</span><span class="n">el</span><span class="o">);</span>	<span class="c1">// 放进桶里</span>
+	<span class="o">}</span>
 	
-	List&lt;Integer&gt; re = new ArrayList&lt;&gt;();
-	// int index = 0;
-	for (int i = 0; i &lt; buckets.size(); i++) {
-		List&lt;Integer&gt; bkt = buckets.get(i);
-		if (bkt.size &gt; 1) {
-			insertSort(bkt); // 桶内插入排序
-		}
-		for (Integer k : bkt) {
-			re.add(k); // 将排好序的数据，放回原来的序列中
-			// index++;
-		}
-	}
-	return re;
-}
+	<span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">re</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
+	<span class="c1">// int index = 0;</span>
+	<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">buckets</span><span class="o">.</span><span class="na">size</span><span class="o">();</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+		<span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">bkt</span> <span class="o">=</span> <span class="n">buckets</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+		<span class="k">if</span> <span class="o">(</span><span class="n">bkt</span><span class="o">.</span><span class="na">size</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
+			<span class="n">insertSort</span><span class="o">(</span><span class="n">bkt</span><span class="o">);</span> <span class="c1">// 桶内插入排序</span>
+		<span class="o">}</span>
+		<span class="k">for</span> <span class="o">(</span><span class="n">Integer</span> <span class="n">k</span> <span class="o">:</span> <span class="n">bkt</span><span class="o">)</span> <span class="o">{</span>
+			<span class="n">re</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">k</span><span class="o">);</span> <span class="c1">// 将排好序的数据，放回原来的序列中</span>
+			<span class="c1">// index++;</span>
+		<span class="o">}</span>
+	<span class="o">}</span>
+	<span class="k">return</span> <span class="n">re</span><span class="o">;</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h4 id="6-外部排序">6. 外部排序</h4>
@@ -794,9 +794,9 @@ public static int[] getMinAndMax(List&lt;Integer&gt; arr) {
 
 <p>基本思想：减而治之（减治）思想，逐渐（减半）缩小问题规模。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Arrays.sort(nums);
-// 必须有序
-int index = Arrays.binarySearch(nums, [0, nums.length,] target);
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Arrays</span><span class="o">.</span><span class="na">sort</span><span class="o">(</span><span class="n">nums</span><span class="o">);</span>
+<span class="c1">// 必须有序</span>
+<span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="n">Arrays</span><span class="o">.</span><span class="na">binarySearch</span><span class="o">(</span><span class="n">nums</span><span class="o">,</span> <span class="o">[</span><span class="mi">0</span><span class="o">,</span> <span class="n">nums</span><span class="o">.</span><span class="na">length</span><span class="o">,]</span> <span class="n">target</span><span class="o">);</span>
 </code></pre></div></div>
 
 <h5 id="应用场景">应用场景</h5>
@@ -876,58 +876,66 @@ int index = Arrays.binarySearch(nums, [0, nums.length,] target);
   <p>常用 <code class="highlighter-rouge">[begin,end) </code>表示左闭右开，<code class="highlighter-rouge">[left, right]</code>、<code class="highlighter-rouge">[from, to]</code> 表示左闭右闭，范围包括左右端点。</p>
 </blockquote>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// leftBound()
-// searchFistPos()
-int binarySearch(int[] nums, int target) {
-	int result = -1;
-	int n = nums.length;
-    if (n &lt;= 0) return -1; //
-    int left = 0;
-    int right = n-1; // 查找区间为[left, right]，left = right + 1 时搜索区间为空，故while条件为l &lt;= r。推荐。
-    // //int right = n; // 查找区间为[left, right)，left = right 时搜索区间为空，故while条件为l &lt; r；不采用
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// leftBound()</span>
+<span class="c1">// searchFistPos()</span>
+<span class="kt">int</span> <span class="nf">binarySearch</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">nums</span><span class="o">,</span> <span class="kt">int</span> <span class="n">target</span><span class="o">)</span> <span class="o">{</span>
+	<span class="kt">int</span> <span class="n">result</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">;</span>
+	<span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">nums</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="o">)</span> <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="o">;</span> <span class="c1">//</span>
+    <span class="kt">int</span> <span class="n">left</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">right</span> <span class="o">=</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="o">;</span> <span class="c1">// 查找区间为[left, right]，left = right + 1 时搜索区间为空，故while条件为l &lt;= r。推荐。</span>
+    <span class="c1">// //int right = n; // 查找区间为[left, right)，left = right 时搜索区间为空，故while条件为l &lt; r；不采用</span>
 
-	// 终止条件是查找区间为[]时，表示在区间里只剩下一个元素时仍需继续查找
-    while (left &lt;= right) {
-    	// 防溢出，int signed 4byte 32bit ~2^31-1 ~21亿，取left = right = 2^31-2
-        int mid = left + (right - left) / 2;
-        int num = nums[mid];
-        // 若中间值小于目标值
-        if (num &lt; target) {
-        	// 则左边界向右收缩，搜索区间变为[mid + 1, right]
-            left = mid + 1;
-        } else if (num &gt; target) {
-        	// 右边界向左收缩
-            right = mid - 1;
+	<span class="c1">// 终止条件是查找区间为[]时，表示在区间里只剩下一个元素时仍需继续查找</span>
+    <span class="k">while</span> <span class="o">(</span><span class="n">left</span> <span class="o">&lt;=</span> <span class="n">right</span><span class="o">)</span> <span class="o">{</span>
+    	<span class="c1">// 防溢出，int signed 4byte 32bit ~2^31-1 ~21亿，取left = right = 2^31-2</span>
+        <span class="kt">int</span> <span class="n">mid</span> <span class="o">=</span> <span class="n">left</span> <span class="o">+</span> <span class="o">(</span><span class="n">right</span> <span class="o">-</span> <span class="n">left</span><span class="o">)</span> <span class="o">/</span> <span class="mi">2</span><span class="o">;</span>
+        <span class="kt">int</span> <span class="n">num</span> <span class="o">=</span> <span class="n">nums</span><span class="o">[</span><span class="n">mid</span><span class="o">];</span>
+        <span class="c1">// 若中间值小于目标值</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">num</span> <span class="o">&lt;</span> <span class="n">target</span><span class="o">)</span> <span class="o">{</span>
+        	<span class="c1">// 则左边界向右收缩，搜索区间变为[mid + 1, right]</span>
+            <span class="n">left</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">+</span> <span class="mi">1</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">num</span> <span class="o">&gt;</span> <span class="n">target</span><span class="o">)</span> <span class="o">{</span>
+        	<span class="c1">// 右边界向左收缩</span>
+            <span class="n">right</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">-</span> <span class="mi">1</span><span class="o">;</span>
             
-            // //[left, right)，当 nums[mid] 被检测后，下一步应去 mid 的左侧[left, mid)或右侧区间[mid + 1, right)搜索，不采用
-            // //left = mid + 1; right = mid;
-        } else {
-            // 0.当 nums[mid] == target 时立即返回
-            result = mid;
-            break;
+            <span class="c1">// //[left, right)，当 nums[mid] 被检测后，下一步应去 mid 的左侧[left, mid)或右侧区间[mid + 1, right)搜索，不采用</span>
+            <span class="c1">// //left = mid + 1; right = mid;</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="c1">// 0.当 nums[mid] == target 时立即返回</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">mid</span><span class="o">;</span>
+            <span class="k">break</span><span class="o">;</span>
 
-            // 1.找左边界时，当中间值和目标值相等时，右边界也需向左收缩，最终达到left锁定左边界的目的。
-    		right = mid - 1;
-    		// 2.找右边界时，收缩左侧边界
-    		left = mid + 1;
-        }
-    }
-    // 0.二分查找，未找到
-    return result;
+            <span class="c1">// 1.找左边界时，当中间值和目标值相等时，右边界也需向左收缩，最终达到left锁定左边界的目的。</span>
+    		<span class="n">right</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">-</span> <span class="mi">1</span><span class="o">;</span>
+    		<span class="c1">// 2.找右边界时，收缩左侧边界</span>
+    		<span class="n">left</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">+</span> <span class="mi">1</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="c1">// 0.二分查找，未找到</span>
+    <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
     
-    // 1.找左边界时，检查 left 是否越界、是否未找到目标值（未找到时left == right+1，查找区间为[]）
-    if (left &gt;= n || nums[left] != target) { return -1; }
-    return left;
+    <span class="c1">// 1.找左边界时，检查 left 是否越界、是否未找到目标值（未找到时left == right+1，查找区间为[]）</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">left</span> <span class="o">&gt;=</span> <span class="n">n</span> <span class="o">||</span> <span class="n">nums</span><span class="o">[</span><span class="n">left</span><span class="o">]</span> <span class="o">!=</span> <span class="n">target</span><span class="o">)</span> <span class="o">{</span> <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="o">;</span> <span class="o">}</span>
+    <span class="k">return</span> <span class="n">left</span><span class="o">;</span>
     
-    // 2.找右边界时，检查 right 是否越界
-    if (right &lt; 0 || nums[right] != target) { return -1; }
-    return right;
-}
+    <span class="c1">// 2.找右边界时，检查 right 是否越界</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">right</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">nums</span><span class="o">[</span><span class="n">right</span><span class="o">]</span> <span class="o">!=</span> <span class="n">target</span><span class="o">)</span> <span class="o">{</span> <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="o">;</span> <span class="o">}</span>
+    <span class="k">return</span> <span class="n">right</span><span class="o">;</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h4 id="b-树和-b-树">B 树和 B+ 树</h4>
 
+<blockquote>
+  <p>见数据结构文档 #二叉树部分、MySQL 文档 #存储引擎部分。</p>
+</blockquote>
+
 <h4 id="哈希表">哈希表</h4>
+
+<blockquote>
+  <p>见数据结构文档。</p>
+</blockquote>
 
 <h4 id="字符串模式匹配">字符串模式匹配</h4>
 
@@ -941,7 +949,7 @@ int binarySearch(int[] nums, int target) {
 
 <h2 id="分治与递归">分治与递归</h2>
 
-<h5 id="分治">分治</h5>
+<h4 id="分治">分治</h4>
 
 <p>分治（Divide and Conquer）：问题分而治之；</p>
 
@@ -951,7 +959,7 @@ int binarySearch(int[] nums, int target) {
   <li>合并（回溯）：将子问题的解合并成原问题的解。</li>
 </ol>
 
-<h5 id="递归">递归</h5>
+<h4 id="递归">递归</h4>
 
 <p>所有递归算法的本质上都是<a href="#前序/中序/后序遍历">二叉树的遍历</a>。</p>
 
@@ -987,36 +995,36 @@ int binarySearch(int[] nums, int target) {
 
 <p><img src="../assets/recursion.jpg" alt="img" style="zoom:50%;" /></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 打印缩进和i、j来debug递归
-int count = 0;
-void printIndent(int n) {
-    while (n-- &gt; 0)) {
-        System.out.print("\t");
-    }
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 打印缩进和i、j来debug递归</span>
+<span class="kt">int</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+<span class="kt">void</span> <span class="nf">printIndent</span><span class="o">(</span><span class="kt">int</span> <span class="n">n</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">while</span> <span class="o">(</span><span class="n">n</span><span class="o">--</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">))</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="s">"\t"</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 
-int dp(string&amp; ring, int i, string&amp; key, int j) {
-    // printIndent(count++);
-    // printf("i = %d, j = %d\n", i, j);
+<span class="kt">int</span> <span class="nf">dp</span><span class="o">(</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">ring</span><span class="o">,</span> <span class="kt">int</span> <span class="n">i</span><span class="o">,</span> <span class="n">string</span><span class="o">&amp;</span> <span class="n">key</span><span class="o">,</span> <span class="kt">int</span> <span class="n">j</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// printIndent(count++);</span>
+    <span class="c1">// printf("i = %d, j = %d\n", i, j);</span>
 
-    if (j == key.size()) {
-        // printIndent(--count);
-        // printf("return 0\n");
-        return 0;
-    }
+    <span class="k">if</span> <span class="o">(</span><span class="n">j</span> <span class="o">==</span> <span class="n">key</span><span class="o">.</span><span class="na">size</span><span class="o">())</span> <span class="o">{</span>
+        <span class="c1">// printIndent(--count);</span>
+        <span class="c1">// printf("return 0\n");</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="o">;</span>
+    <span class="o">}</span>
     
-    int res = INT_MAX;
-    for (int k : charToIndex[key[j]]) {
-        res = min(res, dp(ring, j, key, i + 1));
-    }
+    <span class="kt">int</span> <span class="n">res</span> <span class="o">=</span> <span class="n">INT_MAX</span><span class="o">;</span>
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">k</span> <span class="o">:</span> <span class="n">charToIndex</span><span class="o">[</span><span class="n">key</span><span class="o">[</span><span class="n">j</span><span class="o">]])</span> <span class="o">{</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">min</span><span class="o">(</span><span class="n">res</span><span class="o">,</span> <span class="n">dp</span><span class="o">(</span><span class="n">ring</span><span class="o">,</span> <span class="n">j</span><span class="o">,</span> <span class="n">key</span><span class="o">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="o">));</span>
+    <span class="o">}</span>
     
-    // printIndent(--count);
-    // printf("return %d\n", res);
-    return res;
-}
+    <span class="c1">// printIndent(--count);</span>
+    <span class="c1">// printf("return %d\n", res);</span>
+    <span class="k">return</span> <span class="n">res</span><span class="o">;</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
-<h5 id="经典例题-2">经典例题</h5>
+<h4 id="经典例题-2">经典例题</h4>
 
 <ul>
   <li>二叉树
@@ -1039,21 +1047,21 @@ int dp(string&amp; ring, int i, string&amp; key, int j) {
 
 <h5 id="为什么常用-dfs-寻找所有路径">为什么常用 DFS 寻找所有路径？</h5>
 
-<h5 id="广度优先搜索常见场景">广度优先搜索常见场景</h5>
+<h4 id="广度优先搜索常见场景">广度优先搜索常见场景</h4>
 
 <ul>
   <li>本质是在一幅「图或书」中，找到从起点 <code class="highlighter-rouge">start</code> 到终点 <code class="highlighter-rouge">target</code> 的最短距离；</li>
   <li>遍历图（或树）</li>
 </ul>
 
-<h5 id="经典例题-3">经典例题</h5>
+<h4 id="经典例题-3">经典例题</h4>
 
 <ul>
   <li><a href="#布隆过滤器">最短路径 Dijkstra 算法模板</a>：就是改造版 BFS 算法 + 类似 dp table 的数组。</li>
   <li><a href="https://leetcode.cn/problems/open-the-lock/">752.打开转盘锁的最少步数</a></li>
 </ul>
 
-<h5 id="bfs-算法框架">BFS 算法框架</h5>
+<h4 id="bfs-算法框架">BFS 算法框架</h4>
 
 <ul>
   <li><a href="#层序遍历">层序遍历</a></li>
@@ -1061,41 +1069,41 @@ int dp(string&amp; ring, int i, string&amp; key, int j) {
 
 <p><img src="../assets/binary_bfs.jpeg" alt="img" style="zoom: 28%;" /></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// BFS 遍历树：计算从起点 start 到终点 target 的最近距离
-int BFSTree(Node start, Node target) {
-	int step = 0; // 记录扩散的步数
-	if (start == null) {
-    	return step;
-    }
-	// 核心数据结构
-    Queue&lt;Node&gt; q = new LinkedList&lt;&gt;();
-    // 图避免走回头路，一般的二叉树结构没有子节点到父节点的指针，不会走回头路
-    Set&lt;Node&gt; visited = new HashSet&lt;&gt;(); 
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// BFS 遍历树：计算从起点 start 到终点 target 的最近距离</span>
+<span class="kt">int</span> <span class="nf">BFSTree</span><span class="o">(</span><span class="n">Node</span> <span class="n">start</span><span class="o">,</span> <span class="n">Node</span> <span class="n">target</span><span class="o">)</span> <span class="o">{</span>
+	<span class="kt">int</span> <span class="n">step</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="c1">// 记录扩散的步数</span>
+	<span class="k">if</span> <span class="o">(</span><span class="n">start</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+    	<span class="k">return</span> <span class="n">step</span><span class="o">;</span>
+    <span class="o">}</span>
+	<span class="c1">// 核心数据结构</span>
+    <span class="n">Queue</span><span class="o">&lt;</span><span class="n">Node</span><span class="o">&gt;</span> <span class="n">q</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LinkedList</span><span class="o">&lt;&gt;();</span>
+    <span class="c1">// 图避免走回头路，一般的二叉树结构没有子节点到父节点的指针，不会走回头路</span>
+    <span class="n">Set</span><span class="o">&lt;</span><span class="n">Node</span><span class="o">&gt;</span> <span class="n">visited</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashSet</span><span class="o">&lt;&gt;();</span> 
     
-    q.offer(start); // 将起点加入队列
-    visited.add(start);
+    <span class="n">q</span><span class="o">.</span><span class="na">offer</span><span class="o">(</span><span class="n">start</span><span class="o">);</span> <span class="c1">// 将起点加入队列</span>
+    <span class="n">visited</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">start</span><span class="o">);</span>
 
-    while (!q.isEmpty()) {
-        // 划重点：更新步数，记录层数
-        step++;
-        int sz = q.size();
-        // 将当前队列中的所有节点向四周扩散，遍历一层，按层从左到右遍历树
-        for (int i = 0; i &lt; sz; i++) {
-            Node cur = q.poll();
-            // 判断是否到达终点
-            if (cur is target)
-                return step;
-            // 将 cur 的相邻节点加入队列
-            for (Node x : cur.adj()) {
-                if (x not in visited) {
-                    q.offer(x);
-                    visited.add(x);
-                }
-            }
-        }
-    }
-    return step;
-}
+    <span class="k">while</span> <span class="o">(!</span><span class="n">q</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+        <span class="c1">// 划重点：更新步数，记录层数</span>
+        <span class="n">step</span><span class="o">++;</span>
+        <span class="kt">int</span> <span class="n">sz</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="na">size</span><span class="o">();</span>
+        <span class="c1">// 将当前队列中的所有节点向四周扩散，遍历一层，按层从左到右遍历树</span>
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">sz</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+            <span class="n">Node</span> <span class="n">cur</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="na">poll</span><span class="o">();</span>
+            <span class="c1">// 判断是否到达终点</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">cur</span> <span class="n">is</span> <span class="n">target</span><span class="o">)</span>
+                <span class="k">return</span> <span class="n">step</span><span class="o">;</span>
+            <span class="c1">// 将 cur 的相邻节点加入队列</span>
+            <span class="k">for</span> <span class="o">(</span><span class="n">Node</span> <span class="n">x</span> <span class="o">:</span> <span class="n">cur</span><span class="o">.</span><span class="na">adj</span><span class="o">())</span> <span class="o">{</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">x</span> <span class="n">not</span> <span class="n">in</span> <span class="n">visited</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="n">q</span><span class="o">.</span><span class="na">offer</span><span class="o">(</span><span class="n">x</span><span class="o">);</span>
+                    <span class="n">visited</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">x</span><span class="o">);</span>
+                <span class="o">}</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="n">step</span><span class="o">;</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h2 id="dfs-框架回溯">DFS 框架、回溯</h2>
@@ -1113,7 +1121,7 @@ int BFSTree(Node start, Node target) {
   </li>
 </ul>
 
-<h5 id="常见场景">常见场景</h5>
+<h4 id="常见场景">常见场景</h4>
 
 <ol>
   <li>遍历图（或树）；
@@ -1130,7 +1138,7 @@ int BFSTree(Node start, Node target) {
   </li>
 </ol>
 
-<h5 id="经典例题-4">经典例题</h5>
+<h4 id="经典例题-4">经典例题</h4>
 
 <ul>
   <li><a href="https://leetcode.cn/problems/permutations/">46.全排列（元素无重不可复选）</a>：<strong>回溯框架</strong>。
@@ -1176,7 +1184,7 @@ int BFSTree(Node start, Node target) {
   </li>
 </ul>
 
-<h5 id="回溯算法经典例题">回溯算法经典例题</h5>
+<h4 id="回溯算法经典例题">回溯算法经典例题</h4>
 
 <ul>
   <li><a href="https://leetcode.cn/problems/numbers-with-same-consecutive-differences/">967.连续差相同的数字</a>【】</li>
@@ -1188,7 +1196,7 @@ int BFSTree(Node start, Node target) {
   <li><a href="https://leetcode.cn/problems/word-search/">79.单词搜索</a>【】</li>
 </ul>
 
-<h5 id="回溯算法框架">回溯算法框架</h5>
+<h4 id="回溯算法框架">回溯算法框架</h4>
 
 <p>站在<strong>回溯树</strong>的一个节点上，只需思考 3 个问题：</p>
 
@@ -1202,45 +1210,45 @@ int BFSTree(Node start, Node target) {
 
 <p>另见<a href="#层序遍历">层序遍历</a>二叉树</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>List&lt;List&lt;Integer&gt; &gt; res = new LinkedList&lt;&gt;();
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">List</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">res</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LinkedList</span><span class="o">&lt;&gt;();</span>
 
-// 排列
-public List&lt;List&lt;Integer&gt; &gt; permute(int[] nums) {
-	// 一个排列，记录路径
-	LinkedList&lt;Integer&gt; track = new LinedList&lt;&gt;();
-	// 标记已走过路径中的元素，避免重复使用
-	backtrack(nums, track, used);
-	return res;
-}
+<span class="c1">// 排列</span>
+<span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">permute</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">nums</span><span class="o">)</span> <span class="o">{</span>
+	<span class="c1">// 一个排列，记录路径</span>
+	<span class="n">LinkedList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">track</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LinedList</span><span class="o">&lt;&gt;();</span>
+	<span class="c1">// 标记已走过路径中的元素，避免重复使用</span>
+	<span class="n">backtrack</span><span class="o">(</span><span class="n">nums</span><span class="o">,</span> <span class="n">track</span><span class="o">,</span> <span class="n">used</span><span class="o">);</span>
+	<span class="k">return</span> <span class="n">res</span><span class="o">;</span>
+<span class="o">}</span>
 
-// 回溯
-private void backtrack(int[] nums, 路径track, 选择列表) {
-    if 满足结束条件:
-        result.add(路径)
-        return
+<span class="c1">// 回溯</span>
+<span class="kd">private</span> <span class="kt">void</span> <span class="nf">backtrack</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">nums</span><span class="o">,</span> <span class="err">路径</span><span class="n">track</span><span class="o">,</span> <span class="err">选择列表</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="err">满足结束条件</span><span class="o">:</span>
+        <span class="n">result</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="err">路径</span><span class="o">)</span>
+        <span class="k">return</span>
 
-    for 选择 in 选择列表:
-        # 做选择
-        将该选择从选择列表移除
-    	路径.add(该选择) # 记录路径
+    <span class="k">for</span> <span class="err">选择</span> <span class="n">in</span> <span class="err">选择列表</span><span class="o">:</span>
+        <span class="err">#</span> <span class="err">做选择</span>
+        <span class="err">将该选择从选择列表移除</span>
+    	<span class="err">路径</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="err">该选择</span><span class="o">)</span> <span class="err">#</span> <span class="err">记录路径</span>
 
-        // 核心是递归
-        backtrack(路径, 选择列表)
+        <span class="c1">// 核心是递归</span>
+        <span class="n">backtrack</span><span class="o">(</span><span class="err">路径</span><span class="o">,</span> <span class="err">选择列表</span><span class="o">)</span>
 
-        # 可重复做选择的情况，撤销选择
-        路径.remove(选择)
-		将该选择再加入选择列表
+        <span class="err">#</span> <span class="err">可重复做选择的情况，撤销选择</span>
+        <span class="err">路径</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="err">选择</span><span class="o">)</span>
+		<span class="err">将该选择再加入选择列表</span>
 	
-	// 组合
-        for (int i = start; i &lt; nums.size(); i++) {
-        // 做选择
-        track.push_back(nums[i]);
-        // 回溯
-        backtrack(nums, i + 1, track);
-        // 撤销选择
-        track.pop_back();
-    }
-}
+	<span class="c1">// 组合</span>
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">start</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nums</span><span class="o">.</span><span class="na">size</span><span class="o">();</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+        <span class="c1">// 做选择</span>
+        <span class="n">track</span><span class="o">.</span><span class="na">push_back</span><span class="o">(</span><span class="n">nums</span><span class="o">[</span><span class="n">i</span><span class="o">]);</span>
+        <span class="c1">// 回溯</span>
+        <span class="n">backtrack</span><span class="o">(</span><span class="n">nums</span><span class="o">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="o">,</span> <span class="n">track</span><span class="o">);</span>
+        <span class="c1">// 撤销选择</span>
+        <span class="n">track</span><span class="o">.</span><span class="na">pop_back</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h2 id="贪心">贪心</h2>
@@ -1277,7 +1285,7 @@ private void backtrack(int[] nums, 路径track, 选择列表) {
 
 <p>动态规划的暴力穷举解法一般是递归形式，优化方法非常固定，要么是添加备忘录，要么是改写成迭代形式。</p>
 
-<h5 id="动态规划三要素">动态规划三要素</h5>
+<h4 id="动态规划三要素">动态规划三要素</h4>
 
 <ol>
   <li><strong>重复子问题</strong>：在计算的过程中，有一些问题会重复计算，必须记住结果；若没有重复子问题，可用「分治法」求解。</li>
@@ -1311,7 +1319,7 @@ private void backtrack(int[] nums, 路径track, 选择列表) {
   </li>
 </ol>
 
-<h5 id="子序列">子序列</h5>
+<h4 id="子序列">子序列</h4>
 
 <blockquote>
   <p>子序列 != 子串</p>
@@ -1361,7 +1369,7 @@ private void backtrack(int[] nums, 路径track, 选择列表) {
   </li>
 </ul>
 
-<h5 id="经典例题-5">经典例题</h5>
+<h4 id="经典例题-5">经典例题</h4>
 
 <ul>
   <li>
@@ -1417,87 +1425,92 @@ private void backtrack(int[] nums, 路径track, 选择列表) {
       <li><a href="https://leetcode.cn/problems/maximum-difference-between-increasing-elements/">2016.增量元素间的最大差值</a>【】</li>
     </ul>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  特化到 k = 1 买入或卖出一次的情况：
-  状态转移方程：max(今天选择 rest, 今天选择 sell);
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="err">特化到</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">1</span> <span class="err">买入或卖出一次的情况：</span>
+  <span class="err">状态转移方程：</span><span class="n">max</span><span class="o">(</span><span class="err">今天选择</span> <span class="n">rest</span><span class="o">,</span> <span class="err">今天选择</span> <span class="n">sell</span><span class="o">);</span>
     
-  今天未持有股票，对于昨天来说，有两种可能，从中求最大利润：
-  1、昨天未持有，今天选择 rest 休息，仍未持有；
-  2、昨天持有，今天选择 sell，未持有股票。
-  dp[i][0] = max(dp[i-1][0], dp[i-1][1] + prices[i]);
+  <span class="err">今天未持有股票，对于昨天来说，有两种可能，从中求最大利润：</span>
+  <span class="mi">1</span><span class="err">、昨天未持有，今天选择</span> <span class="n">rest</span> <span class="err">休息，仍未持有；</span>
+  <span class="mi">2</span><span class="err">、昨天持有，今天选择</span> <span class="n">sell</span><span class="err">，未持有股票。</span>
+  <span class="n">dp</span><span class="o">[</span><span class="n">i</span><span class="o">][</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="n">max</span><span class="o">(</span><span class="n">dp</span><span class="o">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="o">][</span><span class="mi">0</span><span class="o">],</span> <span class="n">dp</span><span class="o">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="o">][</span><span class="mi">1</span><span class="o">]</span> <span class="o">+</span> <span class="n">prices</span><span class="o">[</span><span class="n">i</span><span class="o">]);</span>
     
-  今天持有股票，有两种可能，从中求最大利润：
-  1、昨天就持有股票，今天选择 rest，今天仍持有股票；
-  2、昨天本没有持有，但今天选择 buy，持有了股票。
-  dp[i][1] = max(dp[i-1][1], -prices[i]);
-  // 即前一天没有持有股票时、使dp[i-1][0]=0，今天选择买入则利润为-prices[i]
+  <span class="err">今天持有股票，有两种可能，从中求最大利润：</span>
+  <span class="mi">1</span><span class="err">、昨天就持有股票，今天选择</span> <span class="n">rest</span><span class="err">，今天仍持有股票；</span>
+  <span class="mi">2</span><span class="err">、昨天本没有持有，但今天选择</span> <span class="n">buy</span><span class="err">，持有了股票。</span>
+  <span class="n">dp</span><span class="o">[</span><span class="n">i</span><span class="o">][</span><span class="mi">1</span><span class="o">]</span> <span class="o">=</span> <span class="n">max</span><span class="o">(</span><span class="n">dp</span><span class="o">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="o">][</span><span class="mi">1</span><span class="o">],</span> <span class="o">-</span><span class="n">prices</span><span class="o">[</span><span class="n">i</span><span class="o">]);</span>
+  <span class="c1">// 即前一天没有持有股票时、使dp[i-1][0]=0，今天选择买入则利润为-prices[i]</span>
     
-  base case：
-  dp[0][0] = 0;
-  dp[0][1] = -prices[i]; // Integer.MIN_VALUE;负数表示买入
+  <span class="n">base</span> <span class="k">case</span><span class="err">：</span>
+  <span class="n">dp</span><span class="o">[</span><span class="mi">0</span><span class="o">][</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+  <span class="n">dp</span><span class="o">[</span><span class="mi">0</span><span class="o">][</span><span class="mi">1</span><span class="o">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">prices</span><span class="o">[</span><span class="n">i</span><span class="o">];</span> <span class="c1">// Integer.MIN_VALUE;负数表示买入</span>
 </code></pre></div>    </div>
   </li>
 </ul>
 
-<h5 id="动态规划算法框架">动态规划算法框架</h5>
+<h4 id="动态规划算法框架">动态规划算法框架</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 一、递归（可看做动态规划函数），推荐
-int[] dp;
-// 返回要凑出金额 amount 至少需要的硬币数
-int coinDp(int[] coins, int amount) {
-    if (amount &lt; 0) return -1;
-    // base case
-    if (amount == 0) return 0;
-    // 查备忘录，防止重复计算
-    if (dp[amount] != dp.length) {
-    	return dp[amount];
-    }
+<h5 id="递归-1">递归</h5>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 一、递归（可看做动态规划函数），推荐</span>
+<span class="kt">int</span><span class="o">[]</span> <span class="n">dp</span><span class="o">;</span>
+<span class="c1">// 返回要凑出金额 amount 至少需要的硬币数</span>
+<span class="kt">int</span> <span class="nf">coinDp</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">coins</span><span class="o">,</span> <span class="kt">int</span> <span class="n">amount</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">amount</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="o">)</span> <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="o">;</span>
+    <span class="c1">// base case</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">amount</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="k">return</span> <span class="mi">0</span><span class="o">;</span>
+    <span class="c1">// 查备忘录，防止重复计算</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">dp</span><span class="o">[</span><span class="n">amount</span><span class="o">]</span> <span class="o">!=</span> <span class="n">dp</span><span class="o">.</span><span class="na">length</span><span class="o">)</span> <span class="o">{</span>
+    	<span class="k">return</span> <span class="n">dp</span><span class="o">[</span><span class="n">amount</span><span class="o">];</span>
+    <span class="o">}</span>
     
-    int res = Integer.MAX_VALUE;
-    // 遍历当前状态的所有取值,1、2、5
-    for (int coin : coins) {
-        // 计算子问题的结果
-        // amount - coin表示扣除当前面额，还需凑的金额
-        int subProblem = coinChange(coins, amount - coin);
-        // 子问题无解则跳过
-        if (subProblem == -1) continue;
-        // 在子问题中选择最优解，加1表示当前这枚硬币，面额可能为1、2、5
-        res = Math.min(res, subProblem + 1);
-    }
-    // 未正好凑出金额amount，则返回-1，把计算结果存入备忘录
-    dp[amount] = (res == Integer.MAX_VALUE) ? -1 : res;
-    return dp[amount];
-}
+    <span class="kt">int</span> <span class="n">res</span> <span class="o">=</span> <span class="n">Integer</span><span class="o">.</span><span class="na">MAX_VALUE</span><span class="o">;</span>
+    <span class="c1">// 遍历当前状态的所有取值,1、2、5</span>
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">coin</span> <span class="o">:</span> <span class="n">coins</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">// 计算子问题的结果</span>
+        <span class="c1">// amount - coin表示扣除当前面额，还需凑的金额</span>
+        <span class="kt">int</span> <span class="n">subProblem</span> <span class="o">=</span> <span class="n">coinChange</span><span class="o">(</span><span class="n">coins</span><span class="o">,</span> <span class="n">amount</span> <span class="o">-</span> <span class="n">coin</span><span class="o">);</span>
+        <span class="c1">// 子问题无解则跳过</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">subProblem</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="k">continue</span><span class="o">;</span>
+        <span class="c1">// 在子问题中选择最优解，加1表示当前这枚硬币，面额可能为1、2、5</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">Math</span><span class="o">.</span><span class="na">min</span><span class="o">(</span><span class="n">res</span><span class="o">,</span> <span class="n">subProblem</span> <span class="o">+</span> <span class="mi">1</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="c1">// 未正好凑出金额amount，则返回-1，把计算结果存入备忘录</span>
+    <span class="n">dp</span><span class="o">[</span><span class="n">amount</span><span class="o">]</span> <span class="o">=</span> <span class="o">(</span><span class="n">res</span> <span class="o">==</span> <span class="n">Integer</span><span class="o">.</span><span class="na">MAX_VALUE</span><span class="o">)</span> <span class="o">?</span> <span class="o">-</span><span class="mi">1</span> <span class="o">:</span> <span class="n">res</span><span class="o">;</span>
+    <span class="k">return</span> <span class="n">dp</span><span class="o">[</span><span class="n">amount</span><span class="o">];</span>
+<span class="o">}</span>
 
-int coinChange(int[] coins, int amount) {
-    // coins表示硬币面额，可取1、2、5
-	dp = new int[amount + 1];
-	// dp 数组全都初始化为特殊值
-	Arrays.fill(dp, amount + 1);
-	return dp(coins, amount);
-}
+<span class="kt">int</span> <span class="nf">coinChange</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">coins</span><span class="o">,</span> <span class="kt">int</span> <span class="n">amount</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// coins表示硬币面额，可取1、2、5</span>
+	<span class="n">dp</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="o">[</span><span class="n">amount</span> <span class="o">+</span> <span class="mi">1</span><span class="o">];</span>
+	<span class="c1">// dp 数组全都初始化为特殊值</span>
+	<span class="n">Arrays</span><span class="o">.</span><span class="na">fill</span><span class="o">(</span><span class="n">dp</span><span class="o">,</span> <span class="n">amount</span> <span class="o">+</span> <span class="mi">1</span><span class="o">);</span>
+	<span class="k">return</span> <span class="nf">dp</span><span class="o">(</span><span class="n">coins</span><span class="o">,</span> <span class="n">amount</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
 
-// 二、动态规划数组
-int coinChange(int[] coins, int amount) {
-    int[] dp = new int[amount + 1];
-    // dp 数组全都初始化为特殊值，如 amount + 1，数组大小也为 amount + 1，
-    // 因凑成 amount 金额的硬币数最多只可能等于 amount（全用 1 元），永远不可能为 amount + 1;
-    // 若初始化为 Integer.MAX_VALUE 的话，dp[i-coin] + 1 会导致整型溢出。
-    Arrays.fill(dp, amount + 1);
+<h5 id="动态规划数组">动态规划数组</h5>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 二、动态规划数组</span>
+<span class="kt">int</span> <span class="nf">coinChange</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">coins</span><span class="o">,</span> <span class="kt">int</span> <span class="n">amount</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">int</span><span class="o">[]</span> <span class="n">dp</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="o">[</span><span class="n">amount</span> <span class="o">+</span> <span class="mi">1</span><span class="o">];</span>
+    <span class="c1">// dp 数组全都初始化为特殊值，如 amount + 1，数组大小也为 amount + 1，</span>
+    <span class="c1">// 因凑成 amount 金额的硬币数最多只可能等于 amount（全用 1 元），永远不可能为 amount + 1;</span>
+    <span class="c1">// 若初始化为 Integer.MAX_VALUE 的话，dp[i-coin] + 1 会导致整型溢出。</span>
+    <span class="n">Arrays</span><span class="o">.</span><span class="na">fill</span><span class="o">(</span><span class="n">dp</span><span class="o">,</span> <span class="n">amount</span> <span class="o">+</span> <span class="mi">1</span><span class="o">);</span>
     
-    dp[0] = 0;
-    // 遍历所有状态
-    for (int i = 0; i &lt; dp.length; i++) {
-        // 遍历当前状态的所有取值，1、2、5求所有选择的最小值
-        for (int coin : coins) {
-            // dp下界溢出，子问题无解，跳过
-            if (i - coin &lt; 0) {
-                continue;
-            }
-            dp[i] = Math.min(dp[i], 1 + dp[i - coin]);
-        }
-    }
-    return (dp[amount] == amount + 1) ? -1 : dp[amount];
-}
+    <span class="n">dp</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+    <span class="c1">// 遍历所有状态</span>
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">dp</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+        <span class="c1">// 遍历当前状态的所有取值，1、2、5求所有选择的最小值</span>
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">coin</span> <span class="o">:</span> <span class="n">coins</span><span class="o">)</span> <span class="o">{</span>
+            <span class="c1">// dp下界溢出，子问题无解，跳过</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">coin</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">continue</span><span class="o">;</span>
+            <span class="o">}</span>
+            <span class="n">dp</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="n">Math</span><span class="o">.</span><span class="na">min</span><span class="o">(</span><span class="n">dp</span><span class="o">[</span><span class="n">i</span><span class="o">],</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">dp</span><span class="o">[</span><span class="n">i</span> <span class="o">-</span> <span class="n">coin</span><span class="o">]);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="o">(</span><span class="n">dp</span><span class="o">[</span><span class="n">amount</span><span class="o">]</span> <span class="o">==</span> <span class="n">amount</span> <span class="o">+</span> <span class="mi">1</span><span class="o">)</span> <span class="o">?</span> <span class="o">-</span><span class="mi">1</span> <span class="o">:</span> <span class="n">dp</span><span class="o">[</span><span class="n">amount</span><span class="o">];</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h2 id="位运算">位运算</h2>

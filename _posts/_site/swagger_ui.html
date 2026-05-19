@@ -10,13 +10,13 @@
 
 <h2 id="整合-swagger-ui-接口文档">整合 Swagger-UI 接口文档</h2>
 
-<h5 id="接口文档简介">接口文档简介</h5>
+<h4 id="接口文档简介">接口文档简介</h4>
 
 <p>Swagger-UI（音S歪戈）：可动态地根据<strong>注解</strong>生成在线API文档。是一套基于 OpenAPI 规范构建的开源工具，可帮助设计、构建、记录及使用 Restful 接口。</p>
 
 <p>作用： 前后端分离的情况下，只需少量注解即可生成一份自带 UI 界面的 <strong>Rest API 文档</strong>，包括接口需要的参数及返回值，还可直接对 API <strong>调试</strong>。</p>
 
-<h5 id="整合-swagger-ui-的步骤">整合 Swagger-UI 的步骤</h5>
+<h4 id="整合-swagger-ui-的步骤">整合 Swagger-UI 的步骤</h4>
 
 <ol>
   <li>添加项目依赖；</li>
@@ -53,7 +53,7 @@
 <span class="o">}</span>
 </code></pre></div></div>
 
-<h5 id="常用注解">常用注解</h5>
+<h4 id="常用注解">常用注解</h4>
 
 <ol>
   <li><code class="highlighter-rouge">@EnableSwagger2</code>：打开 Swagger-UI，用于生成相关文档信息；</li>
@@ -64,7 +64,11 @@
   <li><code class="highlighter-rouge">@Schema</code> 注解：通常与Swagger或OpenAPI规范一起使用，用于为API模型（如<a href="https://so.csdn.net/so/search?q=请求体&amp;spm=1001.2101.3001.7020">请求体</a>、响应体等）中的属性或整个模型<strong>提供元数据描述</strong>。这些描述信息对于生成API文档、客户端代码以及理解API的结构和用法非常有帮助。</li>
 </ol>
 
-<h5 id="commentgenerator-自定义注释生成器"><code class="highlighter-rouge">CommentGenerator</code> 自定义注释生成器</h5>
+<h4 id="commentgenerator"><code class="highlighter-rouge">CommentGenerator</code></h4>
+
+<blockquote>
+  <p>自定义注释生成器</p>
+</blockquote>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
  * 自定义注释生成器

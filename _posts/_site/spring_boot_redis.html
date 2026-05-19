@@ -10,10 +10,10 @@
 
 <h2 id="缓存">缓存</h2>
 
-<p>在系统访问量越来越大之后，往往最先出现瓶颈的往往是数据库。而为了减少数据库的压力，<strong>我们可以选择让产品砍掉消耗数据库性能的需求</strong>。当然，我们也可以选择如下方式优化：</p>
+<p>在系统访问量越来越大之后，往往最先出现瓶颈的往往是数据库。而为了减少数据库的压力，<strong>可以选择让产品砍掉消耗数据库性能的需求</strong>。当然，也可以选择如下方式优化：</p>
 
 <blockquote>
-  <p>艿艿：在这里，我们暂时不考虑优化数据库的硬件，索引等等手段。</p>
+  <p>在这里，暂时不考虑优化数据库的硬件，索引等等手段。</p>
 </blockquote>
 
 <ul>
@@ -295,44 +295,45 @@
 
 <p>那么同理，我们缓存对象，怎么进行对应呢？对于复杂的缓存对象，我们创建了 <code class="highlighter-rouge">cacheobject</code> 包，和 <code class="highlighter-rouge">dataobject</code> 包同层。如：</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>service # 业务逻辑层
-dao # 数据库访问层
-dataobject # DO
-cacheobject # 缓存对象
-</code></pre></div></div>
+<ul>
+  <li>service # 业务逻辑层</li>
+  <li>dao # 数据库访问层</li>
+  <li>dataobject # DO</li>
+  <li>cacheobject # 缓存对象</li>
+</ul>
 
 <p>并且所有的 Cache Object 对象使用 CacheObject 结尾，例如说 UserCacheObject、ProductCacheObject 。</p>
 
 <h4 id="42-数据访问层">4.2 数据访问层</h4>
 
-<p>在我们访问数据库时，我们会创建 <code class="highlighter-rouge">dao</code> 包，存放每个 DO 对应的 Dao 对应。那么对于每一个 CacheObject 类，我们也会创建一个其对应的 Dao 类。例如说，UserCacheObject 对应 UserCacheObjectDao 类。示例代码如下：</p>
+<p>在我们访问数据库时，我们会创建 <code class="highlighter-rouge">dao</code> 包，存放每个 DO 对应的 Dao 对应。那么对于每一个 CacheObject 类，我们也会创建一个其对应的 Dao 类。例如说，UserCacheObject 对应 UserCacheObjectDao 类。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@Repository
-public class UserCacheDao {
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Repository</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">UserCacheDao</span> <span class="o">{</span>
 
-    private static final String KEY_PATTERN = "user:%d"; // user:用户编号 &lt;1&gt;
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">KEY_PATTERN</span> <span class="o">=</span> <span class="s">"user:%d"</span><span class="o">;</span> <span class="c1">// user:用户编号 &lt;1&gt;</span>
 
-    @Resource(name = "redisTemplate")
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-    private ValueOperations&lt;String, String&gt; operations; // &lt;2&gt;
+    <span class="nd">@Resource</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"redisTemplate"</span><span class="o">)</span>
+    <span class="nd">@SuppressWarnings</span><span class="o">(</span><span class="s">"SpringJavaInjectionPointsAutowiringInspection"</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="n">ValueOperations</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">operations</span><span class="o">;</span> <span class="c1">// &lt;2&gt;</span>
 
-    private static String buildKey(Integer id) { // &lt;3&gt;
-        return String.format(KEY_PATTERN, id);
-    }
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">buildKey</span><span class="o">(</span><span class="n">Integer</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// &lt;3&gt;</span>
+        <span class="k">return</span> <span class="n">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="n">KEY_PATTERN</span><span class="o">,</span> <span class="n">id</span><span class="o">);</span>
+    <span class="o">}</span>
 
-    public UserCacheObject get(Integer id) {
-        String key = buildKey(id);
-        String value = operations.get(key);
-        return JSONUtil.parseObject(value, UserCacheObject.class);
-    }
+    <span class="kd">public</span> <span class="n">UserCacheObject</span> <span class="nf">get</span><span class="o">(</span><span class="n">Integer</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">String</span> <span class="n">key</span> <span class="o">=</span> <span class="n">buildKey</span><span class="o">(</span><span class="n">id</span><span class="o">);</span>
+        <span class="n">String</span> <span class="n">value</span> <span class="o">=</span> <span class="n">operations</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">key</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">JSONUtil</span><span class="o">.</span><span class="na">parseObject</span><span class="o">(</span><span class="n">value</span><span class="o">,</span> <span class="n">UserCacheObject</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+    <span class="o">}</span>
 
-    public void set(Integer id, UserCacheObject object) {
-        String key = buildKey(id);
-        String value = JSONUtil.toJSONString(object);
-        operations.set(key, value);
-    }
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">set</span><span class="o">(</span><span class="n">Integer</span> <span class="n">id</span><span class="o">,</span> <span class="n">UserCacheObject</span> <span class="n">object</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">String</span> <span class="n">key</span> <span class="o">=</span> <span class="n">buildKey</span><span class="o">(</span><span class="n">id</span><span class="o">);</span>
+        <span class="n">String</span> <span class="n">value</span> <span class="o">=</span> <span class="n">JSONUtil</span><span class="o">.</span><span class="na">toJSONString</span><span class="o">(</span><span class="n">object</span><span class="o">);</span>
+        <span class="n">operations</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">value</span><span class="o">);</span>
+    <span class="o">}</span>
 
-}
+<span class="o">}</span>
 </code></pre></div></div>
 
 <ul>
@@ -471,7 +472,7 @@ public class UserCacheDao {
   <li>9 秒后（因为我们 sleep 了 1 秒），主线程成功获得到 Redis 分布式锁，符合预期。</li>
 </ul>
 
-<h2 id="redis-缓存">Redis 缓存</h2>
+<h2 id="redis-实现缓存的方式">Redis 实现缓存的方式</h2>
 
 <p>使用 Redis 实现缓存，有 2 种使用方式：</p>
 
@@ -999,7 +1000,7 @@ public class UserCacheDao {
 <span class="o">}</span>
 </code></pre></div></div>
 
-<h5 id="接口">接口</h5>
+<h5 id="service-接口">Service 接口</h5>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">macro</span><span class="o">.</span><span class="na">mall</span><span class="o">.</span><span class="na">tiny</span><span class="o">.</span><span class="na">service</span><span class="o">;</span>
 
@@ -1084,3 +1085,166 @@ public class UserCacheDao {
 <blockquote>
   <p>如果未学习过 MySQL 与 Redis 一致性的问题，可以后续阅读 <a href="https://www.iocoder.cn/Fight/How-Redis-and-MySQL-double-write-consistency-guarantee/?yudao">《Redis 与 MySQL 双写一致性如何保证？ 》 (opens new window)</a>文章。</p>
 </blockquote>
+
+<h2 id="本地缓存">本地缓存</h2>
+
+<p>重要说明：</p>
+
+<p>① 由于大家普遍反馈，“本地缓存”学习成本太高，一般 Redis 缓存足够满足大多数场景的性能要求，所以基本使用 <a href="https://cloud.iocoder.cn/redis-cache">Spring Cache</a> + Redis 所替代。</p>
+
+<p>也因此，本章节更多的，是讲解如何在项目中使用本地缓存。如果你不需要本地缓存，可以忽略本章节。</p>
+
+<p>② 项目中还保留了部分地方使用本地缓存，例如说：<strong>短信客户端、文件客户端、敏感词</strong>等。主要原因是，它们是<strong>“有状态”的 Java 对象</strong>，无法缓存到 Redis 中。</p>
+
+<p>系统使用本地缓存，提升公用逻辑的执行性能。 例如说：</p>
+
+<ul>
+  <li><a href="https://github.com/YunaiV/yudao-cloud/blob/master/yudao-module-system/yudao-module-system-biz/src/main/java/cn/iocoder/yudao/module/system/service/tenant/TenantServiceImpl.java">租户模块 (opens new window)</a>缓存租户信息，每次 RESTful API 校验租户是否禁用、过期时，无需读库。</li>
+  <li><a href="https://github.com/YunaiV/yudao-cloud/blob/master/yudao-module-system/yudao-module-system-biz/src/main/java/cn/iocoder/yudao/module/system/service/dept/DeptServiceImpl.java">部门模块 (opens new window)</a>缓存部门信息，每次数据权限校验时，无需读库。</li>
+  <li><a href="https://github.com/YunaiV/yudao-cloud/blob/master/yudao-module-system/yudao-module-system-biz/src/main/java/cn/iocoder/yudao/module/system/service/permission/PermissionServiceImpl.java">权限模块 (opens new window)</a>缓存权限信息，每次功能权限校验时，无需读库。</li>
+</ul>
+
+<h4 id="实现原理">实现原理</h4>
+
+<p>本地缓存的实现，一共有两步，如下图所示：</p>
+
+<ol>
+  <li>项目启动时，<strong>初始化缓存</strong>：从数据库中读取数据，写入到本地缓存（例如说一个 Map 对象）</li>
+  <li>数据变化时，实时<strong>刷新缓存</strong>：（例如说通过管理后台修改数据）重新从数据库中读取数据，重新写入到本地缓存</li>
+</ol>
+
+<p>实战案例：以 <a href="https://github.com/YunaiV/yudao-cloud/blob/master/yudao-module-system/yudao-module-system-biz/src/main/java/cn/iocoder/yudao/module/system/service/permission/RoleServiceImpl.java">角色模块 (opens new window)</a>为例，讲解如何实现角色信息的本地缓存。</p>
+
+<p><img src="../assets/01-cloud.png" alt="实现原理" /></p>
+
+<h4 id="初始化缓存">初始化缓存</h4>
+
+<p>① 在 <a href="https://github.com/YunaiV/yudao-cloud/blob/master/yudao-module-system/yudao-module-system-biz/src/main/java/cn/iocoder/yudao/module/system/service/permission/RoleService.java">RoleService (opens new window)</a>接口中，定义 <code class="highlighter-rouge">#initLocalCache()</code> 方法。代码如下：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// RoleService.java</span>
+
+<span class="cm">/**
+ * 初始化角色的本地缓存
+ */</span>
+<span class="kt">void</span> <span class="nf">initLocalCache</span><span class="o">();</span>
+</code></pre></div></div>
+
+<p>为什么要定义接口方法？</p>
+
+<ul>
+  <li>稍后实时刷新缓存时，会调用 RoleService 接口的该方法。</li>
+</ul>
+
+<p>② 在 <a href="https://github.com/YunaiV/yudao-cloud/blob/master/yudao-module-system/yudao-module-system-biz/src/main/java/cn/iocoder/yudao/module/system/service/permission/RoleServiceImpl.java">RoleServiceImpl (opens new window)</a>类中，实现 <code class="highlighter-rouge">#initLocalCache()</code> 方法，通过 <code class="highlighter-rouge">@PostConstruct</code> 注解，在<strong>项目启动时</strong>进行本地缓存的初始化。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// RoleServiceImpl.java</span>
+
+<span class="cm">/**
+ * 角色缓存
+ * key：角色编号 {@link RoleDO#getId()}
+ *
+ * 这里声明 volatile 修饰的原因是，每次刷新时，直接修改指向
+ */</span>
+<span class="nd">@Getter</span>
+<span class="kd">private</span> <span class="kd">volatile</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">,</span> <span class="n">RoleDO</span><span class="o">&gt;</span> <span class="n">roleCache</span><span class="o">;</span>
+
+<span class="cm">/**
+ * 初始化 {@link #roleCache} 缓存
+ */</span>
+<span class="nd">@Override</span>
+<span class="nd">@PostConstruct</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">initLocalCache</span><span class="o">()</span> <span class="o">{</span>
+    <span class="c1">// 注意：忽略自动多租户，因为要全局初始化缓存</span>
+    <span class="n">TenantUtils</span><span class="o">.</span><span class="na">executeIgnore</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="o">{</span>
+        <span class="c1">// 第一步：查询数据</span>
+        <span class="n">List</span><span class="o">&lt;</span><span class="n">RoleDO</span><span class="o">&gt;</span> <span class="n">roleList</span> <span class="o">=</span> <span class="n">roleMapper</span><span class="o">.</span><span class="na">selectList</span><span class="o">();</span>
+        <span class="n">log</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"[initLocalCache][缓存角色，数量为:{}]"</span><span class="o">,</span> <span class="n">roleList</span><span class="o">.</span><span class="na">size</span><span class="o">());</span>
+    
+        <span class="c1">// 第二步：构建缓存</span>
+        <span class="n">roleCache</span> <span class="o">=</span> <span class="n">CollectionUtils</span><span class="o">.</span><span class="na">convertMap</span><span class="o">(</span><span class="n">roleList</span><span class="o">,</span> <span class="nl">RoleDO:</span><span class="o">:</span><span class="n">getId</span><span class="o">);</span>
+    <span class="o">});</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>疑问：为什么使用 TenantUtils 的 executeIgnore 方法来执行逻辑？</p>
+
+<ul>
+  <li>
+    <p>由于 RoleDO 是多租户隔离，如果使用 TenantUtils 方法，会导致缓存刷新时，只加载某个租户的角色数据，导致本地缓存的错误。</p>
+  </li>
+  <li>
+    <p>所以，如果缓存的数据不存在多租户隔离的情况，可以不使用 TenantUtils 方法！！！！</p>
+  </li>
+</ul>
+
+<h4 id="实时刷新缓存">实时刷新缓存</h4>
+
+<p>为什么需要使用 <a href="https://spring.io/projects/spring-cloud-bus">Spring Cloud Bus (opens new window)</a>来实时刷新缓存？</p>
+
+<ul>
+  <li>考虑到<strong>高可用</strong>，线上会部署多个 JVM 实例，需要通过 RocketMQ <strong>广播</strong>到所有实例，实现本地缓存的刷新。</li>
+</ul>
+
+<p><img src="../assets/02-cloud.png" alt="实时刷新缓存" /></p>
+
+<p>友情提示：</p>
+
+<p>对 Spring Cloud Bus 不熟悉的同学，可以后续阅读 <a href="https://www.iocoder.cn/Spring-Cloud-Alibaba/Bus-RocketMQ/?yudao">《芋道 Spring Cloud Alibaba 事件总线 Bus RocketMQ 入门 》 (opens new window)</a>文档。</p>
+
+<h4 id="rolerefreshmessage">RoleRefreshMessage</h4>
+
+<p>新建 <a href="https://github.com/YunaiV/yudao-cloud/blob/master/yudao-module-system/yudao-module-system-biz/src/main/java/cn/iocoder/yudao/module/system/mq/message/permission/RoleRefreshMessage.java">RoleRefreshMessage (opens new window)</a>类，角色数据刷新 Message。代码如下：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Data</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">RoleRefreshMessage</span> <span class="kd">extends</span> <span class="n">RemoteApplicationEvent</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="nf">RoleRefreshMessage</span><span class="o">()</span> <span class="o">{</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nf">RoleRefreshMessage</span><span class="o">(</span><span class="n">Object</span> <span class="n">source</span><span class="o">,</span> <span class="n">String</span> <span class="n">originService</span><span class="o">,</span> <span class="n">String</span> <span class="n">destinationService</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">(</span><span class="n">source</span><span class="o">,</span> <span class="n">originService</span><span class="o">,</span> <span class="n">DEFAULT_DESTINATION_FACTORY</span><span class="o">.</span><span class="na">getDestination</span><span class="o">(</span><span class="n">destinationService</span><span class="o">));</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h4 id="roleproducer">RoleProducer</h4>
+
+<p>① 新建 <a href="https://github.com/YunaiV/yudao-cloud/blob/master/yudao-module-system/yudao-module-system-biz/src/main/java/cn/iocoder/yudao/module/system/mq/producer/permission/RoleProducer.java">RoleProducer (opens new window)</a>类，RoleRefreshMessage 的 Producer 生产者。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Component</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">RoleProducer</span> <span class="kd">extends</span> <span class="n">AbstractBusProducer</span> <span class="o">{</span>
+
+    <span class="cm">/**
+     * 发送 {@link RoleRefreshMessage} 消息
+     */</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">sendRoleRefreshMessage</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">publishEvent</span><span class="o">(</span><span class="k">new</span> <span class="n">RoleRefreshMessage</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">getBusId</span><span class="o">(),</span> <span class="n">selfDestinationService</span><span class="o">()));</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>② 在数据的新增 / 修改 / 删除等写入操作时，需要使用 RoleProducer 发送消息。</p>
+
+<p><img src="../assets/localsession_03.png" alt="localsession_03" /></p>
+
+<h4 id="rolerefreshconsumer">RoleRefreshConsumer</h4>
+
+<p>新建 <a href="https://github.com/YunaiV/yudao-cloud/blob/master/yudao-module-system/yudao-module-system-biz/src/main/java/cn/iocoder/yudao/module/system/mq/consumer/permission/RoleRefreshConsumer.java">RoleRefreshConsumer (opens new window)</a>类，RoleRefreshMessage 的 Consumer 消费者，刷新本地缓存。</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Component</span>
+<span class="nd">@Slf4j</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">RoleRefreshConsumer</span> <span class="o">{</span>
+
+    <span class="nd">@Resource</span>
+    <span class="kd">private</span> <span class="n">RoleService</span> <span class="n">roleService</span><span class="o">;</span>
+
+    <span class="nd">@EventListener</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">execute</span><span class="o">(</span><span class="n">RoleRefreshMessage</span> <span class="n">message</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"[execute][收到 Role 刷新消息]"</span><span class="o">);</span>
+        <span class="n">roleService</span><span class="o">.</span><span class="na">initLocalCache</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>##</p>

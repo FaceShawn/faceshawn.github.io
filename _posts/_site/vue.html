@@ -18,116 +18,116 @@
   <li><code class="highlighter-rouge">src/utils/request.js</code> Axios接口拦截器拦截 request 请求；</li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 1. src/view/ums/admin/index.vue
-&lt;template&gt;
-  &lt;div class="app-container"&gt;
-      &lt;div class="table-container"&gt;
-          &lt;el-table ref="adminTable"
-                    :data="list"
-                    style="width: 100%;"
-                    v-loading="listLoading" border&gt;
-            &lt;el-table-column label="编号" width="100" align="center"&gt;
-              &lt;template slot-scope="scope"&gt;&lt;/template&gt;
-            &lt;/el-table-column&gt;
-       &lt;/div&gt;
-       &lt;el-dialog
-      :title="isEdit?'编辑用户':'添加用户'"
-      :visible.sync="dialogVisible"&gt;
-      &lt;el-form :model="admin"
-               ref="adminForm"&gt;
-        &lt;el-form-item label="帐号："&gt;
-          &lt;el-input v-model="admin.username" style="width: 250px"&gt;&lt;/el-input&gt;
-        &lt;/el-form-item&gt;
+<div class="language-vue highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 1. src/view/ums/admin/index.vue
+<span class="nt">&lt;</span><span class="k">template</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"app-container"</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"table-container"</span><span class="nt">&gt;</span>
+          <span class="nt">&lt;el-table</span> <span class="na">ref=</span><span class="s">"adminTable"</span>
+                    <span class="na">:data=</span><span class="s">"list"</span>
+                    <span class="na">style=</span><span class="s">"width: 100%;"</span>
+                    <span class="na">v-loading=</span><span class="s">"listLoading"</span> <span class="na">border</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;el-table-column</span> <span class="na">label=</span><span class="s">"编号"</span> <span class="na">width=</span><span class="s">"100"</span> <span class="na">align=</span><span class="s">"center"</span><span class="nt">&gt;</span>
+              <span class="nt">&lt;template</span> <span class="na">slot-scope=</span><span class="s">"scope"</span><span class="nt">&gt;&lt;/</span><span class="k">template</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;/el-table-column&gt;</span>
+       <span class="nt">&lt;/div&gt;</span>
+       <span class="nt">&lt;el-dialog</span>
+      <span class="na">:title=</span><span class="s">"isEdit?'编辑用户':'添加用户'"</span>
+      <span class="na">:visible</span><span class="err">.</span><span class="na">sync=</span><span class="s">"dialogVisible"</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;el-form</span> <span class="na">:model=</span><span class="s">"admin"</span>
+               <span class="na">ref=</span><span class="s">"adminForm"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;el-form-item</span> <span class="na">label=</span><span class="s">"帐号："</span><span class="nt">&gt;</span>
+          <span class="nt">&lt;el-input</span> <span class="na">v-model=</span><span class="s">"admin.username"</span> <span class="na">style=</span><span class="s">"width: 250px"</span><span class="nt">&gt;&lt;/el-input&gt;</span>
+        <span class="nt">&lt;/el-form-item&gt;</span>
 
-      &lt;/el-form&gt;
-      &lt;span slot="footer" class="dialog-footer"&gt;
-        &lt;el-button @click="dialogVisible = false" size="small"&gt;取 消&lt;/el-button&gt;
-        &lt;el-button type="primary" @click="handleDialogConfirm()" size="small"&gt;确 定&lt;/el-button&gt;
-      &lt;/span&gt;
-    &lt;/el-dialog&gt;
+      <span class="nt">&lt;/el-form&gt;</span>
+      <span class="nt">&lt;span</span> <span class="na">slot=</span><span class="s">"footer"</span> <span class="na">class=</span><span class="s">"dialog-footer"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;el-button</span> <span class="err">@</span><span class="na">click=</span><span class="s">"dialogVisible = false"</span> <span class="na">size=</span><span class="s">"small"</span><span class="nt">&gt;</span>取 消<span class="nt">&lt;/el-button&gt;</span>
+        <span class="nt">&lt;el-button</span> <span class="na">type=</span><span class="s">"primary"</span> <span class="err">@</span><span class="na">click=</span><span class="s">"handleDialogConfirm()"</span> <span class="na">size=</span><span class="s">"small"</span><span class="nt">&gt;</span>确 定<span class="nt">&lt;/el-button&gt;</span>
+      <span class="nt">&lt;/span&gt;</span>
+    <span class="nt">&lt;/el-dialog&gt;</span>
    ...
-&lt;/template&gt;
+<span class="nt">&lt;/template&gt;</span>
 
-&lt;script&gt;
-export default {
-    name: 'adminList',
-    data() {
-      return {
-        listQuery: Object.assign({}, defaultListQuery),
-        list: null,
-        total: null,
-        dialogVisible: false,
-        admin: Object.assign({}, defaultAdmin),
-        isEdit: false,
-      }
-    },
-   methods: {
-     getList() {
-        this.listLoading = true;
-        fetchList(this.listQuery).then(response =&gt; {
-          this.listLoading = false;
-          this.list = response.data.list;
-          this.total = response.data.total;
-        });
-      }
-   }
-}
-&lt;/script&gt;
+<span class="nt">&lt;</span><span class="k">script</span><span class="nt">&gt;</span>
+<span class="k">export</span> <span class="k">default</span> <span class="p">{</span>
+    <span class="na">name</span><span class="p">:</span> <span class="s1">'adminList'</span><span class="p">,</span>
+    <span class="nx">data</span><span class="p">()</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="p">{</span>
+        <span class="na">listQuery</span><span class="p">:</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">assign</span><span class="p">({},</span> <span class="nx">defaultListQuery</span><span class="p">),</span>
+        <span class="na">list</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+        <span class="na">total</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+        <span class="na">dialogVisible</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+        <span class="na">admin</span><span class="p">:</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">assign</span><span class="p">({},</span> <span class="nx">defaultAdmin</span><span class="p">),</span>
+        <span class="na">isEdit</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+   <span class="na">methods</span><span class="p">:</span> <span class="p">{</span>
+     <span class="nx">getList</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">listLoading</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+        <span class="nx">fetchList</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">listQuery</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">response</span> <span class="o">=&gt;</span> <span class="p">{</span>
+          <span class="k">this</span><span class="p">.</span><span class="nx">listLoading</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+          <span class="k">this</span><span class="p">.</span><span class="nx">list</span> <span class="o">=</span> <span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">list</span><span class="p">;</span>
+          <span class="k">this</span><span class="p">.</span><span class="nx">total</span> <span class="o">=</span> <span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">total</span><span class="p">;</span>
+        <span class="p">});</span>
+      <span class="p">}</span>
+   <span class="p">}</span>
+<span class="p">}</span>
+<span class="nt">&lt;/</span><span class="k">script</span><span class="nt">&gt;</span>
 </code></pre></div></div>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 2. src/api/login.js api接口
-export function fetchList(params) {
-  return request({
-    url: '/admin/list',
-    method: 'get',
-    params: params
-  })
-}
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 2. src/api/login.js api接口</span>
+<span class="k">export</span> <span class="kd">function</span> <span class="nx">fetchList</span><span class="p">(</span><span class="nx">params</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">request</span><span class="p">({</span>
+    <span class="na">url</span><span class="p">:</span> <span class="s1">'/admin/list'</span><span class="p">,</span>
+    <span class="na">method</span><span class="p">:</span> <span class="s1">'get'</span><span class="p">,</span>
+    <span class="na">params</span><span class="p">:</span> <span class="nx">params</span>
+  <span class="p">})</span>
+<span class="p">}</span>
 
-// 3. src/utils/request.js Axios接口拦截器拦截请求
-// 创建axios实例
-const service = axios.create({
-  baseURL: process.env.BASE_API, // api的base_url
-  timeout: 15000 // 请求超时时间
-})
+<span class="c1">// 3. src/utils/request.js Axios接口拦截器拦截请求</span>
+<span class="c1">// 创建axios实例</span>
+<span class="kd">const</span> <span class="nx">service</span> <span class="o">=</span> <span class="nx">axios</span><span class="p">.</span><span class="nx">create</span><span class="p">({</span>
+  <span class="na">baseURL</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">BASE_API</span><span class="p">,</span> <span class="c1">// api的base_url</span>
+  <span class="na">timeout</span><span class="p">:</span> <span class="mi">15000</span> <span class="c1">// 请求超时时间</span>
+<span class="p">})</span>
 
-// request拦截器
-service.interceptors.request.use(config =&gt; {
-  if (store.getters.token) {
-    config.headers['Authorization'] = getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
-  }
-  return config
-}, error =&gt; {
-  // Do something with request error
-  console.log(error) // for debug
-  Promise.reject(error)
-})
+<span class="c1">// request拦截器</span>
+<span class="nx">service</span><span class="p">.</span><span class="nx">interceptors</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">config</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">store</span><span class="p">.</span><span class="nx">getters</span><span class="p">.</span><span class="nx">token</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">config</span><span class="p">.</span><span class="nx">headers</span><span class="p">[</span><span class="s1">'Authorization'</span><span class="p">]</span> <span class="o">=</span> <span class="nx">getToken</span><span class="p">()</span> <span class="c1">// 让每个请求携带自定义token 请根据实际情况自行修改</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nx">config</span>
+<span class="p">},</span> <span class="nx">error</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// Do something with request error</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="c1">// for debug</span>
+  <span class="nb">Promise</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+<span class="p">})</span>
 
-// respone拦截器
-service.interceptors.response.use(
-  response =&gt; {
-    const res = response.data
-    if (res.code !== 200) {
-      Message({
-        message: res.message,
-        type: 'error',
-        duration: 3 * 1000
-      })
-      return Promise.reject('error')
-    } else {
-      return response.data
-    }
-  },
-  error =&gt; {
-    console.log('err' + error)// for debug
-    Message({
-      message: error.message,
-      type: 'error',
-      duration: 3 * 1000
-    })
-    return Promise.reject(error)
-  }
-)
+<span class="c1">// respone拦截器</span>
+<span class="nx">service</span><span class="p">.</span><span class="nx">interceptors</span><span class="p">.</span><span class="nx">response</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span>
+  <span class="nx">response</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">res</span> <span class="o">=</span> <span class="nx">response</span><span class="p">.</span><span class="nx">data</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">code</span> <span class="o">!==</span> <span class="mi">200</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">Message</span><span class="p">({</span>
+        <span class="na">message</span><span class="p">:</span> <span class="nx">res</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+        <span class="na">type</span><span class="p">:</span> <span class="s1">'error'</span><span class="p">,</span>
+        <span class="na">duration</span><span class="p">:</span> <span class="mi">3</span> <span class="o">*</span> <span class="mi">1000</span>
+      <span class="p">})</span>
+      <span class="k">return</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="s1">'error'</span><span class="p">)</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">response</span><span class="p">.</span><span class="nx">data</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="nx">error</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'err'</span> <span class="o">+</span> <span class="nx">error</span><span class="p">)</span><span class="c1">// for debug</span>
+    <span class="nx">Message</span><span class="p">({</span>
+      <span class="na">message</span><span class="p">:</span> <span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+      <span class="na">type</span><span class="p">:</span> <span class="s1">'error'</span><span class="p">,</span>
+      <span class="na">duration</span><span class="p">:</span> <span class="mi">3</span> <span class="o">*</span> <span class="mi">1000</span>
+    <span class="p">})</span>
+    <span class="k">return</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">)</span>
 </code></pre></div></div>
 
 <h3 id="项目结构">项目结构</h3>
@@ -207,24 +207,24 @@ service.interceptors.response.use(
   </li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;!-- 完整语法 --&gt;
-&lt;a v-bind:href="url"&gt;&lt;/a&gt;
-&lt;!-- 缩写 --&gt;
-&lt;a :href="url"&gt;&lt;/a&gt;
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">&lt;!-- 完整语法 --&gt;</span>
+<span class="nt">&lt;a</span> <span class="na">v-bind:href=</span><span class="s">"url"</span><span class="nt">&gt;&lt;/a&gt;</span>
+<span class="c">&lt;!-- 缩写 --&gt;</span>
+<span class="nt">&lt;a</span> <span class="na">:href=</span><span class="s">"url"</span><span class="nt">&gt;&lt;/a&gt;</span>
 
-&lt;!-- 完整语法 --&gt;
-&lt;a v-on:click="doSomething"&gt;&lt;/a&gt;
-&lt;!-- 缩写 --&gt;
-&lt;a @click="doSomething"&gt;&lt;/a&gt;
+<span class="c">&lt;!-- 完整语法 --&gt;</span>
+<span class="nt">&lt;a</span> <span class="na">v-on:click=</span><span class="s">"doSomething"</span><span class="nt">&gt;&lt;/a&gt;</span>
+<span class="c">&lt;!-- 缩写 --&gt;</span>
+<span class="nt">&lt;a</span> <span class="err">@</span><span class="na">click=</span><span class="s">"doSomething"</span><span class="nt">&gt;&lt;/a&gt;</span>
 
-&lt;!-- 与 :id="id" 相同 --&gt;
-&lt;div :id&gt;&lt;/div&gt;
+<span class="c">&lt;!-- 与 :id="id" 相同 --&gt;</span>
+<span class="nt">&lt;div</span> <span class="na">:id</span><span class="nt">&gt;&lt;/div&gt;</span>
 
-&lt;!-- 这也同样有效 --&gt;
-&lt;div v-bind:id&gt;&lt;/div&gt;
+<span class="c">&lt;!-- 这也同样有效 --&gt;</span>
+<span class="nt">&lt;div</span> <span class="na">v-bind:id</span><span class="nt">&gt;&lt;/div&gt;</span>
 
-&lt;!-- 例如，.prevent 修饰符告诉 v-on 指令对于触发的事件调用 event.preventDefault() --&gt;
-&lt;form v-on:submit.prevent="onSubmit"&gt;&lt;/form&gt;
+<span class="c">&lt;!-- 例如，.prevent 修饰符告诉 v-on 指令对于触发的事件调用 event.preventDefault() --&gt;</span>
+<span class="nt">&lt;form</span> <span class="na">v-on:submit</span><span class="err">.</span><span class="na">prevent=</span><span class="s">"onSubmit"</span><span class="nt">&gt;&lt;/form&gt;</span>
 </code></pre></div></div>
 
 <h3 id="声明响应式状态">声明响应式状态</h3>

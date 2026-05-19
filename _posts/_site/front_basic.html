@@ -437,10 +437,10 @@ HTML5： <span class="nt">&lt;meta</span> <span class="na">charset=</span><span 
   <li>
     <p>二者值相等， 类型不同；</p>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> typeof undefined             // undefined
- typeof null                  // object
- null === undefined           // false
- null == undefined            // true
+    <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="k">typeof</span> <span class="kc">undefined</span>             <span class="c1">// undefined</span>
+ <span class="k">typeof</span> <span class="kc">null</span>                  <span class="c1">// object</span>
+ <span class="kc">null</span> <span class="o">===</span> <span class="kc">undefined</span>           <span class="c1">// false</span>
+ <span class="kc">null</span> <span class="o">==</span> <span class="kc">undefined</span>            <span class="c1">// true</span>
 </code></pre></div>    </div>
   </li>
   <li>
@@ -481,30 +481,30 @@ HTML5： <span class="nt">&lt;meta</span> <span class="na">charset=</span><span 
   <li>
     <p><strong>初始值</strong>：var 和 let 可以不设置，const 必须设置初始值，不能改变指针指向。用 <code class="highlighter-rouge">const</code> 声明的变量保持<strong>恒定值</strong>。常量对象。</p>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> var greeter = "hey hi";
- var greeter = "say Hello instead"; // 重新声明var不报错
- var times = 4;
+    <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="kd">var</span> <span class="nx">greeter</span> <span class="o">=</span> <span class="s2">"hey hi"</span><span class="p">;</span>
+ <span class="kd">var</span> <span class="nx">greeter</span> <span class="o">=</span> <span class="s2">"say Hello instead"</span><span class="p">;</span> <span class="c1">// 重新声明var不报错</span>
+ <span class="kd">var</span> <span class="nx">times</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
     
- function newFunction() {
-     var hello = "hello";
- }
- console.log(hello); // 超出函数作用域，error: hello is not defined
+ <span class="kd">function</span> <span class="nx">newFunction</span><span class="p">()</span> <span class="p">{</span>
+     <span class="kd">var</span> <span class="nx">hello</span> <span class="o">=</span> <span class="s2">"hello"</span><span class="p">;</span>
+ <span class="p">}</span>
+ <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">hello</span><span class="p">);</span> <span class="c1">// 超出函数作用域，error: hello is not defined</span>
     
- if (times &gt; 3) {
-     var greeter = "say Hello instead"; 
- }
- //全局作用域和函数中同名
- console.log(greeter) // "say Hello instead"
+ <span class="k">if</span> <span class="p">(</span><span class="nx">times</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
+     <span class="kd">var</span> <span class="nx">greeter</span> <span class="o">=</span> <span class="s2">"say Hello instead"</span><span class="p">;</span> 
+ <span class="p">}</span>
+ <span class="c1">//全局作用域和函数中同名</span>
+ <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">greeter</span><span class="p">)</span> <span class="c1">// "say Hello instead"</span>
     
-    // let 用法
-    let greeting = "say Hi";
-    let times = 4;
+    <span class="c1">// let 用法</span>
+    <span class="kd">let</span> <span class="nx">greeting</span> <span class="o">=</span> <span class="s2">"say Hi"</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">times</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
     
-    if (times &gt; 3) {
-         let hello = "say Hello instead";
-         console.log(hello);// "say Hello instead"
-     }
-    console.log(hello) // hello is not defined
+    <span class="k">if</span> <span class="p">(</span><span class="nx">times</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
+         <span class="kd">let</span> <span class="nx">hello</span> <span class="o">=</span> <span class="s2">"say Hello instead"</span><span class="p">;</span>
+         <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">hello</span><span class="p">);</span><span class="c1">// "say Hello instead"</span>
+     <span class="p">}</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">hello</span><span class="p">)</span> <span class="c1">// hello is not defined</span>
 </code></pre></div>    </div>
   </li>
 </ol>
@@ -521,24 +521,24 @@ HTML5： <span class="nt">&lt;meta</span> <span class="na">charset=</span><span 
   <li>
     <p>声明的变量部分会提升，初始化部分不会。</p>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  var x = 5; // 初始化 x
+    <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="kd">var</span> <span class="nx">x</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span> <span class="c1">// 初始化 x</span>
     
-  elem = document.getElementById("demo"); // 查找元素
-  elem.innerHTML = x + " " + y;           // 显示 x 和 y, y 输出了 undefined，因为变量声明 (var y) 提升了，但是初始化(y = 7) 并不会提升，所以 y 变量是一个未定义的变量。
+  <span class="nx">elem</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s2">"demo"</span><span class="p">);</span> <span class="c1">// 查找元素</span>
+  <span class="nx">elem</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">x</span> <span class="o">+</span> <span class="s2">" "</span> <span class="o">+</span> <span class="nx">y</span><span class="p">;</span>           <span class="c1">// 显示 x 和 y, y 输出了 undefined，因为变量声明 (var y) 提升了，但是初始化(y = 7) 并不会提升，所以 y 变量是一个未定义的变量。</span>
     
-  var y = 7; // 初始化 y
+  <span class="kd">var</span> <span class="nx">y</span> <span class="o">=</span> <span class="mi">7</span><span class="p">;</span> <span class="c1">// 初始化 y</span>
 </code></pre></div>    </div>
   </li>
 </ul>
 
 <h4 id="严格模式">严格模式</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>"use strict";
-myFunction();
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s2">"use strict"</span><span class="p">;</span>
+<span class="nx">myFunction</span><span class="p">();</span>
 
-function myFunction() {
-    y = 3.14;   // 报错 (y 未定义)
-}
+<span class="kd">function</span> <span class="nx">myFunction</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">y</span> <span class="o">=</span> <span class="mf">3.14</span><span class="p">;</span>   <span class="c1">// 报错 (y 未定义)</span>
+<span class="p">}</span>
 </code></pre></div></div>
 
 <h4 id="数字">数字</h4>
@@ -551,10 +551,10 @@ function myFunction() {
       <li>浮点数存储：使用 64 位固定长度来表示，也就是标准的 double 双精度浮点数</li>
     </ul>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>      var x = 0.1;
-      var y = 0.2;
-      var z = x + y   // z 的结果为 0.30000000000000004
-      if (z == 0.3)   // 返回 false
+    <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code>      <span class="kd">var</span> <span class="nx">x</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">;</span>
+      <span class="kd">var</span> <span class="nx">y</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">;</span>
+      <span class="kd">var</span> <span class="nx">z</span> <span class="o">=</span> <span class="nx">x</span> <span class="o">+</span> <span class="nx">y</span>   <span class="c1">// z 的结果为 0.30000000000000004</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">z</span> <span class="o">==</span> <span class="mf">0.3</span><span class="p">)</span>   <span class="c1">// 返回 false</span>
 </code></pre></div>    </div>
   </li>
   <li>
@@ -579,9 +579,9 @@ function myFunction() {
   </li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var x = 10;
-var y = "10";
-if (x == y) // 返回 true，在常规的比较中，数据类型是被忽略的
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">x</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">y</span> <span class="o">=</span> <span class="s2">"10"</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="nx">x</span> <span class="o">==</span> <span class="nx">y</span><span class="p">)</span> <span class="c1">// 返回 true，在常规的比较中，数据类型是被忽略的</span>
 </code></pre></div></div>
 
 <h4 id="对象">对象</h4>
@@ -615,11 +615,11 @@ if (x == y) // 返回 true，在常规的比较中，数据类型是被忽略的
   </li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>function myFunction(a, b) {
-    return a * b;
-}
-myArray = [10, 2];
-myObject = myFunction.apply(myObject, myArray);  // 返回 20
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">myFunction</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">a</span> <span class="o">*</span> <span class="nx">b</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nx">myArray</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">];</span>
+<span class="nx">myObject</span> <span class="o">=</span> <span class="nx">myFunction</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">myObject</span><span class="p">,</span> <span class="nx">myArray</span><span class="p">);</span>  <span class="c1">// 返回 20</span>
 </code></pre></div></div>
 
 <h4 id="数组">数组</h4>
@@ -672,13 +672,13 @@ myObject = myFunction.apply(myObject, myArray);  // 返回 20
   </li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>+ '' // 等价于 String(X)
-+X     // 等价于 Number(X),也可以写成 x-0
-!!X    // 等价于 Boolean(X)
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">+</span> <span class="s1">''</span> <span class="c1">// 等价于 String(X)</span>
+<span class="o">+</span><span class="nx">X</span>     <span class="c1">// 等价于 Number(X),也可以写成 x-0</span>
+<span class="o">!!</span><span class="nx">X</span>    <span class="c1">// 等价于 Boolean(X)</span>
 
-var str= '012.345 ';  
-var x = str-0;  
-x = x*1;
+<span class="kd">var</span> <span class="nx">str</span><span class="o">=</span> <span class="s1">'012.345 '</span><span class="p">;</span>  
+<span class="kd">var</span> <span class="nx">x</span> <span class="o">=</span> <span class="nx">str</span><span class="o">-</span><span class="mi">0</span><span class="p">;</span>  
+<span class="nx">x</span> <span class="o">=</span> <span class="nx">x</span><span class="o">*</span><span class="mi">1</span><span class="p">;</span>
 </code></pre></div></div>
 
 <h4 id="正则表达式">正则表达式</h4>
@@ -863,17 +863,17 @@ x = x*1;
 
 <h4 id="计数器困境内嵌函数闭包">计数器困境、内嵌函数、闭包</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var add = (function () {
-    var counter = 0;
-    return function () {return counter += 1;}
-})();
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">add</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">counter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">return</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span><span class="k">return</span> <span class="nx">counter</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;}</span>
+<span class="p">})();</span>
  
-add();
-add();
-add();
+<span class="nx">add</span><span class="p">();</span>
+<span class="nx">add</span><span class="p">();</span>
+<span class="nx">add</span><span class="p">();</span>
  
-// 受外层匿名自我调用函数的作用域保护，只能用 add() 修改
-// 计数器 add.counter = 3
+<span class="c1">// 受外层匿名自我调用函数的作用域保护，只能用 add() 修改</span>
+<span class="c1">// 计数器 add.counter = 3</span>
 </code></pre></div></div>
 
 <h3 id="prototype原型对象">prototype（原型对象）</h3>
@@ -894,9 +894,9 @@ add();
   <li>如果没有，它会沿着原型链向上查找。</li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let obj = {};
-console.log(obj.toString()); // 输出: [object Object]
-// 这个 `toString` 方法实际上是从 `Object.prototype` 继承过来的
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">obj</span> <span class="o">=</span> <span class="p">{};</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">obj</span><span class="p">.</span><span class="nx">toString</span><span class="p">());</span> <span class="c1">// 输出: [object Object]</span>
+<span class="c1">// 这个 `toString` 方法实际上是从 `Object.prototype` 继承过来的</span>
 </code></pre></div></div>
 
 <p><strong>prototype 继承</strong>：</p>
@@ -940,14 +940,14 @@ console.log(obj.toString()); // 输出: [object Object]
   <li>
     <p>大括号保存对象，方括号保存数组；数组、对象可相互嵌套。</p>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  {"sites":[
-      {"name":"Runoob", "url":"www.runoob.com"}, 
-      {"name":"Google", "url":"www.google.com"},
-      {"name":"Taobao", "url":"www.taobao.com"}
-  ]}
+    <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="p">{</span><span class="s2">"sites"</span><span class="p">:[</span>
+      <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span><span class="s2">"Runoob"</span><span class="p">,</span> <span class="s2">"url"</span><span class="p">:</span><span class="s2">"www.runoob.com"</span><span class="p">},</span> 
+      <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span><span class="s2">"Google"</span><span class="p">,</span> <span class="s2">"url"</span><span class="p">:</span><span class="s2">"www.google.com"</span><span class="p">},</span>
+      <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span><span class="s2">"Taobao"</span><span class="p">,</span> <span class="s2">"url"</span><span class="p">:</span><span class="s2">"www.taobao.com"</span><span class="p">}</span>
+  <span class="p">]}</span>
     
-  var obj = JSON.parse( jsonStringData ); // 将字符串转换为 JavaScript 对象
-  var jsonStringData  = JSON.stringify( obj ); // 将 JavaScript 值转换为 JSON 字符串。
+  <span class="kd">var</span> <span class="nx">obj</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span> <span class="nx">jsonStringData</span> <span class="p">);</span> <span class="c1">// 将字符串转换为 JavaScript 对象</span>
+  <span class="kd">var</span> <span class="nx">jsonStringData</span>  <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span> <span class="nx">obj</span> <span class="p">);</span> <span class="c1">// 将 JavaScript 值转换为 JSON 字符串。</span>
 </code></pre></div>    </div>
   </li>
   <li>parse()</li>
@@ -970,11 +970,11 @@ console.log(obj.toString()); // 输出: [object Object]
 
 <h3 id="错误和调试">错误和调试</h3>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>try {
-} catch(e) {
-} throw {  
-} finally {  
-}
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">try</span> <span class="p">{</span>
+<span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+<span class="p">}</span> <span class="k">throw</span> <span class="p">{</span>  
+<span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>  
+<span class="p">}</span>
 </code></pre></div></div>
 
 <h3 id="es6">ES6</h3>
@@ -993,20 +993,20 @@ console.log(obj.toString()); // 输出: [object Object]
 
 <p>jQuery 入口函数:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$(document).ready(function(){
-    // 执行代码
-});
-或者
-$(function(){
-    // 执行代码
-});
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+    <span class="c1">// 执行代码</span>
+<span class="p">});</span>
+<span class="err">或者</span>
+<span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+    <span class="c1">// 执行代码</span>
+<span class="p">});</span>
 </code></pre></div></div>
 
 <p>JavaScript 入口函数:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>window.onload = function () {
-    // 执行代码
-}
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">window</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// 执行代码</span>
+<span class="p">}</span>
 </code></pre></div></div>
 
 <p>jQuery 入口函数与 JavaScript 入口函数的区别：</p>
@@ -1038,13 +1038,13 @@ $(function(){
 
 <h4 id="append-和-prepend">append() 和 prepend()</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>function appendText(){
-    var txt1="&lt;p&gt;文本-1。&lt;/p&gt;";              // 使用 text/HTML 标签创建文本
-    var txt2=$("&lt;p&gt;&lt;/p&gt;").text("文本-2。");  // 使用 jQuery 创建文本
-    var txt3=document.createElement("p");
-    txt3.innerHTML="文本-3。";               // 使用 JavaScript/DOM 创建文本
-    $("body").append(txt1,txt2,txt3);        // 追加新元素
-}
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">appendText</span><span class="p">(){</span>
+    <span class="kd">var</span> <span class="nx">txt1</span><span class="o">=</span><span class="s2">"&lt;p&gt;文本-1。&lt;/p&gt;"</span><span class="p">;</span>              <span class="c1">// 使用 text/HTML 标签创建文本</span>
+    <span class="kd">var</span> <span class="nx">txt2</span><span class="o">=</span><span class="nx">$</span><span class="p">(</span><span class="s2">"&lt;p&gt;&lt;/p&gt;"</span><span class="p">).</span><span class="nx">text</span><span class="p">(</span><span class="s2">"文本-2。"</span><span class="p">);</span>  <span class="c1">// 使用 jQuery 创建文本</span>
+    <span class="kd">var</span> <span class="nx">txt3</span><span class="o">=</span><span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s2">"p"</span><span class="p">);</span>
+    <span class="nx">txt3</span><span class="p">.</span><span class="nx">innerHTML</span><span class="o">=</span><span class="s2">"文本-3。"</span><span class="p">;</span>               <span class="c1">// 使用 JavaScript/DOM 创建文本</span>
+    <span class="nx">$</span><span class="p">(</span><span class="s2">"body"</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="nx">txt1</span><span class="p">,</span><span class="nx">txt2</span><span class="p">,</span><span class="nx">txt3</span><span class="p">);</span>        <span class="c1">// 追加新元素</span>
+<span class="p">}</span>
 </code></pre></div></div>
 
 <h4 id="jquery-尺寸">jQuery 尺寸</h4>
@@ -1161,7 +1161,7 @@ $(function(){
   </li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>window.document.getElementById("header");
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">window</span><span class="p">.</span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s2">"header"</span><span class="p">);</span>
 </code></pre></div></div>
 
 <h4 id="存储对象">存储对象</h4>
@@ -1183,7 +1183,7 @@ $(function(){
 
 <p>通过以下方式访问：</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>window.document 或仅用 document
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">window</span><span class="p">.</span><span class="nb">document</span> <span class="err">或仅用</span> <span class="nb">document</span>
 </code></pre></div></div>
 
 <ul>
@@ -1232,22 +1232,22 @@ $(function(){
       <li>我们可以一边读取文件，一边执行其他命令，<strong>在文件读取完成后</strong>，将文件内容作为回调函数的参数返回。这样在执行代码时就没有阻塞或等待文件 I/O 操作。这就大大提高了 Node.js 的性能，可以处理大量的并发请求。</li>
     </ul>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> // 阻塞代码实例
- var fs = require("fs");
- var data = fs.readFileSync('input.txt');
- console.log(data.toString());
- console.log("程序执行结束!");
+    <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c1">// 阻塞代码实例</span>
+ <span class="kd">var</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"fs"</span><span class="p">);</span>
+ <span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span><span class="p">(</span><span class="s1">'input.txt'</span><span class="p">);</span>
+ <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">toString</span><span class="p">());</span>
+ <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"程序执行结束!"</span><span class="p">);</span>
     
- // 非阻塞代码实例
- var fs = require("fs");
- fs.readFile('input.txt', function (err, data) {
-     if (err) return console.error(err);
-     console.log(data.toString());
- });
- console.log("程序执行结束!");
+ <span class="c1">// 非阻塞代码实例</span>
+ <span class="kd">var</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"fs"</span><span class="p">);</span>
+ <span class="nx">fs</span><span class="p">.</span><span class="nx">readFile</span><span class="p">(</span><span class="s1">'input.txt'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+     <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">toString</span><span class="p">());</span>
+ <span class="p">});</span>
+ <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"程序执行结束!"</span><span class="p">);</span>
     
- // 第一个实例在文件读取完后才执行程序。
- // 第二个实例不需要等待文件读取完，这样就可以在读取文件时同时执行接下来的代码，大大提高了程序的性能。
+ <span class="c1">// 第一个实例在文件读取完后才执行程序。</span>
+ <span class="c1">// 第二个实例不需要等待文件读取完，这样就可以在读取文件时同时执行接下来的代码，大大提高了程序的性能。</span>
 </code></pre></div>    </div>
   </li>
   <li>
@@ -1284,53 +1284,53 @@ $(function(){
 
 <h3 id="路由">路由</h3>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 1.route.js 文件
-// router.js 处理路由逻辑，定义并导出 route 函数，用于在服务器收到请求时处理不同路径。
-function route(pathname) {
-  console.log("About to route a request for " + pathname);
-}
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 1.route.js 文件</span>
+<span class="c1">// router.js 处理路由逻辑，定义并导出 route 函数，用于在服务器收到请求时处理不同路径。</span>
+<span class="kd">function</span> <span class="nx">route</span><span class="p">(</span><span class="nx">pathname</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"About to route a request for "</span> <span class="o">+</span> <span class="nx">pathname</span><span class="p">);</span>
+<span class="p">}</span>
  
-// 导出了 route 函数
-exports.route = route;
+<span class="c1">// 导出了 route 函数</span>
+<span class="nx">exports</span><span class="p">.</span><span class="nx">route</span> <span class="o">=</span> <span class="nx">route</span><span class="p">;</span>
 
-// 2.server.js 文件
-// server.js 定义了服务器的启动逻辑，并在接收到请求时调用路由函数。
-const http = require("http"); // 引入 Node.js 的 http 模块，用于创建服务器
-const { URL } = require("url"); // 从 url 模块引入 URL 构造函数
+<span class="c1">// 2.server.js 文件</span>
+<span class="c1">// server.js 定义了服务器的启动逻辑，并在接收到请求时调用路由函数。</span>
+<span class="kd">const</span> <span class="nx">http</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"http"</span><span class="p">);</span> <span class="c1">// 引入 Node.js 的 http 模块，用于创建服务器</span>
+<span class="kd">const</span> <span class="p">{</span> <span class="nx">URL</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"url"</span><span class="p">);</span> <span class="c1">// 从 url 模块引入 URL 构造函数</span>
  
-// 定义并导出 start 函数，用于启动服务器
-function start(route) {
-  // 定义 onRequest 函数，处理每个请求
-  function onRequest(request, response) {
-    // 使用 URL 构造函数解析请求路径
-    const pathname = new URL(request.url, `http://${request.headers.host}`).pathname;
-    console.log(`Request for ${pathname} received.`); // 打印请求路径
+<span class="c1">// 定义并导出 start 函数，用于启动服务器</span>
+<span class="kd">function</span> <span class="nx">start</span><span class="p">(</span><span class="nx">route</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// 定义 onRequest 函数，处理每个请求</span>
+  <span class="kd">function</span> <span class="nx">onRequest</span><span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// 使用 URL 构造函数解析请求路径</span>
+    <span class="kd">const</span> <span class="nx">pathname</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">URL</span><span class="p">(</span><span class="nx">request</span><span class="p">.</span><span class="nx">url</span><span class="p">,</span> <span class="s2">`http://</span><span class="p">${</span><span class="nx">request</span><span class="p">.</span><span class="nx">headers</span><span class="p">.</span><span class="nx">host</span><span class="p">}</span><span class="s2">`</span><span class="p">).</span><span class="nx">pathname</span><span class="p">;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">`Request for </span><span class="p">${</span><span class="nx">pathname</span><span class="p">}</span><span class="s2"> received.`</span><span class="p">);</span> <span class="c1">// 打印请求路径</span>
  
-    route(pathname); // 调用路由函数处理路径
+    <span class="nx">route</span><span class="p">(</span><span class="nx">pathname</span><span class="p">);</span> <span class="c1">// 调用路由函数处理路径</span>
  
-    // 设置响应头和响应内容
-    response.writeHead(200, { "Content-Type": "text/plain" });
-    response.write("Hello World");
-    response.end();
-  }
+    <span class="c1">// 设置响应头和响应内容</span>
+    <span class="nx">response</span><span class="p">.</span><span class="nx">writeHead</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{</span> <span class="s2">"Content-Type"</span><span class="p">:</span> <span class="s2">"text/plain"</span> <span class="p">});</span>
+    <span class="nx">response</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s2">"Hello World"</span><span class="p">);</span>
+    <span class="nx">response</span><span class="p">.</span><span class="nx">end</span><span class="p">();</span>
+  <span class="p">}</span>
  
-  // 创建服务器并监听指定端口
-  http.createServer(onRequest).listen(8888);
-  console.log("Server has started.");
-}
+  <span class="c1">// 创建服务器并监听指定端口</span>
+  <span class="nx">http</span><span class="p">.</span><span class="nx">createServer</span><span class="p">(</span><span class="nx">onRequest</span><span class="p">).</span><span class="nx">listen</span><span class="p">(</span><span class="mi">8888</span><span class="p">);</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Server has started."</span><span class="p">);</span>
+<span class="p">}</span>
  
-// 导出 start 函数供其他模块使用
-module.exports.start = start;
+<span class="c1">// 导出 start 函数供其他模块使用</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span><span class="p">.</span><span class="nx">start</span> <span class="o">=</span> <span class="nx">start</span><span class="p">;</span>
 
-// 3.index.js 文件
-// index.js 是程序的入口文件，负责启动服务器并将路由模块传入服务器模块中。
-var server = require("./server");
-var router = require("./router");
+<span class="c1">// 3.index.js 文件</span>
+<span class="c1">// index.js 是程序的入口文件，负责启动服务器并将路由模块传入服务器模块中。</span>
+<span class="kd">var</span> <span class="nx">server</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"./server"</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">router</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"./router"</span><span class="p">);</span>
  
-server.start(router.route);
+<span class="nx">server</span><span class="p">.</span><span class="nx">start</span><span class="p">(</span><span class="nx">router</span><span class="p">.</span><span class="nx">route</span><span class="p">);</span>
 
-//cmd
-$ node index.js
+<span class="c1">//cmd</span>
+<span class="nx">$</span> <span class="nx">node</span> <span class="nx">index</span><span class="p">.</span><span class="nx">js</span>
 </code></pre></div></div>
 
 <h3 id="内置模块">内置模块</h3>
@@ -1365,87 +1365,87 @@ $ node index.js
 
 <p><code class="highlighter-rouge">axios(config)</code></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 发送 POST 请求
-axios({
-  method: 'post',
-  url: '/user/12345',
-  data: {
-    firstName: 'Fred',
-    lastName: 'Flintstone'
-  }
-});
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 发送 POST 请求</span>
+<span class="nx">axios</span><span class="p">({</span>
+  <span class="na">method</span><span class="p">:</span> <span class="s1">'post'</span><span class="p">,</span>
+  <span class="na">url</span><span class="p">:</span> <span class="s1">'/user/12345'</span><span class="p">,</span>
+  <span class="na">data</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Fred'</span><span class="p">,</span>
+    <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Flintstone'</span>
+  <span class="p">}</span>
+<span class="p">});</span>
 </code></pre></div></div>
 
 <h4 id="请求配置选项">请求配置选项</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
-   // `url` 是用于请求的服务器 URL
-  url: '/user',
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span>
+   <span class="c1">// `url` 是用于请求的服务器 URL</span>
+  <span class="nl">url</span><span class="p">:</span> <span class="s1">'/user'</span><span class="p">,</span>
 
-  // `method` 是创建请求时使用的方法
-  method: 'get', // default
+  <span class="c1">// `method` 是创建请求时使用的方法</span>
+  <span class="nx">method</span><span class="p">:</span> <span class="s1">'get'</span><span class="p">,</span> <span class="c1">// default</span>
 
-  // `baseURL` 将自动加在 `url` 前面，除非 `url` 是一个绝对 URL。
-  // 它可以通过设置一个 `baseURL` 便于为 axios 实例的方法传递相对 URL
-  baseURL: 'https://some-domain.com/api/',
+  <span class="c1">// `baseURL` 将自动加在 `url` 前面，除非 `url` 是一个绝对 URL。</span>
+  <span class="c1">// 它可以通过设置一个 `baseURL` 便于为 axios 实例的方法传递相对 URL</span>
+  <span class="nx">baseURL</span><span class="p">:</span> <span class="s1">'https://some-domain.com/api/'</span><span class="p">,</span>
 
-  // `headers` 是即将被发送的自定义请求头
-  headers: {'X-Requested-With': 'XMLHttpRequest'},
+  <span class="c1">// `headers` 是即将被发送的自定义请求头</span>
+  <span class="nx">headers</span><span class="p">:</span> <span class="p">{</span><span class="s1">'X-Requested-With'</span><span class="p">:</span> <span class="s1">'XMLHttpRequest'</span><span class="p">},</span>
 
-  // `params` 是即将与请求一起发送的 URL 参数
-  // 必须是一个无格式对象(plain object)或 URLSearchParams 对象
-  params: {
-    ID: 12345
-  },
+  <span class="c1">// `params` 是即将与请求一起发送的 URL 参数</span>
+  <span class="c1">// 必须是一个无格式对象(plain object)或 URLSearchParams 对象</span>
+  <span class="nx">params</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">ID</span><span class="p">:</span> <span class="mi">12345</span>
+  <span class="p">},</span>
 
-  // `data` 是作为请求主体被发送的数据
-  // 只适用于这些请求方法 'PUT', 'POST', 和 'PATCH'
-  // 在没有设置 `transformRequest` 时，必须是以下类型之一：
-  // - string, plain object, ArrayBuffer, ArrayBufferView, URLSearchParams
-  // - 浏览器专属：FormData, File, Blob
-  // - Node 专属： Stream
-  data: {
-    firstName: 'Fred'
-  },
+  <span class="c1">// `data` 是作为请求主体被发送的数据</span>
+  <span class="c1">// 只适用于这些请求方法 'PUT', 'POST', 和 'PATCH'</span>
+  <span class="c1">// 在没有设置 `transformRequest` 时，必须是以下类型之一：</span>
+  <span class="c1">// - string, plain object, ArrayBuffer, ArrayBufferView, URLSearchParams</span>
+  <span class="c1">// - 浏览器专属：FormData, File, Blob</span>
+  <span class="c1">// - Node 专属： Stream</span>
+  <span class="nx">data</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">firstName</span><span class="p">:</span> <span class="s1">'Fred'</span>
+  <span class="p">},</span>
 
-  // `timeout` 指定请求超时的毫秒数(0 表示无超时时间)
-  // 如果请求话费了超过 `timeout` 的时间，请求将被中断
-  timeout: 1000,
+  <span class="c1">// `timeout` 指定请求超时的毫秒数(0 表示无超时时间)</span>
+  <span class="c1">// 如果请求话费了超过 `timeout` 的时间，请求将被中断</span>
+  <span class="nx">timeout</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
 
- // `auth` 表示应该使用 HTTP 基础验证，并提供凭据
-  // 这将设置一个 `Authorization` 头，覆写掉现有的任意使用 `headers` 设置的自定义 `Authorization`头
-  auth: {
-    username: 'janedoe',
-    password: 's00pers3cret'
-  },
+ <span class="c1">// `auth` 表示应该使用 HTTP 基础验证，并提供凭据</span>
+  <span class="c1">// 这将设置一个 `Authorization` 头，覆写掉现有的任意使用 `headers` 设置的自定义 `Authorization`头</span>
+  <span class="nx">auth</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">username</span><span class="p">:</span> <span class="s1">'janedoe'</span><span class="p">,</span>
+    <span class="nx">password</span><span class="p">:</span> <span class="s1">'s00pers3cret'</span>
+  <span class="p">},</span>
 
-   // `responseType` 表示服务器响应的数据类型，可以是 'arraybuffer', 'blob', 'document', 'json', 'text', 'stream'
-  responseType: 'json', // default
+   <span class="c1">// `responseType` 表示服务器响应的数据类型，可以是 'arraybuffer', 'blob', 'document', 'json', 'text', 'stream'</span>
+  <span class="nx">responseType</span><span class="p">:</span> <span class="s1">'json'</span><span class="p">,</span> <span class="c1">// default</span>
 
-}
+<span class="p">}</span>
 </code></pre></div></div>
 
 <h4 id="拦截器">拦截器</h4>
 
 <p>在请求或响应被 then 或 catch 处理前拦截它们。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 添加请求拦截器
-axios.interceptors.request.use(function (config) {
-    // 在发送请求之前做些什么
-    return config;
-  }, function (error) {
-    // 对请求错误做些什么
-    return Promise.reject(error);
-  });
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 添加请求拦截器</span>
+<span class="nx">axios</span><span class="p">.</span><span class="nx">interceptors</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">config</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// 在发送请求之前做些什么</span>
+    <span class="k">return</span> <span class="nx">config</span><span class="p">;</span>
+  <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// 对请求错误做些什么</span>
+    <span class="k">return</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+  <span class="p">});</span>
 
-// 添加响应拦截器
-axios.interceptors.response.use(function (response) {
-    // 对响应数据做点什么
-    return response;
-  }, function (error) {
-    // 对响应错误做点什么
-    return Promise.reject(error);
-  });
+<span class="c1">// 添加响应拦截器</span>
+<span class="nx">axios</span><span class="p">.</span><span class="nx">interceptors</span><span class="p">.</span><span class="nx">response</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// 对响应数据做点什么</span>
+    <span class="k">return</span> <span class="nx">response</span><span class="p">;</span>
+  <span class="p">},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// 对响应错误做点什么</span>
+    <span class="k">return</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+  <span class="p">});</span>
 </code></pre></div></div>
 
 <h2 id="react">React</h2>

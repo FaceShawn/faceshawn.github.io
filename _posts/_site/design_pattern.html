@@ -190,23 +190,23 @@
 
 <p>获取单例时发现没有对象、才去创建对象。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class Singleton {
-	private static Singleton instance;	//
-	private Singleton() {}
-	// 保证了:延迟加载和线程安全
-	public static Singelon getInstance() {	//
-		if (instance == null) {	// 这里线程是不安全的,可能得到两个不同的实例，需要第二次判空
-			synchronized (Singleton.class) { //双重校验锁，每个线程获取类的实例时，进行同步
-				if (instance == null) { //只执行一次实例化代码，后面的线程想获得该类实例，直接return就行
-					this.instance = new Singleton();
-				}
-			}
-		}
-		return this.instance;
-	}
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Singleton</span> <span class="o">{</span>
+	<span class="kd">private</span> <span class="kd">static</span> <span class="n">Singleton</span> <span class="n">instance</span><span class="o">;</span>	<span class="c1">//</span>
+	<span class="kd">private</span> <span class="nf">Singleton</span><span class="o">()</span> <span class="o">{}</span>
+	<span class="c1">// 保证了:延迟加载和线程安全</span>
+	<span class="kd">public</span> <span class="kd">static</span> <span class="n">Singelon</span> <span class="nf">getInstance</span><span class="o">()</span> <span class="o">{</span>	<span class="c1">//</span>
+		<span class="k">if</span> <span class="o">(</span><span class="n">instance</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>	<span class="c1">// 这里线程是不安全的,可能得到两个不同的实例，需要第二次判空</span>
+			<span class="kd">synchronized</span> <span class="o">(</span><span class="n">Singleton</span><span class="o">.</span><span class="na">class</span><span class="o">)</span> <span class="o">{</span> <span class="c1">//双重校验锁，每个线程获取类的实例时，进行同步</span>
+				<span class="k">if</span> <span class="o">(</span><span class="n">instance</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span> <span class="c1">//只执行一次实例化代码，后面的线程想获得该类实例，直接return就行</span>
+					<span class="k">this</span><span class="o">.</span><span class="na">instance</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Singleton</span><span class="o">();</span>
+				<span class="o">}</span>
+			<span class="o">}</span>
+		<span class="o">}</span>
+		<span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">instance</span><span class="o">;</span>
+	<span class="o">}</span>
+<span class="o">}</span>
 
-Singleton sg = Singleton::getInstance();
+<span class="n">Singleton</span> <span class="n">sg</span> <span class="o">=</span> <span class="nl">Singleton:</span><span class="o">:</span><span class="n">getInstance</span><span class="o">();</span>
 </code></pre></div></div>
 
 <h5 id="饿汉实现">饿汉实现</h5>
@@ -217,15 +217,15 @@ Singleton sg = Singleton::getInstance();
 
 <p>缺点：没有达到 <code class="highlighter-rouge">Lazy Loading</code>（懒加载）的效果，即，即使没用到这个实例也会加载，造成内存浪费（可忽略）。日志实例？</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public class SingletonEHan {
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SingletonEHan</span> <span class="o">{</span>
 
-    private SingletonEHan() {}
-    private static SingletonEHan singletonEHan = new SingletonEHan();
+    <span class="kd">private</span> <span class="nf">SingletonEHan</span><span class="o">()</span> <span class="o">{}</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">SingletonEHan</span> <span class="n">singletonEHan</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SingletonEHan</span><span class="o">();</span>
 
-    public static SingletonEHan getInstance() {
-        return singletonEHan;
-    }
-}
+    <span class="kd">public</span> <span class="kd">static</span> <span class="n">SingletonEHan</span> <span class="nf">getInstance</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">singletonEHan</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h5 id="内部类实现">内部类实现</h5>
@@ -239,18 +239,18 @@ Singleton sg = Singleton::getInstance();
   <li>内部类是在需要实例化时，调用<code class="highlighter-rouge">getInstance()</code>方法，才会装载<code class="highlighter-rouge">SingletonInHolder</code>类。</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public class SingletonIn {
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SingletonIn</span> <span class="o">{</span>
 
-    private SingletonIn() {}
+    <span class="kd">private</span> <span class="nf">SingletonIn</span><span class="o">()</span> <span class="o">{}</span>
 
-    private static class SingletonInHodler {
-        private static SingletonIn singletonIn = new SingletonIn();
-    }
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">SingletonInHodler</span> <span class="o">{</span>
+        <span class="kd">private</span> <span class="kd">static</span> <span class="n">SingletonIn</span> <span class="n">singletonIn</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SingletonIn</span><span class="o">();</span>
+    <span class="o">}</span>
 
-    public static SingletonIn getSingletonIn() {
-        return SingletonInHodler.singletonIn;
-    }
-}
+    <span class="kd">public</span> <span class="kd">static</span> <span class="n">SingletonIn</span> <span class="nf">getSingletonIn</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">SingletonInHodler</span><span class="o">.</span><span class="na">singletonIn</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h5 id="枚举实现">枚举实现</h5>

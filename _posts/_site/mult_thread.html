@@ -1,5 +1,5 @@
 <blockquote>
-  <p>摘要：Java高级之多线程、并发编程，包括线程的生命周期、创建方式、调度、同步，线程安全，volatile 和 synchronized 关键字，线程池，JUC 工具类，AQS 等。</p>
+  <p>摘要：Java高级之多线程、并发编程，包括线程的基本概念、生命周期、线程调度通信阻塞，创建线程的方式、线程池，JMM（volatile）、线程安全（悲观锁、CAS）、线程同步（synchronized ），并发容器（AQS 、JUC 工具类）。</p>
 </blockquote>
 
 <!-- more -->
@@ -8,40 +8,59 @@
 
 <p>[TOC]</p>
 
-<h3 id="书">书</h3>
-
-<p>《深入理解Java虚拟机》
-《Java并发编程的艺术》</p>
-
-<h3 id="基本概念">基本概念</h3>
-
-<h5 id="串行并行并发">串行、并行、并发</h5>
-
 <ol>
-  <li>
-    <p>串行 xing：多个任务由同一线程<strong>按顺序</strong>执行；时间上不重叠。e.g. 一个队列和一台机器。</p>
-  </li>
-  <li>
-    <p><strong>并行</strong>：多个任务（在多核CPU上，由不同线程）在<strong>同一时刻</strong>执行；（逻辑上）互不干扰。e.g. 两个队列和两台机器。目前发展方向。</p>
-  </li>
-  <li>
-    <p><strong>并发</strong>：多个任务（在同一CPU上，）在<strong>同一时间段内</strong>（按时间片）<strong>轮流交替</strong>执行，逻辑上是同时执行；允许两个任务<strong>彼此干扰</strong>。e.g. 两个队列和一台机器。多核 CPU 之下，并发往往意味着并行.</p>
-  </li>
+  <li>线程的基本概念、生命周期、线程调度通信阻塞，</li>
+  <li>创建线程的方式、线程池，</li>
+  <li>JMM（volatile）、线程安全（悲观锁、CAS）、线程同步（synchronized ），并发容器（AQS 、JUC 工具类）。</li>
 </ol>
 
-<h5 id="同步异步">同步、异步</h5>
+<h4 id="推荐书">推荐书</h4>
 
 <ul>
   <li>
-    <p>同步：必须等被调用的方法结束后，后面的代码才能执行。发出一个调用后，在没有得到结果前， 该调用就不可返回，一直等待。</p>
+    <p>《深入理解Java虚拟机》</p>
   </li>
   <li>
-    <p>异步：不管被调用方法是否完成，都会继续执行后面的代码，调用完成后会通知调用者。调用在发出后，不用等待返回结果，该调用直接返回。</p>
+    <p>《Java并发编程的艺术》</p>
+  </li>
+</ul>
+
+<h3 id="基本概念">基本概念</h3>
+
+<h4 id="串行并行并发">串行、并行、并发</h4>
+
+<ol>
+  <li>串行（xing）：多个任务由同一线程<strong>按顺序</strong>执行；时间上不重叠。
+    <ul>
+      <li>e.g. 一个队列和一台机器。</li>
+    </ul>
+  </li>
+  <li><strong>并行</strong>：多个任务（在多核CPU上，由不同线程）在<strong>同一时刻</strong>执行；（逻辑上）互不干扰。
+    <ul>
+      <li>e.g. 两个队列和两台机器。目前发展方向。</li>
+    </ul>
+  </li>
+  <li><strong>并发</strong>：多个任务（在同一CPU上，）在<strong>同一时间段内</strong>（按时间片）<strong>轮流交替</strong>执行，逻辑上是同时执行；允许两个任务<strong>彼此干扰</strong>。
+    <ul>
+      <li>e.g. 两个队列和一台机器。多核 CPU 之下，并发往往意味着并行.</li>
+    </ul>
+  </li>
+</ol>
+
+<h4 id="同步异步">同步、异步</h4>
+
+<ul>
+  <li>同步：必须等被调用的方法结束后，后面的代码才能执行。</li>
+  <li>发出一个调用后，在没有得到结果前， 该调用就不可返回，一直等待。</li>
+  <li>异步：不管被调用方法是否完成，都会继续执行后面的代码，调用完成后会通知调用者。
+    <ul>
+      <li>调用在发出后，不用等待返回结果，该调用直接返回。</li>
+    </ul>
   </li>
 </ul>
 
 <blockquote>
-  <p>简单来理解就是：同步<strong>按代码顺序</strong>执行，异步不按照代码顺序执行，异步的执行效率更高。</p>
+  <p>简单来理解就是：同步<strong>按代码顺序</strong>执行，异步不按照代码顺序执行，异步的<strong>执行效率</strong>更高。</p>
 </blockquote>
 
 <p>线程同步：两个或多个共享关键资源的线程<strong>并发</strong>执行。用于避免关键资源使用冲突。</p>
@@ -52,7 +71,7 @@
 
 <p><img src="../assets/async-sync.png" style="zoom:33%;" /></p>
 
-<h5 id="多线程">多线程</h5>
+<h4 id="多线程">多线程</h4>
 
 <p>多线程：多个线程<strong>并发</strong>执行。一个<strong>进程运行时</strong>产生了多个线程。</p>
 
@@ -80,7 +99,7 @@
   <li>单核 CPU 中，频繁的上下文切换；</li>
 </ol>
 
-<h5 id="上下文切换">上下文切换</h5>
+<h4 id="上下文切换">上下文切换</h4>
 
 <p>上下文切换：指<strong>CPU控制权</strong>（由一个正在运行的线程）切换到另一个（就绪并等待获取CPU执行权的）线程的过程。</p>
 
@@ -98,8 +117,8 @@
 <p>减少上下文切换可采用：</p>
 
 <ol>
-  <li>无锁并发编程；</li>
-  <li>用 Atomic 类 CAS 算法更新数据，<strong>乐观锁</strong>可有效减少<strong>不必要的锁竞争</strong>带来的上下文切换；</li>
+  <li>无锁<strong>并发</strong>编程；</li>
+  <li>用 Atomic 类 <strong>CAS 算法</strong>更新数据，<strong>乐观锁</strong>可有效减少<strong>不必要的锁竞争</strong>带来的上下文切换；</li>
   <li>使用最少线程：避免创建不需要的线程，（如任务很少却创建了很多线程，会造成大量线程处于<strong>等待</strong>状态）；</li>
   <li>协程：在单线程里实现多任务的调度，并维持多个任务间的切换。</li>
 </ol>
@@ -151,7 +170,7 @@
   <li><strong><code class="highlighter-rouge">terminted</code> 终止、死亡</strong>：<code class="highlighter-rouge">run()</code> 线程执行完或因异常调用 <code class="highlighter-rouge">stop()</code>退出 <code class="highlighter-rouge">run()</code> 方法。</li>
 </ol>
 
-<p><img src="../assets/thread_status.png" alt="Java 线程状态变迁图" style="zoom: 50%;" /></p>
+<p><img src="../assets/thread_status.png" alt="Java 线程状态变迁图" style="zoom: 67%;" /></p>
 
 <h3 id="线程调度通信阻塞">线程调度、通信、阻塞</h3>
 
@@ -164,23 +183,17 @@
 
 <h5 id="线程优先级"><del>线程优先级</del></h5>
 
-<p>线程的优先级级别由操作系统决定，不同的操作系统级别是不一样的。在Java中，提供了一个级别范围<code class="highlighter-rouge">1~10</code>,方便我们去参考。</p>
+<p>线程的优先级级别由操作系统决定，不同的操作系统级别是不一样的。在Java中，提供了一个级别范围<code class="highlighter-rouge">1~10</code>，方便我们去参考。</p>
 
 <ul>
-  <li>
-    <p>Java默认的线程优先级为<code class="highlighter-rouge">5</code>，线程的执行顺序由<strong>调度程序</strong>来决定，线程的优先级会在线程被调用之前设定。</p>
-  </li>
-  <li>
-    <p>每个Java程序都有一个默认的<strong>主线程</strong>，就是通过JVM启动的第一个线程main线程。</p>
-  </li>
-  <li>
-    <p><strong>守护线程</strong>：为所有用户线程提供服务的线程。如：GC 垃圾回收线程，优先级比较低。如果所有的非守护线程都结束了，这个守护线程也会自动结束。</p>
-
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  thread.setDaemon(true);
-  thread.start();
-</code></pre></div>    </div>
-  </li>
+  <li>Java默认的线程优先级为<code class="highlighter-rouge">5</code>，线程的执行顺序由<strong>调度程序</strong>来决定，线程的优先级会在线程被调用之前设定。</li>
+  <li>每个Java程序都有一个默认的<strong>主线程</strong>，就是通过JVM启动的第一个线程main线程。</li>
+  <li><strong>守护线程</strong>：为所有用户线程提供服务的线程。如：GC 垃圾回收线程，优先级比较低。如果所有的非守护线程都结束了，这个守护线程也会自动结束。</li>
 </ul>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">thread</span><span class="o">.</span><span class="na">setDaemon</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+<span class="n">thread</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+</code></pre></div></div>
 
 <h4 id="线程通信的方式">线程通信的方式</h4>
 
@@ -193,7 +206,11 @@
 
 <h4 id="线程阻塞">线程阻塞</h4>
 
-<p>线程阻塞：线程在运行的过程中因某些原因暂时放弃CPU的使用，停止运行，只有等到导致阻塞的原因消除之后才恢复运行；或是被其他的线程中断，也会退出阻塞状态，同时抛出 <code class="highlighter-rouge">InterruptedException</code>。</p>
+<p>线程阻塞：线程在运行的过程中因某些原因暂时放弃CPU的使用，停止运行，只有等到导致阻塞的原因消除之后才恢复运行；</p>
+
+<ul>
+  <li>或是被其他的线程中断，也会退出阻塞状态，同时抛出 <code class="highlighter-rouge">InterruptedException</code>。</li>
+</ul>
 
 <p>线程阻塞的类型、及导致阻塞的原因：</p>
 
@@ -218,11 +235,13 @@
 
 <ol>
   <li><code class="highlighter-rouge">blocked</code> 阻塞：发出I/O请求导致的IO阻塞；无法唤醒，只能等到I/O处理完毕才能解除阻塞。<code class="highlighter-rouge">Thread.join()、Thread.sleep(long)</code>。</li>
-  <li><code class="highlighter-rouge">waiting</code> 等待：调用 <code class="highlighter-rouge">wait()、join()</code>导致的阻塞；join()等待线程终止或超时后唤醒。</li>
-  <li><code class="highlighter-rouge">timed_waiting</code> 超时等待：调用 <code class="highlighter-rouge">wait()、join()、sleep()</code> 让出占用的CPU资源导致的阻塞；sleep()超时。可中断线程并抛出 <code class="highlighter-rouge">InterruptedException</code>。</li>
-  <li>调用 <code class="highlighter-rouge">yield()</code> 让出占用的CPU资源（给优先级相同或更高的线程）、进入ready？。</li>
+  <li><code class="highlighter-rouge">waiting</code> 等待：<strong>调用 <code class="highlighter-rouge">wait()、join()</code></strong>导致的阻塞；join()等待线程终止或超时后唤醒。</li>
+  <li><code class="highlighter-rouge">timed_waiting</code> 超时等待：<strong>调用 <code class="highlighter-rouge">wait()、join()、sleep()</code></strong> 让出占用的CPU资源导致的阻塞；sleep()超时。可中断线程并抛出 <code class="highlighter-rouge">InterruptedException</code>。</li>
+  <li><strong>调用 <code class="highlighter-rouge">yield()</code></strong> 让出占用的CPU资源（给优先级相同或更高的线程）、进入ready。</li>
   <li><del>调用 <code class="highlighter-rouge">suspend()</code> 挂起线程（被挂起后不会释放锁，可能与其他线程、主线程产生死锁，已废弃）；<code class="highlighter-rouge">resume()</code> 恢复线程</del>。</li>
 </ol>
+
+<p><img src="../assets/thread_status.png" alt="Java 线程状态变迁图" style="zoom: 67%;" /></p>
 
 <h5 id="常用方法">常用方法</h5>
 
@@ -239,6 +258,8 @@
 <p><code class="highlighter-rouge">static Thread Thread.currentThread()</code>：返回当前线程。在 Thread 子类中就是this，常用于主线程和 Runnable 实现类。</p>
 
 <p><code class="highlighter-rouge">boolean isAlive()</code>：判断线程是否还活着。</p>
+
+<p><img src="../assets/thread_state.png" alt="Java 线程状态变迁图" style="zoom: 80%;" /></p>
 
 <h5 id="sleepwait">sleep()、wait()</h5>
 
@@ -275,7 +296,7 @@
 
 <h3 id="创建线程">创建线程</h3>
 
-<h4 id="创建线程的三五种方式">创建线程的三、五种方式</h4>
+<h4 id="创建线程的三五种方式">创建线程的三/五种方式</h4>
 
 <p><img src="../assets/Executor框架的使用示意图.36e59afa.png" style="zoom:80%;" /></p>
 
@@ -283,8 +304,8 @@
   <li><strong>继承 <code class="highlighter-rouge">Thread</code> 类</strong>，重写 <code class="highlighter-rouge">run()</code>，调用 <code class="highlighter-rouge">start()</code> 启动线程。缺点：单继承</li>
   <li><strong>实现 <code class="highlighter-rouge">Runnable</code> 接口</strong>，重写 <code class="highlighter-rouge">run()</code>，并将<strong>创建的子类对象</strong>（作为参数）传给 <strong>Thread 类的构造器</strong> <code class="highlighter-rouge">new Thread(Runnable obj)</code> 来创建线程对象，调用 <code class="highlighter-rouge">start()</code> 启动线程。</li>
   <li><strong>实现 <code class="highlighter-rouge">Callable</code> 接口</strong>，重写 <code class="highlighter-rouge">call()</code>，并将<strong>创建的子类对象</strong>（作为参数）传给 <strong>Thread 类的构造器</strong>来创建线程对象，调用 <code class="highlighter-rouge">start()</code> 开启线程。</li>
-  <li>实现 <code class="highlighter-rouge">ExecutorService</code> 接口创建<strong>线程池</strong>；</li>
-  <li>使用线程工厂 <code class="highlighter-rouge">ThreadFactory</code> 创建<strong>线程池</strong>；</li>
+  <li>实现 <strong><code class="highlighter-rouge">ExecutorService</code> 接口</strong>创建<strong>线程池</strong>；</li>
+  <li>使用<strong>线程工厂 <code class="highlighter-rouge">ThreadFactory</code></strong> 创建<strong>线程池</strong>；</li>
   <li><del>（用两种方式）创建<strong><a href="#线程池">线程池</a></strong>（都实现了 <code class="highlighter-rouge">ExecutorService</code> 接口）：用时直接获取，用完放回。</del></li>
 </ol>
 
@@ -358,27 +379,25 @@
 
 <h4 id="executor-框架">Executor 框架</h4>
 
-<p><a href="#创建线程">3、5种创建线程的方式</a></p>
-
-<p><img src="../assets/任务的执行相关接口.27457eb8.png" style="zoom: 60%;" /><img src="../assets/Executor框架的使用示意图.36e59afa.png" style="zoom:70%;" /></p>
-
 <h5 id="executor-框架结构">Executor 框架结构</h5>
 
 <ol>
   <li>任务：<code class="highlighter-rouge">Runnable</code> /<code class="highlighter-rouge">Callable </code> 接口；</li>
-  <li>任务的执行：任务执行机制的核心接口 <code class="highlighter-rouge">Executor</code> 及继承它的 <code class="highlighter-rouge">ExecutorService</code> 子接口（真正的线程池接口，用于创建并返回不同类型的线程池）：
+  <li>任务的执行：任务执行机制的核心接口 <code class="highlighter-rouge">Executor</code> 及继承它的 <code class="highlighter-rouge">ExecutorService</code> 子接口（真正的<strong>线程池接口</strong>，用于创建并返回不同类型的线程池）：
     <ul>
-      <li>两个关键（线程池）实现类：<code class="highlighter-rouge">ThreadPoolExecutor</code> 和 <code class="highlighter-rouge">ScheduledThreadPoolExecutor</code>；</li>
+      <li>两个关键（线程池）<strong>实现类</strong>：<code class="highlighter-rouge">ThreadPoolExecutor</code> 和 <code class="highlighter-rouge">ScheduledThreadPoolExecutor</code>；</li>
     </ul>
   </li>
   <li>异步计算的结果：<code class="highlighter-rouge">Future</code> 接口及其实现类 <code class="highlighter-rouge">FutureTask</code> 类；</li>
 </ol>
 
+<p><img src="../assets/任务的执行相关接口.27457eb8.png" style="zoom: 80%;" /></p>
+
 <h5 id="用-executor-框架执行线程">用 Executor 框架执行线程</h5>
 
 <ol>
   <li>主线程首先要创建实现 <code class="highlighter-rouge">Runnable</code> 或 <code class="highlighter-rouge">Callable</code> 接口的任务对象；</li>
-  <li>创建 <code class="highlighter-rouge">ExecutorService</code>线程池；</li>
+  <li>创建 <strong><code class="highlighter-rouge">ExecutorService</code>线程池</strong>；</li>
   <li>把创建的对象交给 <code class="highlighter-rouge">ExecutorService</code> 线程池执行：
     <ol>
       <li>直接执行：<code class="highlighter-rouge">ExecutorService.execute(Runnable command)</code>）：没有返回值；用于提交不需返回值的任务，无法判断任务是否被线程池执行成功与否；</li>
@@ -389,40 +408,53 @@
       </li>
     </ol>
   </li>
-  <li>由于 <code class="highlighter-rouge">FutureTask</code> 实现了 <code class="highlighter-rouge">Runnable</code>，也可创建 <code class="highlighter-rouge">FutureTask</code>，然后直接交给 <code class="highlighter-rouge">ExecutorService</code> 执行。</li>
+  <li>由于 <code class="highlighter-rouge">FutureTask</code> 实现了 <code class="highlighter-rouge">Runnable</code>，也可创建 <code class="highlighter-rouge">FutureTask</code>，然后直接<strong>交给 <code class="highlighter-rouge">ExecutorService</code> 执行</strong>。</li>
   <li>最后，主线程可执行 <code class="highlighter-rouge">FutureTask.get()</code>方法来等待任务执行完成，也可执行 <code class="highlighter-rouge">FutureTask.cancel(boolean mayInterruptIfRunning)</code>来取消任务执行。</li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 用构造器创建线程池
-ExecutorService service = new ThreadPoolExecutor(5, 10, 10, TimeUnit.SECONDS, new LinkedBlockingQueue&lt;&gt;());
+<p><img src="../assets/Executor框架的使用示意图.36e59afa.png" style="zoom:90%;" /></p>
 
-// 1.创建一个 Runnable 接口的（匿名）实现类，重写 run()，并提交给 execute()
-service.execute(new Runnable() {
-	@Override
-	public void run() {
-	    System.out.println("execute方式");
-	}
-});
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 用构造器创建线程池</span>
+<span class="n">ExecutorService</span> <span class="n">service</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ThreadPoolExecutor</span><span class="o">(</span><span class="mi">5</span><span class="o">,</span> <span class="mi">10</span><span class="o">,</span> <span class="mi">10</span><span class="o">,</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">SECONDS</span><span class="o">,</span> <span class="k">new</span> <span class="n">LinkedBlockingQueue</span><span class="o">&lt;&gt;());</span>
 
-// 2.创建一个 Callable 接口的（匿名）实现类，重写 call()，并提交给 submit()
-Future&lt;Integer&gt; future = service.submit(new Callable&lt;Integer&gt;() {
-	@Override
-	public Integer call() throws Exception {
-		System.out.println("submit方式");
-		return 2;
-	}
-});
+<span class="c1">// 1.创建一个 Runnable 接口的（匿名）实现类，重写 run()，并提交给 execute()</span>
+<span class="n">service</span><span class="o">.</span><span class="na">execute</span><span class="o">(</span><span class="k">new</span> <span class="n">Runnable</span><span class="o">()</span> <span class="o">{</span>
+	<span class="nd">@Override</span>
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+	    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"execute方式"</span><span class="o">);</span>
+	<span class="o">}</span>
+<span class="o">});</span>
 
-try {
-	Integer number = future.get();
-} catch (ExecutionException e) {
-	e.printStackTrace();
-}
+<span class="c1">// 2.创建一个 Callable 接口的（匿名）实现类，重写 call()，并提交给 submit()</span>
+<span class="n">Future</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">future</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="na">submit</span><span class="o">(</span><span class="k">new</span> <span class="n">Callable</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;()</span> <span class="o">{</span>
+	<span class="nd">@Override</span>
+	<span class="kd">public</span> <span class="n">Integer</span> <span class="nf">call</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+		<span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"submit方式"</span><span class="o">);</span>
+		<span class="k">return</span> <span class="mi">2</span><span class="o">;</span>
+	<span class="o">}</span>
+<span class="o">});</span>
+
+<span class="k">try</span> <span class="o">{</span>
+	<span class="n">Integer</span> <span class="n">number</span> <span class="o">=</span> <span class="n">future</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">ExecutionException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+	<span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h4 id="创建线程池">创建线程池</h4>
 
-<h5 id="一通过五种构造器-threadpoolexecutor">一、通过五种构造器 <code class="highlighter-rouge">ThreadPoolExecutor()</code></h5>
+<blockquote>
+  <p><a href="#创建线程">3、5种创建线程的方式</a></p>
+</blockquote>
+
+<p>创建线程池的方式：</p>
+
+<ol>
+  <li>通过（<strong><code class="highlighter-rouge">ExecutorService</code> 接口</strong>的实现类）<code class="highlighter-rouge">ThreadPoolExecutor</code>（的五种构造器）创建<strong>线程池</strong>；</li>
+  <li>通过五种 Executors 静态工厂类。使用<strong>线程工厂 <code class="highlighter-rouge">ThreadFactory</code></strong> 创建<strong>线程池</strong>；</li>
+</ol>
+
+<h5 id="threadpoolexecutor">ThreadPoolExecutor()</h5>
 
 <blockquote>
   <p>Alibaba 推荐，更明确线程池的运行规则，规避资源耗尽的风险。</p>
@@ -443,11 +475,11 @@ try {
 <p>其中前5个为共有，可选参数有：</p>
 
 <ol>
-  <li><code class="highlighter-rouge">[ThreadFactory threadFactory]</code>：用于 executor 创建新线程；</li>
+  <li><code class="highlighter-rouge">[ThreadFactory threadFactory]</code>：用于 <strong>executor 创建新线程</strong>；</li>
   <li><code class="highlighter-rouge">[RejectExecutionHandler handler]</code>：任务拒绝策略。</li>
 </ol>
 
-<h5 id="任务拒绝策略">任务拒绝策略</h5>
+<h6 id="任务拒绝策略">任务拒绝策略</h6>
 
 <blockquote>
   <p>饱和策略</p>
@@ -466,13 +498,13 @@ try {
   <li><code class="highlighter-rouge">.DiscardOldestPolicy</code>： 此策略将丢弃<strong>最早的未处理的</strong>任务请求。</li>
 </ol>
 
-<h5 id="二通过五种-executors-静态工厂类">二、通过五种 Executors 静态工厂类</h5>
+<h5 id="executors-静态工厂类">Executors 静态工厂类</h5>
 
 <p>通过 <code class="highlighter-rouge">Executor</code> 框架的工具类/线程池的静态工厂类 <code class="highlighter-rouge">Executors</code> 来实现。</p>
 
 <p>目的是将任务提交和运行分离，用户不需从代码层考虑设计任务的提交运行。<strong>不推荐</strong>。</p>
 
-<p><img src="../assets/Executor框架的工具类.png" alt="Executor框架的工具类" style="zoom: 80%;" /></p>
+<p><img src="../assets/Executor框架的工具类.png" alt="Executor框架的工具类" style="zoom: 100%;" /></p>
 
 <h5 id="常见线程池及创建接口">常见线程池及创建接口</h5>
 
@@ -550,7 +582,7 @@ try {
 
 <p>也就是说，JMM 为共享变量提供了<strong>可见性</strong>的保障。</p>
 
-<p><img src="../assets/jmm.png" alt="JMM(Java 内存模型)" style="zoom: 70%;" /></p>
+<p><img src="../assets/jmm.png" alt="JMM(Java 内存模型)" style="zoom: 80%;" /></p>
 
 <p>Java 内存区域和 JMM 的区别：</p>
 
@@ -559,9 +591,9 @@ try {
   <li><strong>Java 内存模型（JMM）</strong>：和 Java 的<strong>并发编程</strong>相关，抽象了线程和主内存之间的关系；规定了从 Java 源代码到 CPU 可执行指令的转化过程要遵守哪些（和并发相关的）原则和规范，主要目的是为了简化多线程编程，增强程序可移植性。</li>
 </ul>
 
-<h5 id="happens-before-规则">happens-before 规则</h5>
+<h4 id="happens-before-规则">happens-before 规则</h4>
 
-<p><img src="../assets/image-20220731155332375.png" alt="img" style="zoom: 80%;" /></p>
+<p><img src="../assets/image-20220731155332375.png" alt="img" style="zoom: 67%;" /></p>
 
 <p>先行发生原则：定义了操作 A 必然先行发生于 B 的一些规则。</p>
 
@@ -583,7 +615,7 @@ try {
   <li>对象<strong>终结</strong>规则：对象的<strong>初始化</strong> happens-before 于 <code class="highlighter-rouge">finalize()</code> 方法；</li>
 </ol>
 
-<h6 id="与-as-if-serial-的区别">与 as-if-serial 的区别</h6>
+<h5 id="与-as-if-serial-的区别">与 as-if-serial 的区别</h5>
 
 <p>as-if-serial：编译器等会对原始程序进行指令重排序和优化，但和原结果一致。</p>
 
@@ -593,7 +625,7 @@ try {
   <li>目的：都是为（在不改变程序执行结果的前提下，）尽可能提高执行的并行度。</li>
 </ol>
 
-<h5 id="volatile">volatile</h5>
+<h4 id="volatile">volatile</h4>
 
 <p>volatile 修饰共享变量：保证每个线程都能获取<strong>主存中的最新值</strong>，避免出现数据脏读。</p>
 
@@ -605,7 +637,7 @@ try {
   <li><del>不能单独保证<strong>原子性</strong>，结合 <strong>CAS</strong> 可保证。</del></li>
 </ol>
 
-<h6 id="指令重排序">指令重排序</h6>
+<h5 id="指令重排序">指令重排序</h5>
 
 <blockquote>
   <p>简单来说就是系统在执行代码时并不一定是按照代码顺序依次执行。</p>
@@ -620,7 +652,7 @@ try {
   <li>处理器<strong>指令并行重排</strong>：现代处理器采用了指令级并行技术（Instruction-Level Parallelism，ILP）来将多条指令重叠执行。如果不存在数据依赖性，处理器可改变<strong>语句对应机器指令的执行顺序</strong>。指令重排序可保证串行语义一致，但不保证多线程间的语义也一致 ，可能会导致一些问题。</li>
 </ol>
 
-<h6 id="volatile-vs-synchronized">volatile VS synchronized</h6>
+<h5 id="volatile-vs-synchronized">volatile VS synchronized</h5>
 
 <blockquote>
   <p><code class="highlighter-rouge">synchronized</code> 关键字和 <code class="highlighter-rouge">volatile</code> 关键字是两个互补的存在，而不是对立的存在！</p>
@@ -637,7 +669,7 @@ try {
   <li>优化：<code class="highlighter-rouge">volatile </code>变量不会<strong>被编译器优化</strong>；<code class="highlighter-rouge">synchronized</code>变量可被优化。</li>
 </ol>
 
-<h5 id="threadlocal">ThreadLocal</h5>
+<h4 id="threadlocal">ThreadLocal</h4>
 
 <p><code class="highlighter-rouge">ThreadLocal</code>（线程共享变量）：为<strong>每个线程</strong>维护一个本地 Map，key 为 ThreadLocal 对象，value 为对应线程的<strong>变量副本</strong>（Entry 对象）</p>
 
@@ -800,7 +832,11 @@ try {
 <span class="kd">private</span> <span class="kd">final</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">ExpressClientEnum</span><span class="o">,</span> <span class="n">ExpressClient</span><span class="o">&gt;</span> <span class="n">clientMap</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ConcurrentHashMap</span><span class="o">&lt;&gt;(</span><span class="mi">8</span><span class="o">);</span>
 </code></pre></div></div>
 
-<h5 id="同步容器collectionssynchorizedxxx">同步容器：<code class="highlighter-rouge">Collections.synchorizedXXX</code>；</h5>
+<h5 id="同步容器">同步容器</h5>
+
+<blockquote>
+  <p><code class="highlighter-rouge">Collections.synchorizedXXX</code>；</p>
+</blockquote>
 
 <ul>
   <li>
@@ -843,7 +879,9 @@ try {
 
 <h5 id="行锁表锁">行锁、表锁</h5>
 
-<p>见数据库文档中的锁机制。</p>
+<blockquote>
+  <p>见数据库文档中的 #锁机制。</p>
+</blockquote>
 
 <h4 id="cas-比较-交换">CAS 比较-交换</h4>
 
@@ -862,8 +900,8 @@ try {
 <p>在 <strong>JUC 包</strong>下实现的很多类都用到了CAS操作：</p>
 
 <ol>
-  <li>AbstractQueuedSynchronizer（<strong>AQS框架</strong>）</li>
-  <li><strong>AtomicXXX 类</strong></li>
+  <li><code class="highlighter-rouge">AbstractQueuedSynchronizer</code>（<strong>AQS框架</strong>）</li>
+  <li><strong><code class="highlighter-rouge">AtomicXXX</code> 类</strong></li>
 </ol>
 
 <h5 id="产生的问题">产生的问题</h5>
@@ -962,9 +1000,9 @@ try {
 
 <p>给<strong>当前对象实例</strong>加锁，进入<strong>同步代码</strong>前要获得当前对象实例的锁。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>synchronized void method() {
-    //业务代码
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">synchronized</span> <span class="kt">void</span> <span class="nf">method</span><span class="o">()</span> <span class="o">{</span>
+    <span class="c1">//业务代码</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h5 id="修饰静态方法">修饰静态方法</h5>
@@ -975,9 +1013,9 @@ try {
   <li>因为静态成员不属于任何一个实例对象，归整个类所有，不依赖于类的特定实例，被类的所有实例共享。</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>synchronized static void method() {
-    //业务代码
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">synchronized</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">method</span><span class="o">()</span> <span class="o">{</span>
+    <span class="c1">//业务代码</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <p>静态 <code class="highlighter-rouge">synchronized</code> 方法和非静态 <code class="highlighter-rouge">synchronized</code> 方法之间的调用互斥么？</p>
@@ -1093,7 +1131,7 @@ try {
 <span class="mi">3</span><span class="o">.</span> <span class="err">解锁</span> <span class="n">l</span><span class="o">.</span><span class="na">unlock</span><span class="o">()</span>
 </code></pre></div></div>
 
-<p><img src="../assets/reentrantlock-class-diagram.png" alt="img" style="zoom: 30%;" /></p>
+<p><img src="../assets/reentrantlock-class-diagram.png" alt="img" style="zoom: 40%;" /></p>
 
 <h5 id="可重入锁">可重入锁</h5>
 
@@ -1236,6 +1274,10 @@ try {
 
 <h4 id="waitnotifynotifyall-通知">wait()、notify()、notifyAll() 通知</h4>
 
+<blockquote>
+  <p>见 <a href="#线程阻塞">线程阻塞</a>。</p>
+</blockquote>
+
 <h4 id="生产者消费者模型">生产者消费者模型</h4>
 
 <p>作用：</p>
@@ -1312,29 +1354,29 @@ try {
 
 <h5 id="atomicinteger-类常用方法">AtomicInteger 类常用方法</h5>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>public final int get() // 获取当前的值
-public final int getAndSet(int newValue) // 获取当前的值，并设置新的值
-public final int getAndIncrement() // 获取当前的值，并自增
-public final int getAndDecrement() // 获取当前的值，并自减
-public final int getAndAdd(int delta) // 获取当前的值，并加上预期的值
-boolean compareAndSet(int expect, int update) // 如果输入的数值等于预期值，则以原子方式将该值设置为输入值（update）
-public final void lazySet(int newValue) // 最终设置为newValue,使用 lazySet 设置后可能导致其他线程在之后的一小段时间内还是可读到旧值。
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">final</span> <span class="kt">int</span> <span class="nf">get</span><span class="o">()</span> <span class="c1">// 获取当前的值</span>
+<span class="kd">public</span> <span class="kd">final</span> <span class="kt">int</span> <span class="nf">getAndSet</span><span class="o">(</span><span class="kt">int</span> <span class="n">newValue</span><span class="o">)</span> <span class="c1">// 获取当前的值，并设置新的值</span>
+<span class="kd">public</span> <span class="kd">final</span> <span class="kt">int</span> <span class="nf">getAndIncrement</span><span class="o">()</span> <span class="c1">// 获取当前的值，并自增</span>
+<span class="kd">public</span> <span class="kd">final</span> <span class="kt">int</span> <span class="nf">getAndDecrement</span><span class="o">()</span> <span class="c1">// 获取当前的值，并自减</span>
+<span class="kd">public</span> <span class="kd">final</span> <span class="kt">int</span> <span class="nf">getAndAdd</span><span class="o">(</span><span class="kt">int</span> <span class="n">delta</span><span class="o">)</span> <span class="c1">// 获取当前的值，并加上预期的值</span>
+<span class="kt">boolean</span> <span class="nf">compareAndSet</span><span class="o">(</span><span class="kt">int</span> <span class="n">expect</span><span class="o">,</span> <span class="kt">int</span> <span class="n">update</span><span class="o">)</span> <span class="c1">// 如果输入的数值等于预期值，则以原子方式将该值设置为输入值（update）</span>
+<span class="kd">public</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">lazySet</span><span class="o">(</span><span class="kt">int</span> <span class="n">newValue</span><span class="o">)</span> <span class="c1">// 最终设置为newValue,使用 lazySet 设置后可能导致其他线程在之后的一小段时间内还是可读到旧值。</span>
 </code></pre></div></div>
 
 <p><code class="highlighter-rouge">AtomicInteger</code> 类的使用示例：</p>
 
 <p>使用 <code class="highlighter-rouge">AtomicInteger</code> 之后，不用对 <code class="highlighter-rouge">increment()</code> 方法加锁也可保证线程安全。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>class AtomicIntegerTest {
-    private AtomicInteger count = new AtomicInteger();
-    // 使用AtomicInteger之后，不需对该方法加锁，也可实现线程安全。
-    public void increment() {
-        count.incrementAndGet();
-    }
-    public int getCount() {
-        return count.get();
-    }
-}
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">AtomicIntegerTest</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="n">AtomicInteger</span> <span class="n">count</span> <span class="o">=</span> <span class="k">new</span> <span class="n">AtomicInteger</span><span class="o">();</span>
+    <span class="c1">// 使用AtomicInteger之后，不需对该方法加锁，也可实现线程安全。</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">increment</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">count</span><span class="o">.</span><span class="na">incrementAndGet</span><span class="o">();</span>
+    <span class="o">}</span>
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getCount</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">count</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h4 id="juc-核心类-aqs">JUC 核心类 AQS</h4>
@@ -1348,7 +1390,7 @@ public final void lazySet(int newValue) // 最终设置为newValue,使用 lazySe
 
 <h5 id="aqs-原理">AQS 原理</h5>
 
-<p><img src="../assets/AQS原理图.png" alt="AQS原理图" style="zoom: 67%;" /></p>
+<p><img src="../assets/AQS原理图.png" alt="AQS原理图" style="zoom: 80%;" /></p>
 
 <p>AQS 核心思想是：</p>
 

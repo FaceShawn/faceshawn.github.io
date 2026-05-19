@@ -120,13 +120,13 @@
   <li>
     <p><code class="highlighter-rouge">BeanFactory</code> 接口：Spring 内部用；<strong>懒加载</strong>（获取对象时才创建对象）；简单，占内存少，启动快。最常用 <strong><code class="highlighter-rouge">XmlBeanFactory</code> 类</strong>实现接口。</p>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> import  org.springframework.beans.factory.BeanFactory;
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="kn">import</span>  <span class="nn">org.springframework.beans.factory.BeanFactory</span><span class="o">;</span>
       
- Resource res = new ClassPathResource("appContext.xml"); 
- BeanFactory fact = new XmlBeanFactory(res); 
+ <span class="n">Resource</span> <span class="n">res</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ClassPathResource</span><span class="o">(</span><span class="s">"appContext.xml"</span><span class="o">);</span> 
+ <span class="n">BeanFactory</span> <span class="n">fact</span> <span class="o">=</span> <span class="k">new</span> <span class="n">XmlBeanFactory</span><span class="o">(</span><span class="n">res</span><span class="o">);</span> 
       
- Student stu = (Student) fact.getBean("student");
- stu.getMsg();
+ <span class="n">Student</span> <span class="n">stu</span> <span class="o">=</span> <span class="o">(</span><span class="n">Student</span><span class="o">)</span> <span class="n">fact</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="s">"student"</span><span class="o">);</span>
+ <span class="n">stu</span><span class="o">.</span><span class="na">getMsg</span><span class="o">();</span>
 </code></pre></div>    </div>
   </li>
   <li>
@@ -138,7 +138,7 @@
       <li><code class="highlighter-rouge">XmlWebApplicationContext</code>：从Web系统中的 XML 文件加载配置文件。</li>
     </ol>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  BeanFactory beanFactory = new ClassPathXmlApplicationContext("beans.xml");
+    <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="n">BeanFactory</span> <span class="n">beanFactory</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ClassPathXmlApplicationContext</span><span class="o">(</span><span class="s">"beans.xml"</span><span class="o">);</span>
 </code></pre></div>    </div>
   </li>
 </ol>
@@ -174,18 +174,18 @@
 
 <p>工厂方法：分为无参和有参，静态工厂和实例工厂。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 用静态工厂方法创建Bean
-class UserFactory {
-    public static UserDao getDao() {
-        // xml解析
-        String className = class属性值;
-        // 通过反射创建对象
-        Class clazz = Class.forName(className);
-        return (UserDao)clazz.newInstance();
-        // return new UserDao();
-    }
-}
-UserDao dao = UserFactory.getDao();
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 用静态工厂方法创建Bean</span>
+<span class="kd">class</span> <span class="nc">UserFactory</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="n">UserDao</span> <span class="nf">getDao</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">// xml解析</span>
+        <span class="n">String</span> <span class="n">className</span> <span class="o">=</span> <span class="n">class</span><span class="err">属性值</span><span class="o">;</span>
+        <span class="c1">// 通过反射创建对象</span>
+        <span class="n">Class</span> <span class="n">clazz</span> <span class="o">=</span> <span class="n">Class</span><span class="o">.</span><span class="na">forName</span><span class="o">(</span><span class="n">className</span><span class="o">);</span>
+        <span class="k">return</span> <span class="o">(</span><span class="n">UserDao</span><span class="o">)</span><span class="n">clazz</span><span class="o">.</span><span class="na">newInstance</span><span class="o">();</span>
+        <span class="c1">// return new UserDao();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+<span class="n">UserDao</span> <span class="n">dao</span> <span class="o">=</span> <span class="n">UserFactory</span><span class="o">.</span><span class="na">getDao</span><span class="o">();</span>
 </code></pre></div></div>
 
 <h4 id="循环依赖">循环依赖</h4>
@@ -227,7 +227,15 @@ UserDao dao = UserFactory.getDao();
 
 <ul>
   <li>在全局配置文件中设置允许循环依赖存在：<code class="highlighter-rouge">spring.main.allow-circular-references=true</code>。最简单粗暴的方式，不太推荐。</li>
-  <li>在导致循环依赖的 Bean 上添加 <strong><code class="highlighter-rouge">@Lazy</code> 注解</strong>，比较推荐。<code class="highlighter-rouge">@Lazy</code> 用来标识类是否需要懒加载/延迟加载，可以作用在类上、方法上、构造器上、方法参数上、成员变量中。</li>
+  <li>在导致<strong>循环依赖</strong>的 Bean 上添加 <strong><code class="highlighter-rouge">@Lazy</code> 注解</strong>，比较推荐。</li>
+</ul>
+
+<h4 id="lazy">@Lazy</h4>
+
+<p><code class="highlighter-rouge">@Lazy</code> 用来标识类需要<strong>懒加载/延迟加载</strong>，用于解决循环依赖。</p>
+
+<ul>
+  <li>可以作用在类上、方法上、构造器上、方法参数上、成员变量中。</li>
 </ul>
 
 <h4 id="依赖注入的方式">依赖注入的方式</h4>
@@ -240,9 +248,9 @@ UserDao dao = UserFactory.getDao();
   <p>见 Spring Boot 文档中。</p>
 </blockquote>
 
-<h2 id="spring-bean-定义">Spring Bean 定义</h2>
+<h2 id="spring-bean">Spring Bean</h2>
 
-<h3 id="spring-bean-定义-1">Spring Bean 定义</h3>
+<h3 id="bean-定义">Bean 定义</h3>
 
 <p>Bean：由 IoC 容器创建并管理的对象。</p>
 
@@ -304,35 +312,35 @@ UserDao dao = UserFactory.getDao();
   </li>
 </ol>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Beans.xml
-&lt;beans&gt;
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Beans.xml
+<span class="nt">&lt;beans&gt;</span>
     // bean 标签: 要创建的对象，默认执行无参构造器
     // id: Bean 的唯一标识符
     // class: Bean的实现类，指定从 package 到 class name 的完全限定名
     // name: 
     // scope: Bean 的作用域
-    &lt;bean id="user" class="com.spring5.User" name="" scope=""&gt;
-        &lt;--! 1. 用（有参）构造器注入属性--&gt;
-        &lt;constructor-arg name="oname" index=0 type="" value="China"&gt;
-        &lt;/constructor-arg&gt;
+    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">"user"</span> <span class="na">class=</span><span class="s">"com.spring5.User"</span> <span class="na">name=</span><span class="s">""</span> <span class="na">scope=</span><span class="s">""</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;--</span><span class="err">!</span> <span class="err">1.</span> <span class="err">用（有参）构造器注入属性--</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;constructor-arg</span> <span class="na">name=</span><span class="s">"oname"</span> <span class="na">index=</span><span class="s">0</span> <span class="na">type=</span><span class="s">""</span> <span class="na">value=</span><span class="s">"China"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;/constructor-arg&gt;</span>
         
-        &lt;--! 2. 用set方法注入属性，通过property标签实现属性注入--&gt;
+        <span class="nt">&lt;--</span><span class="err">!</span> <span class="err">2.</span> <span class="err">用set方法注入属性，通过property标签实现属性注入--</span><span class="nt">&gt;</span>
         // 注入8大基本数据类类 + String
-        &lt;property name="bname" value="java"&gt;&lt;/property&gt;
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"bname"</span> <span class="na">value=</span><span class="s">"java"</span><span class="nt">&gt;&lt;/property&gt;</span>
         // 注入外部bean属性
-        &lt;property name="userDao" ref="userDaoImpl"&gt;&lt;/property&gt;
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"userDao"</span> <span class="na">ref=</span><span class="s">"userDaoImpl"</span><span class="nt">&gt;&lt;/property&gt;</span>
         // 注入集合，创建类，定义数组、List、Set、Map属性，生成set方法
-        &lt;property name="courses"&gt;
+        <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">"courses"</span><span class="nt">&gt;</span>
             // 注入数组类型属性
             // 注入List集合属性
-            &lt;list&gt;
-                &lt;value&gt;java&lt;/value&gt;
-            &lt;/list&gt;
+            <span class="nt">&lt;list&gt;</span>
+                <span class="nt">&lt;value&gt;</span>java<span class="nt">&lt;/value&gt;</span>
+            <span class="nt">&lt;/list&gt;</span>
             // 注入Map属性
             // 在集合里设置对象类型的值
-        &lt;/property&gt;
-    &lt;/bean&gt;
-&lt;/beans&gt;
+        <span class="nt">&lt;/property&gt;</span>
+    <span class="nt">&lt;/bean&gt;</span>
+<span class="nt">&lt;/beans&gt;</span>
 
 // 类中
 public Orders(String oname) {
@@ -344,16 +352,16 @@ public Orders(String oname) {
 
 <p>Bean 作用域：指 Spring IoC 容器<strong>创建</strong>的 Bean 对象相对于其他 Bean 的<strong>请求可见范围</strong>。在装配 Bean 时就必须指明，可通过 XML 或注解方式配置。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. XML 方式：
-&lt;bean id="" class="" scope="singleton"&gt;&lt;/bean&gt;
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 1. XML 方式：</span>
+<span class="o">&lt;</span><span class="n">bean</span> <span class="n">id</span><span class="o">=</span><span class="s">""</span> <span class="kd">class</span><span class="err">=""</span> <span class="nc">scope</span><span class="o">=</span><span class="s">"singleton"</span><span class="o">&gt;&lt;/</span><span class="n">bean</span><span class="o">&gt;</span>
 
-2. 注解方式：
-@Bean
-//@Scope("singleton")
-@Scope(value = Con'figurableBeanFactory.SCOPE_PROTO'TYPE)
-public Person personPrototype() {
-    return new Person();
-}
+<span class="c1">// 2. 注解方式：</span>
+<span class="nd">@Bean</span>
+<span class="c1">//@Scope("singleton")</span>
+<span class="nd">@Scope</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="n">Con</span><span class="err">'</span><span class="n">figurableBeanFactory</span><span class="o">.</span><span class="na">SCOPE_PROTO</span><span class="err">'</span><span class="n">TYPE</span><span class="o">)</span>
+<span class="kd">public</span> <span class="n">Person</span> <span class="nf">personPrototype</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nf">Person</span><span class="o">();</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <p><strong>基本作用域</strong>：</p>
@@ -435,8 +443,8 @@ public Person personPrototype() {
 
 <h4 id="自动装配的五种规则">自动装配的五种规则</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;!-- 通过 autowire 属性设置自动装配的规则--&gt;
-&lt;bean id="employee" class="net.bian.Employee" autowire="byName" ref=""&gt;
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">&lt;!-- 通过 autowire 属性设置自动装配的规则--&gt;</span>
+<span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">"employee"</span> <span class="na">class=</span><span class="s">"net.bian.Employee"</span> <span class="na">autowire=</span><span class="s">"byName"</span> <span class="na">ref=</span><span class="s">""</span><span class="nt">&gt;</span>
 </code></pre></div></div>
 
 <ol>
@@ -468,10 +476,10 @@ public Person personPrototype() {
 
 <p>Spring Boot 彻底抛弃了 XML 配置，推荐基于 Java API 配置 Bean，在 Java 类中用注解设置依赖关系。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Spring 配置文件（xml或properties）中启用注解装配
-&lt;beans&gt;
-	&lt;context:annotation-config/&gt;
-&lt;/beans&gt;
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;--</span> <span class="err">Spring</span> <span class="err">配置文件（xml或properties）中启用注解装配</span> <span class="err">!--</span><span class="nt">&gt;</span>
+<span class="nt">&lt;beans&gt;</span>
+	<span class="nt">&lt;context:annotation-config/&gt;</span>
+<span class="nt">&lt;/beans&gt;</span>
 </code></pre></div></div>
 
 <p>常用注册 Bean 的注解：</p>
@@ -549,7 +557,7 @@ public Person personPrototype() {
 
 <p>应用场景：<strong>异常处理</strong>、<strong>事务</strong>处理、<strong>日志记录</strong>、性能统计、安全控制，<strong>统一参数验证、统一返回对象</strong>等。</p>
 
-<p><img src="../assets/f599114dd06c6a14afe9f64a5396f9de.png" alt="img" style="zoom:50%;" /></p>
+<p><img src="../assets/f599114dd06c6a14afe9f64a5396f9de.png" alt="img" style="zoom: 67%;" /></p>
 
 <h4 id="aop-实现原理">AOP 实现原理</h4>
 
@@ -803,98 +811,98 @@ public Person personPrototype() {
 
 <p>这种异常处理方式下，会给所有或者指定的 <code class="highlighter-rouge">Controller</code> <strong>织入</strong>异常处理 AOP，当 <code class="highlighter-rouge">Controller</code> 中的方法<strong>抛出异常</strong>时，由被<code class="highlighter-rouge">@ExceptionHandler</code> 注解修饰的方法进行处理。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">com</span><span class="p">.</span><span class="n">macro</span><span class="p">.</span><span class="n">mall</span><span class="p">.</span><span class="n">common</span><span class="p">.</span><span class="n">api</span><span class="p">;</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">macro</span><span class="o">.</span><span class="na">mall</span><span class="o">.</span><span class="na">common</span><span class="o">.</span><span class="na">api</span><span class="o">;</span>
 
-<span class="p">/**</span>
- <span class="p">*</span> <span class="err">常用</span><span class="n">API</span><span class="err">返回对象接口</span>
- <span class="p">*/</span>
-<span class="k">public</span> <span class="n">interface</span> <span class="n">IErrorCode</span> <span class="p">{</span>
-    <span class="p">/**</span>
-     <span class="p">*</span> <span class="err">返回码</span>
-     <span class="p">*/</span>
-    <span class="n">long</span> <span class="n">getCode</span><span class="p">();</span>
+<span class="cm">/**
+ * 常用API返回对象接口
+ */</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">IErrorCode</span> <span class="o">{</span>
+    <span class="cm">/**
+     * 返回码
+     */</span>
+    <span class="kt">long</span> <span class="nf">getCode</span><span class="o">();</span>
 
-    <span class="p">/**</span>
-     <span class="p">*</span> <span class="err">返回信息</span>
-     <span class="p">*/</span>
-    <span class="k">String</span> <span class="n">getMessage</span><span class="p">();</span>
-<span class="p">}</span>
+    <span class="cm">/**
+     * 返回信息
+     */</span>
+    <span class="n">String</span> <span class="nf">getMessage</span><span class="o">();</span>
+<span class="o">}</span>
 
-<span class="k">package</span> <span class="n">com</span><span class="p">.</span><span class="n">macro</span><span class="p">.</span><span class="n">mall</span><span class="p">.</span><span class="n">common</span><span class="p">.</span><span class="n">exception</span><span class="p">;</span>
-<span class="n">import</span> <span class="n">com</span><span class="p">.</span><span class="n">macro</span><span class="p">.</span><span class="n">mall</span><span class="p">.</span><span class="n">common</span><span class="p">.</span><span class="n">api</span><span class="p">.</span><span class="n">IErrorCode</span><span class="p">;</span>
+<span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">macro</span><span class="o">.</span><span class="na">mall</span><span class="o">.</span><span class="na">common</span><span class="o">.</span><span class="na">exception</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.macro.mall.common.api.IErrorCode</span><span class="o">;</span>
 
-<span class="p">/**</span>
- <span class="p">*</span> <span class="err">自定义</span><span class="n">API</span><span class="err">异常</span>
- <span class="p">*/</span>
-<span class="k">public</span> <span class="n">class</span> <span class="n">ApiException</span> <span class="n">extends</span> <span class="n">RuntimeException</span> <span class="p">{</span>
-    <span class="n">private</span> <span class="n">IErrorCode</span> <span class="n">errorCode</span><span class="p">;</span>
+<span class="cm">/**
+ * 自定义API异常
+ */</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ApiException</span> <span class="kd">extends</span> <span class="n">RuntimeException</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="n">IErrorCode</span> <span class="n">errorCode</span><span class="o">;</span>
 
-    <span class="k">public</span> <span class="n">ApiException</span><span class="p">(</span><span class="n">IErrorCode</span> <span class="n">errorCode</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">super</span><span class="p">(</span><span class="n">errorCode</span><span class="p">.</span><span class="n">getMessage</span><span class="p">());</span>
-        <span class="n">this</span><span class="p">.</span><span class="n">errorCode</span> <span class="p">=</span> <span class="n">errorCode</span><span class="p">;</span>
-    <span class="p">}</span>
+    <span class="kd">public</span> <span class="nf">ApiException</span><span class="o">(</span><span class="n">IErrorCode</span> <span class="n">errorCode</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">(</span><span class="n">errorCode</span><span class="o">.</span><span class="na">getMessage</span><span class="o">());</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">errorCode</span> <span class="o">=</span> <span class="n">errorCode</span><span class="o">;</span>
+    <span class="o">}</span>
 
-    <span class="k">public</span> <span class="n">ApiException</span><span class="p">(</span><span class="k">String</span> <span class="n">message</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">super</span><span class="p">(</span><span class="n">message</span><span class="p">);</span>
-    <span class="p">}</span>
+    <span class="kd">public</span> <span class="nf">ApiException</span><span class="o">(</span><span class="n">String</span> <span class="n">message</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">(</span><span class="n">message</span><span class="o">);</span>
+    <span class="o">}</span>
 
-    <span class="k">public</span> <span class="n">ApiException</span><span class="p">(</span><span class="n">Throwable</span> <span class="n">cause</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">super</span><span class="p">(</span><span class="n">cause</span><span class="p">);</span>
-    <span class="p">}</span>
+    <span class="kd">public</span> <span class="nf">ApiException</span><span class="o">(</span><span class="n">Throwable</span> <span class="n">cause</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">(</span><span class="n">cause</span><span class="o">);</span>
+    <span class="o">}</span>
 
-    <span class="k">public</span> <span class="n">ApiException</span><span class="p">(</span><span class="k">String</span> <span class="n">message</span><span class="p">,</span> <span class="n">Throwable</span> <span class="n">cause</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">super</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">cause</span><span class="p">);</span>
-    <span class="p">}</span>
+    <span class="kd">public</span> <span class="nf">ApiException</span><span class="o">(</span><span class="n">String</span> <span class="n">message</span><span class="o">,</span> <span class="n">Throwable</span> <span class="n">cause</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">(</span><span class="n">message</span><span class="o">,</span> <span class="n">cause</span><span class="o">);</span>
+    <span class="o">}</span>
 
-    <span class="k">public</span> <span class="n">IErrorCode</span> <span class="n">getErrorCode</span><span class="p">()</span> <span class="p">{</span>
-        <span class="n">return</span> <span class="n">errorCode</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
+    <span class="kd">public</span> <span class="n">IErrorCode</span> <span class="nf">getErrorCode</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">errorCode</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 
-<span class="k">package</span> <span class="n">com</span><span class="p">.</span><span class="n">macro</span><span class="p">.</span><span class="n">mall</span><span class="p">.</span><span class="n">common</span><span class="p">.</span><span class="n">exception</span><span class="p">;</span>
-<span class="p">/**</span>
- <span class="p">*</span> <span class="err">全局异常处理</span>
- <span class="p">*/</span>
-<span class="p">@</span><span class="n">ControllerAdvice</span>
-<span class="k">public</span> <span class="n">class</span> <span class="n">GlobalExceptionHandler</span> <span class="p">{</span>
+<span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">macro</span><span class="o">.</span><span class="na">mall</span><span class="o">.</span><span class="na">common</span><span class="o">.</span><span class="na">exception</span><span class="o">;</span>
+<span class="cm">/**
+ * 全局异常处理
+ */</span>
+<span class="nd">@ControllerAdvice</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">GlobalExceptionHandler</span> <span class="o">{</span>
 
-    <span class="p">@</span><span class="n">ResponseBody</span>
-    <span class="p">@</span><span class="n">ExceptionHandler</span><span class="p">(</span><span class="n">value</span> <span class="p">=</span> <span class="n">ApiException</span><span class="p">.</span><span class="n">class</span><span class="p">)</span>
-    <span class="k">public</span> <span class="n">CommonResult</span> <span class="n">handle</span><span class="p">(</span><span class="n">ApiException</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">getErrorCode</span><span class="p">()</span> <span class="c1">!= null) {
-</span>            <span class="n">return</span> <span class="n">CommonResult</span><span class="p">.</span><span class="n">failed</span><span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">getErrorCode</span><span class="p">());</span>
-        <span class="p">}</span>
-        <span class="n">return</span> <span class="n">CommonResult</span><span class="p">.</span><span class="n">failed</span><span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">getMessage</span><span class="p">());</span>
-    <span class="p">}</span>
+    <span class="nd">@ResponseBody</span>
+    <span class="nd">@ExceptionHandler</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="n">ApiException</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">CommonResult</span> <span class="nf">handle</span><span class="o">(</span><span class="n">ApiException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="na">getErrorCode</span><span class="o">()</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">CommonResult</span><span class="o">.</span><span class="na">failed</span><span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="na">getErrorCode</span><span class="o">());</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">CommonResult</span><span class="o">.</span><span class="na">failed</span><span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="na">getMessage</span><span class="o">());</span>
+    <span class="o">}</span>
 
-    <span class="p">@</span><span class="n">ResponseBody</span>
-    <span class="p">@</span><span class="n">ExceptionHandler</span><span class="p">(</span><span class="n">value</span> <span class="p">=</span> <span class="n">MethodArgumentNotValidException</span><span class="p">.</span><span class="n">class</span><span class="p">)</span>
-    <span class="k">public</span> <span class="n">CommonResult</span> <span class="n">handleValidException</span><span class="p">(</span><span class="n">MethodArgumentNotValidException</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">BindingResult</span> <span class="n">bindingResult</span> <span class="p">=</span> <span class="n">e</span><span class="p">.</span><span class="n">getBindingResult</span><span class="p">();</span>
-        <span class="k">String</span> <span class="n">message</span> <span class="p">=</span> <span class="n">null</span><span class="p">;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">bindingResult</span><span class="p">.</span><span class="n">hasErrors</span><span class="p">())</span> <span class="p">{</span>
-            <span class="n">FieldError</span> <span class="n">fieldError</span> <span class="p">=</span> <span class="n">bindingResult</span><span class="p">.</span><span class="n">getFieldError</span><span class="p">();</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">fieldError</span> <span class="c1">!= null) {
-</span>                <span class="n">message</span> <span class="p">=</span> <span class="n">fieldError</span><span class="p">.</span><span class="n">getField</span><span class="p">()+</span><span class="n">fieldError</span><span class="p">.</span><span class="n">getDefaultMessage</span><span class="p">();</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-        <span class="n">return</span> <span class="n">CommonResult</span><span class="p">.</span><span class="n">validateFailed</span><span class="p">(</span><span class="n">message</span><span class="p">);</span>
-    <span class="p">}</span>
+    <span class="nd">@ResponseBody</span>
+    <span class="nd">@ExceptionHandler</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="n">MethodArgumentNotValidException</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">CommonResult</span> <span class="nf">handleValidException</span><span class="o">(</span><span class="n">MethodArgumentNotValidException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">BindingResult</span> <span class="n">bindingResult</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="na">getBindingResult</span><span class="o">();</span>
+        <span class="n">String</span> <span class="n">message</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">bindingResult</span><span class="o">.</span><span class="na">hasErrors</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">FieldError</span> <span class="n">fieldError</span> <span class="o">=</span> <span class="n">bindingResult</span><span class="o">.</span><span class="na">getFieldError</span><span class="o">();</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">fieldError</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">message</span> <span class="o">=</span> <span class="n">fieldError</span><span class="o">.</span><span class="na">getField</span><span class="o">()+</span><span class="n">fieldError</span><span class="o">.</span><span class="na">getDefaultMessage</span><span class="o">();</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">CommonResult</span><span class="o">.</span><span class="na">validateFailed</span><span class="o">(</span><span class="n">message</span><span class="o">);</span>
+    <span class="o">}</span>
 
-    <span class="p">@</span><span class="n">ResponseBody</span>
-    <span class="p">@</span><span class="n">ExceptionHandler</span><span class="p">(</span><span class="n">value</span> <span class="p">=</span> <span class="n">BindException</span><span class="p">.</span><span class="n">class</span><span class="p">)</span>
-    <span class="k">public</span> <span class="n">CommonResult</span> <span class="n">handleValidException</span><span class="p">(</span><span class="n">BindException</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">BindingResult</span> <span class="n">bindingResult</span> <span class="p">=</span> <span class="n">e</span><span class="p">.</span><span class="n">getBindingResult</span><span class="p">();</span>
-        <span class="k">String</span> <span class="n">message</span> <span class="p">=</span> <span class="n">null</span><span class="p">;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">bindingResult</span><span class="p">.</span><span class="n">hasErrors</span><span class="p">())</span> <span class="p">{</span>
-            <span class="n">FieldError</span> <span class="n">fieldError</span> <span class="p">=</span> <span class="n">bindingResult</span><span class="p">.</span><span class="n">getFieldError</span><span class="p">();</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">fieldError</span> <span class="c1">!= null) {
-</span>                <span class="n">message</span> <span class="p">=</span> <span class="n">fieldError</span><span class="p">.</span><span class="n">getField</span><span class="p">()+</span><span class="n">fieldError</span><span class="p">.</span><span class="n">getDefaultMessage</span><span class="p">();</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-        <span class="n">return</span> <span class="n">CommonResult</span><span class="p">.</span><span class="n">validateFailed</span><span class="p">(</span><span class="n">message</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
+    <span class="nd">@ResponseBody</span>
+    <span class="nd">@ExceptionHandler</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="n">BindException</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">CommonResult</span> <span class="nf">handleValidException</span><span class="o">(</span><span class="n">BindException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">BindingResult</span> <span class="n">bindingResult</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="na">getBindingResult</span><span class="o">();</span>
+        <span class="n">String</span> <span class="n">message</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">bindingResult</span><span class="o">.</span><span class="na">hasErrors</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">FieldError</span> <span class="n">fieldError</span> <span class="o">=</span> <span class="n">bindingResult</span><span class="o">.</span><span class="na">getFieldError</span><span class="o">();</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">fieldError</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">message</span> <span class="o">=</span> <span class="n">fieldError</span><span class="o">.</span><span class="na">getField</span><span class="o">()+</span><span class="n">fieldError</span><span class="o">.</span><span class="na">getDefaultMessage</span><span class="o">();</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">CommonResult</span><span class="o">.</span><span class="na">validateFailed</span><span class="o">(</span><span class="n">message</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 </code></pre></div></div>
 
 <h4 id="filter-过滤器">Filter 过滤器</h4>
@@ -903,11 +911,11 @@ public Person personPrototype() {
   <p>结合项目说下，是怎么用 AOP，通过拦截器拦截非法请求。</p>
 </blockquote>
 
-<p>Filter 过滤器（<strong>重点理解</strong>）：主要用来过滤用户请求，允许对用户请求进行<strong>前置和后置</strong>处理，如实现 URL 级别的权限控制、过滤非法请求等。</p>
+<p>Filter 过滤器（<strong>重点理解</strong>）：主要用来过滤用户请求，允许对用户请求进行<strong>前置和后置</strong>处理，如实现 URL 级别的<strong>权限控制</strong>、过滤非法请求等。</p>
 
 <ul>
   <li>是<strong>面向切面编程（AOP）</strong>的具体实现。</li>
-  <li>依赖于 Servlet 容器，属于 Servlet 规范的一部分。</li>
+  <li>依赖于 Servlet 容器，属于 <strong>Servlet 规范</strong>的一部分。</li>
 </ul>
 
 <h4 id="listener-监听器">Listener 监听器</h4>
@@ -944,7 +952,7 @@ public Person personPrototype() {
   <li>发布事件（监听到该事件的监听器自动进行相关逻辑处理）。</li>
 </ol>
 
-<p><img src="../assets/listener_example.png" alt="在这里插入图片描述" style="zoom:50%;" /></p>
+<p><img src="../assets/listener_example.png" alt="在这里插入图片描述" style="zoom: 60%;" /></p>
 
 <h2 id="spring-事务">Spring 事务</h2>
 
@@ -1017,28 +1025,22 @@ public Person personPrototype() {
   <li><del><code class="highlighter-rouge">NESTED</code></del>：如果当前存在事务，则在<strong>嵌套</strong>事务内执行。如果当前没有事务，进行与 <code class="highlighter-rouge">REQUIRED</code>类似的操作。</li>
 </ol>
 
-<h3 id="事务隔离级别">事务隔离级别</h3>
+<h3 id="事务隔离级别"><del>事务隔离级别</del></h3>
 
-<p>见数据库 MySQL 中。</p>
+<blockquote>
+  <p>见数据库 MySQL 中。</p>
+</blockquote>
 
 <p><img src="../assets/MySQL并发事务的问题及隔离级别.png" style="zoom:33%;" /></p>
 
 <p>在 <code class="highlighter-rouge">enum Isolation</code> 中，枚举值有：</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>DEFAULT(-1), // 采用数据库默认隔离级别
-READ_UNCOMMITTED(1),
-READ_COMMITTED(2),
-REPEATABLE_READ(4),
-SERIALIZABLE(8);
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">DEFAULT</span><span class="o">(-</span><span class="mi">1</span><span class="o">),</span> <span class="c1">// 采用数据库默认隔离级别</span>
+<span class="n">READ_UNCOMMITTED</span><span class="o">(</span><span class="mi">1</span><span class="o">),</span>
+<span class="n">READ_COMMITTED</span><span class="o">(</span><span class="mi">2</span><span class="o">),</span>
+<span class="n">REPEATABLE_READ</span><span class="o">(</span><span class="mi">4</span><span class="o">),</span>
+<span class="n">SERIALIZABLE</span><span class="o">(</span><span class="mi">8</span><span class="o">);</span>
 </code></pre></div></div>
-
-<ol>
-  <li><code class="highlighter-rouge">ISOLATION_DEFAULT</code>：<strong>默认</strong>的隔离级别，使用<strong>数据库默认</strong>的事务隔离级别。MYSQL 默认为 <code class="highlighter-rouge">REPEATABLE_READ</code>，SQLSERVER、Oracle 默认为 <code class="highlighter-rouge">READ_COMMITTED</code>。</li>
-  <li><code class="highlighter-rouge">ISOLATION_READ_UNCOMMITTED</code>：读未提交，允许另外一个事务可看到这个事务<strong>未提交的数据</strong>；最低级别，可能有<strong>脏读、不可重复读、幻读</strong>；</li>
-  <li><code class="highlighter-rouge">ISOLATION_READ_COMMITTED</code>：读已提交，保证一个事务修改的数据<strong>提交后</strong>才能被另一事务读取，而且能看到该事务<strong>对已有记录的更新</strong>；新解决了<strong>脏读</strong>；</li>
-  <li><code class="highlighter-rouge">ISOLATION_REPEATABLE_READ</code>：可重复读，保证一个事务修改的数据<strong>提交后</strong>才能被另一事务读取，但不能看到该事务<strong>对已有记录的更新</strong>；新解决了<strong>不可重复读</strong>；</li>
-  <li><code class="highlighter-rouge">ISOLATION_SERIALIZABLE</code>：一个事务在执行的过程中<strong>完全看不到</strong>其他事务对数据库所做的更新。新解决<strong>幻读</strong>。</li>
-</ol>
 
 <h3 id="spring-事务管理">Spring 事务管理</h3>
 
@@ -1082,9 +1084,7 @@ SERIALIZABLE(8);
 
 <h4 id="方法">方法</h4>
 
-<blockquote>
-  <p>TransactionSynchronizationManager.registerSynchronization方法</p>
-</blockquote>
+<p><code class="highlighter-rouge">TransactionSynchronizationManager.</code>：</p>
 
 <ol>
   <li><code class="highlighter-rouge">.registerSynchronization()</code>：注册一个监听器，需要传入一个对象TransactionSynchronization。</li>

@@ -6,7 +6,7 @@
 
 <hr />
 
-<h3 id="目录">目录</h3>
+<h2 id="目录">目录</h2>
 
 <p>[TOC]</p>
 
@@ -247,27 +247,23 @@
     <p>MySQL 下 <strong>tinyint 字段</strong>转换问题：</p>
 
     <ul>
-      <li>
-        <p>当字段长度为 1 时，无法转换成 <strong>Boolean 字段</strong>，建议在指定数据库连接时添加 <code class="highlighter-rouge">&amp;tinyInt1isBit=true</code>。</p>
-      </li>
-      <li>
-        <p>当字段长度大于 1 时，默认转换成 <strong>Byte</strong>，如果想继续转换成 Integer，可使用如下代码：</p>
-
-        <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="n">FastAutoGenerator</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="s">"url"</span><span class="o">,</span> <span class="s">"username"</span><span class="o">,</span> <span class="s">"password"</span><span class="o">)</span>
-          <span class="o">.</span><span class="na">dataSourceConfig</span><span class="o">(</span><span class="n">builder</span> <span class="o">-&gt;</span>
-                  <span class="n">builder</span><span class="o">.</span><span class="na">typeConvertHandler</span><span class="o">((</span><span class="n">globalConfig</span><span class="o">,</span> <span class="n">typeRegistry</span><span class="o">,</span> <span class="n">metaInfo</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="o">{</span>
-                      <span class="c1">// 兼容旧版本转换成Integer</span>
-                      <span class="k">if</span> <span class="o">(</span><span class="n">JdbcType</span><span class="o">.</span><span class="na">TINYINT</span> <span class="o">==</span> <span class="n">metaInfo</span><span class="o">.</span><span class="na">getJdbcType</span><span class="o">())</span> <span class="o">{</span>
-                          <span class="k">return</span> <span class="n">DbColumnType</span><span class="o">.</span><span class="na">INTEGER</span><span class="o">;</span>
-                      <span class="o">}</span>
-                      <span class="k">return</span> <span class="n">typeRegistry</span><span class="o">.</span><span class="na">getColumnType</span><span class="o">(</span><span class="n">metaInfo</span><span class="o">);</span>
-                  <span class="o">})</span>
-          <span class="o">);</span>
-</code></pre></div>        </div>
-      </li>
+      <li>当字段长度为 1 时，无法转换成 <strong>Boolean 字段</strong>，建议在指定数据库连接时添加 <code class="highlighter-rouge">&amp;tinyInt1isBit=true</code>。
+    - 当字段长度大于 1 时，默认转换成 <strong>Byte</strong>，如果想继续转换成 Integer，可使用如下代码：</li>
     </ul>
   </li>
 </ol>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">FastAutoGenerator</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="s">"url"</span><span class="o">,</span> <span class="s">"username"</span><span class="o">,</span> <span class="s">"password"</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">dataSourceConfig</span><span class="o">(</span><span class="n">builder</span> <span class="o">-&gt;</span>
+                <span class="n">builder</span><span class="o">.</span><span class="na">typeConvertHandler</span><span class="o">((</span><span class="n">globalConfig</span><span class="o">,</span> <span class="n">typeRegistry</span><span class="o">,</span> <span class="n">metaInfo</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="o">{</span>
+                    <span class="c1">// 兼容旧版本转换成Integer</span>
+                    <span class="k">if</span> <span class="o">(</span><span class="n">JdbcType</span><span class="o">.</span><span class="na">TINYINT</span> <span class="o">==</span> <span class="n">metaInfo</span><span class="o">.</span><span class="na">getJdbcType</span><span class="o">())</span> <span class="o">{</span>
+                        <span class="k">return</span> <span class="n">DbColumnType</span><span class="o">.</span><span class="na">INTEGER</span><span class="o">;</span>
+                    <span class="o">}</span>
+                    <span class="k">return</span> <span class="n">typeRegistry</span><span class="o">.</span><span class="na">getColumnType</span><span class="o">(</span><span class="n">metaInfo</span><span class="o">);</span>
+                <span class="o">})</span>
+        <span class="o">);</span>
+</code></pre></div></div>
 
 <h5 id="依赖">依赖</h5>
 
@@ -365,7 +361,6 @@
         <span class="o">.</span><span class="na">templateEngine</span><span class="o">(</span><span class="k">new</span> <span class="n">FreemarkerTemplateEngine</span><span class="o">())</span> <span class="c1">// 使用Freemarker引擎模板，默认的是Velocity引擎模板</span>
 
         <span class="o">.</span><span class="na">execute</span><span class="o">();</span>
-
 <span class="o">}</span>
 </code></pre></div></div>
 
@@ -392,7 +387,6 @@
 </ol>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">com</span><span class="o">..</span><span class="na">common</span><span class="o">.</span><span class="na">dao</span><span class="o">;</span>
-
 <span class="kn">import</span> <span class="nn">java.io.Serializable</span><span class="o">;</span>
 
 <span class="c1">//public class BaseEntity implements Serializable {</span>
@@ -593,8 +587,6 @@
 
 <span class="cm">/**
  * 商品 SKU DO
- *
- * @author 芋道源码
  */</span>
 <span class="nd">@TableName</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">"product_sku"</span><span class="o">,</span> <span class="n">autoResultMap</span> <span class="o">=</span> <span class="kc">true</span><span class="o">)</span>
 <span class="nd">@KeySequence</span><span class="o">(</span><span class="s">"product_sku_seq"</span><span class="o">)</span> <span class="c1">// 用于 Oracle、PostgreSQL、Kingbase、DB2、H2 数据库的主键自增。如果是 MySQL 等数据库，可不写。</span>

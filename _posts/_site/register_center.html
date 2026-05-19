@@ -468,7 +468,6 @@
         <span class="k">return</span> <span class="n">restTemplate</span><span class="o">.</span><span class="na">getForObject</span><span class="o">(</span><span class="s">"http://"</span> <span class="o">+</span> <span class="n">instance</span><span class="o">.</span><span class="na">toInetAddr</span><span class="o">()</span> <span class="o">+</span> <span class="s">"/provider/demo"</span><span class="o">,</span>
                 <span class="n">String</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
     <span class="o">}</span>
-
 <span class="o">}</span>
 </code></pre></div></div>
 
@@ -1146,8 +1145,8 @@
   <li>修改本地host文件</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>127.0.0.1 replica1
-127.0.0.1 replica2
+<div class="language-conf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="m">127</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">1</span> <span class="n">replica1</span>
+<span class="m">127</span>.<span class="m">0</span>.<span class="m">0</span>.<span class="m">1</span> <span class="n">replica2</span>
 </code></pre></div></div>
 
 <h6 id="运行eureka注册中心集群">运行Eureka注册中心集群</h6>
@@ -1264,7 +1263,7 @@
 <ul>
   <li>EurekaClient：
     <ol>
-      <li>代码中注入了<code class="highlighter-rouge">EurekaClient</code>实体类，需要延迟加载<code class="highlighter-rouge">EurekaClient</code>，因此这里使用@Lazy注解。</li>
+      <li>代码中注入了<code class="highlighter-rouge">EurekaClient</code>实体类，需要<strong>延迟加载</strong><code class="highlighter-rouge">EurekaClient</code>，因此这里使用<strong>@Lazy注解</strong>。</li>
       <li>通过<code class="highlighter-rouge">EurekaClient</code>实例，可以接收一个以<code class="highlighter-rouge">service-name</code>命名的服务信息，作为<strong>Application对象</strong>。根据此对象获取（该服务的）所有实例的列表，选择一个合适的实例，然后使用此实例获取主机名和端口。</li>
     </ol>
   </li>
@@ -1322,7 +1321,7 @@
   <li>与Docker容器可以无缝集成。</li>
 </ul>
 
-<p><img src="../assets/76b8e5026867bcb35166e22112253fe7.png" alt="Consul 实现服务注册发现" style="zoom: 67%;" /></p>
+<p><img src="../assets/76b8e5026867bcb35166e22112253fe7.png" alt="Consul 实现服务注册发现" style="zoom: 80%;" /></p>
 
 <h4 id="负载均衡功能">负载均衡功能</h4>
 

@@ -38,44 +38,26 @@
 <p>与 RocketMQ 的消息模型基本一样，唯一区别是没有<strong>队列</strong>这个概念，对应的是 <code class="highlighter-rouge">Partition</code>（分区）。</p>
 
 <ul>
-  <li>还引入了 <strong>broker、Consumer Group</strong>。</li>
+  <li><del>还引入了 <strong>broker、Consumer Group</strong>。</del></li>
 </ul>
 
 <p><img src="../assets/mq-kafka-pubsub.png" alt="mq" style="zoom: 80%;" /></p>
 
-<p>由 Producer、Consumer、Broker 和 Partition 几个组成。</p>
+<h3 id="技术架构">技术架构</h3>
 
-<ol>
-  <li>
-    <p><strong>Producer</strong>：依据<strong>负载均衡</strong>设置，将消息发送到 Topic 的特定 Partition 下。</p>
-  </li>
-  <li>
-    <p><strong>Broker</strong> ：一个 Kafka <strong>集群</strong>由多个 Broker 组成，每个 Broker 上存放着<strong>不同 Topic 的 Partition</strong>。</p>
-  </li>
-  <li>
-    <p><strong>Partition</strong>：为了提高消费的性能而引入，实际上可对应成消息队列中的<strong>队列</strong>。Kafka 里面的每一个消息都<strong>属于</strong>一个主题，每一个<code class="highlighter-rouge">topic</code>可以（有）划分为多个<code class="highlighter-rouge">partition</code>。</p>
-
-    <ol>
-      <li>同一 Topic 下的这些 Partition 均匀<strong>分布在</strong>（横跨）多个不同的 Broker 上，使用<strong>主从复制</strong>模式同步，以保证<strong>高可用</strong>。</li>
-      <li>每一个 Partition 内消息是<strong>有序的</strong>，即分区顺序性。（引出如何<strong>保证消息有序性</strong>）。由于一个主题一般包含几个分区，因此无法在整个主题范围内保证消息的顺序，但可以保证消息在单个分区内的顺序。</li>
-    </ol>
-  </li>
-  <li>
-    <p>Consumer 之间组成了 <strong>Consumer Group</strong>：可以有多个 Consumer Group 消费同一个 Topic（中一份完整的消息），（即同一个  Topic  可以被多个 Consumer Group 消费），互相之间不会有影响。</p>
-
-    <ul>
-      <li>
-        <p>通过多消费者，这样消费的性能就提高了。</p>
-      </li>
-      <li>不过同组内的消费者是竞争关系，同组内一个消息只能被同组内的一个消费者消费。</li>
-      <li>Kafka 强制要求每个 Partition 只能有一个 Consumer 消费，并且 Consumer 采取<strong>拉模式</strong>（拉模型），消费完一批消息之后再拉取一批。</li>
-    </ul>
-  </li>
-</ol>
+<p>由 Producer、Consumer、Broker 和 Partition 组成。</p>
 
 <p><img src="../assets/v2-17a2d36445a764081b45e012397291bd_720w.jpg" alt="Topic，Broker 和 Partition" style="zoom: 80%;" /></p>
 
-<h3 id="broker-代理服务器">Broker （代理服务器）</h3>
+<h3 id="producer">Producer</h3>
+
+<p>Producer：依据<strong>负载均衡</strong>设置，将消息发送到 Topic 的<strong>特定 Partition</strong> 下。</p>
+
+<h3 id="broker">Broker</h3>
+
+<p>Broker ：一个 Kafka <strong>集群</strong>由多个 Broker 组成，每个<code class="highlighter-rouge">broker</code>都是一个节点，存放着<strong>不同 Topic 的（<del>不同</del>） Partition</strong>。</p>
+
+<p><del>功能：</del></p>
 
 <ol>
   <li>接收生产者的信息，为消息设置<strong>偏移量</strong>，并且保存的磁盘中。</li>
@@ -83,7 +65,28 @@
   <li>同时 broker 也会对生产者和消费者进行消息的<strong>确认</strong>，没有收到会重新发送这条消息。</li>
 </ol>
 
-<h3 id="consumer-group消费者组">Consumer Group（消费者组）</h3>
+<h4 id="topic">Topic</h4>
+
+<p>主题：Kafka 里面的每一个消息都<strong>属于</strong>一个主题，每一个<code class="highlighter-rouge">topic</code>可以划分为多个<code class="highlighter-rouge">partition</code>，而每个<code class="highlighter-rouge">partition</code>放一部分数据，分别存在于不同的 <code class="highlighter-rouge">broker</code> 上。</p>
+
+<ul>
+  <li>也就是说，一个 <code class="highlighter-rouge">topic </code>的数据，是<strong>分散</strong>放在多个机器上的，每个机器就放一部分数据。</li>
+</ul>
+
+<h4 id="partition">Partition</h4>
+
+<p>Partition：为了提高消费的性能而引入，实际上可对应成消息队列中的<strong>队列</strong>。</p>
+
+<ol>
+  <li>同一 Topic 下的这些 Partition 均匀<strong>分布在</strong>（横跨）多个不同的 Broker 上，使用<strong>主从复制</strong>模式同步，以保证<strong>高可用</strong>。</li>
+  <li>每一个 Partition 内消息是<strong>有序的</strong>，即分区顺序性。（引出如何<strong>保证消息有序性</strong>）。
+    <ul>
+      <li>由于一个主题一般包含几个分区，因此无法在<strong>整个主题范围内</strong>保证消息的顺序，但可以保证消息在单个分区内的顺序。</li>
+    </ul>
+  </li>
+</ol>
+
+<h3 id="consumer-group">Consumer Group</h3>
 
 <p>消费者通过<strong>偏移量</strong>来确认读过的数据，是个不断累加的数据，每次成功消费一个数据这个偏移量就加一。</p>
 
@@ -92,15 +95,13 @@
   <li>消费者会把每个分区读取的消息偏移量保存在 Zookeeper 或 Kafka 上，如果消费者关闭或重启，它的读取状态不会丢失。</li>
 </ul>
 
-<h3 id="topic主题">Topic（主题）</h3>
+<p>Consumer 之间组成了 <strong>Consumer Group</strong>：通过多消费者，这样消费的<strong>性能</strong>就提高了。</p>
 
-<h3 id="partition分区">Partition（分区）</h3>
-
-<ul>
-  <li>Kafka 的基础集群架构，由多个<code class="highlighter-rouge">broker</code>组成，每个<code class="highlighter-rouge">broker</code>都是一个节点。</li>
-  <li>当创建一个<code class="highlighter-rouge">topic</code>时，它可以划分为多个<code class="highlighter-rouge">partition</code>，而每个<code class="highlighter-rouge">partition</code>放一部分数据，分别存在于不同的 <code class="highlighter-rouge">broker</code> 上。</li>
-  <li>也就是说，一个 <code class="highlighter-rouge">topic </code>的数据，是分散放在多个机器上的，每个机器就放一部分数据。</li>
-</ul>
+<ol>
+  <li>同一个  Topic  可以被多个 Consumer Group 消费，互相之间不会有影响。</li>
+  <li>不过<strong>同组内的消费者</strong>是竞争关系，同组内一个消息只能被同组内的一个消费者消费。</li>
+  <li>（Kafka 强制要求）每个 Partition <strong>只能有一个 Consumer</strong> 消费，并且 Consumer 采取<strong>拉模式</strong>（拉模型），消费完一批消息之后再拉取一批。</li>
+</ol>
 
 <h2 id="高性能">高性能</h2>
 
@@ -120,9 +121,9 @@
     </ul>
   </li>
   <li><strong>批量操作</strong>：包括 Producer 批量发送、Broker 批量落盘。批量能够<strong>放大</strong>顺序写的优势，比如说 Producer 还没攒够一批数据发送就宕机，就会导致<strong>数据丢失</strong>；
-    <ol>
+    <ul>
       <li>批量发送和数据压缩，在处理大数据的中间件中比较常见。比如说分布式追踪系统 CAT 和 skywalking 都有类似的技术。代价就是存在<strong>数据丢失</strong>的风险；</li>
-    </ol>
+    </ul>
   </li>
   <li><strong>数据压缩</strong>：能减少数据传输量，提高效率；
     <ul>
