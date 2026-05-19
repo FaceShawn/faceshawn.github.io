@@ -15,7 +15,7 @@ location:
 abbrlink: 'sharding_sphere'
 permalink: 'sharding_sphere'
 date: 2025-09-14 16:41:00
-updated: 2025-09-14 16:41:00
+updated: 2026-04-14 16:41:00
 ---
 
 > 摘要：ShardingSphere 是目前最好用的数据库中间件之一，用于实现分库分表、读写分离，分布式事务、数据库治理。
